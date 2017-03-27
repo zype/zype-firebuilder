@@ -33,4 +33,6 @@ permissions and limitations under the License.
     <!--File based Data downloader configuration path -->
     <string name="basic_file_downloader.config.file_path">configurations/BasicFileBasedDownloaderConfig.json</string>
 
+    <!--Zype -->
+    <string name="zype_downloader_config_file_path">configurations/ZypeDownloaderConfig.json</string>
 </resources>

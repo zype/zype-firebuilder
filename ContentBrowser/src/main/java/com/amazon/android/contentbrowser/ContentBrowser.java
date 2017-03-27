@@ -66,6 +66,9 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
+/* Zype */
+import com.amazon.android.model.translators.ZypeContentTranslator;
+
 /**
  * This class is the controller of the content browsing solution.
  */
@@ -521,6 +524,11 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             // Register content container translator in case parser recipes use translation.
             ContentContainerTranslator containerTranslator = new ContentContainerTranslator();
             mDynamicParser.addTranslatorImpl(containerTranslator.getName(), containerTranslator);
+
+            /* Zype */
+            // Register Zype content translator parser recipes use translation.
+            ZypeContentTranslator zypeContentTranslator = new ZypeContentTranslator();
+            mDynamicParser.addTranslatorImpl(zypeContentTranslator.getName(), zypeContentTranslator);
         }
         catch (Exception e) {
             Log.e(TAG, "DataLoadManager init failed!!!", e);

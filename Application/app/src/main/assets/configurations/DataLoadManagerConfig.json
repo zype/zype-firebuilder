@@ -1,5 +1,5 @@
 {
-  "data_downloader.impl": "com.amazon.dataloader.datadownloader.BasicHttpBasedDataDownloader",
+  "data_downloader.impl": "com.amazon.dataloader.datadownloader.ZypeDataDownloader",
   "is_cache_manager_enabled": true,
   "data_updater.duration": 14400
 }

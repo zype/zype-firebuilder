@@ -13,31 +13,12 @@
   "globalRecipes": [
     {
       "categories": {
-        "dataLoader": "recipes/LightCastDataLoaderRecipe1.json",
-        "dynamicParser": "recipes/LightCastCategoriesRecipe.json"
+        "dataLoader" : "recipes/ZypePlaylistDataLoaderRecipe.json",
+        "dynamicParser" : "recipes/ZypeCategoriesRecipe.json"
       },
       "contents": {
-        "dataLoader": "recipes/LightCastDataLoaderRecipe1.json",
-        "dynamicParser": "recipes/LightCastContentsRecipe.json"
-      }
-    },
-    {
-      "categories": {
-        "dataLoader": "recipes/LightCastDataLoaderRecipe2.json",
-        "dynamicParser": "recipes/LightCastCategoriesRecipe.json"
-      },
-      "contents": {
-        "dataLoader": "recipes/LightCastDataLoaderRecipe2.json",
-        "dynamicParser": "recipes/LightCastContentsRecipe.json"
-      }
-    },
-    {
-      "categories": {
-        "name": "Hardcoded Category Name"
-      },
-      "contents": {
-        "dataLoader": "recipes/LightCastDataLoaderRecipe1.json",
-        "dynamicParser": "recipes/LightCastAllContentsRecipe.json"
+        "dataLoader": "recipes/ZypeVideoDataLoaderRecipe.json",
+        "dynamicParser": "recipes/ZypeContentsRecipe.json"
       }
     }
   ],

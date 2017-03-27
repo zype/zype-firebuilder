@@ -1,0 +1,16 @@
+{
+  "cooker": "DynamicParser",
+  "format": "json",
+  "model": "com.amazon.android.model.content.Content",
+  "translator": "ZypeContentTranslator",
+  "modelType": "array",
+  "query": "$.response[*]",
+  "matchList": [
+    "title@title",
+    "_id@id",
+    "description@description",
+    "playerUrl@url",
+    "thumbnails@cardImageUrl",
+    "thumbnails@backgroundImageUrl"
+  ]
+}
