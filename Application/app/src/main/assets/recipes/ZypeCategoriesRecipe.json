@@ -4,10 +4,10 @@
   "model": "com.amazon.android.model.content.ContentContainer",
   "translator": "ContentContainerTranslator",
   "modelType": "array",
-  "query": "$.response[*]",
+  "query": "$.categories[*]",
   "queryResultType": "[]$",
   "matchList": [
     "title@name"
   ],
-  "keyDataType": "videoIds@keyDataPath"
+  "keyDataType": "playlistId@keyDataPath"
 }

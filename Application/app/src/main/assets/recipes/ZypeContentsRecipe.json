@@ -4,7 +4,7 @@
   "model": "com.amazon.android.model.content.Content",
   "translator": "ZypeContentTranslator",
   "modelType": "array",
-  "query": "$.response[*]",
+  "query": "$.contents[?(@.playlistId in [$$par0$$])]",
   "matchList": [
     "title@title",
     "_id@id",

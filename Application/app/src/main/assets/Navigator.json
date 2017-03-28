@@ -13,11 +13,11 @@
   "globalRecipes": [
     {
       "categories": {
-        "dataLoader" : "recipes/ZypePlaylistDataLoaderRecipe.json",
+        "dataLoader" : "recipes/ZypeDataLoaderRecipe.json",
         "dynamicParser" : "recipes/ZypeCategoriesRecipe.json"
       },
       "contents": {
-        "dataLoader": "recipes/ZypeVideoDataLoaderRecipe.json",
+        "dataLoader": "recipes/ZypeDataLoaderRecipe.json",
         "dynamicParser": "recipes/ZypeContentsRecipe.json"
       }
     }

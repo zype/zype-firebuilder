@@ -112,103 +112,157 @@ public class ZypeDataDownloader extends ADataDownloader {
         String url = urlGenerator.getUrl(urlGeneratorRecipeMap);
         Log.d(TAG, "url: " + url);
         Data result = Data.createDataForPayload(NetworkUtils.getDataLocatedAtUrl(url));
-//        Data result = Data.createDataForPayload(getDataLocatedAtUrl(url));
+        JSONObject jsonResult = new JSONObject(result.getContent().getPayload());
 
-        int urlIndex = Integer.parseInt((String) urlGeneratorRecipeMap.get("url_index"));
-        switch (urlIndex) {
-            // Playlists
-            case 0: {
-                // Url to retrieve playlist videos
-                Map<String, Object> params = new HashMap<>();
-                params.put("url_index", "1");
-                String urlPlaylistVideos = urlGenerator.getUrl(params);
+        Map<String, Object> params;
+        // Url to retrieve playlist videos
+        params = new HashMap<>();
+        params.put("url_index", "1");
+        String urlPlaylistVideos = urlGenerator.getUrl(params);
+        // Url to retrieve player
+        params = new HashMap<>();
+        params.put("url_index", "3");
+        String urlPlayer = urlGenerator.getUrl(params);
 
-                JSONObject jsonResult = new JSONObject(result.getContent().getPayload());
-                JSONArray jsonPlaylists = jsonResult.getJSONArray("response");
-                JSONArray jsonPlaylistsFiltered = new JSONArray();
-                String rootPlaylistId = "577e65c85577de0d1000c1ee";
-                for (int i = 0; i < jsonPlaylists.length(); i++) {
-                    JSONObject jsonPlaylistData = jsonPlaylists.getJSONObject(i);
-                    // Get playlist videos and add their ids to 'videoIds' parameter of result
-                    if (jsonPlaylistData.getInt("playlist_item_count") > 0) {
-                        String playlistId = jsonPlaylistData.getString("_id");
-                        url = String.format(urlPlaylistVideos, playlistId);
+        // Result data
+        JSONArray jsonCategories = new JSONArray();
+        JSONArray jsonContents = new JSONArray();
+
+        JSONArray jsonPlaylists = jsonResult.getJSONArray("response");
+        for (int i = 0; i < jsonPlaylists.length(); i++) {
+            JSONObject jsonPlaylistData = jsonPlaylists.getJSONObject(i);
+            if (jsonPlaylistData.getInt("playlist_item_count") > 0) {
+                jsonPlaylistData.put("playlistId", jsonPlaylistData.getString("_id"));
+
+                jsonCategories.put(jsonPlaylistData);
+
+                String playlistId = jsonPlaylistData.getString("_id");
+                url = String.format(urlPlaylistVideos, playlistId);
+                try {
+                    String playlistVideosResponse = NetworkUtils.getDataLocatedAtUrl(url);
+                    JSONObject jsonPlaylistVideosResponse = new JSONObject(playlistVideosResponse);
+                    JSONArray jsonPlaylistVideos = jsonPlaylistVideosResponse.getJSONArray("response");
+                    for (int j = 0; j < jsonPlaylistVideos.length(); j++) {
+                        JSONObject jsonVideoData = jsonPlaylistVideos.getJSONObject(j);
+                        String videoId = jsonVideoData.getString("_id");
+                        // Add reference to playlist
+                        jsonVideoData.put("playlistId", playlistId);
+                        // Get player for the video
+                        url = String.format(urlPlayer, videoId, videoId);
                         try {
-                            String playlistVideosResponse = NetworkUtils.getDataLocatedAtUrl(url);
-                            JSONObject jsonPlaylistVideosResponse = new JSONObject(playlistVideosResponse);
-                            JSONArray jsonPlaylistVideos = jsonPlaylistVideosResponse.getJSONArray("response");
-//                            JSONArray jsonVideoIds = new JSONArray();
-                            for (int j = 0; j < jsonPlaylistVideos.length(); j++) {
-                                String videoId = jsonPlaylistVideos.getJSONObject(j).getString("_id");
-                                // See ZypeContentTranslator for details of converting video id to its hash code
-                                jsonPlaylistData.put("videoIds", String.valueOf(videoId.hashCode()));
-                                jsonPlaylistsFiltered.put(jsonPlaylistData);
-//                                jsonVideoIds.put(String.valueOf(videoId.hashCode()));
+                            String playerResponse = getDataLocatedAtUrl(url);
+                            JSONObject jsonPlayer = new JSONObject(playerResponse);
+                            JSONArray jsonFiles = jsonPlayer.getJSONObject("response").getJSONObject("body").getJSONArray("files");
+                            if (jsonFiles != null && jsonFiles.length() > 0) {
+                                String playerUrl = jsonFiles.getJSONObject(0).getString("url");
+                                jsonVideoData.put("playerUrl", playerUrl);
+                            } else {
+                                jsonVideoData.put("playerUrl", "null");
                             }
-//                            jsonPlaylistData.put("videoIds", jsonVideoIds);
-//                            jsonPlaylistsFiltered.put(jsonPlaylistData);
                         } catch (IOException e) {
-                            jsonPlaylistData.put("videoIds", new JSONArray());
-                            Log.d(TAG, "Error get playlist videos. playlistId=" + playlistId);
-                        }
-                    }
-                    else {
-                        jsonPlaylistData.put("videoIds", new JSONArray());
-                    }
-//                    if (jsonPlaylistData.getString("parent_id").equals(rootPlaylistId)) {
-//                        jsonPlaylistsFiltered.put(jsonPlaylistData);
-//                    }
-                }
-                jsonResult.put("response", jsonPlaylistsFiltered);
-                result.getContent().setPayload(jsonResult.toString());
-                break;
-            }
-            // Video data
-            case 2: {
-                // Url to retrieve player
-                Map<String, Object> params = new HashMap<>();
-                params.put("url_index", "3");
-                String urlPlayer = urlGenerator.getUrl(params);
-                JSONObject jsonResult = new JSONObject(result.getContent().getPayload());
-                JSONArray jsonVideos = jsonResult.getJSONArray("response");
-                for (int i = 0; i < jsonVideos.length(); i++) {
-                    JSONObject jsonVideoData = jsonVideos.getJSONObject(i);
-                    String videoId = jsonVideoData.getString("_id");
-                    url = String.format(urlPlayer, videoId, videoId);
-                    try {
-                        String playerResponse = getDataLocatedAtUrl(url);
-                        JSONObject jsonPlayer = new JSONObject(playerResponse);
-                        JSONArray jsonFiles = jsonPlayer.getJSONObject("response").getJSONObject("body").getJSONArray("files");
-                        if (jsonFiles != null && jsonFiles.length() > 0) {
-                            String playerUrl = jsonFiles.getJSONObject(0).getString("url");
-                            jsonVideoData.put("playerUrl", playerUrl);
-                        } else {
                             jsonVideoData.put("playerUrl", "null");
+                            Log.d(TAG, "Error get url for videoId=" + videoId);
                         }
-                    } catch (IOException e) {
-                        jsonVideoData.put("playerUrl", "null");
-                        Log.d(TAG, "Error get url for videoId=" + videoId);
+
+                        jsonContents.put(jsonVideoData);
                     }
+                } catch (IOException e) {
+                    jsonPlaylistData.put("videoIds", new JSONArray());
+                    Log.d(TAG, "Error get playlist videos. playlistId=" + playlistId);
                 }
-                result.getContent().setPayload(jsonResult.toString());
-                break;
+            }
+            else {
+
             }
         }
+
+        jsonResult = new JSONObject();
+        jsonResult.put("categories", jsonCategories);
+        jsonResult.put("contents", jsonContents);
+        result.getContent().setPayload(jsonResult.toString());
+
+//        int urlIndex = Integer.parseInt((String) urlGeneratorRecipeMap.get("url_index"));
+//        switch (urlIndex) {
+//            // Playlists
+//            case 0: {
+//                // Url to retrieve playlist videos
+//                Map<String, Object> params = new HashMap<>();
+//                params.put("url_index", "1");
+//                String urlPlaylistVideos = urlGenerator.getUrl(params);
+//
+//                JSONObject jsonResult = new JSONObject(result.getContent().getPayload());
+//                JSONArray jsonPlaylists = jsonResult.getJSONArray("response");
+//                JSONArray jsonPlaylistsFiltered = new JSONArray();
+//                String rootPlaylistId = "577e65c85577de0d1000c1ee";
+//                for (int i = 0; i < jsonPlaylists.length(); i++) {
+//                    JSONObject jsonPlaylistData = jsonPlaylists.getJSONObject(i);
+//                    // Get playlist videos and add their ids to 'videoIds' parameter of result
+//                    if (jsonPlaylistData.getInt("playlist_item_count") > 0) {
+//                        String playlistId = jsonPlaylistData.getString("_id");
+//                        url = String.format(urlPlaylistVideos, playlistId);
+//                        try {
+//                            String playlistVideosResponse = NetworkUtils.getDataLocatedAtUrl(url);
+//                            JSONObject jsonPlaylistVideosResponse = new JSONObject(playlistVideosResponse);
+//                            JSONArray jsonPlaylistVideos = jsonPlaylistVideosResponse.getJSONArray("response");
+////                            JSONArray jsonVideoIds = new JSONArray();
+//                            for (int j = 0; j < jsonPlaylistVideos.length(); j++) {
+//                                String videoId = jsonPlaylistVideos.getJSONObject(j).getString("_id");
+//                                // See ZypeContentTranslator for details of converting video id to its hash code
+//                                jsonPlaylistData.put("videoIds", String.valueOf(videoId.hashCode()));
+//                                jsonPlaylistsFiltered.put(jsonPlaylistData);
+////                                jsonVideoIds.put(String.valueOf(videoId.hashCode()));
+//                            }
+////                            jsonPlaylistData.put("videoIds", jsonVideoIds);
+////                            jsonPlaylistsFiltered.put(jsonPlaylistData);
+//                        } catch (IOException e) {
+//                            jsonPlaylistData.put("videoIds", new JSONArray());
+//                            Log.d(TAG, "Error get playlist videos. playlistId=" + playlistId);
+//                        }
+//                    }
+//                    else {
+//                        jsonPlaylistData.put("videoIds", new JSONArray());
+//                    }
+////                    if (jsonPlaylistData.getString("parent_id").equals(rootPlaylistId)) {
+////                        jsonPlaylistsFiltered.put(jsonPlaylistData);
+////                    }
+//                }
+//                jsonResult.put("response", jsonPlaylistsFiltered);
+//                result.getContent().setPayload(jsonResult.toString());
+//                break;
+//            }
+//            // Video data
+//            case 2: {
+//                // Url to retrieve player
+//                Map<String, Object> params = new HashMap<>();
+//                params.put("url_index", "3");
+//                String urlPlayer = urlGenerator.getUrl(params);
+//                JSONObject jsonResult = new JSONObject(result.getContent().getPayload());
+//                JSONArray jsonVideos = jsonResult.getJSONArray("response");
+//                for (int i = 0; i < jsonVideos.length(); i++) {
+//                    JSONObject jsonVideoData = jsonVideos.getJSONObject(i);
+//                    String videoId = jsonVideoData.getString("_id");
+//                    url = String.format(urlPlayer, videoId, videoId);
+//                    try {
+//                        String playerResponse = getDataLocatedAtUrl(url);
+//                        JSONObject jsonPlayer = new JSONObject(playerResponse);
+//                        JSONArray jsonFiles = jsonPlayer.getJSONObject("response").getJSONObject("body").getJSONArray("files");
+//                        if (jsonFiles != null && jsonFiles.length() > 0) {
+//                            String playerUrl = jsonFiles.getJSONObject(0).getString("url");
+//                            jsonVideoData.put("playerUrl", playerUrl);
+//                        } else {
+//                            jsonVideoData.put("playerUrl", "null");
+//                        }
+//                    } catch (IOException e) {
+//                        jsonVideoData.put("playerUrl", "null");
+//                        Log.d(TAG, "Error get url for videoId=" + videoId);
+//                    }
+//                }
+//                result.getContent().setPayload(jsonResult.toString());
+//                break;
+//            }
+//        }
         return result;
 
-//        String playlistId = null;
-//        if (dataLoadRecipe.getMap().containsKey(PLAYLIST_ID)) {
-//            playlistId = (String) dataLoadRecipe.getMap().get(PLAYLIST_ID);
-//        }
-//        playlistId = "571a4dc68600bd07fb00431c";
-//        if (playlistId == null) {
-//            return null;
-//        }
-//        String url = API_HOST + String.format("/playlists/%1$s/videos?app_key=%2$s", playlistId, API_KEY);
-//        Log.d(TAG, "url: " + url);
-//
-//        Data result = Data.createDataForPayload(NetworkUtils.getDataLocatedAtUrl(url));
-//        return result;
     }
 
 
