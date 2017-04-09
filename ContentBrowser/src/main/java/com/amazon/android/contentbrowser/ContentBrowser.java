@@ -28,6 +28,7 @@ import com.amazon.android.model.content.constants.PreferencesConstants;
 import com.amazon.android.model.event.ActionUpdateEvent;
 import com.amazon.android.model.translators.ContentContainerTranslator;
 import com.amazon.android.model.translators.ContentTranslator;
+import com.amazon.android.model.translators.ZypeContentContainerTranslator;
 import com.amazon.android.navigator.Navigator;
 import com.amazon.android.navigator.NavigatorModel;
 import com.amazon.android.navigator.UINode;
@@ -51,6 +52,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.util.Pair;
 
@@ -68,6 +70,8 @@ import rx.subscriptions.CompositeSubscription;
 
 /* Zype */
 import com.amazon.android.model.translators.ZypeContentTranslator;
+
+import net.minidev.json.JSONArray;
 
 /**
  * This class is the controller of the content browsing solution.
@@ -529,6 +533,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             // Register Zype content translator parser recipes use translation.
             ZypeContentTranslator zypeContentTranslator = new ZypeContentTranslator();
             mDynamicParser.addTranslatorImpl(zypeContentTranslator.getName(), zypeContentTranslator);
+            // Register content container translator in case parser recipes use translation.
+            ZypeContentContainerTranslator zypeContainerTranslator = new ZypeContentContainerTranslator();
+            mDynamicParser.addTranslatorImpl(zypeContainerTranslator.getName(), zypeContainerTranslator);
         }
         catch (Exception e) {
             Log.e(TAG, "DataLoadManager init failed!!!", e);
@@ -590,6 +597,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     mContentLoaded = false;
                     Log.e(TAG, "Immature app, switching to splash");
                     runGlobalRecipes(activity, ContentBrowser.this);
+                }
+                if (screenName.equals(CONTENT_SUBMENU_SCREEN)) {
+                    runGlobalRecipesForLastSelected(activity, ContentBrowser.this);
                 }
             }
 
@@ -1017,6 +1027,11 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 new ContentContainer(mAppContext.getString(R.string.recommended_contents_header));
 
         for (Content c : mRootContentContainer) {
+            /* Zype, ECh */
+            // After adding subcontainers to containers iterator sometimes returns null next item
+            if (c == null) {
+                continue;
+            }
             if (content.hasSimilarTags(c) && c.getId() != content.getId()) {
                 recommendedContentContainer.addContent(c);
             }
@@ -1075,6 +1090,42 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             // Add all the sub containers.
             if (contentContainer.hasSubContainers()) {
                 for (ContentContainer cc : contentContainer.getContentContainers()) {
+                    contentContainerStack.push(cc);
+                }
+            }
+        }
+        return parentContainer;
+    }
+
+    /* Zype, Evgeny Cherkasov */
+    public ContentContainer getContainerForContentContainer(ContentContainer contentContainer) {
+
+        // Container that contains the current content container
+        ContentContainer parentContainer = null;
+
+        // Stack of all content containers from root container.
+        Stack<ContentContainer> contentContainerStack = new Stack<>();
+
+        contentContainerStack.push(mRootContentContainer);
+
+        while (!contentContainerStack.isEmpty()) {
+            // Get a sub container.
+            ContentContainer subContainer = contentContainerStack.pop();
+
+            for (ContentContainer cc : subContainer.getContentContainers()) {
+
+                if (cc.getName().equals(contentContainer.getName())) {
+                    parentContainer = subContainer;
+                }
+            }
+
+            if (parentContainer != null) {
+                break;
+            }
+
+            // Add all the sub containers.
+            if (subContainer.hasSubContainers()) {
+                for (ContentContainer cc : subContainer.getContentContainers()) {
                     contentContainerStack.push(cc);
                 }
             }
@@ -1559,6 +1610,17 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                                        Recipe dataLoaderRecipeForCategories,
                                                        Recipe dynamicParserRecipeForCategories) {
 
+        /* Zype, Evgeny Cherkasov */
+        // Set parent playlist id in receipt params to fetch only its child playlists
+        String[] params;
+        if (root.getName().equals("Root")) {
+            // TODO: Get root parent playlist id from settings utility class
+            params = new String[] { "577e65c85577de0d1000c1ee" };
+        }
+        else {
+            params = new String[] { (String) root.getExtraStringValue("keyDataType") };
+        }
+
         return mDataLoadManager.cookRecipeObservable(
                 dataLoaderRecipeForCategories,
                 null,
@@ -1578,7 +1640,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                         (dynamicParserRecipeForCategories,
                          feedDataForCategories,
                          null,
-                         null)).map(
+                         params)).map(
                 contentContainerAsObject -> {
                     ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
 
@@ -1595,6 +1657,55 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     }
                     return alreadyAvailableContentContainer;
                 });
+    }
+
+    /* Zype, Evgeny Cherkasov */
+    private Observable<Object> getSubCategoriesObservable(Observable<Object> observable,
+                                                     Recipe dataLoaderRecipeForCategories,
+                                                     Recipe dynamicParserRecipeForCategories) {
+        return observable
+            .concatMap(objectPair -> {
+                ContentContainer contentContainer = (ContentContainer) ((Pair) objectPair).first;
+                contentContainer.getContentContainers().clear();
+                if (DEBUG_RECIPE_CHAIN) {
+                    Log.d(TAG, "getSubCategoriesObservable(): ContentContainer=" + contentContainer.getName());
+                }
+
+                return mDataLoadManager.cookRecipeObservable(
+                        dataLoaderRecipeForCategories,
+                        null,
+                        null,
+                        null).map(
+                        feedDataForCategories -> {
+                            if (DEBUG_RECIPE_CHAIN) {
+                                Log.d(TAG, "Feed download complete");
+                            }
+                            if (CAUSE_A_FEED_ERROR_FOR_DEBUGGING) {
+                                return Observable.error(new Exception());
+                            }
+                            return Pair.create(contentContainer, feedDataForCategories);
+                        });
+            })
+            .concatMap(objectPair1 -> {
+                ContentContainer contentContainer = (ContentContainer) ((Pair) objectPair1).first;
+                String feed = (String) ((Pair) objectPair1).second;
+
+                String[] params = new String[]{(String) contentContainer
+                        .getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG)
+                };
+                return mDynamicParser.cookRecipeObservable(
+                        dynamicParserRecipeForCategories,
+                        feed,
+                        null,
+                        params)
+                    .map(contentContainerAsObject -> {
+                        ContentContainer subContentContainer = (ContentContainer) contentContainerAsObject;
+                        if (subContentContainer != null) {
+                            contentContainer.addContentContainer(subContentContainer);
+                        }
+                        return Pair.create(contentContainer, contentContainerAsObject);
+                    });
+            });
     }
 
     /**
@@ -1684,8 +1795,14 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                    });
         }
 
-        return getContentsObservable(observable, dataLoaderRecipeForContents,
+    /* Zype, Evgeny Cherkasov */
+    // Get subcategories added to chain observable
+//        return getContentsObservable(observable, dataLoaderRecipeForContents,
+//                                     dynamicParserRecipeForContents);
+        Observable<Object> observableContents = getContentsObservable(observable, dataLoaderRecipeForContents,
                                      dynamicParserRecipeForContents);
+        return getSubCategoriesObservable(observableContents, dataLoaderRecipeForCategories,
+                                            dynamicParserRecipeForCategories);
     }
 
     /**
@@ -1834,6 +1951,122 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                     return;
                                 }
                                 switchToHomeScreen();
+                            }
+                        });
+
+        mCompositeSubscription.add(subscription);
+    }
+
+    /* Zype, Evgeny Cherkasov */
+    public void runGlobalRecipesForLastSelected(Activity activity, ICancellableLoad cancellable) {
+
+        final ContentContainer root = getLastSelectedContentContainer();
+        Subscription subscription =
+                Observable.range(0, mNavigator.getNavigatorModel().getGlobalRecipes().size())
+                        // Do this first to make sure were running in new thread right a way.
+                        .subscribeOn(Schedulers.newThread())
+                        .concatMap(index -> runGlobalRecipeAtIndex(index, root))
+                        .onBackpressureBuffer() // This must be right after concatMap.
+                        .doOnNext(o -> {
+                            if (DEBUG_RECIPE_CHAIN) {
+                                Log.d(TAG, "doOnNext");
+                            }
+                        })
+                        // This should be last so the rest is running on a separate thread.
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(objectPair -> {
+                            if (DEBUG_RECIPE_CHAIN) {
+                                Log.d(TAG, "subscriber onNext called");
+                            }
+                        }, throwable -> {
+                            Log.e(TAG, "Recipe chain failed:", throwable);
+                            ErrorHelper.injectErrorFragment(
+                                    mNavigator.getActiveActivity(),
+                                    ErrorUtils.ERROR_CATEGORY.FEED_ERROR,
+                                    (errorDialogFragment, errorButtonType,
+                                     errorCategory) -> {
+                                        if (errorButtonType ==
+                                                ErrorUtils.ERROR_BUTTON_TYPE.EXIT_APP) {
+                                            mNavigator.getActiveActivity().finishAffinity();
+                                        }
+                                    });
+
+                        }, () -> {
+                            Log.v(TAG, "Recipe chain completed");
+                            // Remove empty sub containers.
+                            root.removeEmptySubContainers();
+
+//                            mRootContentContainer = root;
+                            if (mIRootContentContainerListener != null) {
+                                mIRootContentContainerListener.onRootContentContainerPopulated
+                                        (root);
+                            }
+                            mContentReloadRequired = false;
+                            mContentLoaded = true;
+
+                            if (mLauncherIntegrationManager != null && activity != null &&
+                                    LauncherIntegrationManager
+                                            .isCallFromLauncher(activity.getIntent())) {
+
+                                Log.i(TAG, "Call from launcher with intent " +
+                                        activity.getIntent());
+
+                                try {
+                                    long contentId = LauncherIntegrationManager
+                                            .getContentIdToPlay(mAppContext, activity.getIntent());
+
+                                    Content content =
+                                            getRootContentContainer().findContentById(contentId);
+                                    if (content == null) {
+                                        throw new IllegalArgumentException("No content exist for " +
+                                                "contentId " +
+                                                contentId);
+                                    }
+                                    handleRendererScreenSwitch(mNavigator.getActiveActivity(),
+                                            content,
+                                            CONTENT_ACTION_WATCH_NOW, false);
+
+                                }
+                                catch (Exception e) {
+                                    Log.e(TAG, e.getLocalizedMessage(), e);
+                                    AlertDialogFragment.createAndShowAlertDialogFragment
+                                            (mNavigator.getActiveActivity(),
+                                                    "Error",
+                                                    "The desired content does not exist",
+                                                    null,
+                                                    mAppContext.getString(R.string.ok),
+                                                    new AlertDialogFragment.IAlertDialogListener() {
+
+                                                        @Override
+                                                        public void onDialogPositiveButton
+                                                                (AlertDialogFragment alertDialogFragment) {
+
+                                                        }
+
+                                                        @Override
+                                                        public void onDialogNegativeButton
+                                                                (AlertDialogFragment alertDialogFragment) {
+
+                                                            alertDialogFragment.dismiss();
+                                                            if (cancellable != null &&
+                                                                    cancellable.isLoadingCancelled()) {
+                                                                Log.d(TAG, "switchToHomeScreen after " +
+                                                                        "Splash cancelled");
+                                                                return;
+                                                            }
+                                                            switchToHomeScreen();
+                                                        }
+                                                    });
+                                }
+                            }
+                            else {
+                                if (cancellable != null && cancellable.isLoadingCancelled()) {
+                                    Log.d(TAG, "switchToHomeScreen after Splash cancelled");
+                                    return;
+                                }
+                                // TODO: Consider to use event bus instead of broadcast
+                                // This broadcast is handled in ZypePlaylistContentBrowseFragment to update content
+                                LocalBroadcastManager.getInstance(mNavigator.getActiveActivity()).sendBroadcast(new Intent("DataUpdated"));
                             }
                         });
 

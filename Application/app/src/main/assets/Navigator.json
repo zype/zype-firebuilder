@@ -33,6 +33,11 @@
       "verifyNetworkConnection": true,
       "onAction": "CONTENT_HOME_SCREEN"
     },
+    "com.amazon.android.tv.tenfoot.ui.activities.ZypePlaylistContentBrowseActivity": {
+      "verifyScreenAccess": false,
+      "verifyNetworkConnection": true,
+      "onAction": "CONTENT_SUBMENU_SCREEN"
+    },
     "com.amazon.android.tv.tenfoot.ui.activities.ContentDetailsActivity": {
       "verifyScreenAccess": false,
       "verifyNetworkConnection": true,

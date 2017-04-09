@@ -24,6 +24,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/* Zype, Evgeny Cherkasov */
+
 /**
  * This class extends the {@link AModelTranslator} for the {@link Content} class. It provides a way
  * to translate a {link Map} to a {@link Content} object.

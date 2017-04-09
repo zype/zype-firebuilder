@@ -142,7 +142,19 @@ public class CardPresenter extends Presenter {
             ContentContainer contentContainer = (ContentContainer) item;
             cardView.setContentText(contentContainer.getName());
             cardView.setMainImageDimensions(mCardWidthDp, mCardHeightDp);
-            cardView.getMainImageView().setImageDrawable(mDefaultCardImage);
+            /* Zype, Evgeny Cherkasov */
+            // Show image for playlist
+            if (contentContainer.getExtraStringValue(Content.CARD_IMAGE_URL_FIELD_NAME) != null) {
+                Glide.with(viewHolder.view.getContext())
+                        .load(contentContainer.getExtraStringValue(Content.CARD_IMAGE_URL_FIELD_NAME))
+                        .listener(new Helpers.LoggingListener<>())
+                        .centerCrop()
+                        .error(mDefaultCardImage)
+                        .into(cardView.getMainImageView());
+            }
+            else {
+                cardView.getMainImageView().setImageDrawable(mDefaultCardImage);
+            }
         }
     }
 

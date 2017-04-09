@@ -2,12 +2,14 @@
   "cooker": "DynamicParser",
   "format": "json",
   "model": "com.amazon.android.model.content.ContentContainer",
-  "translator": "ContentContainerTranslator",
-  "modelType": "array",
-  "query": "$.categories[*]",
-  "queryResultType": "[]$",
+  "translator": "ZypeContentContainerTranslator",
+  "modelType": "single",
+  "query": "$.categories[?(@.parent_id in [$$par0$$])]",
   "matchList": [
-    "title@name"
+    "title@name",
+    "parent_id@parentId",
+    "thumbnails@thumbnails",
+    "childPlaylistNames@childPlaylistNames"
   ],
-  "keyDataType": "playlistId@keyDataPath"
+  "keyDataType": "_id@keyDataPath"
 }

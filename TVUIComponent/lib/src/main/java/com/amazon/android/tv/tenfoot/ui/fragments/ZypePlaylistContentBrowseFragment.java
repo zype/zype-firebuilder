@@ -28,19 +28,10 @@
  */
 package com.amazon.android.tv.tenfoot.ui.fragments;
 
-import com.amazon.android.contentbrowser.ContentBrowser;
-import com.amazon.android.contentbrowser.helper.AuthHelper;
-import com.amazon.android.model.Action;
-import com.amazon.android.model.content.Content;
-import com.amazon.android.model.content.ContentContainer;
-import com.amazon.android.tv.tenfoot.R;
-import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
-import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
-import com.amazon.android.tv.tenfoot.presenter.SettingsCardPresenter;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -55,25 +46,51 @@ import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowHeaderPresenter;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v17.leanback.widget.VerticalGridView;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.amazon.android.contentbrowser.ContentBrowser;
+import com.amazon.android.contentbrowser.helper.AuthHelper;
+import com.amazon.android.model.Action;
+import com.amazon.android.model.content.Content;
+import com.amazon.android.model.content.ContentContainer;
+import com.amazon.android.tv.tenfoot.R;
+import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
+import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
+import com.amazon.android.tv.tenfoot.presenter.SettingsCardPresenter;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.util.List;
+
+/* Zype, Evgeny Cherkasov */
 
 /**
  * This fragment displays content in horizontal rows for browsing. Each row has its title displayed
  * above it.
  */
-public class ContentBrowseFragment extends RowsFragment {
+public class ZypePlaylistContentBrowseFragment extends RowsFragment {
 
-    private static final String TAG = ContentBrowseFragment.class.getSimpleName();
+    private static final String TAG = ZypePlaylistContentBrowseFragment.class.getSimpleName();
     private static final int WAIT_BEFORE_FOCUS_REQUEST_MS = 500;
     private OnBrowseRowListener mCallback;
     private ArrayObjectAdapter settingsAdapter = null;
+
+    private BroadcastReceiver receiver;
 
     // Container Activity must implement this interface.
     public interface OnBrowseRowListener {
 
         void onItemSelected(Object item);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (receiver != null) {
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, new IntentFilter("DataUpdated"));
+        }
     }
 
     @Override
@@ -99,7 +116,7 @@ public class ContentBrowseFragment extends RowsFragment {
 
         ArrayObjectAdapter mRowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
         
-        addSettingsActionsToRowAdapter(mRowsAdapter);
+//        addSettingsActionsToRowAdapter(mRowsAdapter);
         loadRootContentContainer(mRowsAdapter);
 
         setAdapter(mRowsAdapter);
@@ -117,8 +134,23 @@ public class ContentBrowseFragment extends RowsFragment {
                 }
             }
         }, WAIT_BEFORE_FOCUS_REQUEST_MS);
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                loadRootContentContainer(mRowsAdapter);
+            }
+        };
+
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (receiver != null) {
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(receiver);
+        }
+    }
 
     /**
      * Event bus listener method to listen for authentication updates from AUthHelper and update
@@ -136,9 +168,10 @@ public class ContentBrowseFragment extends RowsFragment {
     }
 
     private void loadRootContentContainer(ArrayObjectAdapter rowsAdapter) {
+        rowsAdapter.clear();
+        addSettingsActionsToRowAdapter(rowsAdapter);
 
-        ContentContainer rootContentContainer = ContentBrowser.getInstance(getActivity())
-                                                              .getRootContentContainer();
+        ContentContainer rootContentContainer = ContentBrowser.getInstance(getActivity()).getLastSelectedContentContainer();
 
         CardPresenter cardPresenter = new CardPresenter();
 
@@ -203,12 +236,10 @@ public class ContentBrowseFragment extends RowsFragment {
                 Log.d(TAG, "ContentContainer with name " + contentContainer.getName() + " was " +
                         "clicked");
 
+                ContentContainer selectedContentContainer = ContentBrowser.getInstance(getActivity()).getContainerForContentContainer(contentContainer);
                 ContentBrowser.getInstance(getActivity())
-/* Zype, Evgeny Cherkasov */
-// Set parent of selected container as last seleceted
-//                              .setLastSelectedContentContainer(contentContainer)
-                              .setLastSelectedContentContainer(ContentBrowser.getInstance(getActivity()).getContainerForContentContainer(contentContainer))
-                              .switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
+                        .setLastSelectedContentContainer(selectedContentContainer)
+                        .switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
             }
             else if (item instanceof Action) {
                 Action settingsAction = (Action) item;

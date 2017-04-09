@@ -3,7 +3,7 @@
   "format": "json",
   "model": "com.amazon.android.model.content.Content",
   "translator": "ZypeContentTranslator",
-  "modelType": "array",
+  "modelType": "single",
   "query": "$.contents[?(@.playlistId in [$$par0$$])]",
   "matchList": [
     "title@title",
