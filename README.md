@@ -78,4 +78,4 @@ See also the list of [contributors](https://github.com/zype/zype-firebuilder/gra
 
 ## License
 
-This project is licensed under the License - see the [LICENSE](LICENSE) file for details
+This project is licensed under the License - see the [LICENSE](LICENSE.md) file for details
