@@ -29,7 +29,7 @@ Android Studio
 
 ## Supported Features
 
-- Populates your app with content from enhanced playlists
+ - Populates your app with content from enhanced playlists
 - Video Search
 - Live Streaming videos
 - Resume watch functionality
@@ -46,7 +46,7 @@ Android Studio
 
 ## Monetizations Supported
 
-- Not yet supported
+ - Not yet supported
 
 
 ## Creating new Fire TV app based of Zype Template
@@ -60,7 +60,40 @@ Coming soon
 
 ## App Architecture
 
-Coming soon
+Modules customized to work with Zype Platform:
+
+- **DataLoader**
+
+New custom data loader ```ZypeDataDownloader``` is added. It is loading playlist and video data using Zype API and put this data into feed, which is processed further by Fire App Builder. See "App Configuration" section for how ZypeDatadownloader is connected to Fire App Builder.
+
+- **ContentBrowser**
+
+This core module is modified to support Zype enchanced playlists and custom data feed.
+
+- **ContentModel**
+
+New custom feed translators ```ZypeContentTranslator``` and ```ZypeContentContainerTranslator``` are added to map specific Zype 
+video and playlist objects to Fire App Builder content model.
+
+- **TVUIComponent**
+
+```CardPresenter``` is modified to support thumbnail images for categories (playlists).
+
+```ContentBrowseFragment``` is modified to support navigation from home screen to nested playlists.
+
+```ZypePlaylistContentBrowseActivity``` 
+```ZypePlaylistContentBrowseFragment``` are added to display content of nested playlistsis.
+
+- **App Configuration**
+
+```DataLoadManagerConfig.json``` is modified to support custom Zype data downloader
+
+```ZypeDownloaderConfig.json``` is added for using with ZypeDataDownloader
+
+```ZypeCategoriesRecipe.json```
+```ZypeContentsRecipe.json``` is added to configure parsing data from custom Zype feed
+
+```Navigator.json``` is modified to support Zype customizations
 
 ## Contributing
 
