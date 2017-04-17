@@ -76,11 +76,12 @@ dependencies {
     compile project(':UAMP')
     compile project(':AMZNMediaPlayerComponent')
     compile project(':PassThroughAdsComponent')
-    compile project(':FacebookAuthComponent')
+//    compile project(':FacebookAuthComponent')
     compile project(':AmazonInAppPurchaseComponent')
     compile project(':LoggerAnalyticsComponent')
     // Uncomment when using CrashlyticsComponent
     /*compile('com.crashlytics.sdk.android:crashlytics:2.6.1@aar') {
         transitive = true;
     }*/
+    compile project(':ZypeAuthComponent')
 }

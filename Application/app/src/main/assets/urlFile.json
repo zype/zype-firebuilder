@@ -3,6 +3,6 @@
     "https://api.zype.com/playlists?app_key=iBjj-jnjT12tQGmyeOR9op8_RjsGmT1Nq5OEETkbxOXnNmDE1m9MrB0wpti0__9l&per_page=100",
     "https://api.zype.com/playlists/%1$s/videos?app_key=iBjj-jnjT12tQGmyeOR9op8_RjsGmT1Nq5OEETkbxOXnNmDE1m9MrB0wpti0__9l&per_page=100",
     "https://api.zype.com/videos/?app_key=iBjj-jnjT12tQGmyeOR9op8_RjsGmT1Nq5OEETkbxOXnNmDE1m9MrB0wpti0__9l&per_page=100",
-    "https://api.zype.com/embed/%1$s?app_key=iBjj-jnjT12tQGmyeOR9op8_RjsGmT1Nq5OEETkbxOXnNmDE1m9MrB0wpti0__9l&video_id=%2$s"
+    "https://player.zype.com/embed/%1$s?app_key=iBjj-jnjT12tQGmyeOR9op8_RjsGmT1Nq5OEETkbxOXnNmDE1m9MrB0wpti0__9l&video_id=%2$s"
   ]
 }

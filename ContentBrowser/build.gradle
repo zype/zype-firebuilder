@@ -58,4 +58,6 @@ dependencies {
     compile project(':ContentModel')
     // Global font support
     compile project(':Calligraphy')
+
+    compile project(':ZypeAuthComponent')
 }

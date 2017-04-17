@@ -53,6 +53,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 
@@ -62,6 +63,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -70,6 +74,11 @@ import rx.subscriptions.CompositeSubscription;
 
 /* Zype */
 import com.amazon.android.model.translators.ZypeContentTranslator;
+import com.zype.fire.api.IZypeApi;
+import com.zype.fire.api.Model.PlayerResponse;
+import com.zype.fire.api.ZypeApi;
+import com.zype.fire.api.ZypeSettings;
+import com.zype.fire.auth.ZypeAuthentication;
 
 import net.minidev.json.JSONArray;
 
@@ -237,6 +246,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      * The maximum number of actions supported.
      */
     public static final int CONTENT_ACTION_MAX = 100;
+
+    /* Zype, Evgeny Cherkasov */
+    public static final int CONTENT_ACTION_LOGIN_TO_WATCH = 100;
 
     /**
      * Search algorithm name.
@@ -598,8 +610,12 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     Log.e(TAG, "Immature app, switching to splash");
                     runGlobalRecipes(activity, ContentBrowser.this);
                 }
-                if (screenName.equals(CONTENT_SUBMENU_SCREEN)) {
-                    runGlobalRecipesForLastSelected(activity, ContentBrowser.this);
+                else {
+                    if (screenName != null) {
+                        if (screenName.equals(CONTENT_SUBMENU_SCREEN)) {
+                            runGlobalRecipesForLastSelected(activity, ContentBrowser.this);
+                        }
+                    }
                 }
             }
 
@@ -1487,14 +1503,65 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      */
     public void switchToRendererScreen(Content content, int actionId) {
 
-        switchToScreen(ContentBrowser.CONTENT_RENDERER_SCREEN, intent -> {
-            intent.putExtra(Content.class.getSimpleName(),
+        /* Zype, Evgeny Cherkasov */
+        // Load player and get video url from it
+        String videoId = (String) content.getExtraValue("_id");
+        String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
+        String appKey = ZypeSettings.getAppKey();
+        HashMap<String, String> params = new HashMap<>();
+        if (!TextUtils.isEmpty(accessToken)) {
+            params.put("access_token", accessToken);
+        }
+        else {
+            params.put("app_key", appKey);
+        }
+        ZypeApi.getInstance().getApi().getPlayer(IZypeApi.HEADER_USER_AGENT, videoId, params).enqueue(new Callback<PlayerResponse>() {
+            @Override
+            public void onResponse(Call<PlayerResponse> call, Response<PlayerResponse> response) {
+                if (!response.body().playerData.body.files.isEmpty()) {
+                    content.setUrl(response.body().playerData.body.files.get(0).url);
+                    switchToScreen(ContentBrowser.CONTENT_RENDERER_SCREEN, intent -> {
+                        intent.putExtra(Content.class.getSimpleName(),
+                                content);
+                        if (actionId == CONTENT_ACTION_RESUME) {
+                            intent.putExtra(PreferencesConstants.CONTENT_ID,
+                                    content.getId());
+                        }
+                    });
+                } else {
+                    content.setUrl("null");
+                    switchToScreen(ContentBrowser.CONTENT_RENDERER_SCREEN, intent -> {
+                        intent.putExtra(Content.class.getSimpleName(),
+                                content);
+                        if (actionId == CONTENT_ACTION_RESUME) {
+                            intent.putExtra(PreferencesConstants.CONTENT_ID,
+                                    content.getId());
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PlayerResponse> call, Throwable t) {
+                content.setUrl("null");
+                switchToScreen(ContentBrowser.CONTENT_RENDERER_SCREEN, intent -> {
+                    intent.putExtra(Content.class.getSimpleName(),
                             content);
-            if (actionId == CONTENT_ACTION_RESUME) {
-                intent.putExtra(PreferencesConstants.CONTENT_ID,
+                    if (actionId == CONTENT_ACTION_RESUME) {
+                        intent.putExtra(PreferencesConstants.CONTENT_ID,
                                 content.getId());
+                    }
+                });
             }
         });
+//        switchToScreen(ContentBrowser.CONTENT_RENDERER_SCREEN, intent -> {
+//            intent.putExtra(Content.class.getSimpleName(),
+//                    content);
+//            if (actionId == CONTENT_ACTION_RESUME) {
+//                intent.putExtra(PreferencesConstants.CONTENT_ID,
+//                        content.getId());
+//            }
+//        });
     }
 
     /**
@@ -1506,6 +1573,46 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      */
     public void handleRendererScreenSwitch(Activity activity, Content content, int actionId,
                                            boolean showErrorDialog) {
+
+        /* Zype, Evgeny Cherkasov */
+        // Check for content on subscription if the user logged in and subscribed
+        if (content.isSubscriptionRequired()) {
+            mAuthHelper.isAuthenticated().subscribe(isAuthenticatedResultBundle -> {
+                boolean result = isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT);
+                if (result) {
+                    // TODO: Consider another way to get preference name to avoid dependemcy on ZypeAuthComponent in this module
+                    if (Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0) {
+                        switchToRendererScreen(content, actionId);
+                    }
+                    else {
+                        AlertDialogFragment.createAndShowAlertDialogFragment(mNavigator.getActiveActivity(),
+                                // TODO: Use string resources
+                                "Suscription",
+                                "You must have a subscription to play this video",
+                                null,
+                                mAppContext.getString(R.string.ok),
+                                new AlertDialogFragment.IAlertDialogListener() {
+                                    @Override
+                                    public void onDialogPositiveButton(AlertDialogFragment alertDialogFragment) {
+                                    }
+
+                                    @Override
+                                    public void onDialogNegativeButton(AlertDialogFragment alertDialogFragment) {
+                                        alertDialogFragment.dismiss();
+                                    }
+                                }
+                                );
+                    }
+                }
+                else {
+                    // After login go back to content detail screen
+                    mAuthHelper.handleAuthChain(extra -> mNavigator.startActivity(CONTENT_DETAILS_SCREEN, intent -> {
+                        intent.putExtra(Content.class.getSimpleName(), content);
+                    }));
+                }
+            });
+            return;
+        }
 
         if (mIAPDisabled) {
             switchToRendererScreen(content, actionId);

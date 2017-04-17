@@ -11,6 +11,7 @@
     "description@description",
     "playerUrl@url",
     "thumbnails@cardImageUrl",
-    "thumbnails@backgroundImageUrl"
+    "thumbnails@backgroundImageUrl",
+    "subscription_required@subscriptionRequired"
   ]
 }

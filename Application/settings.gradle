@@ -13,6 +13,9 @@
  * permissions and limitations under the License.
  */
 include ':app',
+        /* Zype */
+        ':ZypeAPI',
+        ':ZypeAuthComponent',
         /* Frameworks */
         ':TVUIComponent',
         ':UAMP',
@@ -32,7 +35,7 @@ include ':app',
         /* Implementations */
         ':PassThroughAdsComponent',
         ':AMZNMediaPlayerComponent',
-        ':FacebookAuthComponent',
+//        ':FacebookAuthComponent',
         ':AmazonInAppPurchaseComponent',
         ':LoggerAnalyticsComponent'
 
@@ -58,6 +61,8 @@ project(':PurchaseInterface').projectDir = new File(rootProject.projectDir, '../
 /* Implementations */
 project(':AMZNMediaPlayerComponent').projectDir = new File(rootProject.projectDir, '../AMZNMediaPlayerComponent')
 project(':PassThroughAdsComponent').projectDir = new File(rootProject.projectDir, '../PassThroughAdsComponent')
-project(':FacebookAuthComponent').projectDir = new File(rootProject.projectDir, '../FacebookAuthComponent')
+//project(':FacebookAuthComponent').projectDir = new File(rootProject.projectDir, '../FacebookAuthComponent')
 project(':AmazonInAppPurchaseComponent').projectDir = new File(rootProject.projectDir, '../AmazonInAppPurchaseComponent')
 project(':LoggerAnalyticsComponent').projectDir = new File(rootProject.projectDir, '../LoggerAnalyticsComponent')
+/* Zype */
+//project(':ZypeAuthComponent').projectDir = new File(rootProject.projectDir, '../ZypeAuthComponent')

@@ -33,6 +33,8 @@ import org.json.JSONObject;
 public class ZypeContentTranslator extends AModelTranslator<Content> {
     private static final String TAG = ZypeContentTranslator.class.getSimpleName();
 
+    private static final String FIELD_SUBSCRIPTION_REQUIRED = "subscriptionRequired";
+
     /**
      * {@inheritDoc}
      *
@@ -96,6 +98,9 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
                     // Expecting value to be a list.
                     model.setTags(value.toString());
                     break;
+                case FIELD_SUBSCRIPTION_REQUIRED: {
+                    model.setSubscriptionRequired((Boolean) value);
+                }
                 default:
                     model.setExtraValue(field, value);
                     break;

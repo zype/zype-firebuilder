@@ -156,22 +156,24 @@ public class ZypeDataDownloader extends ADataDownloader {
                         String videoId = jsonVideoData.getString("_id");
                         // Add reference to playlist
                         jsonVideoData.put("playlistId", playlistId);
-                        // Get player for the video
-                        url = String.format(urlPlayer, videoId, videoId);
-                        try {
-                            String playerResponse = getDataLocatedAtUrl(url);
-                            JSONObject jsonPlayer = new JSONObject(playerResponse);
-                            JSONArray jsonFiles = jsonPlayer.getJSONObject("response").getJSONObject("body").getJSONArray("files");
-                            if (jsonFiles != null && jsonFiles.length() > 0) {
-                                String playerUrl = jsonFiles.getJSONObject(0).getString("url");
-                                jsonVideoData.put("playerUrl", playerUrl);
-                            } else {
-                                jsonVideoData.put("playerUrl", "null");
-                            }
-                        } catch (IOException e) {
-                            jsonVideoData.put("playerUrl", "null");
-                            Log.d(TAG, "Error get url for videoId=" + videoId);
-                        }
+//                        // Get player for the video
+//                        url = String.format(urlPlayer, videoId, videoId);
+//                        try {
+//                            String playerResponse = getDataLocatedAtUrl(url);
+//                            JSONObject jsonPlayer = new JSONObject(playerResponse);
+//                            JSONArray jsonFiles = jsonPlayer.getJSONObject("response").getJSONObject("body").getJSONArray("files");
+//                            if (jsonFiles != null && jsonFiles.length() > 0) {
+//                                String playerUrl = jsonFiles.getJSONObject(0).getString("url");
+//                                jsonVideoData.put("playerUrl", playerUrl);
+//                            } else {
+//                                jsonVideoData.put("playerUrl", "null");
+//                            }
+//                        } catch (IOException e) {
+//                            jsonVideoData.put("playerUrl", "null");
+//                            Log.d(TAG, "Error get url for videoId=" + videoId);
+//                        }
+                        // Set dummy player url. We get real url before switch to renderer screen
+                        jsonVideoData.put("playerUrl", "null");
 
                         jsonContents.put(jsonVideoData);
                     }
