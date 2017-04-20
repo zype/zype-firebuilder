@@ -906,7 +906,16 @@ public class PlaybackActivity extends Activity implements
 
             // Initialize ads.
             if (mAdsImplementation != null) {
-                mAdsImplementation.init(this, mAdsView, playerExtras);
+                /* Zype, Evgeny Cherkasov */
+                // Pass the ad tag from video data to Ads component
+//                mAdsImplementation.init(this, mAdsView, playerExtras);
+                Bundle adExtras = playerExtras.getBundle("ads");
+                if (mSelectedContent.getExtraValue("adUrl") != null) {
+                    adExtras.putString("VASTAdTag", (String) mSelectedContent.getExtraValue("adUrl"));
+                } else {
+                    adExtras.putString("VASTAdTag", null);
+                }
+                mAdsImplementation.init(this, mAdsView, adExtras);
             }
 
             mPlayer.setUserAgent(System.getProperty("http.agent"));

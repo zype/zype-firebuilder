@@ -137,8 +137,13 @@ public class VASTAdsPlayer implements IAds,
         mFrameLayout = frameLayout;
         mExtras = extras;
 
-        mExtras.putString(VASTAdsPlayer.VAST_TAG_BUNDLE_KEY,
-                          mContext.getResources().getString(R.string.vast_preroll_tag));
+        /* Zype, Evgeny Cherkasov */
+        // Instead of static VAST tag we use the one which come from PlaybackActivity
+//        mExtras.putString(VASTAdsPlayer.VAST_TAG_BUNDLE_KEY,
+//                          mContext.getResources().getString(R.string.vast_preroll_tag));
+        if (!mExtras.containsKey(VASTAdsPlayer.VAST_TAG_BUNDLE_KEY)) {
+            mExtras.putString(VASTAdsPlayer.VAST_TAG_BUNDLE_KEY, mContext.getResources().getString(R.string.vast_preroll_tag));
+        }
 
         DisplayMetrics displayMetrics = mContext.getResources()
                                                 .getDisplayMetrics();

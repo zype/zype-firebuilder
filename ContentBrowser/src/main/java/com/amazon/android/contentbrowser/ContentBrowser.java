@@ -75,6 +75,7 @@ import rx.subscriptions.CompositeSubscription;
 /* Zype */
 import com.amazon.android.model.translators.ZypeContentTranslator;
 import com.zype.fire.api.IZypeApi;
+import com.zype.fire.api.Model.PlayerData;
 import com.zype.fire.api.Model.PlayerResponse;
 import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeSettings;
@@ -1504,7 +1505,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public void switchToRendererScreen(Content content, int actionId) {
 
         /* Zype, Evgeny Cherkasov */
-        // Load player and get video url from it
+        // Before switch to renderer screen load player data and get video url and ad tag from it
         String videoId = (String) content.getExtraValue("_id");
         String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
         String appKey = ZypeSettings.getAppKey();
@@ -1519,7 +1520,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             @Override
             public void onResponse(Call<PlayerResponse> call, Response<PlayerResponse> response) {
                 if (!response.body().playerData.body.files.isEmpty()) {
-                    content.setUrl(response.body().playerData.body.files.get(0).url);
+                    updateContentWithPlayerData(content, response.body().playerData);
                     switchToScreen(ContentBrowser.CONTENT_RENDERER_SCREEN, intent -> {
                         intent.putExtra(Content.class.getSimpleName(),
                                 content);
@@ -1529,7 +1530,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                         }
                     });
                 } else {
-                    content.setUrl("null");
+                    updateContentWithPlayerData(content, null);
                     switchToScreen(ContentBrowser.CONTENT_RENDERER_SCREEN, intent -> {
                         intent.putExtra(Content.class.getSimpleName(),
                                 content);
@@ -1543,7 +1544,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
             @Override
             public void onFailure(Call<PlayerResponse> call, Throwable t) {
-                content.setUrl("null");
+                updateContentWithPlayerData(content, null);
                 switchToScreen(ContentBrowser.CONTENT_RENDERER_SCREEN, intent -> {
                     intent.putExtra(Content.class.getSimpleName(),
                             content);
@@ -2216,5 +2217,23 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             return false;
         }
         return true;
+    }
+
+    /* Zype, Evgeny Cherkasov */
+    private Content updateContentWithPlayerData(Content content, PlayerData playerData) {
+        if (playerData != null) {
+            content.setUrl(playerData.body.files.get(0).url);
+            if (playerData.body.advertising != null) {
+                content.setExtraValue("adUrl", playerData.body.advertising.schedule.get(0).tag);
+            }
+            else {
+                content.setExtraValue("adUrl", null);
+            }
+        }
+        else {
+            content.setUrl("null");
+            content.setExtraValue("adUrl", null);
+        }
+        return content;
     }
 }

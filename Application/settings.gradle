@@ -33,7 +33,8 @@ include ':app',
         ':AnalyticsInterface',
         ':ModuleInterface',
         /* Implementations */
-        ':PassThroughAdsComponent',
+//        ':PassThroughAdsComponent',
+        ':VastAdsComponent',
         ':AMZNMediaPlayerComponent',
 //        ':FacebookAuthComponent',
         ':AmazonInAppPurchaseComponent',
@@ -60,7 +61,8 @@ project(':PurchaseInterface').projectDir = new File(rootProject.projectDir, '../
 
 /* Implementations */
 project(':AMZNMediaPlayerComponent').projectDir = new File(rootProject.projectDir, '../AMZNMediaPlayerComponent')
-project(':PassThroughAdsComponent').projectDir = new File(rootProject.projectDir, '../PassThroughAdsComponent')
+//project(':PassThroughAdsComponent').projectDir = new File(rootProject.projectDir, '../PassThroughAdsComponent')
+project(':VastAdsComponent').projectDir = new File(rootProject.projectDir, '../VastAdsComponent')
 //project(':FacebookAuthComponent').projectDir = new File(rootProject.projectDir, '../FacebookAuthComponent')
 project(':AmazonInAppPurchaseComponent').projectDir = new File(rootProject.projectDir, '../AmazonInAppPurchaseComponent')
 project(':LoggerAnalyticsComponent').projectDir = new File(rootProject.projectDir, '../LoggerAnalyticsComponent')
