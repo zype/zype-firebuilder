@@ -29,16 +29,16 @@ Android Studio
 
 ## Supported Features
 
- - Populates your app with content from enhanced playlists
+- Populates your app with content from enhanced playlists
 - Video Search
 - Live Streaming videos
 - Resume watch functionality
+- Pre-roll ads
 
 ## Unsupported Features
 
 - Video Favorites 
 - Dynamic theme colors
-- Pre-roll ads
 - Midroll ads
 - Closed Caption Support
 - Native SVOD via In App Purchases
