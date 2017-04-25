@@ -20,7 +20,7 @@ permissions and limitations under the License.
     <!-- Background to display on Splash Screen -->
     <drawable name="splash_background">@drawable/bg_generic_nopreview</drawable>
     <!-- Company logo to show on Splash Screen -->
-    <drawable name="splash_logo">@drawable/fire_app_builder_white</drawable>
+    <drawable name="splash_logo">@drawable/zype_logo_cloud</drawable>
     <!-- Copyright string text color -->
     <color name="copyright">#E6FFFFFF</color>
 
@@ -47,11 +47,12 @@ permissions and limitations under the License.
          and rows are showing full screen -->
     <color name="browse_row_header">#99FFFFFF</color>
     <!-- Search orb color (the circle shape around the search icon) -->
-    <color name="search_orb">#EE962D</color>
+    <!--<color name="search_orb">#EE962D</color>-->
+    <color name="search_orb">@color/accent</color>
     <!-- Header text size -->
     <dimen name="browse_header_text">16sp</dimen>
     <!-- Company logo -->
-    <drawable name="company_logo">@drawable/fire_app_builder_white_2</drawable>
+    <drawable name="company_logo">@drawable/zype_logo_cloud</drawable>
 
     <drawable name="browse_bg_color">@drawable/bg_generic_nopreview</drawable>
     <!-- End of Browse Customization -->
@@ -81,7 +82,8 @@ permissions and limitations under the License.
     <!-- Text color for focused action button -->
     <color name="action_button_text_color_focused">#E6FFFFFF</color>
     <!-- Background color for focused action button -->
-    <drawable name="action_button_focused">@drawable/btn_generic_focused</drawable>
+    <!--<drawable name="action_button_focused">@drawable/btn_generic_focused</drawable>-->
+    <drawable name="action_button_focused">@drawable/zype_btn_generic_focused</drawable>
     <!-- Background color for normal state of action button -->
     <drawable name="action_button_normal">@drawable/btn_normal</drawable>
     <!-- Details description title text color -->
@@ -116,7 +118,8 @@ permissions and limitations under the License.
     <!-- Search Bar Customization -->
 
     <!-- Background color of search orb -->
-    <color name="search_orb_background">#EE962D</color>
+    <!--<color name="search_orb_background">#EE962D</color>-->
+    <color name="search_orb_background">@color/accent</color>
     <!-- Icon to display inside of search orb -->
     <drawable name="search_icon">@drawable/ic_search</drawable>
     <!-- Background color of Search screen -->

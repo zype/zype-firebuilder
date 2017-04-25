@@ -13,7 +13,7 @@ express or implied. See the License for the specific language governing
 permissions and limitations under the License.
 -->
 <resources>
-    <string name="app_name">Fire App Builder</string>
+    <string name="app_name">Zype Fire SDK</string>
     <!-- Copyright string -->
     <string name="copyright">Copyright 2016. All Rights Reserved.</string>
     <!-- Search hint text -->
