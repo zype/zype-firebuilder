@@ -33,6 +33,7 @@ import com.amazon.android.configuration.ConfigurationManager;
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.model.Action;
 import com.amazon.android.model.content.Content;
+import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.ui.constants.ConfigurationConstants;
 import com.amazon.android.ui.fragments.LogoutSettingsFragment;
 import com.amazon.android.utils.Helpers;
@@ -116,6 +117,14 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
             callImageLoadSubscription(content.getTitle(),
                                       content.getDescription(),
                                       content.getBackgroundImageUrl());
+        }
+        /* Zype, Evgeny Cherkasov */
+        // Update screen background with selected playlist (category) image
+        else if (item instanceof ContentContainer) {
+            ContentContainer contentContainer = (ContentContainer) item;
+            callImageLoadSubscription(contentContainer.getName(),
+                    "",
+                    (String) contentContainer.getExtraStringValue(Content.BACKGROUND_IMAGE_URL_FIELD_NAME));
         }
         else if (item instanceof Action) {
             Action settingsAction = (Action) item;

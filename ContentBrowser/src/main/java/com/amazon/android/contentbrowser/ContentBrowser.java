@@ -1846,6 +1846,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     });
         }).concatMap(objectPair -> {
             ContentContainer contentContainer = (ContentContainer) objectPair.first;
+            /* Zype, Evgeny Cherkasov */
+            // Clear content list to avoid duplicate contents for nested playlist (subcategory)
+            contentContainer.getContents().clear();
             String feed = (String) objectPair.second;
 
             String[] params = new String[]{(String) contentContainer

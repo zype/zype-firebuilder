@@ -9,8 +9,10 @@ import com.amazon.android.utils.Helpers;
 import com.amazon.android.utils.NetworkUtils;
 import com.amazon.dataloader.R;
 import com.amazon.utils.model.Data;
+import com.zype.fire.api.ZypeSettings;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
@@ -22,6 +24,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
@@ -39,10 +42,6 @@ public class ZypeDataDownloader extends ADataDownloader {
     protected static final String URL_GENERATOR_IMPL = "url_generator_impl";
      // Key to locate the URL generator.
     protected static final String URL_GENERATOR_RECIPE = "url_generator";
-
-    private static final String API_KEY = "6vf5at5colfo7wtTR13GBDdigAUJOS1C_4BTdOOBHcLYjd1BiSfvRZwKggzbSUGF";
-    private static final String API_HOST = "https://api.zype.com";
-    private static final String ROOT_PLAYLIST_ID = "577e65c85577de0d1000c1ee";
 
     /**
      * {@link AUrlGenerator} instance.
@@ -132,18 +131,12 @@ public class ZypeDataDownloader extends ADataDownloader {
         JSONArray jsonContents = new JSONArray();
 
         JSONArray jsonPlaylists = jsonResult.getJSONArray("response");
-        HashMap<String, List<JSONObject>> mapPlaylistHierarchy = new HashMap<>();
+        List<JSONObject> playlists = new ArrayList<>();
         for (int i = 0; i < jsonPlaylists.length(); i++) {
             JSONObject jsonPlaylistData = jsonPlaylists.getJSONObject(i);
-            String playlistId = jsonPlaylistData.getString("_id");
+            playlists.add(jsonPlaylistData);
 
-            String parentPlaylistId = jsonPlaylistData.getString("parent_id");
-            if (!TextUtils.isEmpty(parentPlaylistId) && !parentPlaylistId.equals("null")) {
-                if (!mapPlaylistHierarchy.containsKey(parentPlaylistId)) {
-                    mapPlaylistHierarchy.put(parentPlaylistId, new ArrayList<>());
-                }
-                mapPlaylistHierarchy.get(parentPlaylistId).add(jsonPlaylistData);
-            }
+            String playlistId = jsonPlaylistData.getString("_id");
 
             if (jsonPlaylistData.getInt("playlist_item_count") > 0) {
                 url = String.format(urlPlaylistVideos, playlistId);
@@ -187,20 +180,23 @@ public class ZypeDataDownloader extends ADataDownloader {
             }
         }
 
-        for (int i = 0; i < jsonPlaylists.length(); i++) {
-            JSONObject jsonPlaylistData = jsonPlaylists.getJSONObject(i);
+        Collections.sort(playlists, (a, b) -> {
+            Integer valA;
+            Integer valB;
+            try {
+                valA = a.getInt("priority");
+                valB = b.getInt("priority");
+            }
+            catch (JSONException e) {
+                return 0;
+            }
+            return valA.compareTo(valB);
+        });
+        for (JSONObject jsonPlaylistData : playlists) {
             String playlistId = jsonPlaylistData.getString("_id");
-            if (playlistId.equals(ROOT_PLAYLIST_ID)) {
+            if (playlistId.equals(ZypeSettings.ROOT_PLAYLIST_ID)) {
                 continue;
             }
-            JSONArray jsonChildPlaylistNames = new JSONArray();
-            List<JSONObject> jsonChildPlaylists = mapPlaylistHierarchy.get(playlistId);
-            if (jsonChildPlaylists != null && !jsonChildPlaylists.isEmpty()) {
-                for (JSONObject item : jsonChildPlaylists) {
-                    jsonChildPlaylistNames.put(item.getString("title"));
-                }
-            }
-            jsonPlaylistData.put("childPlaylistNames", jsonChildPlaylistNames);
             jsonCategories.put(jsonPlaylistData);
         }
 
