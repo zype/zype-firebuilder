@@ -343,7 +343,12 @@ public class ContentContainer implements Iterable<Content> {
          */
         private void addToStack(Stack<ContentContainer> stack, ContentContainer contentContainer) {
             // Push ContentContainer to stack.
-            stack.push(contentContainer);
+            /* Zype, Evgeny Cherkasov */
+            // Add current container itself only if it has contents. Otherwise iterator will return
+            // null Content object for this container.
+            if (contentContainer.getContentCount() > 0) {
+                stack.push(contentContainer);
+            }
             // Skip Containers with no sub containers.
             if (contentContainer.getContentContainerCount() == 0) {
                 return;

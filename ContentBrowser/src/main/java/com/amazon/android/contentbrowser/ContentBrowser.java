@@ -29,6 +29,7 @@ import com.amazon.android.model.event.ActionUpdateEvent;
 import com.amazon.android.model.translators.ContentContainerTranslator;
 import com.amazon.android.model.translators.ContentTranslator;
 import com.amazon.android.model.translators.ZypeContentContainerTranslator;
+import com.amazon.android.module.*;
 import com.amazon.android.navigator.Navigator;
 import com.amazon.android.navigator.NavigatorModel;
 import com.amazon.android.navigator.UINode;
@@ -1044,11 +1045,6 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 new ContentContainer(mAppContext.getString(R.string.recommended_contents_header));
 
         for (Content c : mRootContentContainer) {
-            /* Zype, ECh */
-            // After adding subcontainers to containers iterator sometimes returns null next item
-            if (c == null) {
-                continue;
-            }
             if (content.hasSimilarTags(c) && c.getId() != content.getId()) {
                 recommendedContentContainer.addContent(c);
             }
@@ -1504,65 +1500,14 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      */
     public void switchToRendererScreen(Content content, int actionId) {
 
-        /* Zype, Evgeny Cherkasov */
-        // Before switch to renderer screen load player data and get video url and ad tag from it
-        String videoId = (String) content.getExtraValue("_id");
-        String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
-        String appKey = ZypeSettings.getAppKey();
-        HashMap<String, String> params = new HashMap<>();
-        if (!TextUtils.isEmpty(accessToken)) {
-            params.put("access_token", accessToken);
-        }
-        else {
-            params.put("app_key", appKey);
-        }
-        ZypeApi.getInstance().getApi().getPlayer(IZypeApi.HEADER_USER_AGENT, videoId, params).enqueue(new Callback<PlayerResponse>() {
-            @Override
-            public void onResponse(Call<PlayerResponse> call, Response<PlayerResponse> response) {
-                if (!response.body().playerData.body.files.isEmpty()) {
-                    updateContentWithPlayerData(content, response.body().playerData);
-                    switchToScreen(ContentBrowser.CONTENT_RENDERER_SCREEN, intent -> {
-                        intent.putExtra(Content.class.getSimpleName(),
-                                content);
-                        if (actionId == CONTENT_ACTION_RESUME) {
-                            intent.putExtra(PreferencesConstants.CONTENT_ID,
-                                    content.getId());
-                        }
-                    });
-                } else {
-                    updateContentWithPlayerData(content, null);
-                    switchToScreen(ContentBrowser.CONTENT_RENDERER_SCREEN, intent -> {
-                        intent.putExtra(Content.class.getSimpleName(),
-                                content);
-                        if (actionId == CONTENT_ACTION_RESUME) {
-                            intent.putExtra(PreferencesConstants.CONTENT_ID,
-                                    content.getId());
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onFailure(Call<PlayerResponse> call, Throwable t) {
-                updateContentWithPlayerData(content, null);
-                switchToScreen(ContentBrowser.CONTENT_RENDERER_SCREEN, intent -> {
-                    intent.putExtra(Content.class.getSimpleName(),
-                            content);
-                    if (actionId == CONTENT_ACTION_RESUME) {
-                        intent.putExtra(PreferencesConstants.CONTENT_ID,
-                                content.getId());
-                    }
-                });
+        switchToScreen(ContentBrowser.CONTENT_RENDERER_SCREEN, intent -> {
+            intent.putExtra(Content.class.getSimpleName(),
+                    content);
+            if (actionId == CONTENT_ACTION_RESUME) {
+                intent.putExtra(PreferencesConstants.CONTENT_ID,
+                        content.getId());
             }
         });
-//        switchToScreen(ContentBrowser.CONTENT_RENDERER_SCREEN, intent -> {
-//            intent.putExtra(Content.class.getSimpleName(),
-//                    content);
-//            if (actionId == CONTENT_ACTION_RESUME) {
-//                intent.putExtra(PreferencesConstants.CONTENT_ID,
-//                        content.getId());
-//            }
-//        });
     }
 
     /**
@@ -1722,8 +1667,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         // Set parent playlist id in receipt params to fetch only its child playlists
         String[] params;
         if (root.getName().equals("Root")) {
-            // TODO: Get root parent playlist id from settings utility class
-            params = new String[] { "577e65c85577de0d1000c1ee" };
+            params = new String[] { ZypeSettings.ROOT_PLAYLIST_ID };
         }
         else {
             params = new String[] { (String) root.getExtraStringValue("keyDataType") };
@@ -2222,21 +2166,4 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         return true;
     }
 
-    /* Zype, Evgeny Cherkasov */
-    private Content updateContentWithPlayerData(Content content, PlayerData playerData) {
-        if (playerData != null) {
-            content.setUrl(playerData.body.files.get(0).url);
-            if (playerData.body.advertising != null) {
-                content.setExtraValue("adUrl", playerData.body.advertising.schedule.get(0).tag);
-            }
-            else {
-                content.setExtraValue("adUrl", null);
-            }
-        }
-        else {
-            content.setUrl("null");
-            content.setExtraValue("adUrl", null);
-        }
-        return content;
-    }
 }

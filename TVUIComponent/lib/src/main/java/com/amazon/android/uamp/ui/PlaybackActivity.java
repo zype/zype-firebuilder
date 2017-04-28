@@ -49,6 +49,12 @@ import com.amazon.mediaplayer.AMZNMediaPlayer;
 import com.amazon.mediaplayer.AMZNMediaPlayer.PlayerState;
 import com.amazon.mediaplayer.playback.text.Cue;
 import com.amazon.mediaplayer.tracks.TrackType;
+import com.zype.fire.api.IZypeApi;
+import com.zype.fire.api.Model.PlayerData;
+import com.zype.fire.api.Model.PlayerResponse;
+import com.zype.fire.api.ZypeApi;
+import com.zype.fire.api.ZypeSettings;
+import com.zype.fire.auth.ZypeAuthentication;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -70,9 +76,13 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
+import java.util.HashMap;
 import java.util.List;
 
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 import static com.amazon.android.contentbrowser.helper.AnalyticsHelper.trackAdEnded;
@@ -1166,8 +1176,51 @@ public class PlaybackActivity extends Activity implements
         mPlayer.getExtra().putBundle("video", videoExtras);
         // Set Ads video extras.
         mAdsImplementation.getExtra().putBundle("video", videoExtras);
-        // Show pre roll ad.
-        mAdsImplementation.showPreRollAd();
+        /* Zype, Evgeny Cherkasov */
+        // Before playing video load player data from Zype API and update content object with
+        // player url and ad tag
+        String videoId = (String) content.getExtraValue("_id");
+        String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
+        String appKey = ZypeSettings.getAppKey();
+        HashMap<String, String> params = new HashMap<>();
+        if (!TextUtils.isEmpty(accessToken)) {
+            params.put("access_token", accessToken);
+        }
+        else {
+            params.put("app_key", appKey);
+        }
+        ZypeApi.getInstance().getApi().getPlayer(IZypeApi.HEADER_USER_AGENT, videoId, params).enqueue(new Callback<PlayerResponse>() {
+            @Override
+            public void onResponse(Call<PlayerResponse> call, Response<PlayerResponse> response) {
+                if (response.isSuccessful()) {
+                    if (!response.body().playerData.body.files.isEmpty()) {
+                        updateContentWithPlayerData(content, response.body().playerData);
+                    }
+                    else {
+                        updateContentWithPlayerData(content, null);
+                    }
+                }
+                else {
+                    updateContentWithPlayerData(content, null);
+                }
+                Bundle adExtras = mAdsImplementation.getExtra();
+                if (mSelectedContent.getExtraValue("adUrl") != null) {
+                    adExtras.putString("VASTAdTag", (String) mSelectedContent.getExtraValue("adUrl"));
+                } else {
+                    adExtras.putString("VASTAdTag", null);
+                }
+                mAdsImplementation.init(PlaybackActivity.this, mAdsView, adExtras);
+                mAdsImplementation.showPreRollAd();
+            }
+
+            @Override
+            public void onFailure(Call<PlayerResponse> call, Throwable t) {
+                updateContentWithPlayerData(content, null);
+                mAdsImplementation.showPreRollAd();
+            }
+        });
+//        // Show pre roll ad.
+//        mAdsImplementation.showPreRollAd();
     }
 
     private void releasePlayer() {
@@ -1445,4 +1498,23 @@ public class PlaybackActivity extends Activity implements
         }
 
     }
+
+    /* Zype, Evgeny Cherkasov */
+    private Content updateContentWithPlayerData(Content content, PlayerData playerData) {
+        if (playerData != null) {
+            content.setUrl(playerData.body.files.get(0).url);
+            if (playerData.body.advertising != null && playerData.body.advertising.schedule.size() > 0) {
+                content.setExtraValue("adUrl", playerData.body.advertising.schedule.get(0).tag);
+            }
+            else {
+                content.setExtraValue("adUrl", null);
+            }
+        }
+        else {
+            content.setUrl("null");
+            content.setExtraValue("adUrl", null);
+        }
+        return content;
+    }
+
 }

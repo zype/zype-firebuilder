@@ -69,7 +69,7 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
                 case Content.DESCRIPTION_FIELD_NAME:
                     model.setDescription((String) value);
                     if (TextUtils.isEmpty(model.getDescription())) {
-                        model.setDescription("null");
+                        model.setDescription(" ");
                     }
                     break;
                 case Content.ID_FIELD_NAME:
