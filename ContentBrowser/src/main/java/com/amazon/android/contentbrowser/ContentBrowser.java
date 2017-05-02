@@ -411,6 +411,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      */
     private Action mLoginAction;
 
+    /* Zype, Evgeny Cherkasov */
+    private boolean isUserLoggedIn = false;
+
     /**
      * Returns AuthHelper instance.
      *
@@ -691,6 +694,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                           LogoutSettingsFragment.TYPE_LOGOUT :
                                           LogoutSettingsFragment.TYPE_LOGIN);
         }
+        /* Zype, Evgeny Cherkasov */
+        // Update user logged in flag
+        isUserLoggedIn = authenticationStatusUpdateEvent.isUserAuthenticated();
 
     }
 
@@ -1058,10 +1064,44 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             ContentContainer parentContainer = getContainerForContent(content);
 
             if (parentContainer != null) {
-
-                for (Content relatedContent : parentContainer.getContents()) {
-                    if (content.getId() != relatedContent.getId()) {
-                        recommendedContentContainer.addContent(relatedContent);
+                if (!content.isSubscriptionRequired()) {
+                    /* Zype, Evgeny Cherkasov */
+                    // Check is user logged in and has subscription.
+                    if (isUserLoggedIn) {
+                        // TODO: Consider another way to get preference name to avoid dependemcy on ZypeAuthComponent in this module
+                        // User is logged in and has subscription. Add all videos
+                        if (Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0) {
+                            for (Content relatedContent : parentContainer.getContents()) {
+                                if (content.getId() != relatedContent.getId()) {
+                                    recommendedContentContainer.addContent(relatedContent);
+                                }
+                            }
+                        }
+                        else {
+                            // User is logged in but has no subscription. Add onlu not subscription videos
+                            for (Content relatedContent : parentContainer.getContents()) {
+                                if (content.getId() != relatedContent.getId() && !relatedContent.isSubscriptionRequired()) {
+                                    recommendedContentContainer.addContent(relatedContent);
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        // User id not logged in. Add only not subscription videos
+                        for (Content relatedContent : parentContainer.getContents()) {
+                            if (content.getId() != relatedContent.getId() && !relatedContent.isSubscriptionRequired()) {
+                                recommendedContentContainer.addContent(relatedContent);
+                            }
+                        }
+                    }
+                }
+                else {
+                    // If current video is on subscription it mean we already checked user credentials
+                    // and can add all content from the category
+                    for (Content relatedContent : parentContainer.getContents()) {
+                        if (content.getId() != relatedContent.getId()) {
+                            recommendedContentContainer.addContent(relatedContent);
+                        }
                     }
                 }
 
@@ -1093,11 +1133,19 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             // Get a sub container.
             ContentContainer contentContainer = contentContainerStack.pop();
 
-            for (Content c : contentContainer.getContents()) {
-
-                if (c.getId() == content.getId()) {
-                    parentContainer = contentContainer;
-                }
+            /* Zype, Evgeny Cherkasov */
+            // The video may be included in multiple playlists. So we should check the video
+            // playlistId rather than videoId
+//            for (Content c : contentContainer.getContents()) {
+//
+//                if (c.getId() == content.getId()) {
+//                    parentContainer = contentContainer;
+//                }
+//            }
+            String playlistId = (String) contentContainer.getExtraStringValue("keyDataType");
+            if (playlistId != null && playlistId.equals(content.getExtraValue("playlistId"))) {
+                parentContainer = contentContainer;
+                break;
             }
 
             // Add all the sub containers.
@@ -1521,7 +1569,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                            boolean showErrorDialog) {
 
         /* Zype, Evgeny Cherkasov */
-        // Check for content on subscription if the user logged in and subscribed
+        // Check if subscription video available to user
         if (content.isSubscriptionRequired()) {
             mAuthHelper.isAuthenticated().subscribe(isAuthenticatedResultBundle -> {
                 boolean result = isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT);

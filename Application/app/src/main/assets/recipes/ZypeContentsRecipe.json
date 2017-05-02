@@ -12,6 +12,7 @@
     "playerUrl@url",
     "thumbnails@cardImageUrl",
     "thumbnails@backgroundImageUrl",
+    "playlistId@playlistId",
     "subscription_required@subscriptionRequired"
   ]
 }
