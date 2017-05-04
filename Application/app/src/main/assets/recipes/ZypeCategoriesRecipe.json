@@ -8,7 +8,8 @@
   "matchList": [
     "title@name",
     "parent_id@parentId",
-    "thumbnails@thumbnails"
+    "thumbnails@thumbnails",
+    "playlist_item_count@playlistItemCount"
   ],
   "keyDataType": "_id@keyDataPath"
 }

@@ -222,6 +222,13 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
                                   RowPresenter.ViewHolder rowViewHolder, Row row) {
 
+            if (item instanceof ContentContainer) {
+                ContentContainer contentContainer = (ContentContainer) item;
+                if (!contentContainer.getContents().isEmpty()) {
+                    item = contentContainer.getContents().get(0);
+                }
+            }
+
             if (item instanceof Content) {
                 Content content = (Content) item;
                 Log.d(TAG, "Content with title " + content.getTitle() + " was clicked");
@@ -236,9 +243,9 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                 Log.d(TAG, "ContentContainer with name " + contentContainer.getName() + " was " +
                         "clicked");
 
-                ContentContainer selectedContentContainer = ContentBrowser.getInstance(getActivity()).getContainerForContentContainer(contentContainer);
+//                ContentContainer selectedContentContainer = ContentBrowser.getInstance(getActivity()).getContainerForContentContainer(contentContainer);
                 ContentBrowser.getInstance(getActivity())
-                        .setLastSelectedContentContainer(selectedContentContainer)
+                        .setLastSelectedContentContainer(contentContainer)
                         .switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
             }
             else if (item instanceof Action) {

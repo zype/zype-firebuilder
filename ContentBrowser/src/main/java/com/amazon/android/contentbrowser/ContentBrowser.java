@@ -1756,56 +1756,50 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                         Log.d(TAG, "Dynamic parser got an container");
                     }
                     return alreadyAvailableContentContainer;
-                });
+                })
+                /* Zype, Evgeny Cherkasov */
+                // Get all nested playlists for each playlist in root
+                .concatMap(contentContainer -> getSubCategoriesObservable(contentContainer, dataLoaderRecipeForCategories, dynamicParserRecipeForCategories));
     }
 
     /* Zype, Evgeny Cherkasov */
-    private Observable<Object> getSubCategoriesObservable(Observable<Object> observable,
-                                                     Recipe dataLoaderRecipeForCategories,
-                                                     Recipe dynamicParserRecipeForCategories) {
-        return observable
-            .concatMap(objectPair -> {
-                ContentContainer contentContainer = (ContentContainer) ((Pair) objectPair).first;
-                contentContainer.getContentContainers().clear();
-                if (DEBUG_RECIPE_CHAIN) {
-                    Log.d(TAG, "getSubCategoriesObservable(): ContentContainer=" + contentContainer.getName());
-                }
-
-                return mDataLoadManager.cookRecipeObservable(
-                        dataLoaderRecipeForCategories,
-                        null,
-                        null,
-                        null).map(
-                        feedDataForCategories -> {
-                            if (DEBUG_RECIPE_CHAIN) {
-                                Log.d(TAG, "Feed download complete");
-                            }
-                            if (CAUSE_A_FEED_ERROR_FOR_DEBUGGING) {
-                                return Observable.error(new Exception());
-                            }
-                            return Pair.create(contentContainer, feedDataForCategories);
-                        });
-            })
-            .concatMap(objectPair1 -> {
-                ContentContainer contentContainer = (ContentContainer) ((Pair) objectPair1).first;
-                String feed = (String) ((Pair) objectPair1).second;
-
-                String[] params = new String[]{(String) contentContainer
-                        .getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG)
-                };
-                return mDynamicParser.cookRecipeObservable(
-                        dynamicParserRecipeForCategories,
-                        feed,
-                        null,
-                        params)
-                    .map(contentContainerAsObject -> {
-                        ContentContainer subContentContainer = (ContentContainer) contentContainerAsObject;
-                        if (subContentContainer != null) {
-                            contentContainer.addContentContainer(subContentContainer);
-                        }
-                        return Pair.create(contentContainer, contentContainerAsObject);
-                    });
-            });
+    private Observable<Object> getSubCategoriesObservable(ContentContainer contentContainer,
+                                                          Recipe dataLoaderRecipeForCategories,
+                                                          Recipe dynamicParserRecipeForCategories) {
+        contentContainer.getContentContainers().clear();
+        if ((Integer) contentContainer.getExtraStringValue("playlistItemCount") > 0) {
+            // If playlist contains videos just return itself and ignore nested playlists
+            return Observable.just(contentContainer);
+        }
+        else {
+            return Observable.concat(
+                    Observable.just(contentContainer),
+                    mDataLoadManager.cookRecipeObservable(dataLoaderRecipeForCategories, null, null, null)
+                            .map(feedDataForCategories -> {
+                                if (DEBUG_RECIPE_CHAIN) {
+                                    Log.d(TAG, "Feed download complete");
+                                }
+                                if (CAUSE_A_FEED_ERROR_FOR_DEBUGGING) {
+                                    return Observable.error(new Exception());
+                                }
+                                return feedDataForCategories;
+                            })
+                            .concatMap(feedDataForCategories -> {
+                                String[] params = new String[]{(String) contentContainer.getExtraStringValue("keyDataType")};
+                                return mDynamicParser.cookRecipeObservable(dynamicParserRecipeForCategories, feedDataForCategories, null, params)
+                                        .filter(contentSubContainerAsObject -> contentSubContainerAsObject != null)
+                                        .map(contentSubContainerAsObject -> {
+                                            if (contentSubContainerAsObject == null) {
+                                                return contentContainer;
+                                            }
+                                            ContentContainer contentSubContainer = (ContentContainer) contentSubContainerAsObject;
+                                            contentContainer.getContentContainers().add(contentSubContainer);
+                                            return contentSubContainer;
+                                        })
+                                        .concatMap(contentSubContainer -> getSubCategoriesObservable(contentSubContainer, dataLoaderRecipeForCategories, dynamicParserRecipeForCategories));
+                            })
+            );
+        }
     }
 
     /**
@@ -1898,14 +1892,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                    });
         }
 
-    /* Zype, Evgeny Cherkasov */
-    // Get subcategories added to chain observable
-//        return getContentsObservable(observable, dataLoaderRecipeForContents,
-//                                     dynamicParserRecipeForContents);
-        Observable<Object> observableContents = getContentsObservable(observable, dataLoaderRecipeForContents,
+        return getContentsObservable(observable, dataLoaderRecipeForContents,
                                      dynamicParserRecipeForContents);
-        return getSubCategoriesObservable(observableContents, dataLoaderRecipeForCategories,
-                                            dynamicParserRecipeForCategories);
     }
 
     /**

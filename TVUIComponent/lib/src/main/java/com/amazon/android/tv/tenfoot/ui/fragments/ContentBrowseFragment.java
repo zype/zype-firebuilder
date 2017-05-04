@@ -189,6 +189,16 @@ public class ContentBrowseFragment extends RowsFragment {
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
                                   RowPresenter.ViewHolder rowViewHolder, Row row) {
 
+            /* Zype, Evgeny Cherkasov */
+            // If selected playlist contains videos then open video details screen of the first video
+            // in the playlist
+            if (item instanceof ContentContainer) {
+                ContentContainer contentContainer = (ContentContainer) item;
+                if (!contentContainer.getContents().isEmpty()) {
+                    item = contentContainer.getContents().get(0);
+                }
+            }
+
             if (item instanceof Content) {
                 Content content = (Content) item;
                 Log.d(TAG, "Content with title " + content.getTitle() + " was clicked");
@@ -207,7 +217,8 @@ public class ContentBrowseFragment extends RowsFragment {
 /* Zype, Evgeny Cherkasov */
 // Set parent of selected container as last seleceted
 //                              .setLastSelectedContentContainer(contentContainer)
-                              .setLastSelectedContentContainer(ContentBrowser.getInstance(getActivity()).getContainerForContentContainer(contentContainer))
+//                              .setLastSelectedContentContainer(ContentBrowser.getInstance(getActivity()).getContainerForContentContainer(contentContainer))
+                              .setLastSelectedContentContainer(contentContainer)
                               .switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
             }
             else if (item instanceof Action) {
