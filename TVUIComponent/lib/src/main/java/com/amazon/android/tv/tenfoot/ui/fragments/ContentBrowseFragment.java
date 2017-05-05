@@ -69,6 +69,8 @@ public class ContentBrowseFragment extends RowsFragment {
     private static final int WAIT_BEFORE_FOCUS_REQUEST_MS = 500;
     private OnBrowseRowListener mCallback;
     private ArrayObjectAdapter settingsAdapter = null;
+    /* Zype, Evgeny Cherkasov */
+    ArrayObjectAdapter mRowsAdapter = null;
 
     // Container Activity must implement this interface.
     public interface OnBrowseRowListener {
@@ -97,8 +99,10 @@ public class ContentBrowseFragment extends RowsFragment {
         // Uncomment this code to remove shadow from the cards
         //customListRowPresenter.setShadowEnabled(false);
 
-        ArrayObjectAdapter mRowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
-        
+        /* Zype, Evgney Cherkasov */
+//        ArrayObjectAdapter mRowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
+        mRowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
+
         addSettingsActionsToRowAdapter(mRowsAdapter);
         loadRootContentContainer(mRowsAdapter);
 
@@ -132,6 +136,10 @@ public class ContentBrowseFragment extends RowsFragment {
 
         if (settingsAdapter != null) {
             settingsAdapter.notifyArrayItemRangeChanged(0, settingsAdapter.size());
+        }
+        /* Zype, Evgney Cherkasov */
+        if (mRowsAdapter != null) {
+            mRowsAdapter.notifyArrayItemRangeChanged(0, mRowsAdapter.size());
         }
     }
 

@@ -33,7 +33,10 @@ import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.utils.Helpers;
 import com.amazon.android.tv.tenfoot.R;
+import com.amazon.android.utils.Preferences;
 import com.bumptech.glide.Glide;
+import com.zype.fire.auth.ZypeAuthentication;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -61,6 +64,9 @@ public class CardPresenter extends Presenter {
     private Drawable mDefaultCardImage;
     private static Drawable sFocusedFadeMask;
     private View mInfoField;
+    /* Zype, Evgeny Cherkasov */
+    private Drawable imageLocked;
+    private Drawable imageUnlocked;
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
@@ -69,6 +75,9 @@ public class CardPresenter extends Presenter {
         try {
             mDefaultCardImage = ContextCompat.getDrawable(context, R.drawable.movie);
             sFocusedFadeMask = ContextCompat.getDrawable(context, R.drawable.content_fade_focused);
+            /* Zype, Evgeny Cherkasov */
+            imageLocked = ContextCompat.getDrawable(context, R.drawable.locked);
+            imageUnlocked = ContextCompat.getDrawable(context, R.drawable.unlocked);
         }
         catch (Resources.NotFoundException e) {
             Log.e(TAG, "Could not find resource ", e);
@@ -136,6 +145,17 @@ public class CardPresenter extends Presenter {
                      .centerCrop()
                      .error(mDefaultCardImage)
                      .into(cardView.getMainImageView());
+
+                /*Zype, EvgenyCherkasov */
+                // Display lock icon for subscription video
+                if (content.isSubscriptionRequired()) {
+                    if (Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0) {
+                        cardView.setBadgeImage(imageUnlocked);
+                    }
+                    else {
+                        cardView.setBadgeImage(imageLocked);
+                    }
+                }
             }
         }
         else if (item instanceof ContentContainer) {

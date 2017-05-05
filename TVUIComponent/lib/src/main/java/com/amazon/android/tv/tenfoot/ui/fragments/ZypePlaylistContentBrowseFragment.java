@@ -76,6 +76,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
     private static final int WAIT_BEFORE_FOCUS_REQUEST_MS = 500;
     private OnBrowseRowListener mCallback;
     private ArrayObjectAdapter settingsAdapter = null;
+    ArrayObjectAdapter mRowsAdapter = null;
 
     private BroadcastReceiver receiver;
 
@@ -114,7 +115,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
         // Uncomment this code to remove shadow from the cards
         //customListRowPresenter.setShadowEnabled(false);
 
-        ArrayObjectAdapter mRowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
+        mRowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
         
 //        addSettingsActionsToRowAdapter(mRowsAdapter);
         loadRootContentContainer(mRowsAdapter);
@@ -164,6 +165,9 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
 
         if (settingsAdapter != null) {
             settingsAdapter.notifyArrayItemRangeChanged(0, settingsAdapter.size());
+        }
+        if (mRowsAdapter != null) {
+            mRowsAdapter.notifyArrayItemRangeChanged(0, mRowsAdapter.size());
         }
     }
 
