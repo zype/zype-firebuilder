@@ -1,6 +1,7 @@
 package com.amazon.dataloader.datadownloader;
 
 import android.content.Context;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -9,6 +10,11 @@ import com.amazon.android.utils.Helpers;
 import com.amazon.android.utils.NetworkUtils;
 import com.amazon.dataloader.R;
 import com.amazon.utils.model.Data;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.zype.fire.api.Model.PlaylistData;
+import com.zype.fire.api.Model.PlaylistsResponse;
+import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeSettings;
 
 import org.json.JSONArray;
@@ -38,9 +44,9 @@ import java.util.Map;
 public class ZypeDataDownloader extends ADataDownloader {
     private static final String TAG = ZypeDataDownloader.class.getSimpleName();
 
-     // Key to locate the URL generator implementation.
+    // Key to locate the URL generator implementation.
     protected static final String URL_GENERATOR_IMPL = "url_generator_impl";
-     // Key to locate the URL generator.
+    // Key to locate the URL generator.
     protected static final String URL_GENERATOR_RECIPE = "url_generator";
 
     /**
@@ -105,48 +111,60 @@ public class ZypeDataDownloader extends ADataDownloader {
      */
     @Override
     protected Data fetchData(Recipe dataLoadRecipe) throws Exception {
-        // Starting with an empty map and replacing it with a map from recipe if one exists.
-        Map urlGeneratorRecipeMap = Collections.emptyMap();
-        if (dataLoadRecipe.getMap().containsKey(URL_GENERATOR_RECIPE)) {
-            urlGeneratorRecipeMap = (Map) dataLoadRecipe.getMap().get(URL_GENERATOR_RECIPE);
-        }
-        // Get the url.
-        String url = urlGenerator.getUrl(urlGeneratorRecipeMap);
-        Log.d(TAG, "url: " + url);
-        Data result = Data.createDataForPayload(NetworkUtils.getDataLocatedAtUrl(url));
-        JSONObject jsonResult = new JSONObject(result.getContent().getPayload());
+        Log.d(TAG, "fetchData(): Started");
+
+        List<PlaylistData> playlists = loadPlaylists();
+        Log.d(TAG, "fetchData(): Playlists loaded");
+
+//        // Starting with an empty map and replacing it with a map from recipe if one exists.
+//        Map urlGeneratorRecipeMap = Collections.emptyMap();
+//        if (dataLoadRecipe.getMap().containsKey(URL_GENERATOR_RECIPE)) {
+//            urlGeneratorRecipeMap = (Map) dataLoadRecipe.getMap().get(URL_GENERATOR_RECIPE);
+//        }
+//        // Get the url.
+//        String url = urlGenerator.getUrl(urlGeneratorRecipeMap);
+//        Log.d(TAG, "url: " + url);
+//        Data result = Data.createDataForPayload(NetworkUtils.getDataLocatedAtUrl(url));
+//        JSONObject jsonResult = new JSONObject(result.getContent().getPayload());
 
         Map<String, Object> params;
         // Url to retrieve playlist videos
         params = new HashMap<>();
         params.put("url_index", "1");
         String urlPlaylistVideos = urlGenerator.getUrl(params);
-        // Url to retrieve player
-        params = new HashMap<>();
-        params.put("url_index", "3");
-        String urlPlayer = urlGenerator.getUrl(params);
+//        // Url to retrieve player
+//        params = new HashMap<>();
+//        params.put("url_index", "3");
+//        String urlPlayer = urlGenerator.getUrl(params);
 
         // Result data
         JSONArray jsonCategories = new JSONArray();
         JSONArray jsonContents = new JSONArray();
 
-        JSONArray jsonPlaylists = jsonResult.getJSONArray("response");
-        List<JSONObject> playlists = new ArrayList<>();
-        for (int i = 0; i < jsonPlaylists.length(); i++) {
-            JSONObject jsonPlaylistData = jsonPlaylists.getJSONObject(i);
-            playlists.add(jsonPlaylistData);
+//        JSONArray jsonPlaylists = jsonResult.getJSONArray("response");
+//        List<JSONObject> playlists = new ArrayList<>();
+//        for (int i = 0; i < jsonPlaylists.length(); i++) {
+        for (PlaylistData playlistData : playlists) {
+            // Skip not direct root child playlist
+            if (TextUtils.isEmpty(playlistData.parentId) || !playlistData.parentId.equals(ZypeSettings.ROOT_PLAYLIST_ID)) {
+                continue;
+            }
+//            JSONObject jsonPlaylistData = jsonPlaylists.getJSONObject(i);
+//            playlists.add(jsonPlaylistData);
 
-            String playlistId = jsonPlaylistData.getString("_id");
+//            String playlistId = jsonPlaylistData.getString("_id");
+            String playlistId = playlistData.id;
 
-            if (jsonPlaylistData.getInt("playlist_item_count") > 0) {
-                url = String.format(urlPlaylistVideos, playlistId);
+//            if (jsonPlaylistData.getInt("playlist_item_count") > 0) {
+            if (playlistData.playlistItemCount > 0) {
+                Log.d(TAG, "fetchData(): Loading videos for " + playlistData.title);
+                String url = String.format(urlPlaylistVideos, playlistId);
                 try {
                     String playlistVideosResponse = NetworkUtils.getDataLocatedAtUrl(url);
                     JSONObject jsonPlaylistVideosResponse = new JSONObject(playlistVideosResponse);
                     JSONArray jsonPlaylistVideos = jsonPlaylistVideosResponse.getJSONArray("response");
                     for (int j = 0; j < jsonPlaylistVideos.length(); j++) {
                         JSONObject jsonVideoData = jsonPlaylistVideos.getJSONObject(j);
-                        String videoId = jsonVideoData.getString("_id");
                         // Put a space string for description if it is not specified to avoid crashing
                         // because 'description' is mandatory field in the Content model
                         if (TextUtils.isEmpty(jsonVideoData.getString("description")) || jsonVideoData.getString("description").equals("null")) {
@@ -161,7 +179,7 @@ public class ZypeDataDownloader extends ADataDownloader {
                     }
                 }
                 catch (IOException e) {
-                    jsonPlaylistData.put("videoIds", new JSONArray());
+//                    jsonPlaylistData.put("videoIds", new JSONArray());
                     Log.d(TAG, "Error get playlist videos. playlistId=" + playlistId);
                 }
             }
@@ -169,66 +187,61 @@ public class ZypeDataDownloader extends ADataDownloader {
 
             }
         }
+        Log.d(TAG, "fetchData(): Videos loaded");
 
         Collections.sort(playlists, (a, b) -> {
             Integer valA;
             Integer valB;
             try {
-                valA = a.getInt("priority");
-                valB = b.getInt("priority");
+//                valA = a.getInt("priority");
+//                valB = b.getInt("priority");
+                valA = a.priority;
+                valB = b.priority;
             }
-            catch (JSONException e) {
+            catch (Exception e) {
                 return 0;
             }
             return valA.compareTo(valB);
         });
-        for (JSONObject jsonPlaylistData : playlists) {
-            String playlistId = jsonPlaylistData.getString("_id");
-            if (playlistId.equals(ZypeSettings.ROOT_PLAYLIST_ID)) {
+//        for (JSONObject jsonPlaylistData : playlists) {
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+        for (PlaylistData playlistData : playlists) {
+//            String playlistId = jsonPlaylistData.getString("_id");
+            String playlistId = playlistData.id;
+            if (playlistId.equals(ZypeSettings.ROOT_PLAYLIST_ID) || TextUtils.isEmpty(playlistData.parentId)) {
                 continue;
             }
-            jsonCategories.put(jsonPlaylistData);
+            jsonCategories.put(new JSONObject(gson.toJson(playlistData)));
         }
 
-        jsonResult = new JSONObject();
+        JSONObject jsonResult = new JSONObject();
         jsonResult.put("categories", jsonCategories);
         jsonResult.put("contents", jsonContents);
-        result.getContent().setPayload(jsonResult.toString());
+//        result.getContent().setPayload(jsonResult.toString());
 
+//        return result;
+        Log.d(TAG, "fetchData(): finished");
+        return Data.createDataForPayload(jsonResult.toString());
+    }
+
+    private List<PlaylistData> loadPlaylists() {
+        List<PlaylistData> result = new ArrayList<>();
+
+        int page = 1;
+        PlaylistsResponse playlistsResponse = ZypeApi.getInstance().getPlaylists(page);
+        if (playlistsResponse != null && playlistsResponse.response != null) {
+            result.addAll(playlistsResponse.response);
+            if (playlistsResponse.pagination != null && playlistsResponse.pagination.pages > 1) {
+                for (page = playlistsResponse.pagination.next; page <= playlistsResponse.pagination.pages; page++) {
+                    playlistsResponse = ZypeApi.getInstance().getPlaylists(page);
+                    if (playlistsResponse != null && playlistsResponse.response != null) {
+                        result.addAll(playlistsResponse.response);
+                    }
+                }
+            }
+        }
         return result;
     }
-
-
-    public static String getDataLocatedAtUrl(String urlString) throws IOException {
-
-        InputStream inputStream = null;
-
-        try {
-            URL url = new URL(urlString);
-            URLConnection urlConnection = url.openConnection();
-            urlConnection.setRequestProperty("User-Agent", "Dalvik/2.1.0 (Zype Android; Linux; U; Android 5.0.2; One X Build/LRX22G)");
-            inputStream = new BufferedInputStream(urlConnection.getInputStream());
-            BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    urlConnection.getInputStream(), Helpers.getDefaultAppCharset()), 8);
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-            return sb.toString();
-        }
-        finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                    inputStream = null;
-                }
-                catch (IOException e) {
-                    Log.e(TAG, "Closing input stream failed", e);
-                }
-            }
-        }
-    }
-
 
 }

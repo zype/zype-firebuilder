@@ -1,0 +1,18 @@
+{
+  "cooker": "DynamicParser",
+  "format": "json",
+  "model": "com.amazon.android.model.content.Content",
+  "translator": "ZypeContentTranslator",
+  "modelType": "single",
+  "query": "$.[*]",
+  "matchList": [
+    "title@title",
+    "_id@id",
+    "description@description",
+    "playerUrl@url",
+    "thumbnails@cardImageUrl",
+    "thumbnails@backgroundImageUrl",
+    "playlistId@playlistId",
+    "subscription_required@subscriptionRequired"
+  ]
+}

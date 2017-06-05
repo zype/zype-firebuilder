@@ -1,11 +1,10 @@
 package com.zype.fire.api;
 
-import android.content.Context;
-
 import com.zype.fire.api.Model.AccessTokenInfoResponse;
 import com.zype.fire.api.Model.AccessTokenResponse;
 import com.zype.fire.api.Model.ConsumerResponse;
-import com.zype.fire.api.Model.PlayerResponse;
+import com.zype.fire.api.Model.PlaylistsResponse;
+import com.zype.fire.api.Model.VideosResponse;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -13,8 +12,6 @@ import java.util.Map;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -25,9 +22,21 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ZypeApi {
     private static final String BASE_URL = "https://api.zype.com/";
-    private static final String CLIENT_GRAND_TYPE = "grant_type";
+
+    // Parameters
+    public static final String ACCESS_TOKEN = "access_token";
+    public static final String APP_KEY = "app_key";
+    private static final String CLIENT_GRANT_TYPE = "grant_type";
     private static final String CLIENT_ID = "client_id";
     private static final String CLIENT_SECRET = "client_secret";
+    private static final String PAGE = "page";
+    public static final String PER_PAGE = "per_page";
+    private static final String PASSWORD = "password";
+    public static final String QUERY = "q";
+    private static final String REFRESH_TOKEN = "refresh_token";
+    private static final String USERNAME = "username";
+
+    public static final int PER_PAGE_DEFAULT = 100;
 
     private static ZypeApi instance;
     private static IZypeApi apiImpl;
@@ -59,12 +68,11 @@ public class ZypeApi {
 
     public AccessTokenResponse retrieveAccessToken(String username, String password) {
         Map<String, String> params = new HashMap<>();
-        params.put("username", username);
-        params.put("password", password);
-        // TODO: Move client id and secret values to configuration file
-        params.put("client_id", "62f1d247b4c5e77b6111d9a9ed8b3b64bab6be66cc8b7513a928198083cd1c72");
-        params.put("client_secret", "06f45687da00bbe3cf51dddc7dbd7a288d1c852cf0b9a6e76e25bb115dcf872c");
-        params.put("grant_type", "password");
+        params.put(USERNAME, username);
+        params.put(PASSWORD, password);
+        params.put(CLIENT_ID, ZypeSettings.CLIENT_ID);
+        params.put(CLIENT_SECRET, ZypeSettings.CLIENT_SECRET);
+        params.put(CLIENT_GRANT_TYPE, "password");
         try {
             Response response = apiImpl.retrieveAccessToken(params).execute();
             if (response.isSuccessful()) {
@@ -81,11 +89,10 @@ public class ZypeApi {
 
     public AccessTokenResponse refreshAccessToken(String refreshToken) {
         Map<String, String> params = new HashMap<>();
-        params.put("refresh_token", refreshToken);
-        // TODO: Move client id and secret values to configuration file
-        params.put("client_id", "62f1d247b4c5e77b6111d9a9ed8b3b64bab6be66cc8b7513a928198083cd1c72");
-        params.put("client_secret", "06f45687da00bbe3cf51dddc7dbd7a288d1c852cf0b9a6e76e25bb115dcf872c");
-        params.put("grant_type", "refresh_token");
+        params.put(REFRESH_TOKEN, refreshToken);
+        params.put(CLIENT_ID, ZypeSettings.CLIENT_ID);
+        params.put(CLIENT_SECRET, ZypeSettings.CLIENT_SECRET);
+        params.put(CLIENT_GRANT_TYPE, "refresh_token");
         try {
             Response response = apiImpl.retrieveAccessToken(params).execute();
             if (response.isSuccessful()) {
@@ -118,7 +125,7 @@ public class ZypeApi {
     public ConsumerResponse getConsumer(String consumerId, String accessToken) {
         try {
             HashMap<String, String> params = new HashMap<>();
-            params.put("access_token", accessToken);
+            params.put(ACCESS_TOKEN, accessToken);
             Response response = apiImpl.getConsumer(consumerId, params).execute();
             if (response.isSuccessful()) {
                 return (ConsumerResponse) response.body();
@@ -131,4 +138,60 @@ public class ZypeApi {
             return null;
         }
     }
+
+    public PlaylistsResponse getPlaylists(int page) {
+        try {
+            HashMap<String, String> params = new HashMap<>();
+            params.put(APP_KEY, ZypeSettings.APP_KEY);
+            params.put(PER_PAGE, String.valueOf(PER_PAGE_DEFAULT));
+            Response response = apiImpl.getPlaylists(page, params).execute();
+            if (response.isSuccessful()) {
+                return (PlaylistsResponse) response.body();
+            }
+            else {
+                return null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public VideosResponse getPlaylistVideos(String playlistId) {
+        try {
+            HashMap<String, String> params = new HashMap<>();
+            params.put(APP_KEY, ZypeSettings.APP_KEY);
+            params.put(PER_PAGE, String.valueOf(PER_PAGE_DEFAULT));
+            Response response = apiImpl.getPlaylistVideos(playlistId, 1, params).execute();
+            if (response.isSuccessful()) {
+                return (VideosResponse) response.body();
+            }
+            else {
+                return null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public VideosResponse searchVideos(String query) {
+        try {
+            HashMap<String, String> params = new HashMap<>();
+            params.put(APP_KEY, ZypeSettings.APP_KEY);
+            params.put(PER_PAGE, String.valueOf(PER_PAGE_DEFAULT));
+            params.put(QUERY, query);
+            Response response = apiImpl.getVideos(1, params).execute();
+            if (response.isSuccessful()) {
+                return (VideosResponse) response.body();
+            }
+            else {
+                return null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }

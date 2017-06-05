@@ -57,6 +57,7 @@ import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v17.leanback.widget.VerticalGridView;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -90,8 +91,8 @@ public class ContentBrowseFragment extends RowsFragment {
         }
         catch (ClassCastException e) {
             throw new ClassCastException(getActivity().toString() +
-                                                 " must implement " +
-                                                 "OnBrowseRowListener: " + e);
+                    " must implement " +
+                    "OnBrowseRowListener: " + e);
         }
 
         CustomListRowPresenter customListRowPresenter = new CustomListRowPresenter();
@@ -146,7 +147,7 @@ public class ContentBrowseFragment extends RowsFragment {
     private void loadRootContentContainer(ArrayObjectAdapter rowsAdapter) {
 
         ContentContainer rootContentContainer = ContentBrowser.getInstance(getActivity())
-                                                              .getRootContentContainer();
+                .getRootContentContainer();
 
         CardPresenter cardPresenter = new CardPresenter();
 
@@ -205,6 +206,22 @@ public class ContentBrowseFragment extends RowsFragment {
                 if (!contentContainer.getContents().isEmpty()) {
                     item = contentContainer.getContents().get(0);
                 }
+                else {
+                    if ((Integer) contentContainer.getExtraStringValue("playlistItemCount") > 0) {
+                        // Playlist has  videos, but they is not loaded yet.
+                        // Load videos and then open video detail screen of the first video in the playlist
+                        ContentBrowser.ILoadContentForContentContainer listener = new ContentBrowser.ILoadContentForContentContainer() {
+                            @Override
+                            public void onContentsLoaded() {
+                                ContentBrowser.getInstance(getActivity())
+                                        .setLastSelectedContent(contentContainer.getContents().get(0))
+                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                            }
+                        };
+                        ContentBrowser.getInstance(getActivity()).loadContentForContentContainer(contentContainer, listener);
+                        return;
+                    }
+                }
             }
 
             if (item instanceof Content) {
@@ -212,8 +229,8 @@ public class ContentBrowseFragment extends RowsFragment {
                 Log.d(TAG, "Content with title " + content.getTitle() + " was clicked");
 
                 ContentBrowser.getInstance(getActivity())
-                              .setLastSelectedContent(content)
-                              .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                        .setLastSelectedContent(content)
+                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
 
             }
             else if (item instanceof ContentContainer) {
@@ -222,19 +239,15 @@ public class ContentBrowseFragment extends RowsFragment {
                         "clicked");
 
                 ContentBrowser.getInstance(getActivity())
-/* Zype, Evgeny Cherkasov */
-// Set parent of selected container as last seleceted
-//                              .setLastSelectedContentContainer(contentContainer)
-//                              .setLastSelectedContentContainer(ContentBrowser.getInstance(getActivity()).getContainerForContentContainer(contentContainer))
-                              .setLastSelectedContentContainer(contentContainer)
-                              .switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
+                        .setLastSelectedContentContainer(contentContainer)
+                        .switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
             }
             else if (item instanceof Action) {
                 Action settingsAction = (Action) item;
                 Log.d(TAG, "Settings with title " + settingsAction.getAction() + " was clicked");
                 ContentBrowser.getInstance(getActivity())
-                              .settingsActionTriggered(getActivity(),
-                                                       settingsAction);
+                        .settingsActionTriggered(getActivity(),
+                                settingsAction);
             }
         }
     }

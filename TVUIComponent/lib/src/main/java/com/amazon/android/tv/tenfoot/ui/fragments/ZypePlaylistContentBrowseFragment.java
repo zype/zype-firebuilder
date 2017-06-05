@@ -106,8 +106,8 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
         }
         catch (ClassCastException e) {
             throw new ClassCastException(getActivity().toString() +
-                                                 " must implement " +
-                                                 "OnBrowseRowListener: " + e);
+                    " must implement " +
+                    "OnBrowseRowListener: " + e);
         }
 
         CustomListRowPresenter customListRowPresenter = new CustomListRowPresenter();
@@ -116,7 +116,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
         //customListRowPresenter.setShadowEnabled(false);
 
         mRowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
-        
+
 //        addSettingsActionsToRowAdapter(mRowsAdapter);
         loadRootContentContainer(mRowsAdapter);
 
@@ -231,6 +231,22 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                 if (!contentContainer.getContents().isEmpty()) {
                     item = contentContainer.getContents().get(0);
                 }
+                else {
+                    if ((Integer) contentContainer.getExtraStringValue("playlistItemCount") > 0) {
+                        // Playlist has  videos, but they is not loaded yet.
+                        // Load videos and then open video detail screen of the first video in the playlist
+                        ContentBrowser.ILoadContentForContentContainer listener = new ContentBrowser.ILoadContentForContentContainer() {
+                            @Override
+                            public void onContentsLoaded() {
+                                ContentBrowser.getInstance(getActivity())
+                                        .setLastSelectedContent(contentContainer.getContents().get(0))
+                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                            }
+                        };
+                        ContentBrowser.getInstance(getActivity()).loadContentForContentContainer(contentContainer, listener);
+                        return;
+                    }
+                }
             }
 
             if (item instanceof Content) {
@@ -238,8 +254,8 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                 Log.d(TAG, "Content with title " + content.getTitle() + " was clicked");
 
                 ContentBrowser.getInstance(getActivity())
-                              .setLastSelectedContent(content)
-                              .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                        .setLastSelectedContent(content)
+                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
 
             }
             else if (item instanceof ContentContainer) {
@@ -247,7 +263,6 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                 Log.d(TAG, "ContentContainer with name " + contentContainer.getName() + " was " +
                         "clicked");
 
-//                ContentContainer selectedContentContainer = ContentBrowser.getInstance(getActivity()).getContainerForContentContainer(contentContainer);
                 ContentBrowser.getInstance(getActivity())
                         .setLastSelectedContentContainer(contentContainer)
                         .switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
@@ -256,8 +271,8 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                 Action settingsAction = (Action) item;
                 Log.d(TAG, "Settings with title " + settingsAction.getAction() + " was clicked");
                 ContentBrowser.getInstance(getActivity())
-                              .settingsActionTriggered(getActivity(),
-                                                       settingsAction);
+                        .settingsActionTriggered(getActivity(),
+                                settingsAction);
             }
         }
     }

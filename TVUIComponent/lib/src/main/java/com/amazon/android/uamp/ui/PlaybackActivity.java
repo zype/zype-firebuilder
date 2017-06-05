@@ -208,7 +208,7 @@ public class PlaybackActivity extends Activity implements
                     Log.e(TAG, "Video position tracking failed.", e);
                 }
                 mVideoPositionTrackingHandler.postDelayed(this,
-                                                          VIDEO_POSITION_TRACKING_POLL_TIME_MS);
+                        VIDEO_POSITION_TRACKING_POLL_TIME_MS);
             }
         };
 
@@ -231,9 +231,9 @@ public class PlaybackActivity extends Activity implements
                 (Content) getIntent().getSerializableExtra(Content.class.getSimpleName());
 
         mContentIdFromPreferences = getIntent().getLongExtra(com.amazon.android.model.content
-                                                                     .constants
-                                                                     .PreferencesConstants
-                                                                     .CONTENT_ID, 0);
+                .constants
+                .PreferencesConstants
+                .CONTENT_ID, 0);
         mSelectedContentId = mSelectedContent.getId();
 
         if (mSelectedContent == null || TextUtils.isEmpty(mSelectedContent.getUrl())) {
@@ -295,7 +295,7 @@ public class PlaybackActivity extends Activity implements
 
         // Get persisted state of CC.
         mIsCloseCaptionEnabled = Preferences.getBoolean(PreferencesConstants
-                                                                .IS_CLOSE_CAPTION_FLAG_PERSISTED);
+                .IS_CLOSE_CAPTION_FLAG_PERSISTED);
 
         long recentContentSeekPosition = Preferences.getLong(
                 com.amazon.android.model.content.constants.PreferencesConstants.SEEK_POSITION);
@@ -339,15 +339,15 @@ public class PlaybackActivity extends Activity implements
 
         // Persist CC state.
         Preferences.setBoolean(PreferencesConstants
-                                       .IS_CLOSE_CAPTION_FLAG_PERSISTED, mIsCloseCaptionEnabled);
+                .IS_CLOSE_CAPTION_FLAG_PERSISTED, mIsCloseCaptionEnabled);
         Log.d(TAG, "Close captioning enable status is " + mIsCloseCaptionEnabled);
         if (mPlayer.getCurrentPosition() > 0) {
             Preferences.setLong(com.amazon.android.model.content.constants.PreferencesConstants
-                                        .FINAL_POSITION, mPlayer.getDuration());
+                    .FINAL_POSITION, mPlayer.getDuration());
             Preferences.setLong(com.amazon.android.model.content.constants.PreferencesConstants
-                                        .CONTENT_ID, mSelectedContentId);
+                    .CONTENT_ID, mSelectedContentId);
             Preferences.setLong(com.amazon.android.model.content.constants.PreferencesConstants
-                                        .SEEK_POSITION, mPlayer.getCurrentPosition());
+                    .SEEK_POSITION, mPlayer.getCurrentPosition());
         }
         mIsActivityResumed = false;
         pause();
@@ -404,7 +404,7 @@ public class PlaybackActivity extends Activity implements
 
             mPlaybackOverlayFragment.fastForward();
             mTransportControlsUpdateHandler.postDelayed(new ContinualFwdUpdater(),
-                                                        TRANSPORT_CONTROLS_DELAY_PERIOD);
+                    TRANSPORT_CONTROLS_DELAY_PERIOD);
         }
     }
 
@@ -418,7 +418,7 @@ public class PlaybackActivity extends Activity implements
 
             mPlaybackOverlayFragment.fastRewind();
             mTransportControlsUpdateHandler.postDelayed(new ContinualRewindUpdater(),
-                                                        TRANSPORT_CONTROLS_DELAY_PERIOD);
+                    TRANSPORT_CONTROLS_DELAY_PERIOD);
         }
     }
 
@@ -779,23 +779,23 @@ public class PlaybackActivity extends Activity implements
             case KeyEvent.KEYCODE_MEDIA_PLAY:
                 playbackOverlayFragment.togglePlayback(false);
                 trackContentAction(AnalyticsConstants.ACTION_PLAYBACK_CONTROL_PLAY,
-                                   mSelectedContent);
+                        mSelectedContent);
                 return true;
             case KeyEvent.KEYCODE_MEDIA_PAUSE:
                 playbackOverlayFragment.togglePlayback(false);
                 trackContentAction(AnalyticsConstants.ACTION_PLAYBACK_CONTROL_PAUSE,
-                                   mSelectedContent);
+                        mSelectedContent);
                 return true;
             case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
                 if (mPlaybackState == LeanbackPlaybackState.PLAYING) {
                     playbackOverlayFragment.togglePlayback(false);
                     trackContentAction(AnalyticsConstants.ACTION_PLAYBACK_CONTROL_PAUSE,
-                                       mSelectedContent);
+                            mSelectedContent);
                 }
                 else {
                     playbackOverlayFragment.togglePlayback(true);
                     trackContentAction(AnalyticsConstants.ACTION_PLAYBACK_CONTROL_PLAY,
-                                       mSelectedContent);
+                            mSelectedContent);
                 }
                 return true;
             case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
@@ -806,7 +806,7 @@ public class PlaybackActivity extends Activity implements
                     playbackOverlayFragment.fastForward();
                 }
                 trackContentAction(AnalyticsConstants.ACTION_PLAYBACK_CONTROL_FF,
-                                   mSelectedContent);
+                        mSelectedContent);
                 return true;
             case KeyEvent.KEYCODE_MEDIA_REWIND:
                 if (mIsLongPress) {
@@ -817,7 +817,7 @@ public class PlaybackActivity extends Activity implements
                     playbackOverlayFragment.fastRewind();
                 }
                 trackContentAction(AnalyticsConstants.ACTION_PLAYBACK_CONTROL_REWIND,
-                                   mSelectedContent);
+                        mSelectedContent);
                 return true;
             case KeyEvent.KEYCODE_BUTTON_R1:
                 if (mIsLongPress) {
@@ -827,7 +827,7 @@ public class PlaybackActivity extends Activity implements
                     playbackOverlayFragment.fastForward();
                 }
                 trackContentAction(AnalyticsConstants.ACTION_PLAYBACK_CONTROL_FF,
-                                   mSelectedContent);
+                        mSelectedContent);
                 return true;
             case KeyEvent.KEYCODE_BUTTON_L1:
                 if (mIsLongPress) {
@@ -837,7 +837,7 @@ public class PlaybackActivity extends Activity implements
                     playbackOverlayFragment.fastRewind();
                 }
                 trackContentAction(AnalyticsConstants.ACTION_PLAYBACK_CONTROL_REWIND,
-                                   mSelectedContent);
+                        mSelectedContent);
                 return true;
             default:
                 return super.onKeyUp(keyCode, event);
@@ -897,8 +897,8 @@ public class PlaybackActivity extends Activity implements
             // Get default Ads implementation without creating a new one.
             try {
                 mAdsImplementation = (IAds) ModuleManager.getInstance()
-                                                         .getModule(IAds.class.getSimpleName())
-                                                         .getImpl(false);
+                        .getModule(IAds.class.getSimpleName())
+                        .getImpl(false);
                 playerExtras.putBundle("ads", mAdsImplementation.getExtra());
             }
             catch (Exception e) {
@@ -908,8 +908,8 @@ public class PlaybackActivity extends Activity implements
             // Create a player interface by using the default hooked implementation.
             String playerInterfaceName = UAMP.class.getSimpleName();
             mPlayer = (UAMP) ModuleManager.getInstance()
-                                          .getModule(playerInterfaceName)
-                                          .createImpl();
+                    .getModule(playerInterfaceName)
+                    .createImpl();
 
             // Init player interface, this is where it is fully created.
             mPlayer.init(this, mVideoView, playerExtras);
@@ -1102,8 +1102,8 @@ public class PlaybackActivity extends Activity implements
 
             if (mPlaybackOverlayFragment != null) {
                 mPlaybackOverlayFragment.updateCCButtonState(mIsContentSupportCC &&
-                                                                     mIsCloseCaptionEnabled,
-                                                             mIsContentSupportCC);
+                                mIsCloseCaptionEnabled,
+                        mIsContentSupportCC);
                 mPlaybackOverlayFragment.updateCurrentContent(mSelectedContent);
             }
 
@@ -1181,13 +1181,12 @@ public class PlaybackActivity extends Activity implements
         // player url and ad tag
         String videoId = (String) content.getExtraValue("_id");
         String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
-        String appKey = ZypeSettings.getAppKey();
         HashMap<String, String> params = new HashMap<>();
         if (!TextUtils.isEmpty(accessToken)) {
-            params.put("access_token", accessToken);
+            params.put(ZypeApi.ACCESS_TOKEN, accessToken);
         }
         else {
-            params.put("app_key", appKey);
+            params.put(ZypeApi.APP_KEY, ZypeSettings.APP_KEY);
         }
         ZypeApi.getInstance().getApi().getPlayer(IZypeApi.HEADER_USER_AGENT, videoId, params).enqueue(new Callback<PlayerResponse>() {
             @Override

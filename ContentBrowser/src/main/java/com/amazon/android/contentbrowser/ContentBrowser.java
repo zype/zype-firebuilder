@@ -53,6 +53,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v17.leanback.widget.ArrayObjectAdapter;
+import android.support.v17.leanback.widget.HeaderItem;
+import android.support.v17.leanback.widget.ListRow;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -75,9 +78,13 @@ import rx.subscriptions.CompositeSubscription;
 
 /* Zype */
 import com.amazon.android.model.translators.ZypeContentTranslator;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.zype.fire.api.IZypeApi;
 import com.zype.fire.api.Model.PlayerData;
 import com.zype.fire.api.Model.PlayerResponse;
+import com.zype.fire.api.Model.VideoData;
+import com.zype.fire.api.Model.VideosResponse;
 import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
@@ -97,7 +104,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     /**
      * Debug recipe chain flag.
      */
-    private static final boolean DEBUG_RECIPE_CHAIN = false;
+    private static final boolean DEBUG_RECIPE_CHAIN = true;
 
     /**
      * Cause a feed error flag for debugging.
@@ -526,7 +533,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         mOverrideAllContentsSubscriptionFlag =
                 mAppContext.getResources()
-                           .getBoolean(R.bool.override_all_contents_subscription_flag);
+                        .getBoolean(R.bool.override_all_contents_subscription_flag);
 
         addWidgetsAction(createSearchAction());
         //addWidgetsAction(createSlideShowAction());
@@ -587,6 +594,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 });
             }
         });
+        /* Zype, Evgeny Cherkasov */
+        setCustomSearchHandler(new ZypeSearchManager(Recipe.newInstance(mAppContext, "recipes/ZypeSearchContentsRecipe.json")));
 
         mNavigator.setINavigationListener(new Navigator.INavigationListener() {
 
@@ -617,7 +626,11 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 }
                 else {
                     if (screenName != null) {
+//                        if (screenName.equals(CONTENT_HOME_SCREEN)) {
+//                            loadContentForSubcontainers(activity, ContentBrowser.this);
+//                        }
                         if (screenName.equals(CONTENT_SUBMENU_SCREEN)) {
+//                            loadContentForSubcontainers(activity, ContentBrowser.this, getLastSelectedContentContainer());
                             runGlobalRecipesForLastSelected(activity, ContentBrowser.this);
                         }
                     }
@@ -691,8 +704,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         if (mLoginAction != null) {
             mLoginAction.setState(authenticationStatusUpdateEvent.isUserAuthenticated() ?
-                                          LogoutSettingsFragment.TYPE_LOGOUT :
-                                          LogoutSettingsFragment.TYPE_LOGIN);
+                    LogoutSettingsFragment.TYPE_LOGOUT :
+                    LogoutSettingsFragment.TYPE_LOGIN);
         }
         /* Zype, Evgeny Cherkasov */
         // Update user logged in flag
@@ -954,7 +967,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     private Action createTermsOfUseSettingsAction() {
         // Create the Terms of Use settings action.
         return new Action().setAction(TERMS).setIconResourceId(R.drawable.ic_terms_text)
-                           .setLabel1(mAppContext.getString(R.string.terms_title));
+                .setLabel1(mAppContext.getString(R.string.terms_title));
     }
 
     /**
@@ -965,16 +978,16 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     private Action createLogoutButtonSettingsAction() {
         // Create the logout button settings action.
         return new Action().setAction(LOGIN_LOGOUT)
-                           .setId(ContentBrowser.CONTENT_ACTION_LOGIN_LOGOUT)
-                           .setLabel1(LogoutSettingsFragment.TYPE_LOGOUT,
-                                      mAppContext.getString(R.string.logout_label))
-                           .setIconResourceId(LogoutSettingsFragment.TYPE_LOGOUT, R
-                                   .drawable.ic_login_logout)
-                           .setLabel1(LogoutSettingsFragment.TYPE_LOGIN,
-                                      mAppContext.getString(R.string.login_label))
-                           .setIconResourceId(LogoutSettingsFragment.TYPE_LOGIN, R
-                                   .drawable.ic_login_logout)
-                           .setState(LogoutSettingsFragment.TYPE_LOGIN);
+                .setId(ContentBrowser.CONTENT_ACTION_LOGIN_LOGOUT)
+                .setLabel1(LogoutSettingsFragment.TYPE_LOGOUT,
+                        mAppContext.getString(R.string.logout_label))
+                .setIconResourceId(LogoutSettingsFragment.TYPE_LOGOUT, R
+                        .drawable.ic_login_logout)
+                .setLabel1(LogoutSettingsFragment.TYPE_LOGIN,
+                        mAppContext.getString(R.string.login_label))
+                .setIconResourceId(LogoutSettingsFragment.TYPE_LOGIN, R
+                        .drawable.ic_login_logout)
+                .setState(LogoutSettingsFragment.TYPE_LOGIN);
     }
 
     /**
@@ -1022,8 +1035,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     private Action createSlideShowSettingAction() {
 
         return new Action().setAction(SLIDESHOW_SETTING)
-                           .setLabel1(mAppContext.getString(R.string.slideshow_title))
-                           .setIconResourceId(R.drawable.ic_terms_text);
+                .setLabel1(mAppContext.getString(R.string.slideshow_title))
+                .setIconResourceId(R.drawable.ic_terms_text);
     }
 
     /**
@@ -1207,9 +1220,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         }
         else {
             mSearchManager.syncSearch(DEFAULT_SEARCH_ALGO_NAME,
-                                      query,
-                                      iSearchResult,
-                                      mRootContentContainer);
+                    query,
+                    iSearchResult,
+                    mRootContentContainer);
         }
     }
 
@@ -1230,8 +1243,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             case TERMS:
                 new NoticeSettingsFragment()
                         .createFragment(activity,
-                                        activity.getFragmentManager(),
-                                        settingsAction);
+                                activity.getFragmentManager(),
+                                settingsAction);
                 break;
             case SLIDESHOW_SETTING:
                 slideShowSettingActionTriggered(activity, settingsAction);
@@ -1251,8 +1264,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     private void slideShowSettingActionTriggered(Activity activity, Action settingsAction) {
 
         new SlideShowSettingFragment().createFragment(activity,
-                                                      activity.getFragmentManager(),
-                                                      settingsAction);
+                activity.getFragmentManager(),
+                settingsAction);
     }
 
     /**
@@ -1264,19 +1277,19 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     private void loginLogoutActionTriggered(Activity activity, Action settingsAction) {
 
         mAuthHelper.isAuthenticated()
-                   .subscribe(isAuthenticatedResultBundle -> {
-                       if (isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT)) {
-                           settingsAction.setState(LogoutSettingsFragment.TYPE_LOGOUT);
-                       }
-                       else {
-                           settingsAction.setState(LogoutSettingsFragment.TYPE_LOGIN);
-                       }
+                .subscribe(isAuthenticatedResultBundle -> {
+                    if (isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT)) {
+                        settingsAction.setState(LogoutSettingsFragment.TYPE_LOGOUT);
+                    }
+                    else {
+                        settingsAction.setState(LogoutSettingsFragment.TYPE_LOGIN);
+                    }
 
-                       new LogoutSettingsFragment()
-                               .createFragment(activity,
-                                               activity.getFragmentManager(),
-                                               settingsAction);
-                   });
+                    new LogoutSettingsFragment()
+                            .createFragment(activity,
+                                    activity.getFragmentManager(),
+                                    settingsAction);
+                });
     }
 
     /**
@@ -1296,7 +1309,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         if (mSubscribed || isSubscriptionNotRequired || mIAPDisabled) {
             long recentContentIdFromPreferences = Preferences.getLong(PreferencesConstants
-                                                                              .CONTENT_ID);
+                    .CONTENT_ID);
             long recentContentPositionFromPreferences =
                     Preferences.getLong(PreferencesConstants.FINAL_POSITION)
                             - Preferences.getLong(PreferencesConstants.SEEK_POSITION) -
@@ -1315,40 +1328,40 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
                     contentActionList.add(
                             new Action().setId(CONTENT_ACTION_RESUME)
-                                        .setLabel1(mAppContext.getResources()
-                                                              .getString(R.string.resume_1))
-                                        .setLabel2(mAppContext.getResources()
-                                                              .getString(R.string.resume_2)));
+                                    .setLabel1(mAppContext.getResources()
+                                            .getString(R.string.resume_1))
+                                    .setLabel2(mAppContext.getResources()
+                                            .getString(R.string.resume_2)));
                 }
                 contentActionList.add(new Action().setId(CONTENT_ACTION_WATCH_FROM_BEGINNING)
-                                                  .setLabel1(mAppContext.getResources().getString(
-                                                          R.string.watch_from_beginning_1))
-                                                  .setLabel2(mAppContext.getResources().getString(
-                                                          R.string.watch_from_beginning_2)));
+                        .setLabel1(mAppContext.getResources().getString(
+                                R.string.watch_from_beginning_1))
+                        .setLabel2(mAppContext.getResources().getString(
+                                R.string.watch_from_beginning_2)));
             }
             else {
                 contentActionList.add(new Action()
-                                              .setId(CONTENT_ACTION_WATCH_NOW)
-                                              .setLabel1(mAppContext.getResources().getString(
-                                                      R.string.watch_now_1))
-                                              .setLabel2(mAppContext.getResources().getString(
-                                                      R.string.watch_now_2)));
+                        .setId(CONTENT_ACTION_WATCH_NOW)
+                        .setLabel1(mAppContext.getResources().getString(
+                                R.string.watch_now_1))
+                        .setLabel2(mAppContext.getResources().getString(
+                                R.string.watch_now_2)));
             }
         }
         else {
             contentActionList.add(new Action()
-                                          .setId(CONTENT_ACTION_SUBSCRIPTION)
-                                          .setLabel1(mAppContext.getResources()
-                                                                .getString(R.string.premium_1))
-                                          .setLabel2(mAppContext.getResources()
-                                                                .getString(R.string.premium_2)));
+                    .setId(CONTENT_ACTION_SUBSCRIPTION)
+                    .setLabel1(mAppContext.getResources()
+                            .getString(R.string.premium_1))
+                    .setLabel2(mAppContext.getResources()
+                            .getString(R.string.premium_2)));
 
             contentActionList.add(new Action()
-                                          .setId(CONTENT_ACTION_DAILY_PASS)
-                                          .setLabel1(mAppContext.getResources()
-                                                                .getString(R.string.daily_pass_1))
-                                          .setLabel2(mAppContext.getResources()
-                                                                .getString(R.string.daily_pass_2)));
+                    .setId(CONTENT_ACTION_DAILY_PASS)
+                    .setLabel1(mAppContext.getResources()
+                            .getString(R.string.daily_pass_1))
+                    .setLabel2(mAppContext.getResources()
+                            .getString(R.string.daily_pass_2)));
         }
 
         contentActionList.addAll(mGlobalContentActionList);
@@ -1417,7 +1430,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             else {
                 boolean loginLater = Preferences.getBoolean(AuthHelper.LOGIN_LATER_PREFERENCES_KEY);
                 if (!loginLater && mAuthHelper.getIAuthentication()
-                                              .isAuthenticationCanBeDoneLater()) {
+                        .isAuthenticationCanBeDoneLater()) {
 
                     mAuthHelper.isAuthenticated().subscribe(extras -> {
                         if (extras.getBoolean(AuthHelper.RESULT)) {
@@ -1484,7 +1497,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             activitySwitchListener) {
 
         verifyScreenSwitch(screenName, extra ->
-                                   mNavigator.startActivity(screenName, activitySwitchListener)
+                mNavigator.startActivity(screenName, activitySwitchListener)
         );
     }
 
@@ -1497,7 +1510,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public void switchToScreen(String screenName, Bundle bundle) {
 
         verifyScreenSwitch(screenName, extra ->
-                                   mNavigator.startActivity(screenName, bundle)
+                mNavigator.startActivity(screenName, bundle)
         );
     }
 
@@ -1595,7 +1608,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                         alertDialogFragment.dismiss();
                                     }
                                 }
-                                );
+                        );
                     }
                 }
                 else {
@@ -1650,8 +1663,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                             else {
                                 Log.e(TAG, "Purchase expired while handleRendererScreenSwitch");
                                 ContentBrowser.getInstance(activity).setLastSelectedContent(content)
-                                              .switchToScreen(ContentBrowser
-                                                                      .CONTENT_DETAILS_SCREEN);
+                                        .switchToScreen(ContentBrowser
+                                                .CONTENT_DETAILS_SCREEN);
                             }
                             updateContentActions();
                         }
@@ -1738,9 +1751,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 }).concatMap(
                 feedDataForCategories -> mDynamicParser.cookRecipeObservable
                         (dynamicParserRecipeForCategories,
-                         feedDataForCategories,
-                         null,
-                         params)).map(
+                                feedDataForCategories,
+                                null,
+                                params)).map(
                 contentContainerAsObject -> {
                     ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
 
@@ -1763,41 +1776,48 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     /* Zype, Evgeny Cherkasov */
-    private Observable<Object> getSubCategoriesObservable(ContentContainer contentContainer,
+    private Observable<Object> getSubCategoriesObservable(ContentContainer parentContentContainer,
                                                           Recipe dataLoaderRecipeForCategories,
                                                           Recipe dynamicParserRecipeForCategories) {
-        contentContainer.getContentContainers().clear();
-        if ((Integer) contentContainer.getExtraStringValue("playlistItemCount") > 0) {
+        parentContentContainer.getContentContainers().clear();
+        if ((Integer) parentContentContainer.getExtraStringValue("playlistItemCount") > 0) {
             // If playlist contains videos just return itself and ignore nested playlists
-            return Observable.just(contentContainer);
+            return Observable.just(parentContentContainer);
         }
         else {
             return Observable.concat(
-                    Observable.just(contentContainer),
+                    Observable.just(parentContentContainer),
                     mDataLoadManager.cookRecipeObservable(dataLoaderRecipeForCategories, null, null, null)
                             .map(feedDataForCategories -> {
-                                if (DEBUG_RECIPE_CHAIN) {
-                                    Log.d(TAG, "Feed download complete");
-                                }
                                 if (CAUSE_A_FEED_ERROR_FOR_DEBUGGING) {
                                     return Observable.error(new Exception());
                                 }
                                 return feedDataForCategories;
                             })
                             .concatMap(feedDataForCategories -> {
-                                String[] params = new String[]{(String) contentContainer.getExtraStringValue("keyDataType")};
-                                return mDynamicParser.cookRecipeObservable(dynamicParserRecipeForCategories, feedDataForCategories, null, params)
-                                        .filter(contentSubContainerAsObject -> contentSubContainerAsObject != null)
-                                        .map(contentSubContainerAsObject -> {
-                                            if (contentSubContainerAsObject == null) {
-                                                return contentContainer;
-                                            }
-                                            ContentContainer contentSubContainer = (ContentContainer) contentSubContainerAsObject;
-                                            contentContainer.getContentContainers().add(contentSubContainer);
-                                            return contentSubContainer;
-                                        })
-                                        .concatMap(contentSubContainer -> getSubCategoriesObservable(contentSubContainer, dataLoaderRecipeForCategories, dynamicParserRecipeForCategories));
+                                String[] params = new String[]{(String) parentContentContainer.getExtraStringValue("keyDataType")};
+                                return mDynamicParser.cookRecipeObservable(dynamicParserRecipeForCategories, feedDataForCategories, null, params);
+//                                        .concatMap(contentSubContainer -> getSubCategoriesObservable(contentSubContainer, dataLoaderRecipeForCategories, dynamicParserRecipeForCategories));
                             })
+                            .filter(contentSubContainerAsObject -> contentSubContainerAsObject != null)
+                            .map(contentSubContainerAsObject -> {
+//                                            if (contentSubContainerAsObject == null) {
+//                                                return contentContainer;
+//                                            }
+                                ContentContainer contentSubContainer = (ContentContainer) contentSubContainerAsObject;
+                                if (DEBUG_RECIPE_CHAIN) {
+                                    Log.d(TAG, "getSubCategoriesObservable(): " + contentSubContainer.getName());
+                                }
+                                parentContentContainer.getContentContainers().add(contentSubContainer);
+                                if ((Integer) contentSubContainer.getExtraStringValue("playlistItemCount") > 0) {
+//                                    return contentSubContainer;
+                                    return parentContentContainer;
+                                }
+                                else {
+                                    return parentContentContainer;
+                                }
+                            })
+                            .distinct()
             );
         }
     }
@@ -1880,20 +1900,20 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         if (hardCodedCategoryName == null) {
             observable = getCategoriesObservable(root, dataLoaderRecipeForCategories,
-                                                 dynamicParserRecipeForCategories);
+                    dynamicParserRecipeForCategories);
         }
         else {
             observable = Observable.just(hardCodedCategoryName)
-                                   .map(s -> {
-                                       ContentContainer contentContainer =
-                                               new ContentContainer(hardCodedCategoryName);
-                                       root.addContentContainer(contentContainer);
-                                       return contentContainer;
-                                   });
+                    .map(s -> {
+                        ContentContainer contentContainer =
+                                new ContentContainer(hardCodedCategoryName);
+                        root.addContentContainer(contentContainer);
+                        return contentContainer;
+                    });
         }
 
         return getContentsObservable(observable, dataLoaderRecipeForContents,
-                                     dynamicParserRecipeForContents);
+                dynamicParserRecipeForContents);
     }
 
     /**
@@ -1907,7 +1927,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
 
         NavigatorModel.GlobalRecipes recipe = mNavigator.getNavigatorModel().getGlobalRecipes()
-                                                        .get(index);
+                .get(index);
 
         Recipe dataLoaderRecipeForCategories = recipe.getCategories().dataLoaderRecipe;
         Recipe dataLoaderRecipeForContents = recipe.getContents().dataLoaderRecipe;
@@ -1919,17 +1939,17 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         if (recipe.getRecipeConfig() != null) {
             // Add if the recipe is for live feed data.
             dynamicParserRecipeForContents.getMap().put(Recipe.LIVE_FEED_TAG,
-                                                        recipe.getRecipeConfig().liveContent);
+                    recipe.getRecipeConfig().liveContent);
         }
 
         String hardCodedCategoryName = recipe.getCategories().name;
 
         return getContentChainObservable(hardCodedCategoryName,
-                                         dataLoaderRecipeForCategories,
-                                         dataLoaderRecipeForContents,
-                                         dynamicParserRecipeForCategories,
-                                         dynamicParserRecipeForContents,
-                                         root);
+                dataLoaderRecipeForCategories,
+                dataLoaderRecipeForContents,
+                dynamicParserRecipeForCategories,
+                dynamicParserRecipeForContents,
+                root);
     }
 
     /**
@@ -1949,7 +1969,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                 Log.d(TAG, "doOnNext");
                             }
                         })
-                                // This should be last so the rest is running on a separate thread.
+                        // This should be last so the rest is running on a separate thread.
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(objectPair -> {
                             if (DEBUG_RECIPE_CHAIN) {
@@ -1996,44 +2016,44 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                             getRootContentContainer().findContentById(contentId);
                                     if (content == null) {
                                         throw new IllegalArgumentException("No content exist for " +
-                                                                                   "contentId " +
-                                                                                   contentId);
+                                                "contentId " +
+                                                contentId);
                                     }
                                     handleRendererScreenSwitch(mNavigator.getActiveActivity(),
-                                                               content,
-                                                               CONTENT_ACTION_WATCH_NOW, false);
+                                            content,
+                                            CONTENT_ACTION_WATCH_NOW, false);
 
                                 }
                                 catch (Exception e) {
                                     Log.e(TAG, e.getLocalizedMessage(), e);
                                     AlertDialogFragment.createAndShowAlertDialogFragment
                                             (mNavigator.getActiveActivity(),
-                                             "Error",
-                                             "The desired content does not exist",
-                                             null,
-                                             mAppContext.getString(R.string.ok),
-                                             new AlertDialogFragment.IAlertDialogListener() {
+                                                    "Error",
+                                                    "The desired content does not exist",
+                                                    null,
+                                                    mAppContext.getString(R.string.ok),
+                                                    new AlertDialogFragment.IAlertDialogListener() {
 
-                                                 @Override
-                                                 public void onDialogPositiveButton
-                                                         (AlertDialogFragment alertDialogFragment) {
+                                                        @Override
+                                                        public void onDialogPositiveButton
+                                                                (AlertDialogFragment alertDialogFragment) {
 
-                                                 }
+                                                        }
 
-                                                 @Override
-                                                 public void onDialogNegativeButton
-                                                         (AlertDialogFragment alertDialogFragment) {
+                                                        @Override
+                                                        public void onDialogNegativeButton
+                                                                (AlertDialogFragment alertDialogFragment) {
 
-                                                     alertDialogFragment.dismiss();
-                                                     if (cancellable != null &&
-                                                             cancellable.isLoadingCancelled()) {
-                                                         Log.d(TAG, "switchToHomeScreen after " +
-                                                                 "Splash cancelled");
-                                                         return;
-                                                     }
-                                                     switchToHomeScreen();
-                                                 }
-                                             });
+                                                            alertDialogFragment.dismiss();
+                                                            if (cancellable != null &&
+                                                                    cancellable.isLoadingCancelled()) {
+                                                                Log.d(TAG, "switchToHomeScreen after " +
+                                                                        "Splash cancelled");
+                                                                return;
+                                                            }
+                                                            switchToHomeScreen();
+                                                        }
+                                                    });
                                 }
                             }
                             else {
@@ -2056,7 +2076,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 Observable.range(0, mNavigator.getNavigatorModel().getGlobalRecipes().size())
                         // Do this first to make sure were running in new thread right a way.
                         .subscribeOn(Schedulers.newThread())
-                        .concatMap(index -> runGlobalRecipeAtIndex(index, root))
+                        .concatMap(index -> runZypeGlobalRecipeAtIndex(index, root))
                         .onBackpressureBuffer() // This must be right after concatMap.
                         .doOnNext(o -> {
                             if (DEBUG_RECIPE_CHAIN) {
@@ -2162,6 +2182,236 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                         });
 
         mCompositeSubscription.add(subscription);
+    }
+
+    //
+    private Observable<Object> getLoadContentsObservable(Observable<Object> observable) {
+        Recipe recipe = Recipe.newInstance(mAppContext, "recipes/ZypeSearchContentsRecipe.json");
+        return observable
+                .concatMap(contentContainerAsObject -> {
+                    ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
+                    if (DEBUG_RECIPE_CHAIN) {
+                        Log.d(TAG, "getLoadContentsObservable:" + contentContainer.getName());
+                    }
+                    VideosResponse response = ZypeApi.getInstance().getPlaylistVideos((String) contentContainer.getExtraStringValue("keyDataType"));
+                    if (response != null) {
+                        Log.d(TAG, "getLoadContentsObservable(): size=" + response.videoData.size());
+                        for (VideoData videoData : response.videoData) {
+                            if (TextUtils.isEmpty(videoData.description) || videoData.description.equals("null")) {
+                                videoData.description = " ";
+                            }
+                            videoData.playlistId = (String) contentContainer.getExtraStringValue("keyDataType");
+                            videoData.playerUrl = "null";
+                        }
+                        GsonBuilder builder = new GsonBuilder();
+                        Gson gson = builder.create();
+                        String feed = gson.toJson(response.videoData);
+                        return Observable.just(Pair.create(contentContainerAsObject, feed));
+                    }
+                    else {
+                        return Observable.just(Pair.create(contentContainerAsObject, ""));
+                    }
+                })
+                .concatMap(objectPair -> {
+                    ContentContainer contentContainer = (ContentContainer) objectPair.first;
+                    contentContainer.getContents().clear();
+                    String feed = (String) objectPair.second;
+                    String[] params = new String[]{(String) contentContainer
+                            .getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG)
+                    };
+
+                    return mDynamicParser.cookRecipeObservable(
+                            recipe,
+                            feed,
+                            null,
+                            params).map(contentAsObject -> {
+                        if (DEBUG_RECIPE_CHAIN) {
+                            Log.d(TAG, "Parser got an content");
+                        }
+                        Content content = (Content) contentAsObject;
+                        if (content != null) {
+                            contentContainer.addContent(content);
+                        }
+                        return Pair.create(contentContainer, contentAsObject);
+                    });
+                });
+    }
+
+    private Observable<Object> runZypeGlobalRecipeAtIndex(int index, ContentContainer root) {
+
+
+        NavigatorModel.GlobalRecipes recipe = mNavigator.getNavigatorModel().getGlobalRecipes()
+                .get(index);
+
+        Recipe dataLoaderRecipeForCategories = recipe.getCategories().dataLoaderRecipe;
+        Recipe dataLoaderRecipeForContents = recipe.getContents().dataLoaderRecipe;
+
+        Recipe dynamicParserRecipeForCategories = recipe.getCategories().dynamicParserRecipe;
+        Recipe dynamicParserRecipeForContents = recipe.getContents().dynamicParserRecipe;
+
+        // Add any extra configurations that the parser recipe needs from the navigator recipe.
+        if (recipe.getRecipeConfig() != null) {
+            // Add if the recipe is for live feed data.
+            dynamicParserRecipeForContents.getMap().put(Recipe.LIVE_FEED_TAG,
+                    recipe.getRecipeConfig().liveContent);
+        }
+
+        String hardCodedCategoryName = recipe.getCategories().name;
+
+        return getLoadContentChainObservable(hardCodedCategoryName,
+                dataLoaderRecipeForCategories,
+                dynamicParserRecipeForCategories,
+                root);
+    }
+
+    private Observable<Object> getLoadContentChainObservable(String hardCodedCategoryName,
+                                                             Recipe dataLoaderRecipeForCategories,
+                                                             Recipe dynamicParserRecipeForCategories,
+                                                             ContentContainer root) {
+
+        Observable<Object> observable;
+
+        if (hardCodedCategoryName == null) {
+            observable = getCategoriesObservable(root, dataLoaderRecipeForCategories,
+                    dynamicParserRecipeForCategories);
+        }
+        else {
+            observable = Observable.just(hardCodedCategoryName)
+                    .map(s -> {
+                        ContentContainer contentContainer =
+                                new ContentContainer(hardCodedCategoryName);
+                        root.addContentContainer(contentContainer);
+                        return contentContainer;
+                    });
+        }
+
+        return getLoadContentsObservable(observable);
+    }
+
+    private void loadContentForSubcontainers(Activity activity, ICancellableLoad cancellable, ContentContainer parentContainer) {
+        List<ContentContainer> subContainers = new ArrayList<>();
+        for (ContentContainer contentContainer : parentContainer.getContentContainers()) {
+            for (ContentContainer innerContentContainer : contentContainer.getContentContainers()) {
+                if ((Integer) innerContentContainer.getExtraStringValue("playlistItemCount") > 0) {
+                    loadContentForContentContainer(innerContentContainer, new ILoadContentForContentContainer() {
+                        @Override
+                        public void onContentsLoaded() {
+                            if (DEBUG_RECIPE_CHAIN) {
+                                Log.d(TAG, "loadContentForSubcontainers(): " + innerContentContainer.getName());
+                            }
+                        }
+                    });
+//                    subContainers.add(innerContentContainer);
+                }
+            }
+        }
+
+//        NavigatorModel.GlobalRecipes recipe = mNavigator.getNavigatorModel().getGlobalRecipes().get(0);
+//        Recipe dataLoaderRecipeForContents = recipe.getContents().dataLoaderRecipe;
+//        Recipe dynamicParserRecipeForContents = recipe.getContents().dynamicParserRecipe;
+//
+//        Subscription subscription = Observable.from(subContainers)
+//                .subscribeOn(Schedulers.newThread())
+//                .concatMap(contentContainer -> {
+//                    if (DEBUG_RECIPE_CHAIN) {
+//                        Log.d(TAG, "loadContentForSubcontainers(): " + contentContainer.getName());
+//                    }
+//                    return getContentsObservable(Observable.just(contentContainer), dataLoaderRecipeForContents, dynamicParserRecipeForContents);
+//                })
+//                .onBackpressureBuffer() // This must be right after concatMap.
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(objectPair -> { },
+//                        throwable -> {
+//                            Log.e(TAG, "Recipe chain failed:", throwable);
+//                            ErrorHelper.injectErrorFragment(
+//                                    mNavigator.getActiveActivity(),
+//                                    ErrorUtils.ERROR_CATEGORY.FEED_ERROR,
+//                                    (errorDialogFragment, errorButtonType,
+//                                     errorCategory) -> {
+//                                        if (errorButtonType ==
+//                                                ErrorUtils.ERROR_BUTTON_TYPE.EXIT_APP) {
+//                                            mNavigator.getActiveActivity().finishAffinity();
+//                                        }
+//                                    });
+//
+//                            },
+//                        () -> { });
+//
+//        mCompositeSubscription.add(subscription);
+    }
+
+    public interface ILoadContentForContentContainer {
+        void onContentsLoaded();
+    }
+
+    public void loadContentForContentContainer(ContentContainer contentContainer, ILoadContentForContentContainer callback) {
+//        NavigatorModel.GlobalRecipes recipe = mNavigator.getNavigatorModel().getGlobalRecipes().get(0);
+//        Recipe dataLoaderRecipeForContents = recipe.getContents().dataLoaderRecipe;
+//        Recipe dynamicParserRecipeForContents = recipe.getContents().dynamicParserRecipe;
+//
+        HashMap<String, String> params = new HashMap<>();
+        params.put(ZypeApi.APP_KEY, ZypeSettings.APP_KEY);
+        params.put(ZypeApi.PER_PAGE, String.valueOf(ZypeApi.PER_PAGE_DEFAULT));
+        ZypeApi.getInstance().getApi().getPlaylistVideos((String) contentContainer.getExtraStringValue("keyDataType"), 1, params).enqueue(new Callback<VideosResponse>() {
+            @Override
+            public void onResponse(Call<VideosResponse> call, Response<VideosResponse> response) {
+                if (response.isSuccessful()) {
+                    if (!response.body().videoData.isEmpty()) {
+                        Log.d(TAG, "loadContentForContentContainer(): onResponse(): size=" + response.body().videoData.size());
+                        for (VideoData videoData : response.body().videoData) {
+                            if (TextUtils.isEmpty(videoData.description) || videoData.description.equals("null")) {
+                                videoData.description = " ";
+                            }
+                            videoData.playlistId = (String) contentContainer.getExtraStringValue("keyDataType");
+                            videoData.playerUrl = "null";
+                        }
+                        GsonBuilder builder = new GsonBuilder();
+                        Gson gson = builder.create();
+                        String feed = gson.toJson(response.body().videoData);
+                        Subscription subscription = getContentsForContentContainerObservable(feed, contentContainer)
+                                .subscribeOn(Schedulers.newThread())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(result -> {
+                                        },
+                                        throwable -> {
+                                        },
+                                        () -> {
+                                            callback.onContentsLoaded();
+//                                            setLastSelectedContent(contentContainer.getContents().get(0));
+//                                            switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                                        });
+
+                        mCompositeSubscription.add(subscription);
+                    }
+                }
+                else {
+                    // TODO: Handle error
+                }
+            }
+
+            @Override
+            public void onFailure(Call<VideosResponse> call, Throwable t) {
+                // TODO: Handle exception
+            }
+        });
+    }
+
+    private Observable<Object> getContentsForContentContainerObservable(String feed, ContentContainer contentContainer) {
+        String[] params = new String[] { (String) contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG) };
+        // TODO: Rename the recipe file
+        Recipe recipe = Recipe.newInstance(mAppContext, "recipes/ZypeSearchContentsRecipe.json");
+        return Observable.just(contentContainer)
+                .concatMap(o -> mDynamicParser.cookRecipeObservable(recipe, feed, null, params)
+                        .map(contentAsObject -> {
+                            Content content = (Content) contentAsObject;
+                            if (content != null) {
+                                if (DEBUG_RECIPE_CHAIN) {
+                                    Log.d(TAG, "getContentsForContentContainerObservable(): " + content.getTitle());
+                                }
+                                contentContainer.addContent(content);
+                            }
+                            return content;
+                        }));
     }
 
     /**
