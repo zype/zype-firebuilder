@@ -27,6 +27,9 @@ public class PlaylistData {
     @Expose
     public String deletedAt;
 
+    @Expose
+    public String description;
+
     @SerializedName("site_id")
     @Expose
     public String siteId;

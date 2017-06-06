@@ -116,46 +116,24 @@ public class ZypeDataDownloader extends ADataDownloader {
         List<PlaylistData> playlists = loadPlaylists();
         Log.d(TAG, "fetchData(): Playlists loaded");
 
-//        // Starting with an empty map and replacing it with a map from recipe if one exists.
-//        Map urlGeneratorRecipeMap = Collections.emptyMap();
-//        if (dataLoadRecipe.getMap().containsKey(URL_GENERATOR_RECIPE)) {
-//            urlGeneratorRecipeMap = (Map) dataLoadRecipe.getMap().get(URL_GENERATOR_RECIPE);
-//        }
-//        // Get the url.
-//        String url = urlGenerator.getUrl(urlGeneratorRecipeMap);
-//        Log.d(TAG, "url: " + url);
-//        Data result = Data.createDataForPayload(NetworkUtils.getDataLocatedAtUrl(url));
-//        JSONObject jsonResult = new JSONObject(result.getContent().getPayload());
-
         Map<String, Object> params;
         // Url to retrieve playlist videos
         params = new HashMap<>();
         params.put("url_index", "1");
         String urlPlaylistVideos = urlGenerator.getUrl(params);
-//        // Url to retrieve player
-//        params = new HashMap<>();
-//        params.put("url_index", "3");
-//        String urlPlayer = urlGenerator.getUrl(params);
 
         // Result data
         JSONArray jsonCategories = new JSONArray();
         JSONArray jsonContents = new JSONArray();
 
-//        JSONArray jsonPlaylists = jsonResult.getJSONArray("response");
-//        List<JSONObject> playlists = new ArrayList<>();
-//        for (int i = 0; i < jsonPlaylists.length(); i++) {
         for (PlaylistData playlistData : playlists) {
             // Skip not direct root child playlist
             if (TextUtils.isEmpty(playlistData.parentId) || !playlistData.parentId.equals(ZypeSettings.ROOT_PLAYLIST_ID)) {
                 continue;
             }
-//            JSONObject jsonPlaylistData = jsonPlaylists.getJSONObject(i);
-//            playlists.add(jsonPlaylistData);
 
-//            String playlistId = jsonPlaylistData.getString("_id");
             String playlistId = playlistData.id;
 
-//            if (jsonPlaylistData.getInt("playlist_item_count") > 0) {
             if (playlistData.playlistItemCount > 0) {
                 Log.d(TAG, "fetchData(): Loading videos for " + playlistData.title);
                 String url = String.format(urlPlaylistVideos, playlistId);
@@ -179,7 +157,6 @@ public class ZypeDataDownloader extends ADataDownloader {
                     }
                 }
                 catch (IOException e) {
-//                    jsonPlaylistData.put("videoIds", new JSONArray());
                     Log.d(TAG, "Error get playlist videos. playlistId=" + playlistId);
                 }
             }
@@ -193,8 +170,6 @@ public class ZypeDataDownloader extends ADataDownloader {
             Integer valA;
             Integer valB;
             try {
-//                valA = a.getInt("priority");
-//                valB = b.getInt("priority");
                 valA = a.priority;
                 valB = b.priority;
             }
@@ -203,11 +178,9 @@ public class ZypeDataDownloader extends ADataDownloader {
             }
             return valA.compareTo(valB);
         });
-//        for (JSONObject jsonPlaylistData : playlists) {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
         for (PlaylistData playlistData : playlists) {
-//            String playlistId = jsonPlaylistData.getString("_id");
             String playlistId = playlistData.id;
             if (playlistId.equals(ZypeSettings.ROOT_PLAYLIST_ID) || TextUtils.isEmpty(playlistData.parentId)) {
                 continue;
@@ -218,9 +191,7 @@ public class ZypeDataDownloader extends ADataDownloader {
         JSONObject jsonResult = new JSONObject();
         jsonResult.put("categories", jsonCategories);
         jsonResult.put("contents", jsonContents);
-//        result.getContent().setPayload(jsonResult.toString());
 
-//        return result;
         Log.d(TAG, "fetchData(): finished");
         return Data.createDataForPayload(jsonResult.toString());
     }

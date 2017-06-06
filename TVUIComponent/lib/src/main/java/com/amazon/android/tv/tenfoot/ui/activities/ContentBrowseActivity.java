@@ -94,11 +94,11 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
 
         Uri defaultImageUri =
                 Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE +
-                                  "://" + getResources()
+                        "://" + getResources()
                         .getResourcePackageName(R.drawable.browse_background_no_preview)
-                                  + '/' + getResources()
+                        + '/' + getResources()
                         .getResourceTypeName(R.drawable.browse_background_no_preview)
-                                  + '/' + getResources()
+                        + '/' + getResources()
                         .getResourceEntryName(R.drawable.browse_background_no_preview));
 
         mContentImage.setImageURI(defaultImageUri);
@@ -115,15 +115,15 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         if (item instanceof Content) {
             Content content = (Content) item;
             callImageLoadSubscription(content.getTitle(),
-                                      content.getDescription(),
-                                      content.getBackgroundImageUrl());
+                    content.getDescription(),
+                    content.getBackgroundImageUrl());
         }
         /* Zype, Evgeny Cherkasov */
         // Update screen background with selected playlist (category) image
         else if (item instanceof ContentContainer) {
             ContentContainer contentContainer = (ContentContainer) item;
             callImageLoadSubscription(contentContainer.getName(),
-                    "",
+                    (String) contentContainer.getExtraStringValue("description"),
                     (String) contentContainer.getExtraStringValue(Content.BACKGROUND_IMAGE_URL_FIELD_NAME));
         }
         else if (item instanceof Action) {
@@ -131,21 +131,21 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
             // Terms of use action.
             if (ContentBrowser.TERMS.equals(settingsAction.getAction())) {
                 callImageLoadSubscription(getString(R.string.terms_title),
-                                          getString(R.string.terms_description),
-                                          null);
+                        getString(R.string.terms_description),
+                        null);
             }
             // Login and logout action.
             else if (ContentBrowser.LOGIN_LOGOUT.equals(settingsAction.getAction())) {
 
                 if (settingsAction.getState() == LogoutSettingsFragment.TYPE_LOGOUT) {
                     callImageLoadSubscription(getString(R.string.logout_label),
-                                              getString(R.string.logout_description),
-                                              null);
+                            getString(R.string.logout_description),
+                            null);
                 }
                 else {
                     callImageLoadSubscription(getString(R.string.login_label),
-                                              getString(R.string.login_description),
-                                              null);
+                            getString(R.string.login_description),
+                            null);
                 }
             }
         }
@@ -170,9 +170,9 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
                     mContentTitle.setText(title);
                     mContentDescription.setText(description);
                     Helpers.loadImageWithCrossFadeTransition(this,
-                                                             mContentImage,
-                                                             bgImageUrl,
-                                                             CONTENT_IMAGE_CROSS_FADE_DURATION);
+                            mContentImage,
+                            bgImageUrl,
+                            CONTENT_IMAGE_CROSS_FADE_DURATION);
                 });
     }
 

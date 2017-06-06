@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 /**
  * Copyright 2015-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
@@ -18,25 +20,52 @@ apply plugin: 'me.tatarka.retrolambda'
 //apply plugin: 'io.fabric'
 
 android {
+    def String majorKey = 'MAJOR_VERSION'
+    def String minorKey = 'MINOR_VERSION'
+    def String versionCodeKey = 'DEBUG_VERSION_CODE'
+    def versionPropertiesFile = file('version.properties')
+    def Properties versionProperties = readVersionProperties(versionPropertiesFile)
+
+    def df = new SimpleDateFormat("yyyy-MM-dd HH:mmZ")
+    def String date = df.format(new Date(System.currentTimeMillis()))
+
+    def getDate = { ->
+        def dateFormatted = new Date()
+        def formattedDate = dateFormatted.format('yyyyMMdd')
+        return formattedDate
+    }
+
+    def currentCodeVersion = versionProperties[versionCodeKey].toString().toInteger()
+
     compileSdkVersion 23
     buildToolsVersion "24.0.3"
 
     defaultConfig {
-        applicationId "com.amazon.android.calypso"
+        applicationId "com.zype.aftv"
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 5
+        versionCode currentCodeVersion
         versionName "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
     buildTypes {
         release {
+            setVersionNameSuffix(".${currentCodeVersion}")
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
+            setVersionNameSuffix(".${currentCodeVersion} DEBUG [${date}]")
             testCoverageEnabled = true
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def outputNameNew = "Zype-AFTV" + "-" + variant.productFlavors.name + "-" + variant.buildType.name +
+                    "-" + defaultConfig.versionName + "-" + getDate() + ".apk"
+            output.outputFile = new File(output.outputFile.parent, outputNameNew)
         }
     }
 
@@ -57,6 +86,20 @@ android {
         abortOnError false
     }
 
+}
+
+public def readVersionProperties(File from) {
+    if (from.canRead()) {
+        def Properties result = new Properties()
+        result.load(new FileInputStream(from))
+        return result
+    } else {
+        throw new GradleException("Could not read version.properties!")
+    }
+}
+
+public def store(File to, Properties properties) {
+    properties.store(to.newWriter(), null)
 }
 
 dependencies {

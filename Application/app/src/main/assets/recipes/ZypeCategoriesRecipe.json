@@ -9,7 +9,8 @@
     "title@name",
     "parent_id@parentId",
     "thumbnails@thumbnails",
-    "playlist_item_count@playlistItemCount"
+    "playlist_item_count@playlistItemCount",
+    "description@description"
   ],
   "keyDataType": "_id@keyDataPath"
 }

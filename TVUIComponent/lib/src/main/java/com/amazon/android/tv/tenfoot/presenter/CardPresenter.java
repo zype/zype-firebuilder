@@ -101,7 +101,10 @@ public class CardPresenter extends Presenter {
         cardView.setCardType(BaseCardView.CARD_TYPE_INFO_OVER);
         cardView.setInfoVisibility(BaseCardView.CARD_REGION_VISIBLE_ALWAYS);
 
-        int CARD_WIDTH_PX = 160;
+        /* Zype, Evgeny Cherkasov */
+        // Make card size 16:9
+//        int CARD_WIDTH_PX = 160;
+        int CARD_WIDTH_PX = 210;
         mCardWidthDp = Helpers.convertPixelToDp(context, CARD_WIDTH_PX);
 
         int CARD_HEIGHT_PX = 120;
@@ -140,11 +143,11 @@ public class CardPresenter extends Presenter {
                 cardView.setContentText(content.getTitle());
                 cardView.setMainImageDimensions(mCardWidthDp, mCardHeightDp);
                 Glide.with(viewHolder.view.getContext())
-                     .load(content.getCardImageUrl())
-                     .listener(new Helpers.LoggingListener<>())
-                     .centerCrop()
-                     .error(mDefaultCardImage)
-                     .into(cardView.getMainImageView());
+                        .load(content.getCardImageUrl())
+                        .listener(new Helpers.LoggingListener<>())
+                        .centerCrop()
+                        .error(mDefaultCardImage)
+                        .into(cardView.getMainImageView());
 
                 /*Zype, EvgenyCherkasov */
                 // Display lock icon for subscription video

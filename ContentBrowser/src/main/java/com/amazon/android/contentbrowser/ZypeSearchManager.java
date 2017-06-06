@@ -83,8 +83,13 @@ public class ZypeSearchManager implements ContentBrowser.ICustomSearchHandler {
                                             iSearchResult.onSearchResult(null, true);
                                         });
                     }
+                    else {
+                        Log.d(TAG, "onResponse(): No videos found");
+                        iSearchResult.onSearchResult(null, true);
+                    }
                 }
                 else {
+                    Log.d(TAG, "onResponse(): Error: " + response.message());
                     iSearchResult.onSearchResult(null, true);
                 }
             }

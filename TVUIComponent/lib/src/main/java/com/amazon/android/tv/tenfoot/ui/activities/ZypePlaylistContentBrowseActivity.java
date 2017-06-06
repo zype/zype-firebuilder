@@ -29,11 +29,18 @@
 
 package com.amazon.android.tv.tenfoot.ui.activities;
 
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.amazon.android.configuration.ConfigurationManager;
@@ -73,8 +80,11 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity implements Z
     private TextView mContentTitle;
     private TextView mContentDescription;
     private ImageView mContentImage;
+    private ProgressBar progressBar;
 
     private Subscription mContentImageLoadSubscription;
+
+    private BroadcastReceiver receiver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -97,14 +107,25 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity implements Z
 
         Uri defaultImageUri =
                 Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE +
-                                  "://" + getResources()
+                        "://" + getResources()
                         .getResourcePackageName(R.drawable.browse_background_no_preview)
-                                  + '/' + getResources()
+                        + '/' + getResources()
                         .getResourceTypeName(R.drawable.browse_background_no_preview)
-                                  + '/' + getResources()
+                        + '/' + getResources()
                         .getResourceEntryName(R.drawable.browse_background_no_preview));
 
         mContentImage.setImageURI(defaultImageUri);
+
+        progressBar = (ProgressBar) findViewById(R.id.feed_progress);
+        progressBar.setVisibility(View.VISIBLE);
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+        };
+
     }
 
     /**
@@ -118,13 +139,13 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity implements Z
         if (item instanceof Content) {
             Content content = (Content) item;
             callImageLoadSubscription(content.getTitle(),
-                                      content.getDescription(),
-                                      content.getBackgroundImageUrl());
+                    content.getDescription(),
+                    content.getBackgroundImageUrl());
         }
         else if (item instanceof ContentContainer) {
             ContentContainer contentContainer = (ContentContainer) item;
             callImageLoadSubscription(contentContainer.getName(),
-                    "",
+                    (String) contentContainer.getExtraStringValue("description"),
                     (String) contentContainer.getExtraStringValue(Content.BACKGROUND_IMAGE_URL_FIELD_NAME));
         }
         else if (item instanceof Action) {
@@ -132,21 +153,21 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity implements Z
             // Terms of use action.
             if (ContentBrowser.TERMS.equals(settingsAction.getAction())) {
                 callImageLoadSubscription(getString(R.string.terms_title),
-                                          getString(R.string.terms_description),
-                                          null);
+                        getString(R.string.terms_description),
+                        null);
             }
             // Login and logout action.
             else if (ContentBrowser.LOGIN_LOGOUT.equals(settingsAction.getAction())) {
 
                 if (settingsAction.getState() == LogoutSettingsFragment.TYPE_LOGOUT) {
                     callImageLoadSubscription(getString(R.string.logout_label),
-                                              getString(R.string.logout_description),
-                                              null);
+                            getString(R.string.logout_description),
+                            null);
                 }
                 else {
                     callImageLoadSubscription(getString(R.string.login_label),
-                                              getString(R.string.login_description),
-                                              null);
+                            getString(R.string.login_description),
+                            null);
                 }
             }
         }
@@ -171,10 +192,18 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity implements Z
                     mContentTitle.setText(title);
                     mContentDescription.setText(description);
                     Helpers.loadImageWithCrossFadeTransition(this,
-                                                             mContentImage,
-                                                             bgImageUrl,
-                                                             CONTENT_IMAGE_CROSS_FADE_DURATION);
+                            mContentImage,
+                            bgImageUrl,
+                            CONTENT_IMAGE_CROSS_FADE_DURATION);
                 });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (receiver != null) {
+            LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter("DataUpdated"));
+        }
     }
 
     @Override
@@ -185,5 +214,9 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity implements Z
         if (mContentImageLoadSubscription != null) {
             mContentImageLoadSubscription.unsubscribe();
         }
+        if (receiver != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+        }
+
     }
 }

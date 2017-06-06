@@ -173,7 +173,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
 
     private void loadRootContentContainer(ArrayObjectAdapter rowsAdapter) {
         rowsAdapter.clear();
-        addSettingsActionsToRowAdapter(rowsAdapter);
+//        addSettingsActionsToRowAdapter(rowsAdapter);
 
         ContentContainer rootContentContainer = ContentBrowser.getInstance(getActivity()).getLastSelectedContentContainer();
 
@@ -192,7 +192,8 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                 listRowAdapter.add(content);
             }
 
-            rowsAdapter.add(rowsAdapter.size() - 1, new ListRow(header, listRowAdapter));
+//            rowsAdapter.add(rowsAdapter.size() - 1, new ListRow(header, listRowAdapter));
+            rowsAdapter.add(new ListRow(header, listRowAdapter));
         }
     }
 
