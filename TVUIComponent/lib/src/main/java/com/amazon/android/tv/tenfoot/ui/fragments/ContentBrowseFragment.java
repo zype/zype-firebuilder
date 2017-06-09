@@ -91,12 +91,13 @@ public class ContentBrowseFragment extends RowsFragment {
         }
         catch (ClassCastException e) {
             throw new ClassCastException(getActivity().toString() +
-                    " must implement " +
-                    "OnBrowseRowListener: " + e);
+                                                 " must implement " +
+                                                 "OnBrowseRowListener: " + e);
         }
 
         CustomListRowPresenter customListRowPresenter = new CustomListRowPresenter();
         customListRowPresenter.setHeaderPresenter(new RowHeaderPresenter());
+
         // Uncomment this code to remove shadow from the cards
         //customListRowPresenter.setShadowEnabled(false);
 
@@ -106,6 +107,7 @@ public class ContentBrowseFragment extends RowsFragment {
 
         addSettingsActionsToRowAdapter(mRowsAdapter);
         loadRootContentContainer(mRowsAdapter);
+        addSettingsActionsToRowAdapter(mRowsAdapter);
 
         setAdapter(mRowsAdapter);
 
@@ -123,7 +125,6 @@ public class ContentBrowseFragment extends RowsFragment {
             }
         }, WAIT_BEFORE_FOCUS_REQUEST_MS);
     }
-
 
     /**
      * Event bus listener method to listen for authentication updates from AUthHelper and update
@@ -147,7 +148,7 @@ public class ContentBrowseFragment extends RowsFragment {
     private void loadRootContentContainer(ArrayObjectAdapter rowsAdapter) {
 
         ContentContainer rootContentContainer = ContentBrowser.getInstance(getActivity())
-                .getRootContentContainer();
+                                                              .getRootContentContainer();
 
         CardPresenter cardPresenter = new CardPresenter();
 
@@ -164,7 +165,7 @@ public class ContentBrowseFragment extends RowsFragment {
                 listRowAdapter.add(content);
             }
 
-            rowsAdapter.add(rowsAdapter.size() - 1, new ListRow(header, listRowAdapter));
+            rowsAdapter.add(new ListRow(header, listRowAdapter));
         }
     }
 
@@ -188,7 +189,7 @@ public class ContentBrowseFragment extends RowsFragment {
         if (settingsAdapter != null) {
             // Create settings header and row
             HeaderItem header = new HeaderItem(0, getString(R.string.settings_title));
-            arrayObjectAdapter.add(0, new ListRow(header, settingsAdapter));
+            arrayObjectAdapter.add(new ListRow(header, settingsAdapter));
         }
     }
 
@@ -229,8 +230,8 @@ public class ContentBrowseFragment extends RowsFragment {
                 Log.d(TAG, "Content with title " + content.getTitle() + " was clicked");
 
                 ContentBrowser.getInstance(getActivity())
-                        .setLastSelectedContent(content)
-                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                              .setLastSelectedContent(content)
+                              .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
 
             }
             else if (item instanceof ContentContainer) {
@@ -239,15 +240,15 @@ public class ContentBrowseFragment extends RowsFragment {
                         "clicked");
 
                 ContentBrowser.getInstance(getActivity())
-                        .setLastSelectedContentContainer(contentContainer)
-                        .switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
+                              .setLastSelectedContentContainer(contentContainer)
+                              .switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
             }
             else if (item instanceof Action) {
                 Action settingsAction = (Action) item;
                 Log.d(TAG, "Settings with title " + settingsAction.getAction() + " was clicked");
                 ContentBrowser.getInstance(getActivity())
-                        .settingsActionTriggered(getActivity(),
-                                settingsAction);
+                              .settingsActionTriggered(getActivity(),
+                                                       settingsAction);
             }
         }
     }

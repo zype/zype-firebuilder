@@ -18,6 +18,25 @@ apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 // Uncomment when using CrashlyticsComponent
 //apply plugin: 'io.fabric'
+apply from: "../artifacts.gradle"
+
+repositories {
+    // Uncomment when using CrashlyticsComponent
+    //maven { url 'https://maven.fabric.io/public' }
+}
+
+buildscript {
+    repositories {
+        jcenter()
+        // Uncomment when using CrashlyticsComponent
+        //maven { url 'https://maven.fabric.io/public' }
+    }
+    dependencies {
+        classpath 'me.tatarka:gradle-retrolambda:3.2.3'
+        // Uncomment when using CrashlyticsComponent
+        //classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
 
 android {
     def String majorKey = 'MAJOR_VERSION'
@@ -38,7 +57,7 @@ android {
     def currentCodeVersion = versionProperties[versionCodeKey].toString().toInteger()
 
     compileSdkVersion 23
-    buildToolsVersion "24.0.3"
+    buildToolsVersion "25.0.0"
 
     defaultConfig {
         applicationId "com.zype.aftv"
@@ -104,11 +123,13 @@ public def store(File to, Properties properties) {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'org.mockito:mockito-core:1.9.5'
-    androidTestCompile('com.android.support.test:runner:0.3') {
-        exclude module: 'support-annotations'
+    androidTestCompile ('com.android.support.test:rules:0.5') {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    androidTestCompile ('com.android.support.test:runner:0.5') {
+        exclude group: 'com.android.support', module: 'support-annotations'
     }
     androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'

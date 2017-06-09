@@ -36,15 +36,23 @@ import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.ui.constants.ConfigurationConstants;
 import com.amazon.android.ui.fragments.LogoutSettingsFragment;
+import com.amazon.android.utils.GlideHelper;
+import com.amazon.android.ui.utils.BackgroundImageUtils;
 import com.amazon.android.utils.Helpers;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment;
 
-import android.content.ContentResolver;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.content.ContextCompat;
+import android.view.Display;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -70,8 +78,11 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
     private TextView mContentTitle;
     private TextView mContentDescription;
     private ImageView mContentImage;
-
     private Subscription mContentImageLoadSubscription;
+
+    // View that contains the background
+    private View mMainFrame;
+    private Drawable mBackgroundWithPreview;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -92,16 +103,28 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
 
         mContentImage = (ImageView) findViewById(R.id.content_image);
 
-        Uri defaultImageUri =
-                Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE +
-                        "://" + getResources()
-                        .getResourcePackageName(R.drawable.browse_background_no_preview)
-                        + '/' + getResources()
-                        .getResourceTypeName(R.drawable.browse_background_no_preview)
-                        + '/' + getResources()
-                        .getResourceEntryName(R.drawable.browse_background_no_preview));
+        mContentImage.setImageURI(Uri.EMPTY);
 
-        mContentImage.setImageURI(defaultImageUri);
+        // Get display/background size
+        Display display = getWindowManager().getDefaultDisplay();
+        Point windowSize = new Point();
+        display.getSize(windowSize);
+        int imageWidth = (int) getResources().getDimension(R.dimen.content_image_width);
+        int imageHeight = (int) getResources().getDimension(R.dimen.content_image_height);
+        int gradientSize = (int) getResources().getDimension(R.dimen.content_image_gradient_size);
+        // Create the background
+        Bitmap background =
+                BackgroundImageUtils.createBackgroundWithPreviewWindow(
+                        windowSize.x,
+                        windowSize.y,
+                        imageWidth,
+                        imageHeight,
+                        gradientSize,
+                        ContextCompat.getColor(this, R.color.browse_background_color));
+        mBackgroundWithPreview = new BitmapDrawable(getResources(), background);
+        // Set the background
+        mMainFrame = findViewById(R.id.main_frame);
+        mMainFrame.setBackground(mBackgroundWithPreview);
     }
 
     /**
@@ -115,8 +138,8 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         if (item instanceof Content) {
             Content content = (Content) item;
             callImageLoadSubscription(content.getTitle(),
-                    content.getDescription(),
-                    content.getBackgroundImageUrl());
+                                      content.getDescription(),
+                                      content.getBackgroundImageUrl());
         }
         /* Zype, Evgeny Cherkasov */
         // Update screen background with selected playlist (category) image
@@ -131,21 +154,21 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
             // Terms of use action.
             if (ContentBrowser.TERMS.equals(settingsAction.getAction())) {
                 callImageLoadSubscription(getString(R.string.terms_title),
-                        getString(R.string.terms_description),
-                        null);
+                                          getString(R.string.terms_description),
+                                          null);
             }
             // Login and logout action.
             else if (ContentBrowser.LOGIN_LOGOUT.equals(settingsAction.getAction())) {
 
                 if (settingsAction.getState() == LogoutSettingsFragment.TYPE_LOGOUT) {
                     callImageLoadSubscription(getString(R.string.logout_label),
-                            getString(R.string.logout_description),
-                            null);
+                                              getString(R.string.logout_description),
+                                              null);
                 }
                 else {
                     callImageLoadSubscription(getString(R.string.login_label),
-                            getString(R.string.login_description),
-                            null);
+                                              getString(R.string.login_description),
+                                              null);
                 }
             }
         }
@@ -166,23 +189,43 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
                 .timer(UI_UPDATE_DELAY_IN_MS, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread()) // This is a must for timer.
                 .subscribe(c -> {
-                    Log.d(TAG, "image update timer called");
                     mContentTitle.setText(title);
                     mContentDescription.setText(description);
-                    Helpers.loadImageWithCrossFadeTransition(this,
-                            mContentImage,
-                            bgImageUrl,
-                            CONTENT_IMAGE_CROSS_FADE_DURATION);
+                    GlideHelper.loadImageWithCrossFadeTransition(this,
+                                                                 mContentImage,
+                                                                 bgImageUrl,
+                                                                 CONTENT_IMAGE_CROSS_FADE_DURATION,
+                                                                 R.color.browse_background_color);
+
+                    // If there is no image, remove the preview window
+                    if (bgImageUrl != null && !bgImageUrl.isEmpty()) {
+                        mMainFrame.setBackground(mBackgroundWithPreview);
+                    }
+                    else {
+                        mMainFrame.setBackgroundColor(Color.TRANSPARENT);
+                    }
                 });
+
     }
 
     @Override
-    protected void onPause() {
+    protected void onDestroy() {
 
-        super.onPause();
-
+        super.onDestroy();
         if (mContentImageLoadSubscription != null) {
             mContentImageLoadSubscription.unsubscribe();
         }
+    }
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+        if (ContentBrowser.getInstance(this).getAuthHelper() != null) {
+            ContentBrowser.getInstance(this).getAuthHelper()
+                          .loadPoweredByLogo(this, (ImageView) findViewById(R.id.mvpd_logo));
+        }
+
+        reportFullyDrawn();
     }
 }

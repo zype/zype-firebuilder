@@ -36,8 +36,7 @@ include ':app',
 //        ':PassThroughAdsComponent',
         ':VastAdsComponent',
         ':AMZNMediaPlayerComponent',
-//        ':FacebookAuthComponent',
-        ':AmazonInAppPurchaseComponent',
+        ':PassThroughLoginComponent',
         ':LoggerAnalyticsComponent'
 
 /* Frameworks */
@@ -65,6 +64,6 @@ project(':AMZNMediaPlayerComponent').projectDir = new File(rootProject.projectDi
 project(':VastAdsComponent').projectDir = new File(rootProject.projectDir, '../VastAdsComponent')
 //project(':FacebookAuthComponent').projectDir = new File(rootProject.projectDir, '../FacebookAuthComponent')
 project(':AmazonInAppPurchaseComponent').projectDir = new File(rootProject.projectDir, '../AmazonInAppPurchaseComponent')
+project(':PassThroughAdsComponent').projectDir = new File(rootProject.projectDir, '../PassThroughAdsComponent')
+project(':PassThroughLoginComponent').projectDir = new File(rootProject.projectDir, '../PassThroughLoginComponent')
 project(':LoggerAnalyticsComponent').projectDir = new File(rootProject.projectDir, '../LoggerAnalyticsComponent')
-/* Zype */
-//project(':ZypeAuthComponent').projectDir = new File(rootProject.projectDir, '../ZypeAuthComponent')
