@@ -78,11 +78,9 @@ public class CardPresenter extends Presenter {
         try {
             mDefaultCardImage = ContextCompat.getDrawable(mContext, R.drawable.movie);
             sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused);
-            mDefaultCardImage = ContextCompat.getDrawable(context, R.drawable.movie);
-            sFocusedFadeMask = ContextCompat.getDrawable(context, R.drawable.content_fade_focused);
             /* Zype, Evgeny Cherkasov */
-            imageLocked = ContextCompat.getDrawable(context, R.drawable.locked);
-            imageUnlocked = ContextCompat.getDrawable(context, R.drawable.unlocked);
+            imageLocked = ContextCompat.getDrawable(mContext, R.drawable.locked);
+            imageUnlocked = ContextCompat.getDrawable(mContext, R.drawable.unlocked);
         }
         catch (Resources.NotFoundException e) {
             Log.e(TAG, "Could not find resource ", e);
@@ -110,7 +108,7 @@ public class CardPresenter extends Presenter {
         // Make card size 16:9
 //        int CARD_WIDTH_PX = 160;
         int CARD_WIDTH_PX = 210;
-        mCardWidthDp = Helpers.convertPixelToDp(context, CARD_WIDTH_PX);
+        mCardWidthDp = Helpers.convertPixelToDp(mContext, CARD_WIDTH_PX);
 
         int CARD_HEIGHT_PX = 120;
         mCardHeightDp = Helpers.convertPixelToDp(mContext, CARD_HEIGHT_PX);
@@ -152,12 +150,6 @@ public class CardPresenter extends Presenter {
                                               content.getCardImageUrl(),
                                               new GlideHelper.LoggingListener<>(),
                                               R.drawable.movie);
-                Glide.with(viewHolder.view.getContext())
-                        .load(content.getCardImageUrl())
-                        .listener(new Helpers.LoggingListener<>())
-                        .centerCrop()
-                        .error(mDefaultCardImage)
-                        .into(cardView.getMainImageView());
 
                 /*Zype, EvgenyCherkasov */
                 // Display lock icon for subscription video
@@ -180,7 +172,7 @@ public class CardPresenter extends Presenter {
             if (contentContainer.getExtraStringValue(Content.CARD_IMAGE_URL_FIELD_NAME) != null) {
                 Glide.with(viewHolder.view.getContext())
                         .load(contentContainer.getExtraStringValue(Content.CARD_IMAGE_URL_FIELD_NAME))
-                        .listener(new Helpers.LoggingListener<>())
+                        .listener(new GlideHelper.LoggingListener<>())
                         .centerCrop()
                         .error(mDefaultCardImage)
                         .into(cardView.getMainImageView());

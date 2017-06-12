@@ -34,10 +34,17 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -54,6 +61,8 @@ import com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment;
 import com.amazon.android.tv.tenfoot.ui.fragments.ZypePlaylistContentBrowseFragment;
 import com.amazon.android.ui.constants.ConfigurationConstants;
 import com.amazon.android.ui.fragments.LogoutSettingsFragment;
+import com.amazon.android.ui.utils.BackgroundImageUtils;
+import com.amazon.android.utils.GlideHelper;
 import com.amazon.android.utils.Helpers;
 
 import java.util.concurrent.TimeUnit;
@@ -81,8 +90,11 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity implements Z
     private TextView mContentDescription;
     private ImageView mContentImage;
     private ProgressBar progressBar;
-
     private Subscription mContentImageLoadSubscription;
+
+    // View that contains the background
+    private View mMainFrame;
+    private Drawable mBackgroundWithPreview;
 
     private BroadcastReceiver receiver;
 
@@ -105,16 +117,28 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity implements Z
 
         mContentImage = (ImageView) findViewById(R.id.content_image);
 
-        Uri defaultImageUri =
-                Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE +
-                        "://" + getResources()
-                        .getResourcePackageName(R.drawable.browse_background_no_preview)
-                        + '/' + getResources()
-                        .getResourceTypeName(R.drawable.browse_background_no_preview)
-                        + '/' + getResources()
-                        .getResourceEntryName(R.drawable.browse_background_no_preview));
+        mContentImage.setImageURI(Uri.EMPTY);
 
-        mContentImage.setImageURI(defaultImageUri);
+        // Get display/background size
+        Display display = getWindowManager().getDefaultDisplay();
+        Point windowSize = new Point();
+        display.getSize(windowSize);
+        int imageWidth = (int) getResources().getDimension(R.dimen.content_image_width);
+        int imageHeight = (int) getResources().getDimension(R.dimen.content_image_height);
+        int gradientSize = (int) getResources().getDimension(R.dimen.content_image_gradient_size);
+        // Create the background
+        Bitmap background =
+                BackgroundImageUtils.createBackgroundWithPreviewWindow(
+                        windowSize.x,
+                        windowSize.y,
+                        imageWidth,
+                        imageHeight,
+                        gradientSize,
+                        ContextCompat.getColor(this, R.color.browse_background_color));
+        mBackgroundWithPreview = new BitmapDrawable(getResources(), background);
+        // Set the background
+        mMainFrame = findViewById(R.id.main_frame);
+        mMainFrame.setBackground(mBackgroundWithPreview);
 
         progressBar = (ProgressBar) findViewById(R.id.feed_progress);
         progressBar.setVisibility(View.VISIBLE);
@@ -145,8 +169,8 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity implements Z
         else if (item instanceof ContentContainer) {
             ContentContainer contentContainer = (ContentContainer) item;
             callImageLoadSubscription(contentContainer.getName(),
-                    (String) contentContainer.getExtraStringValue("description"),
-                    (String) contentContainer.getExtraStringValue(Content.BACKGROUND_IMAGE_URL_FIELD_NAME));
+                    contentContainer.getExtraStringValue("description"),
+                    contentContainer.getExtraStringValue(Content.BACKGROUND_IMAGE_URL_FIELD_NAME));
         }
         else if (item instanceof Action) {
             Action settingsAction = (Action) item;
@@ -188,14 +212,23 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity implements Z
                 .timer(UI_UPDATE_DELAY_IN_MS, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread()) // This is a must for timer.
                 .subscribe(c -> {
-                    Log.d(TAG, "image update timer called");
                     mContentTitle.setText(title);
                     mContentDescription.setText(description);
-                    Helpers.loadImageWithCrossFadeTransition(this,
+                    GlideHelper.loadImageWithCrossFadeTransition(this,
                             mContentImage,
                             bgImageUrl,
-                            CONTENT_IMAGE_CROSS_FADE_DURATION);
+                            CONTENT_IMAGE_CROSS_FADE_DURATION,
+                            R.color.browse_background_color);
+
+                    // If there is no image, remove the preview window
+                    if (bgImageUrl != null && !bgImageUrl.isEmpty()) {
+                        mMainFrame.setBackground(mBackgroundWithPreview);
+                    }
+                    else {
+                        mMainFrame.setBackgroundColor(Color.TRANSPARENT);
+                    }
                 });
+
     }
 
     @Override
@@ -204,6 +237,12 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity implements Z
         if (receiver != null) {
             LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter("DataUpdated"));
         }
+        if (ContentBrowser.getInstance(this).getAuthHelper() != null) {
+            ContentBrowser.getInstance(this).getAuthHelper()
+                    .loadPoweredByLogo(this, (ImageView) findViewById(R.id.mvpd_logo));
+        }
+
+        reportFullyDrawn();
     }
 
     @Override
@@ -219,4 +258,14 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity implements Z
         }
 
     }
+
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
+        if (mContentImageLoadSubscription != null) {
+            mContentImageLoadSubscription.unsubscribe();
+        }
+    }
+
 }

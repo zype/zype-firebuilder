@@ -30,7 +30,7 @@ permissions and limitations under the License.
     <!-- Color of splash screen spinning loader animation -->
     <color name="spinner_color">#FFFFFFFF</color>
     <!-- The color of button highlights and widgets. -->
-    <color name="accent">#EE962D</color>
+    <color name="accent">#00AEEF</color>
     <!-- FullContentBrowser:
          The header's bar color (left-hand navigation bar). -->
     <color name="browse_headers_bar">#0DFFFFFF</color>
@@ -57,17 +57,14 @@ permissions and limitations under the License.
     <!-- Splash Screen Customization -->
 
     <!-- Company logo to show on Splash Screen -->
-    <drawable name="splash_logo">@drawable/fire_app_builder_white</drawable>
     <drawable name="splash_logo">@drawable/zype_logo_cloud</drawable>
-    <!-- Copyright string text color -->
-    <color name="copyright">#E6FFFFFF</color>
 
     <!-- End of Splash Screen Customization -->
 
     <!-- Browse Customization -->
 
     <!-- Company logo -->
-    <drawable name="company_logo">@drawable/fire_app_builder_white_2</drawable>
+    <drawable name="company_logo">@drawable/zype_logo_cloud</drawable>
     <!-- App icon -->
     <drawable name="app_logo">@mipmap/ic_launcher</drawable>
     <!-- Content preview window customization -->
@@ -75,7 +72,6 @@ permissions and limitations under the License.
     <dimen name="content_image_width">540dp</dimen>
     <!-- Size of gradient fade for content preview window -->
     <dimen name="content_image_gradient_size">100dp</dimen>
-    <drawable name="company_logo">@drawable/zype_logo_cloud</drawable>
 
     <!-- End of Browse Customization -->
 

@@ -14,15 +14,17 @@
  */
 package com.amazon.android.model.translators;
 
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.amazon.android.model.AModelTranslator;
 import com.amazon.android.model.content.Content;
+import com.amazon.utils.ListUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
 
 /* Zype, Evgeny Cherkasov */
 
@@ -57,34 +59,42 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
      */
     @Override
     public boolean setMemberVariable(Content model, String field, Object value) {
-        if (model == null || field == null || field.isEmpty() || value == null) {
+        if (model == null || field == null || field.isEmpty()) {
             Log.e(TAG, "Input parameters should not be null and field cannot be empty.");
             return false;
+        }
+        // This allows for some content to have extra values that others might not have.
+        if (value == null) {
+            Log.w(TAG, "Value for " + field + " was null so not set for Content, this may be " +
+                    "intentional.");
+            return true;
         }
         try {
             switch (field) {
                 case Content.TITLE_FIELD_NAME:
-                    model.setTitle((String) value);
+                    model.setTitle(value.toString());
                     break;
                 case Content.DESCRIPTION_FIELD_NAME:
-                    model.setDescription((String) value);
-                    if (TextUtils.isEmpty(model.getDescription())) {
-                        model.setDescription(" ");
-                    }
+                    model.setDescription(value.toString());
+//                    if (TextUtils.isEmpty(model.getDescription())) {
+//                        model.setDescription(" ");
+//                    }
                     break;
                 case Content.ID_FIELD_NAME:
-                    // Convert Zype hex 24 digit id to long by getting hash code of id String
-                    // The result long id may be not unique.
-                    // TODO: Consider another way to convert original id to long value
-                    model.setId(Long.valueOf(String.valueOf(((String) value).hashCode())));
+                    model.setId(value.toString());
+//                    // Convert Zype hex 24 digit id to long by getting hash code of id String
+//                    // The result long id may be not unique.
+//                    // TODO: Consider another way to convert original id to long value
+//                    model.setId(Long.valueOf(String.valueOf(((String) value).hashCode())));
+                    // TODO: Id type changes to String, so we probably don't need save original id anymore
                     // Put original id as extra value
                     model.setExtraValue("_id", value);
                     break;
                 case Content.SUBTITLE_FIELD_NAME:
-                    model.setSubtitle((String) value);
+                    model.setSubtitle(value.toString());
                     break;
                 case Content.URL_FIELD_NAME:
-                    model.setUrl((String) value);
+                    model.setUrl(value.toString());
                     break;
                 case Content.CARD_IMAGE_URL_FIELD_NAME: {
                     model.setCardImageUrl(findImageUrl(field, value));
@@ -98,9 +108,37 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
                     // Expecting value to be a list.
                     model.setTags(value.toString());
                     break;
-                case FIELD_SUBSCRIPTION_REQUIRED: {
-                    model.setSubscriptionRequired((Boolean) value);
-                }
+//                case FIELD_SUBSCRIPTION_REQUIRED: {
+//                    model.setSubscriptionRequired((Boolean) value);
+//                }
+                case Content.CLOSED_CAPTION_FIELD_NAME:
+                    model.setCloseCaptionUrls((List) value);
+                    break;
+                case Content.RECOMMENDATIONS_FIELD_NAME:
+                    // Expecting value to be a list.
+                    model.setRecommendations(value.toString());
+                    break;
+                case Content.AVAILABLE_DATE_FIELD_NAME:
+                    model.setAvailableDate(value.toString());
+                    break;
+                case Content.SUBSCRIPTION_REQUIRED_FIELD_NAME:
+                    model.setSubscriptionRequired((boolean) value);
+                    break;
+                case Content.CHANNEL_ID_FIELD_NAME:
+                    model.setChannelId(value.toString());
+                    break;
+                case Content.DURATION_FIELD_NAME:
+                    model.setDuration(Long.valueOf((String) value));
+                    break;
+                case Content.AD_CUE_POINTS_FIELD_NAME:
+                    model.setAdCuePoints((List) value);
+                    break;
+                case Content.STUDIO_FIELD_NAME:
+                    model.setStudio(value.toString());
+                    break;
+                case Content.FORMAT_FIELD_NAME:
+                    model.setFormat(value.toString());
+                    break;
                 default:
                     model.setExtraValue(field, value);
                     break;
@@ -110,7 +148,7 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
             Log.e(TAG, "Error casting value to the required type for field " + field, e);
             return false;
         }
-        catch (JSONException e) {
+        catch (ListUtils.ExpectingJsonArrayException e) {
             Log.e(TAG, "Error creating JSONArray from provided tags string " + value, e);
             return false;
         }

@@ -43,11 +43,19 @@ permissions and limitations under the License.
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"/>
 
+<!--
     <RelativeLayout
         android:id="@+id/main_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/browse_background">
+        android:background="@drawable/browse_background"
+        >
+-->
+    <RelativeLayout
+        android:id="@+id/main_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
 
         <ImageView
             android:id="@+id/main_logo"

@@ -29,6 +29,7 @@
 package com.amazon.android.tv.tenfoot.ui.fragments;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
+import com.amazon.android.contentbrowser.ContentLoader;
 import com.amazon.android.contentbrowser.helper.AuthHelper;
 import com.amazon.android.model.Action;
 import com.amazon.android.model.content.Content;
@@ -105,7 +106,6 @@ public class ContentBrowseFragment extends RowsFragment {
 //        ArrayObjectAdapter mRowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
         mRowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
 
-        addSettingsActionsToRowAdapter(mRowsAdapter);
         loadRootContentContainer(mRowsAdapter);
         addSettingsActionsToRowAdapter(mRowsAdapter);
 
@@ -208,10 +208,10 @@ public class ContentBrowseFragment extends RowsFragment {
                     item = contentContainer.getContents().get(0);
                 }
                 else {
-                    if ((Integer) contentContainer.getExtraStringValue("playlistItemCount") > 0) {
+                    if (Integer.valueOf(contentContainer.getExtraStringValue("playlistItemCount")) > 0) {
                         // Playlist has  videos, but they is not loaded yet.
                         // Load videos and then open video detail screen of the first video in the playlist
-                        ContentBrowser.ILoadContentForContentContainer listener = new ContentBrowser.ILoadContentForContentContainer() {
+                        ContentLoader.ILoadContentForContentContainer listener = new ContentLoader.ILoadContentForContentContainer() {
                             @Override
                             public void onContentsLoaded() {
                                 ContentBrowser.getInstance(getActivity())
@@ -219,7 +219,8 @@ public class ContentBrowseFragment extends RowsFragment {
                                         .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
                             }
                         };
-                        ContentBrowser.getInstance(getActivity()).loadContentForContentContainer(contentContainer, listener);
+                        // TODO: Add mCompositeSubscription parameter from ContentBrowser
+                        ContentLoader.getInstance(getActivity()).loadContentForContentContainer(contentContainer, listener);
                         return;
                     }
                 }

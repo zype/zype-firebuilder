@@ -1343,7 +1343,7 @@ public class PlaybackActivity extends Activity implements
         /* Zype, Evgeny Cherkasov */
         // Before playing video load player data from Zype API and update content object with
         // player url and ad tag
-        String videoId = (String) content.getExtraValue("_id");
+        String videoId = (String) mSelectedContent.getExtraValue("_id");
         String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
         HashMap<String, String> params = new HashMap<>();
         if (!TextUtils.isEmpty(accessToken)) {
@@ -1357,14 +1357,14 @@ public class PlaybackActivity extends Activity implements
             public void onResponse(Call<PlayerResponse> call, Response<PlayerResponse> response) {
                 if (response.isSuccessful()) {
                     if (!response.body().playerData.body.files.isEmpty()) {
-                        updateContentWithPlayerData(content, response.body().playerData);
+                        updateContentWithPlayerData(mSelectedContent, response.body().playerData);
                     }
                     else {
-                        updateContentWithPlayerData(content, null);
+                        updateContentWithPlayerData(mSelectedContent, null);
                     }
                 }
                 else {
-                    updateContentWithPlayerData(content, null);
+                    updateContentWithPlayerData(mSelectedContent, null);
                 }
                 Bundle adExtras = mAdsImplementation.getExtra();
                 if (mSelectedContent.getExtraValue("adUrl") != null) {
@@ -1378,7 +1378,7 @@ public class PlaybackActivity extends Activity implements
 
             @Override
             public void onFailure(Call<PlayerResponse> call, Throwable t) {
-                updateContentWithPlayerData(content, null);
+                updateContentWithPlayerData(mSelectedContent, null);
                 mAdsImplementation.showPreRollAd();
             }
         });
