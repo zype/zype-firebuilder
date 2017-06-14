@@ -33,6 +33,12 @@ public interface IAds {
      */
     String WAS_A_MID_ROLL = "wasAMidRoll";
 
+    /* Zype, Evgeny Cherkasov */
+    /**
+     * Extra key for ad number to play
+     */
+    String AD_NUMBER = "AdNumber";
+
     /**
      * Major version number.
      */

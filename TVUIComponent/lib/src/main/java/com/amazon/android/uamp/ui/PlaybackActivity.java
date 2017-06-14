@@ -57,6 +57,7 @@ import com.amazon.mediaplayer.AMZNMediaPlayer.PlayerState;
 import com.amazon.mediaplayer.playback.text.Cue;
 import com.amazon.mediaplayer.tracks.TrackType;
 import com.zype.fire.api.IZypeApi;
+import com.zype.fire.api.Model.AdvertisingSchedule;
 import com.zype.fire.api.Model.PlayerData;
 import com.zype.fire.api.Model.PlayerResponse;
 import com.zype.fire.api.ZypeApi;
@@ -84,6 +85,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -194,6 +196,8 @@ public class PlaybackActivity extends Activity implements
         mVideoPositionTrackingRunnable = new Runnable() {
             @Override
             public void run() {
+                /* Zype, Evgeny Cherkasov */
+                boolean stopTracking = false;
 
                 try {
                     // If player exists and playing then set video position to ads implementation.
@@ -201,14 +205,25 @@ public class PlaybackActivity extends Activity implements
                         if (mAdsImplementation != null) {
                             mAdsImplementation.setCurrentVideoPosition(
                                     mPlayer.getCurrentPosition());
+                            /* Zype, Evgeny Cherkasov */
+                            if (mSelectedContent.getAdCuePoints() != null && !mSelectedContent.getAdCuePoints().isEmpty()) {
+                                int adNumber = mAdsImplementation.getExtra().getInt(IAds.AD_NUMBER);
+                                if (adNumber >= 0 && mPlayer.getCurrentPosition() >= mSelectedContent.getAdCuePoints().get(adNumber)) {
+                                    Log.d(TAG, "Start mid-roll ad");
+                                    stopTracking = true;
+                                    showMidRollAd();
+                                }
+                            }
                         }
                     }
                 }
                 catch (Exception e) {
                     Log.e(TAG, "Video position tracking failed.", e);
                 }
-                mVideoPositionTrackingHandler.postDelayed(this,
-                                                          VIDEO_POSITION_TRACKING_POLL_TIME_MS);
+                /* Zype, Evgeny Cherkasov */
+                if (!stopTracking) {
+                    mVideoPositionTrackingHandler.postDelayed(this, VIDEO_POSITION_TRACKING_POLL_TIME_MS);
+                }
             }
         };
 
@@ -273,8 +288,10 @@ public class PlaybackActivity extends Activity implements
      */
     private void resumePlaybackAfterAuthentication() {
 
-        // Start tracking video position changes.
-        mVideoPositionTrackingHandler.post(mVideoPositionTrackingRunnable);
+        /* Zype, Evgeny Cherkasov */
+        // Start tracking after player ready
+//        // Start tracking video position changes.
+//        mVideoPositionTrackingHandler.post(mVideoPositionTrackingRunnable);
 
         // Check to see if a previous network failure was now rectified.
         if (!mIsActivityResumed && mIsNetworkError && Helpers.isConnectedToNetwork(this)) {
@@ -322,6 +339,9 @@ public class PlaybackActivity extends Activity implements
             duration = mSelectedContent.getDuration();
         }
         AnalyticsHelper.trackPlaybackStarted(mSelectedContent, duration, mCurrentPlaybackPosition);
+
+        // Start tracking video position changes.
+        mVideoPositionTrackingHandler.post(mVideoPositionTrackingRunnable);
 
         // Let ads implementation track player activity lifecycle.
         if (mAdsImplementation != null) {
@@ -1079,16 +1099,7 @@ public class PlaybackActivity extends Activity implements
 
             // Initialize ads.
             if (mAdsImplementation != null) {
-                /* Zype, Evgeny Cherkasov */
-                // Pass the ad tag from video data to Ads component
-//                mAdsImplementation.init(this, mAdsView, playerExtras);
-                Bundle adExtras = playerExtras.getBundle("ads");
-                if (mSelectedContent.getExtraValue("adUrl") != null) {
-                    adExtras.putString("VASTAdTag", (String) mSelectedContent.getExtraValue("adUrl"));
-                } else {
-                    adExtras.putString("VASTAdTag", null);
-                }
-                mAdsImplementation.init(this, mAdsView, adExtras);
+                mAdsImplementation.init(this, mAdsView, playerExtras);
             }
 
             mPlayer.setUserAgent(System.getProperty("http.agent"));
@@ -1179,6 +1190,18 @@ public class PlaybackActivity extends Activity implements
                 openContentHelper(mSelectedContent);
             }
             AnalyticsHelper.trackAdEnded(mSelectedContent, duration, getCurrentPosition());
+
+            /* Zype, Evgeny Cherkasov */
+            // Set ad number to the next scheduled
+            int adNumber = mAdsImplementation.getExtra().getInt(IAds.AD_NUMBER);
+            if (adNumber >= 0) {
+                if (mSelectedContent.getAdCuePoints().size() > adNumber + 1) {
+                    mAdsImplementation.getExtra().putInt(IAds.AD_NUMBER, adNumber + 1);
+                }
+                else {
+                    mAdsImplementation.getExtra().putInt(IAds.AD_NUMBER, -1);
+                }
+            }
         }
     };
 
@@ -1342,8 +1365,7 @@ public class PlaybackActivity extends Activity implements
         mAdsImplementation.getExtra().putBundle("video", videoExtras);
         /* Zype, Evgeny Cherkasov */
         // Before playing video load player data from Zype API and update content object with
-        // player url and ad tag
-        String videoId = (String) mSelectedContent.getExtraValue("_id");
+        // player url and ad tags
         String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
         HashMap<String, String> params = new HashMap<>();
         if (!TextUtils.isEmpty(accessToken)) {
@@ -1352,7 +1374,7 @@ public class PlaybackActivity extends Activity implements
         else {
             params.put(ZypeApi.APP_KEY, ZypeSettings.APP_KEY);
         }
-        ZypeApi.getInstance().getApi().getPlayer(IZypeApi.HEADER_USER_AGENT, videoId, params).enqueue(new Callback<PlayerResponse>() {
+        ZypeApi.getInstance().getApi().getPlayer(IZypeApi.HEADER_USER_AGENT, mSelectedContent.getId(), params).enqueue(new Callback<PlayerResponse>() {
             @Override
             public void onResponse(Call<PlayerResponse> call, Response<PlayerResponse> response) {
                 if (response.isSuccessful()) {
@@ -1366,14 +1388,20 @@ public class PlaybackActivity extends Activity implements
                 else {
                     updateContentWithPlayerData(mSelectedContent, null);
                 }
-                Bundle adExtras = mAdsImplementation.getExtra();
-                if (mSelectedContent.getExtraValue("adUrl") != null) {
-                    adExtras.putString("VASTAdTag", (String) mSelectedContent.getExtraValue("adUrl"));
-                } else {
-                    adExtras.putString("VASTAdTag", null);
+                // We need current playback position here to determine ad number to play
+                loadContentPlaybackState();
+                // Update ad parameters
+                initAdsExtras();
+                if (mAdsImplementation.getExtra().getInt(IAds.AD_NUMBER) == 0
+                        && mSelectedContent.getAdCuePoints().get(0) == 0) {
+                    mAdsImplementation.init(PlaybackActivity.this, mAdsView, mAdsImplementation.getExtra());
+                    mAdsImplementation.showPreRollAd();
                 }
-                mAdsImplementation.init(PlaybackActivity.this, mAdsView, adExtras);
-                mAdsImplementation.showPreRollAd();
+                else {
+                    // Show video View.
+                    switch2VideoView();
+                    openContentHelper(mSelectedContent);
+                }
             }
 
             @Override
@@ -1668,20 +1696,72 @@ public class PlaybackActivity extends Activity implements
 
     /* Zype, Evgeny Cherkasov */
     private Content updateContentWithPlayerData(Content content, PlayerData playerData) {
+        // TODO: Use constant for 'adTags' key instead of hardcoded string
         if (playerData != null) {
             content.setUrl(playerData.body.files.get(0).url);
             if (playerData.body.advertising != null && playerData.body.advertising.schedule.size() > 0) {
-                content.setExtraValue("adUrl", playerData.body.advertising.schedule.get(0).tag);
+                content.setAdCuePoints(new ArrayList<>());
+                List<String> adTags = new ArrayList<>();
+                for (AdvertisingSchedule item : playerData.body.advertising.schedule) {
+                    content.getAdCuePoints().add(item.offset);
+                    adTags.add(item.tag);
+                }
+                content.setExtraValue("adTags", adTags);
             }
             else {
-                content.setExtraValue("adUrl", null);
+                content.setAdCuePoints(null);
+                content.setExtraValue("adTags", null);
             }
         }
         else {
             content.setUrl("null");
-            content.setExtraValue("adUrl", null);
+            content.setAdCuePoints(null);
+            content.setExtraValue("adTags", null);
         }
         return content;
     }
 
+    private void initAdsExtras() {
+        Bundle extras = mAdsImplementation.getExtra();
+        int adNumber = -1;
+        if (mSelectedContent.getAdCuePoints() != null && !mSelectedContent.getAdCuePoints().isEmpty()) {
+            if (mCurrentPlaybackPosition == 0) {
+                adNumber = 0;
+            }
+            else {
+                for (int i = 0; i < mSelectedContent.getAdCuePoints().size(); i++) {
+                    if (mSelectedContent.getAdCuePoints().get(i) >= mCurrentPlaybackPosition) {
+                        adNumber = i;
+                        break;
+                    }
+                }
+            }
+        }
+        extras.putInt(IAds.AD_NUMBER, adNumber);
+        if (adNumber != -1) {
+            // TODO: Use constant for 'adTags' key instead of hardcoded string
+            extras.putString("VASTAdTag", (String) mSelectedContent.getExtraValueAsList("adTags").get(adNumber));
+        }
+        else {
+            extras.putString("VASTAdTag", null);
+        }
+    }
+
+    private void showMidRollAd() {
+        // Pause the video if we are already playing a content.
+        if (mPlayer != null && isPlaying()) {
+            mPlayer.pause();
+        }
+        // Hide videoView which make adsView visible.
+        switch2AdsView();
+        // Hide media controller.
+        if (mPlaybackOverlayFragment != null && mPlaybackOverlayFragment.getView() != null) {
+            mPlaybackOverlayFragment.getView().setVisibility(View.INVISIBLE);
+        }
+        // Show progress before mid roll ad.
+        showProgress();
+
+        mAdsImplementation.init(PlaybackActivity.this, mAdsView, mAdsImplementation.getExtra());
+        mAdsImplementation.showPreRollAd();
+    }
 }
