@@ -1185,41 +1185,41 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         return parentContainer;
     }
 
-    /* Zype, Evgeny Cherkasov */
-    public ContentContainer getContainerForContentContainer(ContentContainer contentContainer) {
-
-        // Container that contains the current content container
-        ContentContainer parentContainer = null;
-
-        // Stack of all content containers from root container.
-        Stack<ContentContainer> contentContainerStack = new Stack<>();
-
-        contentContainerStack.push(mContentLoader.getRootContentContainer());
-
-        while (!contentContainerStack.isEmpty()) {
-            // Get a sub container.
-            ContentContainer subContainer = contentContainerStack.pop();
-
-            for (ContentContainer cc : subContainer.getContentContainers()) {
-
-                if (cc.getName().equals(contentContainer.getName())) {
-                    parentContainer = subContainer;
-                }
-            }
-
-            if (parentContainer != null) {
-                break;
-            }
-
-            // Add all the sub containers.
-            if (subContainer.hasSubContainers()) {
-                for (ContentContainer cc : subContainer.getContentContainers()) {
-                    contentContainerStack.push(cc);
-                }
-            }
-        }
-        return parentContainer;
-    }
+//    /* Zype, Evgeny Cherkasov */
+//    public ContentContainer getContainerForContentContainer(ContentContainer contentContainer) {
+//
+//        // Container that contains the current content container
+//        ContentContainer parentContainer = null;
+//
+//        // Stack of all content containers from root container.
+//        Stack<ContentContainer> contentContainerStack = new Stack<>();
+//
+//        contentContainerStack.push(mContentLoader.getRootContentContainer());
+//
+//        while (!contentContainerStack.isEmpty()) {
+//            // Get a sub container.
+//            ContentContainer subContainer = contentContainerStack.pop();
+//
+//            for (ContentContainer cc : subContainer.getContentContainers()) {
+//
+//                if (cc.getName().equals(contentContainer.getName())) {
+//                    parentContainer = subContainer;
+//                }
+//            }
+//
+//            if (parentContainer != null) {
+//                break;
+//            }
+//
+//            // Add all the sub containers.
+//            if (subContainer.hasSubContainers()) {
+//                for (ContentContainer cc : subContainer.getContentContainers()) {
+//                    contentContainerStack.push(cc);
+//                }
+//            }
+//        }
+//        return parentContainer;
+//    }
 
     /**
      * Search content.

@@ -1,9 +1,9 @@
 {
   "skusList": [
     {
-      "sku": "testSubSku",
+      "sku": "com.zype.aftv.testsubscriptionmonthly",
       "productType": "SUBSCRIBE",
-      "purchaseSku": "testSubSku"
+      "purchaseSku": "com.zype.aftv.testsubscriptionmonthly"
     },
     {
       "sku": "RentUnPurchased",
@@ -13,6 +13,6 @@
   ],
   "actions": {
     "CONTENT_ACTION_DAILY_PASS": "RentUnPurchased",
-    "CONTENT_ACTION_SUBSCRIPTION": "testSubSku"
+    "CONTENT_ACTION_SUBSCRIPTION": "com.zype.aftv.testsubscriptionmonthly"
   }
 }
