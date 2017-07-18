@@ -1449,7 +1449,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 mAuthHelper.handleAuthChain(iScreenSwitchListener::onScreenSwitch);
             }
             else {
-                boolean loginLater = Preferences.getBoolean(AuthHelper.LOGIN_LATER_PREFERENCES_KEY);
+                // Never show login later alert
+//                boolean loginLater = Preferences.getBoolean(AuthHelper.LOGIN_LATER_PREFERENCES_KEY);
+                boolean loginLater = true;
                 if (!loginLater && mAuthHelper.getIAuthentication()
                                               .isAuthenticationCanBeDoneLater()) {
 
