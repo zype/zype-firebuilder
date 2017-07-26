@@ -51,8 +51,38 @@ Android Studio
 
 ## Creating new Fire TV app based of Zype Template
 
-Coming soon
+### Customizing UI resources
 
+- **App name**
+
+In the ```app\res\values\strings.xml``` file update following string resources:
+
+```app_name```
+
+```app_name_short```
+
+- **Company logo**
+
+Image dimensions should be approximately 356 x 108 px and have a transparent background.
+Put your logo file to ```app\res\drawable``` folder.
+
+In the ```app\res\values\custom.xml``` file update following elements with your logo drawable resource id:
+
+```splash_logo```
+
+```company_logo```
+
+- **App icon**
+
+In the ```app\res\mipmap``` folder update ```ic_launcher``` file.
+
+- **Action buttons**
+
+To make focused action button appear with brand color:
+
+1. Prepare drawable resource for button background.
+2. Put these files to ```app\res\drawable``` and ```app\res\drawable-xhdpi``` folders.
+3. In the ```app\res\values\custom.xml``` file update ```action_button_focused``` element with your background drawable resource id.
 
 ## Built With
 
