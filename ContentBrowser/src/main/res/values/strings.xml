@@ -56,4 +56,9 @@ permissions and limitations under the License.
     <string name="app_name">ContentBrowser</string>
     <!-- Used in recommendations. Should be no more than 15 characters. -->
     <string name="app_name_short">@string/app_name</string>
+
+    <!-- Zype, Evgeny Cherkasov -->
+
+    <string name="action_swaf_1">Watch</string>
+    <string name="action_swaf_2">Ad Free</string>
 </resources>

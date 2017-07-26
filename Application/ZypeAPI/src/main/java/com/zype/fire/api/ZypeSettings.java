@@ -15,5 +15,16 @@ public class ZypeSettings {
     // Playlist
     // TODO: Provide your Zype root playlist id
     public static final String ROOT_PLAYLIST_ID = "577e65c85577de0d1000c1ee";
+
+    // App features
+    // TODO: Update app feature settings
+//    public static final boolean BACKGROUND_PLAYBACK_ENABLED = false;
+//    public static final boolean DOWNLOADS_ENABLED = true;
+//    public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = true;
+//    public static final boolean SHARE_VIDEO_ENABLED = false;
+//    public static final boolean THEME_LIGHT = true;
+//    public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = true;
+    public static final boolean NATIVE_AMAZON_SUBSCRIPTION_ENABLED = true;
+    public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = true;
 }
 

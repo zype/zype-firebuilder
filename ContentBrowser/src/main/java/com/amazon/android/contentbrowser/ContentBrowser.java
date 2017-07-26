@@ -271,7 +271,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final int CONTENT_ACTION_MAX = 100;
 
     /* Zype, Evgeny Cherkasov */
-    public static final int CONTENT_ACTION_LOGIN_TO_WATCH = 100;
+    // Watch ad free action
+    public static final int CONTENT_ACTION_SWAF = 50;
 
     /**
      * Search algorithm name.
@@ -1370,6 +1371,15 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                                           .getString(R.string.watch_now_1))
                                     .setLabel2(mAppContext.getResources()
                                                           .getString(R.string.watch_now_2)));
+                /* Zype, Evgeny Cherkasov */
+                if (ZypeSettings.SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED && !isUserLoggedIn) {
+                    contentActionList.add(
+                            new Action().setId(CONTENT_ACTION_SWAF)
+                                    .setLabel1(mAppContext.getResources()
+                                            .getString(R.string.action_swaf_1))
+                                    .setLabel2(mAppContext.getResources()
+                                            .getString(R.string.action_swaf_2)));
+                }
             }
         }
         else {
@@ -1623,12 +1633,14 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         /* Zype, Evgeny Cherkasov */
         // Check if subscription video available to user
-        if (content.isSubscriptionRequired()) {
+        if (content.isSubscriptionRequired()
+                || (ZypeSettings.SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED && actionId == CONTENT_ACTION_SWAF)) {
             mAuthHelper.isAuthenticated().subscribe(isAuthenticatedResultBundle -> {
                 boolean result = isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT);
                 if (result) {
                     // TODO: Consider another way to get preference name to avoid dependemcy on ZypeAuthComponent in this module
-                    if (Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0) {
+                    if (Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0
+                            || actionId == CONTENT_ACTION_SWAF) {
                         switchToRendererScreen(content, actionId);
                     }
                     else {
@@ -1747,6 +1759,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             case CONTENT_ACTION_SUBSCRIPTION:
             case CONTENT_ACTION_DAILY_PASS:
                 mPurchaseHelper.handleAction(activity, content, actionId);
+                break;
+            /* Zype, Evgeny Cherkasov */
+            case CONTENT_ACTION_SWAF:
+                handleRendererScreenSwitch(activity, content, actionId, true);
                 break;
         }
     }
