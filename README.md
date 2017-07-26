@@ -74,7 +74,9 @@ In the ```app\res\values\custom.xml``` file update following elements with your 
 
 - **App icon**
 
-In the ```app\res\mipmap``` folder update ```ic_launcher``` file.
+In ```app\res\mipmap``` folders (```-mdpi```, ```-hdpi```, ```-xhdpi```, ```-xxhdpi```) update ```ic_launcher``` file.
+
+You can use icon generatir in Android Studio to produce icons with required dimensions from 512x512 source icon image.   
 
 - **Action buttons**
 
