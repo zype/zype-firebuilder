@@ -220,7 +220,7 @@ public class ContentBrowseFragment extends RowsFragment {
                             }
                         };
                         // TODO: Add mCompositeSubscription parameter from ContentBrowser
-                        ContentLoader.getInstance(getActivity()).loadContentForContentContainer(contentContainer, listener);
+                        ContentLoader.getInstance(getActivity()).loadContentForContentContainer(contentContainer, getActivity(), listener);
                         return;
                     }
                 }

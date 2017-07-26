@@ -696,7 +696,7 @@ public class ContentLoader {
         for (ContentContainer contentContainer : parentContainer.getContentContainers()) {
             for (ContentContainer innerContentContainer : contentContainer.getContentContainers()) {
                 if (Integer.valueOf(innerContentContainer.getExtraStringValue("playlistItemCount")) > 0) {
-                    loadContentForContentContainer(innerContentContainer, new ILoadContentForContentContainer() {
+                    loadContentForContentContainer(innerContentContainer, activity, new ILoadContentForContentContainer() {
                         @Override
                         public void onContentsLoaded() {
                             if (DEBUG_RECIPE_CHAIN) {
@@ -747,7 +747,7 @@ public class ContentLoader {
         void onContentsLoaded();
     }
 
-    public void loadContentForContentContainer(ContentContainer contentContainer, ILoadContentForContentContainer callback) {
+    public void loadContentForContentContainer(ContentContainer contentContainer, Context context, ILoadContentForContentContainer callback) {
 //        NavigatorModel.GlobalRecipes recipe = mNavigator.getNavigatorModel().getGlobalRecipes().get(0);
 //        Recipe dataLoaderRecipeForContents = recipe.getContents().dataLoaderRecipe;
 //        Recipe dynamicParserRecipeForContents = recipe.getContents().dynamicParserRecipe;
@@ -771,7 +771,9 @@ public class ContentLoader {
                         GsonBuilder builder = new GsonBuilder();
                         Gson gson = builder.create();
                         String feed = gson.toJson(response.body().videoData);
-                        Subscription subscription = getContentsForContentContainerObservable(feed, null, contentContainer)
+                        // TODO: Rename the recipe file
+                        Recipe recipe = Recipe.newInstance(context, "recipes/ZypeSearchContentsRecipe.json");
+                        Subscription subscription = getContentsForContentContainerObservable(feed, recipe, contentContainer)
                                 .subscribeOn(Schedulers.newThread())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(result -> {
@@ -800,8 +802,6 @@ public class ContentLoader {
     private Observable<Object> getContentsForContentContainerObservable(String feed, Recipe recipeDynamicParserVideos,
                                                                         ContentContainer contentContainer) {
         String[] params = new String[] { (String) contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG) };
-//        // TODO: Rename the recipe file
-//        Recipe recipe = Recipe.newInstance(mAppContext, "recipes/ZypeSearchContentsRecipe.json");
         return Observable.just(contentContainer)
                 .concatMap(o -> mDynamicParser.cookRecipeObservable(recipeDynamicParserVideos, feed, null, params)
                         .map(contentAsObject -> {
