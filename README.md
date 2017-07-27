@@ -53,38 +53,42 @@ Android Studio
 
 ### Customizing UI resources
 
-- **App name**
+**App name**
 
 In the ```app\res\values\strings.xml``` file update following string resources:
 
-```app_name```
+- ```app_name```
+- ```app_name_short```
 
-```app_name_short```
-
-- **Company logo**
+**Company logo**
 
 Image dimensions should be approximately 356 x 108 px and have a transparent background.
 Put your logo file to ```app\res\drawable``` folder.
 
 In the ```app\res\values\custom.xml``` file update following elements with your logo drawable resource id:
 
-```splash_logo```
+- ```splash_logo```
+- ```company_logo```
 
-```company_logo```
-
-- **App icon**
+**App icon**
 
 In ```app\res\mipmap``` folders (```-mdpi```, ```-hdpi```, ```-xhdpi```, ```-xxhdpi```) update ```ic_launcher``` file.
 
 You can use icon generatir in Android Studio to produce icons with required dimensions from 512x512 source icon image.   
 
-- **Action buttons**
+**Action buttons**
 
 To make focused action button appear with brand color:
 
 1. Prepare drawable resource for button background.
+    
+    Background image should be resizible bitmap (9-Patch image). Follow this [guide](https://developer.android.com/studio/write/draw9patch.html) to create 9-Patch images. 
 2. Put these files to ```app\res\drawable``` and ```app\res\drawable-xhdpi``` folders.
 3. In the ```app\res\values\custom.xml``` file update ```action_button_focused``` element with your background drawable resource id.
+
+**Other widgets and buttons**
+
+To use your brand color for highlighting of buttons and widgets update ```accent``` color resource in the ```app\res\values\custom.xml``` file.  
 
 ## Built With
 
