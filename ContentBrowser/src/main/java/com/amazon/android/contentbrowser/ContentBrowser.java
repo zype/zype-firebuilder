@@ -1361,6 +1361,15 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                     .setLabel2(mAppContext.getResources()
                                                           .getString(
                                                                   R.string.watch_from_beginning_2)));
+                /* Zype, Evgeny Cherkasov */
+                if (ZypeSettings.SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED && !isUserLoggedIn) {
+                    contentActionList.add(
+                            new Action().setId(CONTENT_ACTION_SWAF)
+                                    .setLabel1(mAppContext.getResources()
+                                            .getString(R.string.action_swaf_1))
+                                    .setLabel2(mAppContext.getResources()
+                                            .getString(R.string.action_swaf_2)));
+                }
             }
 
 
