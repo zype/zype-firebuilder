@@ -363,7 +363,9 @@ public class PlaybackActivity extends Activity implements
         Log.d(TAG, "AuthenticateUserOnResume needed:" + uiNode.isVerifyScreenAccess());
         //check if this Screen need Access verification
         if (uiNode.isVerifyScreenAccess()) {
-            boolean loginLater = Preferences.getBoolean(AuthHelper.LOGIN_LATER_PREFERENCES_KEY);
+            /* Zype, Evgeny Cherkasov */
+//            boolean loginLater = Preferences.getBoolean(AuthHelper.LOGIN_LATER_PREFERENCES_KEY);
+            boolean loginLater = true;
             //Check if Authentication can be deferred or not
             if (!mAuthHelper.getIAuthentication().isAuthenticationCanBeDoneLater() ||
                     (!loginLater && mAuthHelper.getIAuthentication()

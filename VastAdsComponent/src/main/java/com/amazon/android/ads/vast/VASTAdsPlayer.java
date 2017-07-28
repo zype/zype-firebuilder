@@ -314,12 +314,14 @@ public class VASTAdsPlayer implements IAds,
                     String url = mVASTModel.getPickedMediaFileURL();
 
                     VASTLog.d(TAG, "URL for media file:" + url);
-                    try {
-                        mMediaPlayer.setDataSource(url);
-                    } catch (IOException e) {
-                        VASTLog.e(TAG, "Could not set data source for VAST ad",e);
+                    if (mMediaPlayer != null) {
+                        try {
+                            mMediaPlayer.setDataSource(url);
+                        } catch (IOException e) {
+                            VASTLog.e(TAG, "Could not set data source for VAST ad", e);
+                        }
+                        mMediaPlayer.prepareAsync();
                     }
-                    mMediaPlayer.prepareAsync();
                 }
             });
         }
