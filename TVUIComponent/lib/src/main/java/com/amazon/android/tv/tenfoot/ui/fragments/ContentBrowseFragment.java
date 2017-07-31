@@ -137,6 +137,18 @@ public class ContentBrowseFragment extends RowsFragment {
                                                           authenticationStatusUpdateEvent) {
 
         if (settingsAdapter != null) {
+//            settingsAdapter.notifyArrayItemRangeChanged(0, settingsAdapter.size());
+            settingsAdapter.clear();
+            List<Action> settings = ContentBrowser.getInstance(getActivity()).getSettingsActions();
+            if (settings != null && !settings.isEmpty()) {
+                for (Action item : settings) {
+                    settingsAdapter.add(item);
+                }
+            }
+            else {
+                Log.d(TAG, "No settings were found");
+            }
+//            settingsAdapter.notifyAll();
             settingsAdapter.notifyArrayItemRangeChanged(0, settingsAdapter.size());
         }
         /* Zype, Evgney Cherkasov */

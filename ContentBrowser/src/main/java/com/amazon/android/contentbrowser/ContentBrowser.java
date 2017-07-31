@@ -29,10 +29,6 @@ import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.model.content.constants.PreferencesConstants;
 import com.amazon.android.model.event.ActionUpdateEvent;
-import com.amazon.android.model.translators.ContentContainerTranslator;
-import com.amazon.android.model.translators.ContentTranslator;
-import com.amazon.android.model.translators.ZypeContentContainerTranslator;
-import com.amazon.android.module.*;
 import com.amazon.android.navigator.Navigator;
 import com.amazon.android.navigator.NavigatorModel;
 import com.amazon.android.navigator.UINode;
@@ -55,11 +51,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.HeaderItem;
-import android.support.v17.leanback.widget.ListRow;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -68,9 +60,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -81,19 +70,8 @@ import static com.amazon.android.contentbrowser.helper.LauncherIntegrationManage
         .getSourceOfContentPlayRequest;
 
 /* Zype */
-import com.amazon.android.model.translators.ZypeContentTranslator;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.zype.fire.api.IZypeApi;
-import com.zype.fire.api.Model.PlayerData;
-import com.zype.fire.api.Model.PlayerResponse;
-import com.zype.fire.api.Model.VideoData;
-import com.zype.fire.api.Model.VideosResponse;
-import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
-
-import net.minidev.json.JSONArray;
 
 /**
  * This class is the controller of the content browsing solution.
@@ -452,8 +430,26 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         mLoginAction = createLogoutButtonSettingsAction();
 
-        if (Navigator.isScreenAccessVerificationRequired(mNavigator.getNavigatorModel())) {
-            addSettingsAction(mLoginAction);
+        /* Zype, Evgeny Cherkasov */
+//        if (Navigator.isScreenAccessVerificationRequired(mNavigator.getNavigatorModel())) {
+//            addSettingsAction(mLoginAction);
+//        }
+        updateLoginAction();
+    }
+
+    /* Zype, Evgeny Cherkasov */
+    private void updateLoginAction() {
+        if (mLoginAction != null) {
+            for (Action action : mSettingsActions) {
+                if (action.getId() == mLoginAction.getId()) {
+                    mSettingsActions.remove(action);
+                    break;
+                }
+            }
+            if (Navigator.isScreenAccessVerificationRequired(mNavigator.getNavigatorModel())
+                    && (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED || isUserLoggedIn)) {
+                addSettingsAction(mLoginAction);
+            }
         }
     }
 
@@ -714,6 +710,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         /* Zype, Evgeny Cherkasov */
         // Update user logged in flag
         isUserLoggedIn = authenticationStatusUpdateEvent.isUserAuthenticated();
+        updateLoginAction();
 
     }
 
