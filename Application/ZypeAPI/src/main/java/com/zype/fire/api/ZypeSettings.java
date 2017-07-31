@@ -16,6 +16,9 @@ public class ZypeSettings {
     // TODO: Provide your Zype root playlist id
     public static final String ROOT_PLAYLIST_ID = "577e65c85577de0d1000c1ee";
 
+    // Template version
+    public static final String TEMPLATE_VERSION = "1.0.6";
+
     // App features
     // TODO: Update app feature settings
 //    public static final boolean BACKGROUND_PLAYBACK_ENABLED = false;

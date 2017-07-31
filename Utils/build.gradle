@@ -119,6 +119,8 @@ dependencies {
     testCompile 'org.powermock:powermock-classloading-xstream:1.6.2'
     testCompile 'com.android.support.test:runner:0.4'
     compile project(':Calligraphy')
+    /* Zype, Evgeny Cherkasov */
+    compile project(':ZypeAPI')
 }
 
 buildscript {

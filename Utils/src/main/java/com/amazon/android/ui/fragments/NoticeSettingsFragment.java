@@ -19,6 +19,7 @@ import com.amazon.android.ui.interfaces.ASettingsFragment;
 import com.amazon.android.ui.interfaces.SingleViewProvider;
 import com.amazon.android.utils.Helpers;
 import com.amazon.utils.R;
+import com.zype.fire.api.ZypeSettings;
 
 import android.app.Activity;
 import android.app.FragmentManager;
@@ -91,6 +92,9 @@ public class NoticeSettingsFragment extends ASettingsFragment {
         catch (Exception e) {
             Log.e(TAG, "could not read terms of use file", e);
         }
+        /* Zype, Evgeny Cherkasov */
+        content += "<p>Zype Template version: " + ZypeSettings.TEMPLATE_VERSION + "</p>";
+
         final Spanned spanned = Html.fromHtml(content);
         return new SingleViewProvider() {
 
