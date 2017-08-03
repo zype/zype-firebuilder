@@ -17,7 +17,7 @@ public class ZypeSettings {
     public static final String ROOT_PLAYLIST_ID = "577e65c85577de0d1000c1ee";
 
     // Template version
-    public static final String TEMPLATE_VERSION = "1.0.6";
+    public static final String TEMPLATE_VERSION = "1.0.7";
 
     // App features
     // TODO: Update app feature settings
