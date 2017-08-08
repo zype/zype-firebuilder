@@ -60,7 +60,7 @@ import com.zype.fire.api.IZypeApi;
 import com.zype.fire.api.Model.AdvertisingSchedule;
 import com.zype.fire.api.Model.PlayerData;
 import com.zype.fire.api.Model.PlayerResponse;
-import com.zype.fire.api.Util.SpotXHelper;
+import com.zype.fire.api.Util.AdMacrosHelper;
 import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
@@ -89,7 +89,6 @@ import android.widget.ProgressBar;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 import retrofit2.Call;
@@ -1744,7 +1743,7 @@ public class PlaybackActivity extends Activity implements
         extras.putInt(IAds.AD_NUMBER, adNumber);
         // TODO: Use constant for 'adTags' key instead of hardcoded string
         if (adNumber != -1) {
-            String adTag = SpotXHelper.addSpotXParameters(this, (String) mSelectedContent.getExtraValueAsList("adTags").get(adNumber));
+            String adTag = AdMacrosHelper.updateAdTagParameters(this, (String) mSelectedContent.getExtraValueAsList("adTags").get(adNumber));
             extras.putString("VASTAdTag", adTag);
         }
         else {
