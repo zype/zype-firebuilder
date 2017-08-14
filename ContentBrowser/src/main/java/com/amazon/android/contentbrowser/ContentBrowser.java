@@ -153,6 +153,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      */
     public static final String CONTENT_SLIDESHOW_SCREEN = "CONTENT_SLIDESHOW_SCREEN";
 
+    /* Zype, Evgeny Cherkasov */
+    public static final String SUBSCRIPTION_SCREEN = "SUBSCRIPTION_SCREEN";
+
     /**
      * Search constant.
      */
@@ -249,6 +252,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final int CONTENT_ACTION_MAX = 100;
 
     /* Zype, Evgeny Cherkasov */
+    public static final int CONTENT_ACTION_LOGIN_TO_WATCH = 50;
+    public static final int CONTENT_ACTION_CHOOSE_PLAN = 55;
     // Watch ad free action
     public static final int CONTENT_ACTION_SWAF = 50;
 
@@ -399,7 +404,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     private RecommendationManager mRecommendationManager;
 
     /* Zype, Evgeny Cherkasov */
-    private boolean isUserLoggedIn = false;
+    private boolean userLoggedIn = false;
 
     /**
      * Returns AuthHelper instance.
@@ -709,6 +714,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         }
         /* Zype, Evgeny Cherkasov */
         // Update user logged in flag
+        userLoggedIn = authenticationStatusUpdateEvent.isUserAuthenticated();
         isUserLoggedIn = authenticationStatusUpdateEvent.isUserAuthenticated();
         updateLoginAction();
 
@@ -1093,7 +1099,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 if (!content.isSubscriptionRequired()) {
                     /* Zype, Evgeny Cherkasov */
                     // Check is user logged in and has subscription.
-                    if (isUserLoggedIn) {
+                    if (userLoggedIn) {
                         // TODO: Consider another way to get preference name to avoid dependemcy on ZypeAuthComponent in this module
                         // User is logged in and has subscription. Add all videos
                         if (Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0) {
@@ -1183,41 +1189,41 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         return parentContainer;
     }
 
-    /* Zype, Evgeny Cherkasov */
-    public ContentContainer getContainerForContentContainer(ContentContainer contentContainer) {
-
-        // Container that contains the current content container
-        ContentContainer parentContainer = null;
-
-        // Stack of all content containers from root container.
-        Stack<ContentContainer> contentContainerStack = new Stack<>();
-
-        contentContainerStack.push(mContentLoader.getRootContentContainer());
-
-        while (!contentContainerStack.isEmpty()) {
-            // Get a sub container.
-            ContentContainer subContainer = contentContainerStack.pop();
-
-            for (ContentContainer cc : subContainer.getContentContainers()) {
-
-                if (cc.getName().equals(contentContainer.getName())) {
-                    parentContainer = subContainer;
-                }
-            }
-
-            if (parentContainer != null) {
-                break;
-            }
-
-            // Add all the sub containers.
-            if (subContainer.hasSubContainers()) {
-                for (ContentContainer cc : subContainer.getContentContainers()) {
-                    contentContainerStack.push(cc);
-                }
-            }
-        }
-        return parentContainer;
-    }
+//    /* Zype, Evgeny Cherkasov */
+//    public ContentContainer getContainerForContentContainer(ContentContainer contentContainer) {
+//
+//        // Container that contains the current content container
+//        ContentContainer parentContainer = null;
+//
+//        // Stack of all content containers from root container.
+//        Stack<ContentContainer> contentContainerStack = new Stack<>();
+//
+//        contentContainerStack.push(mContentLoader.getRootContentContainer());
+//
+//        while (!contentContainerStack.isEmpty()) {
+//            // Get a sub container.
+//            ContentContainer subContainer = contentContainerStack.pop();
+//
+//            for (ContentContainer cc : subContainer.getContentContainers()) {
+//
+//                if (cc.getName().equals(contentContainer.getName())) {
+//                    parentContainer = subContainer;
+//                }
+//            }
+//
+//            if (parentContainer != null) {
+//                break;
+//            }
+//
+//            // Add all the sub containers.
+//            if (subContainer.hasSubContainers()) {
+//                for (ContentContainer cc : subContainer.getContentContainers()) {
+//                    contentContainerStack.push(cc);
+//                }
+//            }
+//        }
+//        return parentContainer;
+//    }
 
     /**
      * Search content.
@@ -1389,19 +1395,24 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             }
         }
         else {
+            /* Zype, Evgeny Cherkasov */
+//            contentActionList.add(new Action()
+//                                          .setId(CONTENT_ACTION_SUBSCRIPTION)
+//                                          .setLabel1(mAppContext.getResources()
+//                                                                .getString(R.string.premium_1))
+//                                          .setLabel2(mAppContext.getResources()
+//                                                                .getString(R.string.premium_2)));
+//
+//            contentActionList.add(new Action()
+//                                          .setId(CONTENT_ACTION_DAILY_PASS)
+//                                          .setLabel1(mAppContext.getResources()
+//                                                                .getString(R.string.daily_pass_1))
+//                                          .setLabel2(mAppContext.getResources()
+//                                                                .getString(R.string.daily_pass_2)));
             contentActionList.add(new Action()
-                                          .setId(CONTENT_ACTION_SUBSCRIPTION)
-                                          .setLabel1(mAppContext.getResources()
-                                                                .getString(R.string.premium_1))
-                                          .setLabel2(mAppContext.getResources()
-                                                                .getString(R.string.premium_2)));
-
-            contentActionList.add(new Action()
-                                          .setId(CONTENT_ACTION_DAILY_PASS)
-                                          .setLabel1(mAppContext.getResources()
-                                                                .getString(R.string.daily_pass_1))
-                                          .setLabel2(mAppContext.getResources()
-                                                                .getString(R.string.daily_pass_2)));
+                    .setId(CONTENT_ACTION_CHOOSE_PLAN)
+                    .setLabel1(mAppContext.getResources().getString(R.string.action_subscription_1))
+                    .setLabel2(mAppContext.getResources().getString(R.string.action_subscription_2)));
         }
 
         contentActionList.addAll(mGlobalContentActionList);
@@ -1764,6 +1775,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 break;
             case CONTENT_ACTION_SUBSCRIPTION:
             case CONTENT_ACTION_DAILY_PASS:
+                mPurchaseHelper.handleAction(activity, content, actionId);
+                break;
+            /* Zype, Evgeny Cherkasov */
+            case CONTENT_ACTION_CHOOSE_PLAN:
                 mPurchaseHelper.handleAction(activity, content, actionId);
                 break;
             /* Zype, Evgeny Cherkasov */
@@ -2438,4 +2453,12 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         return mRecommendationManager;
     }
 
+    /* Zype, Evgeny Cherkasov */
+    public boolean isUserLoggedIn() {
+        return userLoggedIn;
+    }
+
+    public void updateSubscriptionSku(String sku) {
+        mPurchaseHelper.setSubscriptionSKU(sku);
+    }
 }

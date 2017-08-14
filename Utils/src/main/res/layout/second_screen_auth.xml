@@ -59,16 +59,16 @@ permissions and limitations under the License.
             android:textColor="@color/login_instructions_color"/>
 
     <TextView
-            android:id="@+id/login_instruction_reg_code"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="100dp"
-            android:text="@string/second_screen_login_instruction_line_4"
-            android:textAllCaps="true"
-            android:textSize="36sp"
-            android:textStyle="bold"
-            android:textColor="@color/login_code_color"/>
+        android:id="@+id/login_instruction_reg_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="100dp"
+        android:text="@string/second_screen_login_instruction_line_4"
+        android:textAllCaps="true"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        android:textColor="@color/login_code_color"/>
 
     <LinearLayout
             android:layout_width="match_parent"

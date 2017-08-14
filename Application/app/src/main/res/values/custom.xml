@@ -50,7 +50,8 @@ permissions and limitations under the License.
     <!-- Content reload time in milliseconds -->
     <integer name="time_to_reload_content">14400000</integer>
     <!-- Is in-app purchase disabled? -->
-    <bool name="is_iap_disabled">true</bool>
+    <bool name="is_iap_disabled">false</bool>
+    <bool name="override_all_contents_subscription_flag">false</bool>
 
     <!-- End of App Configurations -->
 

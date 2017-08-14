@@ -157,6 +157,22 @@ public class PurchaseManager {
     protected Map<String, Response> updatePurchaseResponseMap =
             Collections.synchronizedMap(new HashMap<String, Response>());
 
+    /* Zype, Evgeny Cherkasov */
+    /**
+     * Map for storing the {@link ProductsAction} objects for each products request keyed by request id.
+     */
+    protected Map<String, ProductsAction> productsObjectMap = Collections.synchronizedMap(new HashMap<String, ProductsAction>());
+
+    /**
+     * Map for storing the response for each request keyed by request id.
+     */
+    protected Map<String, Response> responseMap = Collections.synchronizedMap(new HashMap<String, Response>());
+
+    /**
+     * Map for storing the product data for each products request keyed by request id.
+     */
+    protected Map<String, Map<String, Product>> productsDataMap = Collections.synchronizedMap(new HashMap<String, Map<String, Product>>());
+
     /**
      * Certain actions like purchase and isPurchaseValid cannot be executed while purchases are
      * being updated. This list maintains those pending actions.
@@ -376,6 +392,20 @@ public class PurchaseManager {
             public void onProductDataResponse(Response response, Map<String, Product>
                     productDetails, Set<String> invalidSkus) {
                 // Not required for this system.
+                /* Zype, Evgeny Cherkasov */
+                Log.d(TAG, "onProductDataResponse(): response= " + response.getRequestId());
+                // Saving the response and product data.
+                responseMap.put(response.getRequestId(), response);
+                productsDataMap.put(response.getRequestId(), productDetails);
+                if (productsObjectMap.containsKey(response.getRequestId())) {
+                    Log.d(TAG, "onProductDataResponse(): productsObjectMap contains " + response.getRequestId());
+                    // Inform user.
+                    productsObjectMap.get(response.getRequestId()).informUser(response.getRequestId());
+                }
+                else {
+                    // Products request object not available, moving on.
+                    Log.d(TAG, "onProductDataResponse(): productsObjectMap does not contain " + response.getRequestId());
+                }
             }
 
             /**
@@ -647,5 +677,9 @@ public class PurchaseManager {
         this.purchaseUtils = purchaseUtils;
     }
 
-
+    /* Zype, Evgeny Cherkasov */
+    public void getProducts(Set<String> skuSet, PurchaseManagerListener purchaseManagerListener) {
+        // Get available products
+        new ProductsAction(this, skuSet, purchaseManagerListener).execute();
+    }
 }

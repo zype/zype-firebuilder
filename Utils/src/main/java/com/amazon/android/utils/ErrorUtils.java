@@ -40,7 +40,9 @@ public class ErrorUtils {
         REGISTRATION_CODE_ERROR,
         AUTHENTICATION_ERROR,
         AUTHORIZATION_ERROR,
-        PLAYER_ERROR
+        PLAYER_ERROR,
+        /* Zype, Evgeny Cherkasov */
+        ZYPE_CREATE_CONSUMER_ERROR
     }
 
     /**
@@ -85,6 +87,10 @@ public class ErrorUtils {
             case PLAYER_ERROR:
                 errorMessage = context.getResources().getString(R.string.playback_error_message);
                 break;
+            /* Zype, Evgeny Cherkasov */
+            case ZYPE_CREATE_CONSUMER_ERROR:
+                errorMessage = context.getResources().getString(R.string.create_consumer_error);
+                break;
             default:
                 break;
         }
@@ -120,6 +126,10 @@ public class ErrorUtils {
                 buttonLabelsList.add(context.getResources().getString(R.string.logout_label));
                 break;
             case PLAYER_ERROR:
+                buttonLabelsList.add(context.getResources().getString(R.string.dismiss_label));
+                break;
+            /* Zype, Evgeny Cherkasov */
+            case ZYPE_CREATE_CONSUMER_ERROR:
                 buttonLabelsList.add(context.getResources().getString(R.string.dismiss_label));
                 break;
             default:

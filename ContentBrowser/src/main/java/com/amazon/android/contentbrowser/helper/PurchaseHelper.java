@@ -27,18 +27,23 @@ import com.amazon.android.utils.Preferences;
 import com.amazon.purchase.IPurchase;
 import com.amazon.purchase.PurchaseManager;
 import com.amazon.purchase.PurchaseManagerListener;
+import com.amazon.purchase.model.Product;
 import com.amazon.purchase.model.Response;
 
 import org.greenrobot.eventbus.EventBus;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -114,6 +119,12 @@ public class PurchaseHelper {
      */
     public static final String RESULT_VALIDITY = "RESULT_VALIDITY";
 
+    /* Zype, Evgeny Cherkasov */
+    /**
+     * Result products.
+     */
+    public static final String RESULT_PRODUCTS = "RESULT_PRODUCTS";
+
     /**
      * Constructor. Initializes member variables and configures the purchase system.
      *
@@ -188,6 +199,13 @@ public class PurchaseHelper {
 
                     Log.e(TAG, "You should not hit here!!!");
                 }
+
+                /* Zype, Evgeny Cherkasov */
+                @Override
+                public void onProductDataResponse(Response response, Map<String, Product> products) {
+                    Log.e(TAG, "You should not hit here!!!");
+                }
+
             });
         }
         catch (Exception e) {
@@ -311,6 +329,11 @@ public class PurchaseHelper {
                                               validity,
                                               sku);
             }
+
+            /* Zype, Evgeny Cherkasov */
+            public void onProductDataResponse(Response response, Map<String, Product> products) {
+                handleProductsResponse(subscriber, response, products);
+            }
         };
     }
 
@@ -410,6 +433,11 @@ public class PurchaseHelper {
         else if (actionId == ContentBrowser.CONTENT_ACTION_SUBSCRIPTION) {
             handlePurchaseChain(activity, mSubscriptionSKU);
         }
+        /* Zype, Evgeny Cherkasov */
+        else if (actionId == ContentBrowser.CONTENT_ACTION_CHOOSE_PLAN) {
+            handleProductsChain(activity);
+        }
+
     }
 
     /**
@@ -420,5 +448,66 @@ public class PurchaseHelper {
     private void triggerProgress(Activity activity) {
 
         ProgressDialogFragment.createAndShow(activity, mContext.getString(R.string.loading));
+    }
+
+    /* Zype,  Evgeny Cherkasov */
+    private void handleProductsChain(Activity activity) {
+        Set<String> skuSet = new HashSet<>();
+        skuSet.add("com.zype.aftv.testsubscriptionmonthly");
+        skuSet.add("com.zype.aftv.testsubscriptionyearly");
+
+        productsObservable(skuSet)
+                .subscribeOn(Schedulers.newThread()) //this needs to be first make sure
+                .observeOn(AndroidSchedulers.mainThread()) //this needs to be last to
+                // make sure rest is running on separate thread.
+                .subscribe(resultBundle -> {
+                    mContentBrowser.switchToScreen(ContentBrowser.SUBSCRIPTION_SCREEN, resultBundle);
+                    EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
+                }, throwable -> {
+                    EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
+
+                    ErrorHelper.injectErrorFragment(activity, ErrorUtils.ERROR_CATEGORY
+                            .NETWORK_ERROR, (errorDialogFragment, errorButtonType, errorCategory)
+                            -> {
+                        errorDialogFragment.dismiss();
+                    });
+                });
+    }
+
+    public Observable<Bundle> productsObservable(Set<String> skuSet) {
+
+        Log.v(TAG, "productsObservable()");
+
+        return Observable.create(subscriber -> mPurchaseManager
+                .getProducts(skuSet, createObservablePurchaseManagerListener(subscriber))
+        );
+    }
+
+    private void handleProductsResponse(Subscriber subscriber, Response response, Map<String, Product> products) {
+        Bundle resultBundle = new Bundle();
+        if (response != null && Response.Status.SUCCESSFUL.equals(response.getStatus())) {
+            Log.d(TAG, "handleProductsResponse(): successful,  " + response);
+            ArrayList<HashMap<String, String>> productsList = new ArrayList<>();
+            for (String key : products.keySet()) {
+                HashMap<String, String> productDetails = new HashMap<>();
+                // TODO: Use constants for keys
+                productDetails.put("Title", products.get(key).getTitle());
+                productDetails.put("Price", products.get(key).getPrice());
+                productDetails.put("SKU", products.get(key).getSku());
+                productsList.add(productDetails);
+            }
+            resultBundle.putSerializable(RESULT_PRODUCTS, productsList);
+//            AnalyticsHelper.trackPurchaseResult(sku, validity);
+            handleSuccessCase(subscriber, resultBundle);
+        }
+        else {
+            Log.e(TAG, "handleProductsResponse(): failed, " + response);
+//            AnalyticsHelper.trackError(TAG, "Purchase failed "+response);
+            handleFailureCase(subscriber, resultBundle);
+        }
+    }
+
+    public void setSubscriptionSKU(String sku) {
+        mSubscriptionSKU = sku;
     }
 }

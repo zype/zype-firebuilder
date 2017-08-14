@@ -25,7 +25,6 @@ import retrofit2.http.QueryMap;
  */
 
 public interface IZypeApi {
-    //    String HEADER_USER_AGENT = "Dalvik/2.1.0 (Zype Android; Linux; U; Android 5.0.2; One X Build/LRX22G)";
     String HEADER_USER_AGENT = "AmazonWebAppPlatform";
 
     String PARAM_PAGE = "page";
@@ -39,6 +38,10 @@ public interface IZypeApi {
 
     @GET("consumers/{consumer_id}")
     Call<ConsumerResponse> getConsumer(@Path("consumer_id") String consumerId, @QueryMap HashMap<String, String> params);
+
+    @FormUrlEncoded
+    @POST("/consumers")
+    Call<ConsumerResponse> createConsumer(@QueryMap HashMap<String, String> queryParams, @FieldMap HashMap<String, String> fieldParams);
 
     @GET("https://player.zype.com/embed/{video_id}.json")
     Call<PlayerResponse> getPlayer(@Header("User-Agent") String header, @Path("video_id") String videoId, @QueryMap HashMap<String, String> params);
