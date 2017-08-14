@@ -29,10 +29,6 @@ import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.model.content.constants.PreferencesConstants;
 import com.amazon.android.model.event.ActionUpdateEvent;
-import com.amazon.android.model.translators.ContentContainerTranslator;
-import com.amazon.android.model.translators.ContentTranslator;
-import com.amazon.android.model.translators.ZypeContentContainerTranslator;
-import com.amazon.android.module.*;
 import com.amazon.android.navigator.Navigator;
 import com.amazon.android.navigator.NavigatorModel;
 import com.amazon.android.navigator.UINode;
@@ -55,11 +51,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.HeaderItem;
-import android.support.v17.leanback.widget.ListRow;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -68,9 +60,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -81,19 +70,7 @@ import static com.amazon.android.contentbrowser.helper.LauncherIntegrationManage
         .getSourceOfContentPlayRequest;
 
 /* Zype */
-import com.amazon.android.model.translators.ZypeContentTranslator;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.zype.fire.api.IZypeApi;
-import com.zype.fire.api.Model.PlayerData;
-import com.zype.fire.api.Model.PlayerResponse;
-import com.zype.fire.api.Model.VideoData;
-import com.zype.fire.api.Model.VideosResponse;
-import com.zype.fire.api.ZypeApi;
-import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
-
-import net.minidev.json.JSONArray;
 
 /**
  * This class is the controller of the content browsing solution.
@@ -174,6 +151,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      * The slide show screen name.
      */
     public static final String CONTENT_SLIDESHOW_SCREEN = "CONTENT_SLIDESHOW_SCREEN";
+
+    /* Zype, Evgeny Cherkasov */
+    public static final String SUBSCRIPTION_SCREEN = "SUBSCRIPTION_SCREEN";
 
     /**
      * Search constant.
@@ -271,7 +251,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final int CONTENT_ACTION_MAX = 100;
 
     /* Zype, Evgeny Cherkasov */
-    public static final int CONTENT_ACTION_LOGIN_TO_WATCH = 100;
+    public static final int CONTENT_ACTION_LOGIN_TO_WATCH = 50;
+    public static final int CONTENT_ACTION_CHOOSE_PLAN = 55;
 
     /**
      * Search algorithm name.
@@ -420,7 +401,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     private RecommendationManager mRecommendationManager;
 
     /* Zype, Evgeny Cherkasov */
-    private boolean isUserLoggedIn = false;
+    private boolean userLoggedIn = false;
 
     /**
      * Returns AuthHelper instance.
@@ -712,7 +693,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         }
         /* Zype, Evgeny Cherkasov */
         // Update user logged in flag
-        isUserLoggedIn = authenticationStatusUpdateEvent.isUserAuthenticated();
+        userLoggedIn = authenticationStatusUpdateEvent.isUserAuthenticated();
 
     }
 
@@ -1095,7 +1076,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 if (!content.isSubscriptionRequired()) {
                     /* Zype, Evgeny Cherkasov */
                     // Check is user logged in and has subscription.
-                    if (isUserLoggedIn) {
+                    if (userLoggedIn) {
                         // TODO: Consider another way to get preference name to avoid dependemcy on ZypeAuthComponent in this module
                         // User is logged in and has subscription. Add all videos
                         if (Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0) {
@@ -1373,19 +1354,24 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             }
         }
         else {
+            /* Zype, Evgeny Cherkasov */
+//            contentActionList.add(new Action()
+//                                          .setId(CONTENT_ACTION_SUBSCRIPTION)
+//                                          .setLabel1(mAppContext.getResources()
+//                                                                .getString(R.string.premium_1))
+//                                          .setLabel2(mAppContext.getResources()
+//                                                                .getString(R.string.premium_2)));
+//
+//            contentActionList.add(new Action()
+//                                          .setId(CONTENT_ACTION_DAILY_PASS)
+//                                          .setLabel1(mAppContext.getResources()
+//                                                                .getString(R.string.daily_pass_1))
+//                                          .setLabel2(mAppContext.getResources()
+//                                                                .getString(R.string.daily_pass_2)));
             contentActionList.add(new Action()
-                                          .setId(CONTENT_ACTION_SUBSCRIPTION)
-                                          .setLabel1(mAppContext.getResources()
-                                                                .getString(R.string.premium_1))
-                                          .setLabel2(mAppContext.getResources()
-                                                                .getString(R.string.premium_2)));
-
-            contentActionList.add(new Action()
-                                          .setId(CONTENT_ACTION_DAILY_PASS)
-                                          .setLabel1(mAppContext.getResources()
-                                                                .getString(R.string.daily_pass_1))
-                                          .setLabel2(mAppContext.getResources()
-                                                                .getString(R.string.daily_pass_2)));
+                    .setId(CONTENT_ACTION_CHOOSE_PLAN)
+                    .setLabel1(mAppContext.getResources().getString(R.string.action_subscription_1))
+                    .setLabel2(mAppContext.getResources().getString(R.string.action_subscription_2)));
         }
 
         contentActionList.addAll(mGlobalContentActionList);
@@ -1744,6 +1730,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 break;
             case CONTENT_ACTION_SUBSCRIPTION:
             case CONTENT_ACTION_DAILY_PASS:
+                mPurchaseHelper.handleAction(activity, content, actionId);
+                break;
+            /* Zype, Evgeny Cherkasov */
+            case CONTENT_ACTION_CHOOSE_PLAN:
                 mPurchaseHelper.handleAction(activity, content, actionId);
                 break;
         }
@@ -2414,4 +2404,12 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         return mRecommendationManager;
     }
 
+    /* Zype, Evgeny Cherkasov */
+    public boolean isUserLoggedIn() {
+        return userLoggedIn;
+    }
+
+    public void updateSubscriptionSku(String sku) {
+        mPurchaseHelper.setSubscriptionSKU(sku);
+    }
 }

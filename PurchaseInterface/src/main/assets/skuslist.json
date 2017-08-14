@@ -6,6 +6,11 @@
       "purchaseSku": "com.zype.aftv.testsubscriptionmonthly"
     },
     {
+      "sku": "com.zype.aftv.testsubscriptionyearly",
+      "productType": "SUBSCRIBE",
+      "purchaseSku": "com.zype.aftv.testsubscriptionyearly"
+    },
+    {
       "sku": "RentUnPurchased",
       "productType": "RENT",
       "purchaseSku": "RentUnPurchased"

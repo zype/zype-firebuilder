@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="240dp"
+    android:layout_height="136dp"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:padding="16dp"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/list_item_background"
+    android:focusable="true"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textTitle"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@color/login_instructions_color"
+        android:gravity="center_horizontal"
+        tools:text="Monthly"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textFreeTrial"
+        android:textSize="20sp"
+        android:textColor="@color/login_instructions_color"
+        android:gravity="center_horizontal"
+        tools:text="7-day Free Trial"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textPrice"
+        android:textSize="20sp"
+        android:textColor="@color/login_instructions_color"
+        android:gravity="center_horizontal"
+        tools:text="$10.00 per month"
+        />
+</LinearLayout>

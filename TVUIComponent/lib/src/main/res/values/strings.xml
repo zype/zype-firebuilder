@@ -63,4 +63,30 @@ permissions and limitations under the License.
 
     <string name="season">Season</string>
     <string name="episode">Episode</string>
+
+
+    <!--
+        Zype, Evgeny Cherkasov
+    -->
+    <!-- Create login -->
+    <string name="create_login_email">Email</string>
+    <string name="create_login_email_error_empty">Email is required</string>
+    <string name="create_login_email_error_invalid">Enter valid email</string>
+    <string name="create_login_password">Password</string>
+    <string name="create_login_password_error_empty">Enter password</string>
+    <string name="create_login_button_sign_up">Sign Up</string>
+    <string name="create_login_description">You will be able to enjoy watching from any device</string>
+    <string name="create_login_title">Create a login</string>
+
+    <!-- Subscription -->
+    <string name="subscription_button_cancel">Cancel and continue browsing</string>
+    <string name="subscription_button_confirm">Subscribe and Watch</string>
+    <string name="subscription_choose_plan_description">You need to be %1$s subscriber to enjoy this video. Get unlimited access on all your devices by choosing an auto-renewing subscription plan</string>
+    <string name="subscription_have_account">Already have an account?</string>
+    <string name="subscription_item_free_trial">%1$s-day Free Trial</string>
+    <string name="subscription_item_price">$%1$s per %2$s</string>
+    <string name="subscription_logged_in">Logged in as:</string>
+    <string name="subscription_title_choose_plan">Choose a plan</string>
+    <string name="subscription_title_confirm">Confirm Subscription</string>
+
 </resources>

@@ -29,6 +29,8 @@ public class ZypeApi {
     private static final String CLIENT_GRANT_TYPE = "grant_type";
     private static final String CLIENT_ID = "client_id";
     private static final String CLIENT_SECRET = "client_secret";
+    public static final String CONSUMER_EMAIL = "consumer[email]";
+    public static final String CONSUMER_PASSWORD = "consumer[password]";
     private static final String PAGE = "page";
     public static final String PER_PAGE = "per_page";
     private static final String PASSWORD = "password";

@@ -14,7 +14,10 @@
  */
 package com.amazon.purchase;
 
+import com.amazon.purchase.model.Product;
 import com.amazon.purchase.model.Response;
+
+import java.util.Map;
 
 /**
  * Listener for calls made to the {@link PurchaseManager}.
@@ -37,4 +40,7 @@ public interface PurchaseManagerListener {
      * @param sku      The SKU of the item purchased.
      */
     void onValidPurchaseResponse(Response response, boolean validity, String sku);
+
+    /* Zype, Evgeny Cherkasov */
+    void onProductDataResponse(Response response, Map<String, Product> products);
 }

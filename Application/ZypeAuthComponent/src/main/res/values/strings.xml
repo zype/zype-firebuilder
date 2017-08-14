@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">ZypeAuthComponent</string>
 
-    <string name="zype_login_button">Login</string>
+    <string name="zype_login_button">Sign in</string>
     <string name="zype_login_username">Email</string>
     <string name="zype_login_password">Password</string>
 
