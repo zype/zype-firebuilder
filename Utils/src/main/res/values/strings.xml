@@ -53,4 +53,10 @@ permissions and limitations under the License.
     <string name="second_screen_login_instruction_line_4">Loading…</string>
     <!-- End Second Screen Authentication -->
 
+    <!--
+        Zype, Evgeny Cherkasov
+    -->
+    <!-- Create login -->
+    <string name="create_consumer_error">Error creating login. Please retry.</string>
+
 </resources>

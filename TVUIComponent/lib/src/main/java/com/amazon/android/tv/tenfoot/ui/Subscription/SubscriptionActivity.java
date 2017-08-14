@@ -14,9 +14,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
+import com.amazon.android.contentbrowser.helper.AuthHelper;
 import com.amazon.android.contentbrowser.helper.PurchaseHelper;
+import com.amazon.android.model.content.Content;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.ui.Subscription.Model.SubscriptionItem;
+import com.amazon.android.ui.fragments.AlertDialogFragment;
+import com.amazon.android.ui.fragments.LogoutSettingsFragment;
 import com.amazon.android.utils.Preferences;
 import com.zype.fire.auth.ZypeAuthentication;
 
@@ -162,8 +166,37 @@ public class SubscriptionActivity extends Activity {
     // Actions
     //
     private void onLogin() {
-        // TODO: Open Login screen
-        finish();
+        ContentBrowser contentBrowser = ContentBrowser.getInstance(this);
+        contentBrowser.getAuthHelper()
+                .isAuthenticated()
+                .subscribe(isAuthenticatedResultBundle -> {
+                    if (isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT)) {
+                        if (Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0) {
+                            finish();
+                        }
+                        else {
+                            updateViews();
+                        }
+                    }
+                    else {
+                        contentBrowser.getAuthHelper()
+                                .authenticateWithActivity()
+                                .subscribe(resultBundle -> {
+                                    if (resultBundle != null && !resultBundle.getBoolean(AuthHelper.RESULT)) {
+                                        contentBrowser.getNavigator().runOnUpcomingActivity(() -> contentBrowser.getAuthHelper()
+                                                .handleErrorBundle(resultBundle));
+                                    }
+                                    else {
+                                        if (Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0) {
+                                            finish();
+                                        }
+                                        else {
+                                            updateViews();
+                                        }
+                                    }
+                                });
+                    }
+                });
     }
 
     private void onConfirm() {

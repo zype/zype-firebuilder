@@ -12,8 +12,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.amazon.android.contentbrowser.ContentBrowser;
+import com.amazon.android.contentbrowser.helper.AuthHelper;
 import com.amazon.android.tv.tenfoot.R;
+import com.amazon.android.ui.fragments.ErrorDialogFragment;
+import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.NetworkUtils;
+import com.amazon.android.utils.Preferences;
 import com.amazon.auth.AuthenticationConstants;
 import com.zype.fire.api.Model.ConsumerResponse;
 import com.zype.fire.api.ZypeApi;
@@ -32,7 +37,7 @@ import retrofit2.Response;
  * Created by Evgeny Cherkasov on 07.08.2017.
  */
 
-public class CreateLoginActivity extends Activity {
+public class CreateLoginActivity extends Activity implements ErrorDialogFragment.ErrorDialogFragmentListener {
     private static final String TAG = CreateLoginActivity.class.getName();
 
     public static final String PARAMETERS_SKU = "SKU";
@@ -41,6 +46,8 @@ public class CreateLoginActivity extends Activity {
     private EditText editPassword;
     private Button buttonSignUp;
     private Button buttonLogin;
+
+    private ErrorDialogFragment dialogError = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -80,8 +87,37 @@ public class CreateLoginActivity extends Activity {
     }
 
     private void onLogin() {
-        // TODO: Open Login screen
-        finish();
+        ContentBrowser contentBrowser = ContentBrowser.getInstance(this);
+        contentBrowser.getAuthHelper()
+                .isAuthenticated()
+                .subscribe(isAuthenticatedResultBundle -> {
+                    if (isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT)) {
+                        if (Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0) {
+                            finish();
+                        }
+                        else {
+                            finish();
+                        }
+                    }
+                    else {
+                        contentBrowser.getAuthHelper()
+                                .authenticateWithActivity()
+                                .subscribe(resultBundle -> {
+                                    if (resultBundle != null && !resultBundle.getBoolean(AuthHelper.RESULT)) {
+                                        contentBrowser.getNavigator().runOnUpcomingActivity(() -> contentBrowser.getAuthHelper()
+                                                .handleErrorBundle(resultBundle));
+                                    }
+                                    else {
+                                        if (Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0) {
+                                            finish();
+                                        }
+                                        else {
+                                            finish();
+                                        }
+                                    }
+                                });
+                    }
+                });
     }
 
     private void createConsumer() {
@@ -107,6 +143,23 @@ public class CreateLoginActivity extends Activity {
         bundle.putSerializable(AuthenticationConstants.ERROR_CAUSE, throwable);
         setResult(RESULT_CANCELED, intent.putExtra(AuthenticationConstants.ERROR_BUNDLE, bundle));
         finish();
+    }
+
+    //
+    // ErrorDialogFragmentListener
+    //
+    /**
+     * Callback method to define the button behaviour for this activity.
+     *
+     * @param errorDialogFragment The fragment listener.
+     * @param errorButtonType     The display text on the button
+     * @param errorCategory       The error category determined by the client.
+     */
+    @Override
+    public void doButtonClick(ErrorDialogFragment errorDialogFragment, ErrorUtils.ERROR_BUTTON_TYPE errorButtonType, ErrorUtils.ERROR_CATEGORY errorCategory) {
+        if (dialogError  != null) {
+            dialogError .dismiss();
+        }
     }
 
     // //////////
@@ -167,12 +220,16 @@ public class CreateLoginActivity extends Activity {
                 }
                 else {
                     Log.e(TAG, "requestCreateConsumer(): failed");
+                    dialogError = ErrorDialogFragment.newInstance(CreateLoginActivity.this, ErrorUtils.ERROR_CATEGORY.ZYPE_CREATE_CONSUMER_ERROR, CreateLoginActivity.this);
+                    dialogError.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
                 }
             }
 
             @Override
             public void onFailure(Call<ConsumerResponse> call, Throwable t) {
                 Log.e(TAG, "requestCreateConsumer(): failed");
+                dialogError = ErrorDialogFragment.newInstance(CreateLoginActivity.this, ErrorUtils.ERROR_CATEGORY.NETWORK_ERROR, CreateLoginActivity.this);
+                dialogError.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
             }
         });
     }
