@@ -300,7 +300,7 @@ public class SubscriptionActivity extends Activity {
             items.add(item);
         }
 
-        // Comment adding dummy item for release build
+        // TODO: Comment adding dummy item for release build
         if (items.isEmpty()) {
             SubscriptionItem item = new SubscriptionItem();
             item.title = "Monthly";

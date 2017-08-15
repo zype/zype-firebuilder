@@ -58,11 +58,8 @@ permissions and limitations under the License.
     <string name="app_name_short">@string/app_name</string>
 
     <!-- Zype, Evgeny Cherkasov -->
-
     <string name="action_swaf_1">Watch</string>
     <string name="action_swaf_2">Ad Free</string>
-
-    <!-- Zype, Evgeny Cherkasov -->
     <string name="action_subscription_1">Subscribe</string>
     <string name="action_subscription_2"> to Watch</string>
 </resources>

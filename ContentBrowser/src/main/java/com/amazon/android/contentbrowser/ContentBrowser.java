@@ -252,10 +252,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final int CONTENT_ACTION_MAX = 100;
 
     /* Zype, Evgeny Cherkasov */
-    public static final int CONTENT_ACTION_LOGIN_TO_WATCH = 50;
-    public static final int CONTENT_ACTION_CHOOSE_PLAN = 55;
+    // Choose plan action
+    public static final int CONTENT_ACTION_CHOOSE_PLAN = 50;
     // Watch ad free action
-    public static final int CONTENT_ACTION_SWAF = 50;
+    public static final int CONTENT_ACTION_SWAF = 55;
 
     /**
      * Search algorithm name.
@@ -452,7 +452,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 }
             }
             if (Navigator.isScreenAccessVerificationRequired(mNavigator.getNavigatorModel())
-                    && (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED || isUserLoggedIn)) {
+                    && (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED || userLoggedIn)) {
                 addSettingsAction(mLoginAction);
             }
         }
@@ -715,7 +715,6 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         /* Zype, Evgeny Cherkasov */
         // Update user logged in flag
         userLoggedIn = authenticationStatusUpdateEvent.isUserAuthenticated();
-        isUserLoggedIn = authenticationStatusUpdateEvent.isUserAuthenticated();
         updateLoginAction();
 
     }
@@ -1365,7 +1364,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                                           .getString(
                                                                   R.string.watch_from_beginning_2)));
                 /* Zype, Evgeny Cherkasov */
-                if (ZypeSettings.SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED && !isUserLoggedIn) {
+                if (ZypeSettings.SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED && !userLoggedIn) {
                     contentActionList.add(
                             new Action().setId(CONTENT_ACTION_SWAF)
                                     .setLabel1(mAppContext.getResources()
@@ -1384,7 +1383,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                     .setLabel2(mAppContext.getResources()
                                                           .getString(R.string.watch_now_2)));
                 /* Zype, Evgeny Cherkasov */
-                if (ZypeSettings.SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED && !isUserLoggedIn) {
+                if (ZypeSettings.SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED && !userLoggedIn) {
                     contentActionList.add(
                             new Action().setId(CONTENT_ACTION_SWAF)
                                     .setLabel1(mAppContext.getResources()
@@ -1690,7 +1689,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             return;
         }
 
-        if (mIAPDisabled) {
+        /* Zype, Evgeny Cherkasov */
+//        if (mIAPDisabled) {
+        if (mIAPDisabled || ZypeSettings.NATIVE_AMAZON_SUBSCRIPTION_ENABLED) {
             switchToRendererScreen(content, actionId);
         }
         else {
@@ -1781,7 +1782,6 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             case CONTENT_ACTION_CHOOSE_PLAN:
                 mPurchaseHelper.handleAction(activity, content, actionId);
                 break;
-            /* Zype, Evgeny Cherkasov */
             case CONTENT_ACTION_SWAF:
                 handleRendererScreenSwitch(activity, content, actionId, true);
                 break;
