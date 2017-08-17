@@ -1380,7 +1380,10 @@ public class PlaybackActivity extends Activity implements
         else {
             params.put(ZypeApi.APP_KEY, ZypeSettings.APP_KEY);
         }
-        params.put(ZypeApi.UUID, AdMacrosHelper.getAdvertisingId(this));
+        String uuid = AdMacrosHelper.getAdvertisingId(this);
+        if (!TextUtils.isEmpty(uuid)) {
+            params.put(ZypeApi.UUID, uuid);
+        }
         ZypeApi.getInstance().getApi().getPlayer(IZypeApi.HEADER_USER_AGENT, mSelectedContent.getId(), params).enqueue(new Callback<PlayerResponse>() {
             @Override
             public void onResponse(Call<PlayerResponse> call, Response<PlayerResponse> response) {
@@ -1395,7 +1398,12 @@ public class PlaybackActivity extends Activity implements
                 else {
                     updateContentWithPlayerData(mSelectedContent, null);
                 }
-                Log.d(TAG, "openSelectedContent(): Ad tags count = " + mSelectedContent.getAdCuePoints().size());
+                if (mSelectedContent.getAdCuePoints() != null) {
+                    Log.d(TAG, "openSelectedContent(): Ad tags count = " + mSelectedContent.getAdCuePoints().size());
+                }
+                else {
+                    Log.d(TAG, "openSelectedContent(): No ad tags");
+                }
                 // We need current playback position here to determine ad number to play
                 loadContentPlaybackState();
                 // Update ad parameters
