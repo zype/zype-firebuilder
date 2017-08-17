@@ -2,10 +2,13 @@ package com.zype.fire.api.Util;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.text.TextUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +28,8 @@ public class AdMacrosHelper {
     private static final String DEVICE_MODEL = "[device_model]";
     private static final String UUID = "[uuid]";
     private static final String VPI = "[vpi]";
+
+    private static final String PREFERENCE_UUID = "ZypeUUID";
 
     public static String updateAdTagParameters(Context context, String tag) {
         Map<String, String> values = getValues(context.getApplicationContext());
@@ -65,7 +70,8 @@ public class AdMacrosHelper {
     }
 
     /**
-     * Get advertising id on Fire TV according to this guide https://developer.amazon.com/public/solutions/devices/fire-tv/docs/fire-tv-advertising-id
+     * Get advertising id on Fire TV according to this guide https://developer.amazon.com/public/solutions/devices/fire-tv/docs/fire-tv-advertising-id.
+     * If it is not available then generate random UUID and save it to preferences for further usage.
      * TODO: Get advertising id on Android TV devices from Google Play services
      *
      * @param context
@@ -73,6 +79,20 @@ public class AdMacrosHelper {
      */
     public static String getAdvertisingId(Context context) {
         ContentResolver cr = context.getContentResolver();
-        return Settings.Secure.getString(cr, "advertising_id");
+        String result = Settings.Secure.getString(cr, "advertising_id");
+        if (TextUtils.isEmpty(result)) {
+            // Try to get it from preferences
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+            result = prefs.getString(PREFERENCE_UUID, null);
+            if (TextUtils.isEmpty(result)) {
+                // Generate random UUID
+                result = java.util.UUID.randomUUID().toString();
+                // Save to preferences
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString(PREFERENCE_UUID, result);
+                editor.apply();
+            }
+        }
+        return result;
     }
 }
