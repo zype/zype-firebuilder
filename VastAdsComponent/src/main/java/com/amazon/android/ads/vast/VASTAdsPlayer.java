@@ -365,7 +365,8 @@ public class VASTAdsPlayer implements IAds,
             if (mIAdsEvents != null) {
                 /* Zype, Evgeny Cherkasov */
                 Bundle extras = null;
-                if (mExtras.getInt(IAds.AD_NUMBER) > 0) {
+                boolean isMidroll = mExtras.getBoolean(IAds.WAS_A_MID_ROLL, false);
+                if (isMidroll) {
                     extras = new Bundle();
                     extras.putBoolean(IAds.WAS_A_MID_ROLL, true);
                 }

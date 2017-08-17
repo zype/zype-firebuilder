@@ -37,6 +37,7 @@ public class ZypeApi {
     public static final String QUERY = "q";
     private static final String REFRESH_TOKEN = "refresh_token";
     private static final String USERNAME = "username";
+    public static final String UUID = "uuid";
 
     public static final int PER_PAGE_DEFAULT = 100;
 

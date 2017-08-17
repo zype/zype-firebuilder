@@ -48,11 +48,8 @@ public class AdMacrosHelper {
         result.put(APP_DOMAIN, appInfo.packageName);
         result.put(APP_ID, appInfo.packageName);
         result.put(APP_NAME, (appInfo.labelRes == 0) ? appInfo.nonLocalizedLabel.toString() : context.getString(appInfo.labelRes));
-        // Advertizing ID
-        // Get advertising id on Fire TV according to this guide https://developer.amazon.com/public/solutions/devices/fire-tv/docs/fire-tv-advertising-id
-        // TODO: Get advertising id on Android TV devices from Google Play services
-        ContentResolver cr = context.getContentResolver();
-        String advertisingID = Settings.Secure.getString(cr, "advertising_id");
+        // Advertising ID
+        String advertisingID = getAdvertisingId(context);
         result.put(DEVICE_IFA, advertisingID);
         // Device data
         result.put(DEVICE_MAKE, Build.MANUFACTURER);
@@ -67,4 +64,15 @@ public class AdMacrosHelper {
         return result;
     }
 
+    /**
+     * Get advertising id on Fire TV according to this guide https://developer.amazon.com/public/solutions/devices/fire-tv/docs/fire-tv-advertising-id
+     * TODO: Get advertising id on Android TV devices from Google Play services
+     *
+     * @param context
+     * @return
+     */
+    public static String getAdvertisingId(Context context) {
+        ContentResolver cr = context.getContentResolver();
+        return Settings.Secure.getString(cr, "advertising_id");
+    }
 }

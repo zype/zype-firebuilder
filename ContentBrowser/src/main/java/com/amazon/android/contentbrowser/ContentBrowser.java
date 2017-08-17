@@ -527,6 +527,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         mContentLoader = ContentLoader.getInstance(mAppContext);
 
         mIAPDisabled = mAppContext.getResources().getBoolean(R.bool.is_iap_disabled);
+        /* Zype, Evgeny Cherkasov */
+        if (!ZypeSettings.NATIVE_AMAZON_SUBSCRIPTION_ENABLED) {
+            mIAPDisabled = true;
+        }
 
         mLauncherIntegrationEnabled =
                 mAppContext.getResources().getBoolean(R.bool.is_launcher_integration_enabled);

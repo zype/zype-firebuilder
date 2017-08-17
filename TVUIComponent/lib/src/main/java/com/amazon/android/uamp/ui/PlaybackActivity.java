@@ -1200,6 +1200,9 @@ public class PlaybackActivity extends Activity implements
             if (adNumber >= 0) {
                 if (mSelectedContent.getAdCuePoints().size() > adNumber + 1) {
                     mAdsImplementation.getExtra().putInt(IAds.AD_NUMBER, adNumber + 1);
+                    mAdsImplementation.getExtra().putBoolean(IAds.WAS_A_MID_ROLL, true);
+                    // Start tracking video position changes.
+                    mVideoPositionTrackingHandler.post(mVideoPositionTrackingRunnable);
                 }
                 else {
                     mAdsImplementation.getExtra().putInt(IAds.AD_NUMBER, -1);
@@ -1377,6 +1380,7 @@ public class PlaybackActivity extends Activity implements
         else {
             params.put(ZypeApi.APP_KEY, ZypeSettings.APP_KEY);
         }
+        params.put(ZypeApi.UUID, AdMacrosHelper.getAdvertisingId(this));
         ZypeApi.getInstance().getApi().getPlayer(IZypeApi.HEADER_USER_AGENT, mSelectedContent.getId(), params).enqueue(new Callback<PlayerResponse>() {
             @Override
             public void onResponse(Call<PlayerResponse> call, Response<PlayerResponse> response) {
@@ -1391,6 +1395,7 @@ public class PlaybackActivity extends Activity implements
                 else {
                     updateContentWithPlayerData(mSelectedContent, null);
                 }
+                Log.d(TAG, "openSelectedContent(): Ad tags count = " + mSelectedContent.getAdCuePoints().size());
                 // We need current playback position here to determine ad number to play
                 loadContentPlaybackState();
                 // Update ad parameters
@@ -1727,20 +1732,26 @@ public class PlaybackActivity extends Activity implements
     private void initAdsExtras() {
         Bundle extras = mAdsImplementation.getExtra();
         int adNumber = -1;
+        boolean isMidroll = false;
         if (mSelectedContent.getAdCuePoints() != null && !mSelectedContent.getAdCuePoints().isEmpty()) {
             if (mCurrentPlaybackPosition == 0) {
                 adNumber = 0;
+                if (mSelectedContent.getAdCuePoints().get(0) != 0) {
+                    isMidroll = true;
+                }
             }
             else {
                 for (int i = 0; i < mSelectedContent.getAdCuePoints().size(); i++) {
                     if (mSelectedContent.getAdCuePoints().get(i) >= mCurrentPlaybackPosition) {
                         adNumber = i;
+                        isMidroll = true;
                         break;
                     }
                 }
             }
         }
         extras.putInt(IAds.AD_NUMBER, adNumber);
+        extras.putBoolean(IAds.WAS_A_MID_ROLL, isMidroll);
         // TODO: Use constant for 'adTags' key instead of hardcoded string
         if (adNumber != -1) {
             String adTag = AdMacrosHelper.updateAdTagParameters(this, (String) mSelectedContent.getExtraValueAsList("adTags").get(adNumber));
