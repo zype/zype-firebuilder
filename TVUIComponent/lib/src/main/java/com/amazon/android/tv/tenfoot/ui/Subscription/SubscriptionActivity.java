@@ -16,11 +16,8 @@ import android.widget.TextView;
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.helper.AuthHelper;
 import com.amazon.android.contentbrowser.helper.PurchaseHelper;
-import com.amazon.android.model.content.Content;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.ui.Subscription.Model.SubscriptionItem;
-import com.amazon.android.ui.fragments.AlertDialogFragment;
-import com.amazon.android.ui.fragments.LogoutSettingsFragment;
 import com.amazon.android.utils.Preferences;
 import com.zype.fire.auth.ZypeAuthentication;
 
@@ -36,7 +33,7 @@ public class SubscriptionActivity extends Activity {
     private static final String TAG = SubscriptionActivity.class.getName();
 
     public static final String PARAMETERS_MODE = "Mode";
-    public static final String PARAMETERS_PRODUCTS = "Products";
+//    public static final String PARAMETERS_PRODUCTS = "Products";
 
     private static final int REQUEST_CREATE_LOGIN = 110;
 
@@ -61,10 +58,14 @@ public class SubscriptionActivity extends Activity {
     private SubscriptionsAdapter adapter;
     private SubscriptionItem selectedSubscription = null;
 
+    private ContentBrowser contentBrowser;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subscription);
+
+        contentBrowser = ContentBrowser.getInstance(this);
 
         initParameters(savedInstanceState);
 
@@ -120,7 +121,7 @@ public class SubscriptionActivity extends Activity {
         }
         if (args != null) {
             mode = args.getInt(PARAMETERS_MODE, MODE_CHOOSE_PLAN);
-            products = (ArrayList<HashMap<String, String>>) args.getSerializable(PARAMETERS_PRODUCTS);
+            products = (ArrayList<HashMap<String, String>>) args.getSerializable(PurchaseHelper.RESULT_PRODUCTS);
         }
         else {
             mode = MODE_CHOOSE_PLAN;
@@ -141,7 +142,7 @@ public class SubscriptionActivity extends Activity {
         if (mode == MODE_CHOOSE_PLAN) {
             layoutChoosePlan.setVisibility(View.VISIBLE);
             layoutConfirm.setVisibility(View.GONE);
-            if (ContentBrowser.getInstance(this).isUserLoggedIn()) {
+            if (contentBrowser.isUserLoggedIn()) {
                 layoutLoggedIn.setVisibility(View.VISIBLE);
                 layoutLogin.setVisibility(View.GONE);
                 textConsumerEmail.setText(Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_EMAIL));
@@ -166,7 +167,6 @@ public class SubscriptionActivity extends Activity {
     // Actions
     //
     private void onLogin() {
-        ContentBrowser contentBrowser = ContentBrowser.getInstance(this);
         contentBrowser.getAuthHelper()
                 .isAuthenticated()
                 .subscribe(isAuthenticatedResultBundle -> {
@@ -182,17 +182,26 @@ public class SubscriptionActivity extends Activity {
                         contentBrowser.getAuthHelper()
                                 .authenticateWithActivity()
                                 .subscribe(resultBundle -> {
+                                    if (resultBundle != null) {
+                                        if (resultBundle.getBoolean(AuthHelper.RESULT)) {
+                                            if (Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0) {
+                                                finish();
+                                            }
+                                            else {
+                                                updateViews();
+                                            }
+                                        }
+                                        else {
+                                            contentBrowser.getNavigator().runOnUpcomingActivity(() -> contentBrowser.getAuthHelper()
+                                                    .handleErrorBundle(resultBundle));
+                                        }
+                                    }
                                     if (resultBundle != null && !resultBundle.getBoolean(AuthHelper.RESULT)) {
                                         contentBrowser.getNavigator().runOnUpcomingActivity(() -> contentBrowser.getAuthHelper()
                                                 .handleErrorBundle(resultBundle));
                                     }
                                     else {
-                                        if (Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0) {
-                                            finish();
-                                        }
-                                        else {
-                                            updateViews();
-                                        }
+                                        updateViews();
                                     }
                                 });
                     }
@@ -213,8 +222,10 @@ public class SubscriptionActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        contentBrowser.handleOnActivityResult(this, requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_CREATE_LOGIN:
+                updateViews();
                 if (resultCode == RESULT_OK) {
                     showConfirm();
                 }
@@ -227,6 +238,7 @@ public class SubscriptionActivity extends Activity {
     //
     public class SubscriptionsAdapter extends RecyclerView.Adapter<SubscriptionsAdapter.ViewHolder> {
         private List<SubscriptionItem> items;
+        private int selectedItem;
 
         public SubscriptionsAdapter() {
             items = new ArrayList<>();
@@ -247,14 +259,14 @@ public class SubscriptionActivity extends Activity {
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.item = items.get(position);
             holder.textTitle.setText(holder.item.title);
-            holder.textPrice.setText(String.format(getString(R.string.subscription_item_price), String.valueOf(holder.item.price), "month"));
+            holder.textPrice.setText(holder.item.priceText);
 //            holder.textDescription.setText(holder.item.description);
 
             holder.view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     selectedSubscription = holder.item;
-                    if (ContentBrowser.getInstance(SubscriptionActivity.this).isUserLoggedIn()) {
+                    if (contentBrowser.isUserLoggedIn()) {
                         showConfirm();
                     }
                     else {
@@ -263,11 +275,23 @@ public class SubscriptionActivity extends Activity {
                     }
                 }
             });
+
+            if (position == selectedItem) {
+                holder.view.setSelected(true);
+            }
+            else {
+                holder.view.setSelected(false);
+            }
         }
 
         @Override
         public int getItemCount() {
             return items.size();
+        }
+
+        public void setSelectedItem(int index) {
+            selectedItem = index;
+            notifyDataSetChanged();
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {
@@ -295,7 +319,8 @@ public class SubscriptionActivity extends Activity {
             // TODO: Use constants for keys
             item.title = productData.get("Title");
             item.description = productData.get("Description");
-            item.price = Float.valueOf(productData.get("Price"));
+//            item.price = Float.valueOf(productData.get("Price"));
+            item.priceText = productData.get("Price");
             item.sku = productData.get("SKU");
             items.add(item);
         }
@@ -306,6 +331,7 @@ public class SubscriptionActivity extends Activity {
             item.title = "Monthly";
             item.description = "";
             item.price = 4.99f;
+            item.priceText = String.valueOf(item.price);
             item.sku = "com.zype.aftv.testsubscriptionmonthly";
             items.add(item);
 
@@ -313,15 +339,16 @@ public class SubscriptionActivity extends Activity {
             item.title = "Yearly";
             item.description = "";
             item.price = 7.99f;
+            item.priceText = String.valueOf(item.price);
             item.sku = "com.zype.aftv.testsubscriptionyearly";
             items.add(item);
         }
 
         adapter.setData(items);
+        adapter.setSelectedItem(0);
     }
 
     private void purchaseSubscription(SubscriptionItem item) {
-        ContentBrowser contentBrowser = ContentBrowser.getInstance(this);
         contentBrowser.updateSubscriptionSku(item.sku);
         contentBrowser.actionTriggered(this, contentBrowser.getLastSelectedContent(), ContentBrowser.CONTENT_ACTION_SUBSCRIPTION);
     }

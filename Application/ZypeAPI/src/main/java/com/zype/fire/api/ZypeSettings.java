@@ -26,7 +26,7 @@ public class ZypeSettings {
 //    public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = true;
 //    public static final boolean SHARE_VIDEO_ENABLED = false;
 //    public static final boolean THEME_LIGHT = true;
-    public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = false;
+    public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = true;
     public static final boolean NATIVE_AMAZON_SUBSCRIPTION_ENABLED = true;
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = true;
 }

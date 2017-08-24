@@ -4,5 +4,6 @@
     <item android:state_focused="true" android:state_enabled="true" android:drawable="@drawable/list_item_background_focused" />
     <item android:state_enabled="true" android:drawable="@drawable/list_item_background_normal" />
     <item android:state_focused="true" android:drawable="@drawable/list_item_background_focused" />
+    <item android:state_selected="true" android:drawable="@drawable/list_item_background_focused" />
     <item android:drawable="@drawable/list_item_background_normal" />
 </selector>

@@ -47,12 +47,15 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
     private Button buttonSignUp;
     private Button buttonLogin;
 
+    private ContentBrowser contentBrowser;
     private ErrorDialogFragment dialogError = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_login);
+
+        contentBrowser = ContentBrowser.getInstance(this);
 
         editEmail = (EditText) findViewById(R.id.editEmail);
         editPassword = (EditText) findViewById(R.id.editPassword);
@@ -127,6 +130,15 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
         }
         else {
             // TODO: Hide progress
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        contentBrowser.handleOnActivityResult(this, requestCode, resultCode, data);
+        switch (requestCode) {
         }
     }
 

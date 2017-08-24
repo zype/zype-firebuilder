@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="240dp"
-    android:layout_height="136dp"
+    android:layout_width="360dp"
+    android:layout_height="204dp"
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
     android:padding="16dp"
@@ -9,6 +9,7 @@
     android:gravity="center"
     android:background="@drawable/list_item_background"
     android:focusable="true"
+    android:clickable="true"
     xmlns:tools="http://schemas.android.com/tools"
     >
     <TextView

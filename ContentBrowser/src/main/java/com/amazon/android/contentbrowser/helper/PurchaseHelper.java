@@ -453,7 +453,7 @@ public class PurchaseHelper {
     /* Zype,  Evgeny Cherkasov */
     private void handleProductsChain(Activity activity) {
         Set<String> skuSet = new HashSet<>();
-        skuSet.add("com.zype.aftv.testsubscriptionmonthly");
+        skuSet.add("com.zype.aftv.template.testsubscriptionmonthly.monthly");
         skuSet.add("com.zype.aftv.testsubscriptionyearly");
 
         productsObservable(skuSet)
@@ -461,7 +461,8 @@ public class PurchaseHelper {
                 .observeOn(AndroidSchedulers.mainThread()) //this needs to be last to
                 // make sure rest is running on separate thread.
                 .subscribe(resultBundle -> {
-                    mContentBrowser.switchToScreen(ContentBrowser.SUBSCRIPTION_SCREEN, resultBundle);
+//                    mContentBrowser.switchToScreen(ContentBrowser.SUBSCRIPTION_SCREEN, resultBundle);
+                    mContentBrowser.switchToSubscriptionScreen(resultBundle);
                     EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
                 }, throwable -> {
                     EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));

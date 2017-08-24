@@ -719,6 +719,13 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         /* Zype, Evgeny Cherkasov */
         // Update user logged in flag
         userLoggedIn = authenticationStatusUpdateEvent.isUserAuthenticated();
+        if (userLoggedIn) {
+            mSubscribed = Preferences.getBoolean(PurchaseHelper.CONFIG_PURCHASE_VERIFIED)
+                || Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0;
+        }
+        else {
+            mSubscribed = false;
+        }
         updateLoginAction();
 
     }
@@ -1335,7 +1342,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             isSubscriptionNotRequired = false;
         }
 
-        if (mSubscribed || isSubscriptionNotRequired || mIAPDisabled) {
+        /* Zype, Evgeny Cherkasov */
+//        if (mSubscribed || isSubscriptionNotRequired || mIAPDisabled) {
+        if (isUserSubscribed() || isSubscriptionNotRequired || mIAPDisabled) {
 
 
             // Check if the content is meant for live watching. Live content requires only a
@@ -2462,7 +2471,17 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         return userLoggedIn;
     }
 
+    public boolean isUserSubscribed() {
+        return mSubscribed || Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0;
+    }
+
     public void updateSubscriptionSku(String sku) {
         mPurchaseHelper.setSubscriptionSKU(sku);
+    }
+
+    public void switchToSubscriptionScreen(Bundle extras) {
+        switchToScreen(SUBSCRIPTION_SCREEN, intent -> {
+            intent.putExtras(extras);
+        });
     }
 }
