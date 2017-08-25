@@ -4,7 +4,10 @@ package com.amazon.android.tv.tenfoot.ui.Subscription;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.support.v17.leanback.widget.VerticalGridView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,10 +19,13 @@ import android.widget.TextView;
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.helper.AuthHelper;
 import com.amazon.android.contentbrowser.helper.PurchaseHelper;
+import com.amazon.android.model.event.ProgressOverlayDismissEvent;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.ui.Subscription.Model.SubscriptionItem;
 import com.amazon.android.utils.Preferences;
 import com.zype.fire.auth.ZypeAuthentication;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +35,7 @@ import java.util.List;
  * Created by Evgeny Cherkasov on 07.08.2017.
  */
 
-public class SubscriptionActivity extends Activity {
+public class SubscriptionActivity extends Activity implements SubscriptionFragment.ISubscriptionSelectedListener {
     private static final String TAG = SubscriptionActivity.class.getName();
 
     public static final String PARAMETERS_MODE = "Mode";
@@ -41,7 +47,7 @@ public class SubscriptionActivity extends Activity {
     private LinearLayout layoutConfirm;
 
     private TextView textDescription;
-    private RecyclerView listSubscriptions;
+//    private RecyclerView listSubscriptions;
     private LinearLayout layoutLogin;
     private Button buttonLogin;
     private LinearLayout layoutLoggedIn;
@@ -53,9 +59,9 @@ public class SubscriptionActivity extends Activity {
     public static final int MODE_CHOOSE_PLAN = 1;
     public static final int MODE_CONFIRM = 2;
     private int mode;
-    private ArrayList<HashMap<String, String>> products;
+//    private ArrayList<HashMap<String, String>> products;
 
-    private SubscriptionsAdapter adapter;
+//    private SubscriptionsAdapter adapter;
     private SubscriptionItem selectedSubscription = null;
 
     private ContentBrowser contentBrowser;
@@ -74,9 +80,9 @@ public class SubscriptionActivity extends Activity {
 
         textDescription = (TextView) findViewById(R.id.textDescription);
 
-        listSubscriptions = (RecyclerView) findViewById(R.id.listSubscription);
-        adapter = new SubscriptionsAdapter();
-        listSubscriptions.setAdapter(adapter);
+//        listSubscriptions = (RecyclerView) findViewById(R.id.listSubscription);
+//        adapter = new SubscriptionsAdapter();
+//        listSubscriptions.setAdapter(adapter);
 
         layoutLogin = (LinearLayout) findViewById(R.id.layoutLogin);
         buttonLogin = (Button) findViewById(R.id.buttonLogin);
@@ -108,7 +114,7 @@ public class SubscriptionActivity extends Activity {
 
         updateViews();
         bindViews();
-        getSubscriptions();
+//        getSubscriptions();
     }
 
     private void initParameters(Bundle savedInstanceState) {
@@ -121,14 +127,20 @@ public class SubscriptionActivity extends Activity {
         }
         if (args != null) {
             mode = args.getInt(PARAMETERS_MODE, MODE_CHOOSE_PLAN);
-            products = (ArrayList<HashMap<String, String>>) args.getSerializable(PurchaseHelper.RESULT_PRODUCTS);
+//            products = (ArrayList<HashMap<String, String>>) args.getSerializable(PurchaseHelper.RESULT_PRODUCTS);
         }
         else {
             mode = MODE_CHOOSE_PLAN;
         }
-        if (products == null) {
-            products = new ArrayList<>();
-        }
+//        if (products == null) {
+//            products = new ArrayList<>();
+//        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
     }
 
     // //////////
@@ -233,12 +245,24 @@ public class SubscriptionActivity extends Activity {
         }
     }
 
+    @Override
+    public void onSubscriptionSelected(SubscriptionItem item) {
+        selectedSubscription = item;
+        if (contentBrowser.isUserLoggedIn()) {
+            showConfirm();
+        }
+        else {
+            Intent intent = new Intent(SubscriptionActivity.this, CreateLoginActivity.class);
+            startActivityForResult(intent, REQUEST_CREATE_LOGIN);
+        }
+    }
+
     // //////////
     // Data
     //
     public class SubscriptionsAdapter extends RecyclerView.Adapter<SubscriptionsAdapter.ViewHolder> {
         private List<SubscriptionItem> items;
-        private int selectedItem;
+        private int selectedItem = 0;
 
         public SubscriptionsAdapter() {
             items = new ArrayList<>();
@@ -252,6 +276,8 @@ public class SubscriptionActivity extends Activity {
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.subscriptions_list_item, parent, false);
+            view.setFocusable(true);
+            view.setFocusableInTouchMode(true);
             return new ViewHolder(view);
         }
 
@@ -278,6 +304,10 @@ public class SubscriptionActivity extends Activity {
 
             if (position == selectedItem) {
                 holder.view.setSelected(true);
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.postDelayed(() -> {
+                    holder.view.requestFocus();
+                }, 1000);
             }
             else {
                 holder.view.setSelected(false);
@@ -311,42 +341,42 @@ public class SubscriptionActivity extends Activity {
         }
     }
 
-    private void getSubscriptions() {
-        List<SubscriptionItem> items = new ArrayList<>();
-
-        for (HashMap<String, String> productData : products) {
-            SubscriptionItem item = new SubscriptionItem();
-            // TODO: Use constants for keys
-            item.title = productData.get("Title");
-            item.description = productData.get("Description");
-//            item.price = Float.valueOf(productData.get("Price"));
-            item.priceText = productData.get("Price");
-            item.sku = productData.get("SKU");
-            items.add(item);
-        }
-
-        // TODO: Comment adding dummy item for release build
-        if (items.isEmpty()) {
-            SubscriptionItem item = new SubscriptionItem();
-            item.title = "Monthly";
-            item.description = "";
-            item.price = 4.99f;
-            item.priceText = String.valueOf(item.price);
-            item.sku = "com.zype.aftv.testsubscriptionmonthly";
-            items.add(item);
-
-            item = new SubscriptionItem();
-            item.title = "Yearly";
-            item.description = "";
-            item.price = 7.99f;
-            item.priceText = String.valueOf(item.price);
-            item.sku = "com.zype.aftv.testsubscriptionyearly";
-            items.add(item);
-        }
-
-        adapter.setData(items);
-        adapter.setSelectedItem(0);
-    }
+//    private void getSubscriptions() {
+//        List<SubscriptionItem> items = new ArrayList<>();
+//
+//        for (HashMap<String, String> productData : products) {
+//            SubscriptionItem item = new SubscriptionItem();
+//            // TODO: Use constants for keys
+//            item.title = productData.get("Title");
+//            item.description = productData.get("Description");
+////            item.price = Float.valueOf(productData.get("Price"));
+//            item.priceText = productData.get("Price");
+//            item.sku = productData.get("SKU");
+//            items.add(item);
+//        }
+//
+//        // TODO: Comment adding dummy item for release build
+//        if (items.isEmpty()) {
+//            SubscriptionItem item = new SubscriptionItem();
+//            item.title = "Monthly";
+//            item.description = "";
+//            item.price = 4.99f;
+//            item.priceText = String.valueOf(item.price);
+//            item.sku = "com.zype.aftv.testsubscriptionmonthly";
+//            items.add(item);
+//
+//            item = new SubscriptionItem();
+//            item.title = "Yearly";
+//            item.description = "";
+//            item.price = 7.99f;
+//            item.priceText = String.valueOf(item.price);
+//            item.sku = "com.zype.aftv.testsubscriptionyearly";
+//            items.add(item);
+//        }
+//
+//        adapter.setData(items);
+//        adapter.setSelectedItem(0);
+//    }
 
     private void purchaseSubscription(SubscriptionItem item) {
         contentBrowser.updateSubscriptionSku(item.sku);

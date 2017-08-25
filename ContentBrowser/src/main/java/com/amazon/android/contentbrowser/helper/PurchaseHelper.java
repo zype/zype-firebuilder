@@ -18,6 +18,7 @@ import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.R;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.event.ProgressOverlayDismissEvent;
+import com.amazon.android.model.event.SubscriptionProductsUpdateEvent;
 import com.amazon.android.module.ModuleManager;
 import com.amazon.android.recipe.Recipe;
 import com.amazon.android.ui.fragments.ProgressDialogFragment;
@@ -435,7 +436,8 @@ public class PurchaseHelper {
         }
         /* Zype, Evgeny Cherkasov */
         else if (actionId == ContentBrowser.CONTENT_ACTION_CHOOSE_PLAN) {
-            handleProductsChain(activity);
+            mContentBrowser.switchToSubscriptionScreen(new Bundle());
+//            handleProductsChain(activity);
         }
 
     }
@@ -451,28 +453,29 @@ public class PurchaseHelper {
     }
 
     /* Zype,  Evgeny Cherkasov */
-    private void handleProductsChain(Activity activity) {
+    public void handleProductsChain(Activity activity) {
         Set<String> skuSet = new HashSet<>();
         skuSet.add("com.zype.aftv.template.testsubscriptionmonthly.monthly");
         skuSet.add("com.zype.aftv.testsubscriptionyearly");
 
-        productsObservable(skuSet)
-                .subscribeOn(Schedulers.newThread()) //this needs to be first make sure
-                .observeOn(AndroidSchedulers.mainThread()) //this needs to be last to
-                // make sure rest is running on separate thread.
-                .subscribe(resultBundle -> {
-//                    mContentBrowser.switchToScreen(ContentBrowser.SUBSCRIPTION_SCREEN, resultBundle);
-                    mContentBrowser.switchToSubscriptionScreen(resultBundle);
-                    EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
-                }, throwable -> {
-                    EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
-
-                    ErrorHelper.injectErrorFragment(activity, ErrorUtils.ERROR_CATEGORY
-                            .NETWORK_ERROR, (errorDialogFragment, errorButtonType, errorCategory)
-                            -> {
-                        errorDialogFragment.dismiss();
-                    });
-                });
+        EventBus.getDefault().post(new SubscriptionProductsUpdateEvent(new Bundle()));
+//        productsObservable(skuSet)
+//                .subscribeOn(Schedulers.newThread()) //this needs to be first make sure
+//                .observeOn(AndroidSchedulers.mainThread()) //this needs to be last to
+//                // make sure rest is running on separate thread.
+//                .subscribe(resultBundle -> {
+////                    mContentBrowser.switchToScreen(ContentBrowser.SUBSCRIPTION_SCREEN, resultBundle);
+//                    mContentBrowser.switchToSubscriptionScreen(resultBundle);
+//                    EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
+//                }, throwable -> {
+//                    EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
+//
+//                    ErrorHelper.injectErrorFragment(activity, ErrorUtils.ERROR_CATEGORY
+//                            .NETWORK_ERROR, (errorDialogFragment, errorButtonType, errorCategory)
+//                            -> {
+//                        errorDialogFragment.dismiss();
+//                    });
+//                });
     }
 
     public Observable<Bundle> productsObservable(Set<String> skuSet) {

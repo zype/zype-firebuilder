@@ -2484,4 +2484,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             intent.putExtras(extras);
         });
     }
+
+    public PurchaseHelper getPurchaseHelper() {
+        return mPurchaseHelper;
+    }
 }
