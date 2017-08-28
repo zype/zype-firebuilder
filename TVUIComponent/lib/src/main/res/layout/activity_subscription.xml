@@ -40,24 +40,12 @@
             android:textColor="@color/login_instructions_color"
             tools:text="@string/subscription_choose_plan_description"
             />
-<!--
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
-            android:orientation="horizontal"
-            android:layout_gravity="center_horizontal"
-            android:id="@+id/listSubscription"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-            tools:listitem="@layout/subscriptions_list_item"
-            />
--->
         <fragment
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="200dp"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="24dp"
+            android:layout_gravity="center_horizontal"
             android:id="@+id/fragmentSubscriptions"
             android:name="com.amazon.android.tv.tenfoot.ui.Subscription.SubscriptionFragment"
             tools:layout="@layout/action_widget_container"

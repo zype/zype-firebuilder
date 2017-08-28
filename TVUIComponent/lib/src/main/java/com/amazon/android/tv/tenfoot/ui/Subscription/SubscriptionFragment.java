@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v17.leanback.app.RowsFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.OnItemViewClickedListener;
 import android.support.v17.leanback.widget.Presenter;
@@ -14,30 +13,23 @@ import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v17.leanback.widget.VerticalGridView;
 import android.util.Log;
 
+import com.amazon.android.contentbrowser.BuildConfig;
 import com.amazon.android.contentbrowser.ContentBrowser;
-import com.amazon.android.contentbrowser.ContentLoader;
 import com.amazon.android.contentbrowser.helper.PurchaseHelper;
-import com.amazon.android.model.Action;
-import com.amazon.android.model.content.Content;
-import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.model.event.SubscriptionProductsUpdateEvent;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
-import com.amazon.android.tv.tenfoot.presenter.SettingsCardPresenter;
 import com.amazon.android.tv.tenfoot.ui.Subscription.Model.SubscriptionItem;
-import com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by Evgeny Cherkasov on 25.08.2017.
  */
-
 public class SubscriptionFragment extends RowsFragment {
     private static final String TAG = SubscriptionFragment.class.getSimpleName();
 
@@ -50,31 +42,30 @@ public class SubscriptionFragment extends RowsFragment {
         void onSubscriptionSelected(SubscriptionItem item);
     }
 
+    private ISubscriptionSelectedListener listenerSubscriptionSelected;
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         EventBus.getDefault().register(this);
 
-//        // This makes sure that the container activity has implemented the callback interface.
-//        // If not, it throws an exception.
-//        try {
-//            mCallback = (ContentBrowseFragment.OnBrowseRowListener) getActivity();
-//        }
-//        catch (ClassCastException e) {
-//            throw new ClassCastException(getActivity().toString() +
-//                    " must implement " +
-//                    "OnBrowseRowListener: " + e);
-//        }
+        // This makes sure that the container activity has implemented the callback interface.
+        // If not, it throws an exception.
+        try {
+            listenerSubscriptionSelected = (ISubscriptionSelectedListener) getActivity();
+        }
+        catch (ClassCastException e) {
+            throw new ClassCastException(getActivity().toString() + " must implement " + "ISubscriptionSelectedListener: " + e);
+        }
 
         CustomListRowPresenter customListRowPresenter = new CustomListRowPresenter();
-//        customListRowPresenter.setHeaderPresenter(new RowHeaderPresenter());
-
         customListRowPresenter.setShadowEnabled(false);
 
-        /* Zype, Evgney Cherkasov */
-//        ArrayObjectAdapter rowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
         rowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
         setAdapter(rowsAdapter);
+        if (BuildConfig.DEBUG) {
+            updateSubscriptionOptions(rowsAdapter, null);
+        }
 
         setOnItemViewClickedListener(new SubscriptionFragment.ItemViewClickedListener());
 
@@ -90,12 +81,6 @@ public class SubscriptionFragment extends RowsFragment {
         }, WAIT_BEFORE_FOCUS_REQUEST_MS);
 
         ContentBrowser.getInstance(getActivity()).getPurchaseHelper().handleProductsChain(getActivity());
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-//        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -148,7 +133,7 @@ public class SubscriptionFragment extends RowsFragment {
         @Override
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
                                   RowPresenter.ViewHolder rowViewHolder, Row row) {
-            ((ISubscriptionSelectedListener) getActivity()).onSubscriptionSelected((SubscriptionItem) item);
+            listenerSubscriptionSelected.onSubscriptionSelected((SubscriptionItem) item);
         }
     }
 

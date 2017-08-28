@@ -458,24 +458,23 @@ public class PurchaseHelper {
         skuSet.add("com.zype.aftv.template.testsubscriptionmonthly.monthly");
         skuSet.add("com.zype.aftv.testsubscriptionyearly");
 
-        EventBus.getDefault().post(new SubscriptionProductsUpdateEvent(new Bundle()));
-//        productsObservable(skuSet)
-//                .subscribeOn(Schedulers.newThread()) //this needs to be first make sure
-//                .observeOn(AndroidSchedulers.mainThread()) //this needs to be last to
-//                // make sure rest is running on separate thread.
-//                .subscribe(resultBundle -> {
-////                    mContentBrowser.switchToScreen(ContentBrowser.SUBSCRIPTION_SCREEN, resultBundle);
-//                    mContentBrowser.switchToSubscriptionScreen(resultBundle);
-//                    EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
-//                }, throwable -> {
-//                    EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
-//
-//                    ErrorHelper.injectErrorFragment(activity, ErrorUtils.ERROR_CATEGORY
-//                            .NETWORK_ERROR, (errorDialogFragment, errorButtonType, errorCategory)
-//                            -> {
-//                        errorDialogFragment.dismiss();
-//                    });
-//                });
+//        EventBus.getDefault().post(new SubscriptionProductsUpdateEvent(new Bundle()));
+        productsObservable(skuSet)
+                .subscribeOn(Schedulers.newThread()) //this needs to be first make sure
+                .observeOn(AndroidSchedulers.mainThread()) //this needs to be last to
+                // make sure rest is running on separate thread.
+                .subscribe(resultBundle -> {
+                    EventBus.getDefault().post(new SubscriptionProductsUpdateEvent(resultBundle));
+                    EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
+                    },
+                    throwable -> {
+                        EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
+
+                        ErrorHelper.injectErrorFragment(activity, ErrorUtils.ERROR_CATEGORY.NETWORK_ERROR,
+                                (errorDialogFragment, errorButtonType, errorCategory) -> {
+                            errorDialogFragment.dismiss();
+                        });
+                    });
     }
 
     public Observable<Bundle> productsObservable(Set<String> skuSet) {
