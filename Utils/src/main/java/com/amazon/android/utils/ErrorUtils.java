@@ -42,7 +42,8 @@ public class ErrorUtils {
         AUTHORIZATION_ERROR,
         PLAYER_ERROR,
         /* Zype, Evgeny Cherkasov */
-        ZYPE_CREATE_CONSUMER_ERROR
+        ZYPE_CREATE_CONSUMER_ERROR,
+        ZYPE_VERIFY_SUBSCRIPTION_ERROR
     }
 
     /**
@@ -91,6 +92,9 @@ public class ErrorUtils {
             case ZYPE_CREATE_CONSUMER_ERROR:
                 errorMessage = context.getResources().getString(R.string.create_consumer_error);
                 break;
+            case ZYPE_VERIFY_SUBSCRIPTION_ERROR:
+                errorMessage = context.getResources().getString(R.string.verify_subscription_error);
+                break;
             default:
                 break;
         }
@@ -130,6 +134,9 @@ public class ErrorUtils {
                 break;
             /* Zype, Evgeny Cherkasov */
             case ZYPE_CREATE_CONSUMER_ERROR:
+                buttonLabelsList.add(context.getResources().getString(R.string.dismiss_label));
+                break;
+            case ZYPE_VERIFY_SUBSCRIPTION_ERROR:
                 buttonLabelsList.add(context.getResources().getString(R.string.dismiss_label));
                 break;
             default:

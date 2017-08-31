@@ -721,7 +721,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         userLoggedIn = authenticationStatusUpdateEvent.isUserAuthenticated();
         if (userLoggedIn) {
             mSubscribed = Preferences.getBoolean(PurchaseHelper.CONFIG_PURCHASE_VERIFIED)
-                || Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0;
+                || Preferences.getLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT) > 0;
         }
         else {
             mSubscribed = false;
@@ -1112,7 +1112,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     if (userLoggedIn) {
                         // TODO: Consider another way to get preference name to avoid dependemcy on ZypeAuthComponent in this module
                         // User is logged in and has subscription. Add all videos
-                        if (Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0) {
+                        if (Preferences.getLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT) > 0) {
                             for (Content relatedContent : parentContainer.getContents()) {
                                 if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId())) {
                                     recommendedContentContainer.addContent(relatedContent);
@@ -1668,7 +1668,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 boolean result = isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT);
                 if (result) {
                     // TODO: Consider another way to get preference name to avoid dependemcy on ZypeAuthComponent in this module
-                    if (Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0
+                    if (Preferences.getLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT) > 0
                             || actionId == CONTENT_ACTION_SWAF) {
                         switchToRendererScreen(content, actionId);
                     }
@@ -2472,7 +2472,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     public boolean isUserSubscribed() {
-        return mSubscribed || Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0;
+        return mSubscribed || Preferences.getLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT) > 0;
     }
 
     public void updateSubscriptionSku(String sku) {

@@ -63,9 +63,6 @@ public class SubscriptionFragment extends RowsFragment {
 
         rowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
         setAdapter(rowsAdapter);
-        if (BuildConfig.DEBUG) {
-            updateSubscriptionOptions(rowsAdapter, null);
-        }
 
         setOnItemViewClickedListener(new SubscriptionFragment.ItemViewClickedListener());
 
@@ -93,25 +90,7 @@ public class SubscriptionFragment extends RowsFragment {
         SubscriptionCardPresenter cardPresenter = new SubscriptionCardPresenter();
         subscriptionsAdapter = new ArrayObjectAdapter(cardPresenter);
 
-        if (products == null || products.isEmpty()) {
-            // TODO: Comment adding dummy item for release build
-            SubscriptionItem item = new SubscriptionItem();
-            item.title = "Monthly";
-            item.description = "";
-            item.price = 4.99f;
-            item.priceText = String.valueOf(item.price);
-            item.sku = "com.zype.aftv.testsubscriptionmonthly";
-            subscriptionsAdapter.add(item);
-
-            item = new SubscriptionItem();
-            item.title = "Yearly";
-            item.description = "";
-            item.price = 7.99f;
-            item.priceText = String.valueOf(item.price);
-            item.sku = "com.zype.aftv.testsubscriptionyearly";
-            subscriptionsAdapter.add(item);
-        }
-        else {
+        if (products != null && !products.isEmpty()) {
             for (HashMap<String, String> productData : products) {
                 SubscriptionItem item = new SubscriptionItem();
                 // TODO: Use constants for keys
@@ -143,7 +122,7 @@ public class SubscriptionFragment extends RowsFragment {
      * @param event Broadcast event for progress overlay dismiss.
      */
     @Subscribe
-    public void onProgressOverlayDismissEvent(SubscriptionProductsUpdateEvent event) {
+    public void onProductsUpdateEvent(SubscriptionProductsUpdateEvent event) {
         ArrayList<HashMap<String, String>> products = (ArrayList<HashMap<String, String>>) event.getExtras().getSerializable(PurchaseHelper.RESULT_PRODUCTS);
         updateSubscriptionOptions(rowsAdapter, products);
     }

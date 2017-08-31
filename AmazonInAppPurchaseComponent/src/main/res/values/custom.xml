@@ -14,7 +14,13 @@ permissions and limitations under the License.
 -->
 <resources>
     <!-- Receipt verification service for Amazon InApp purchase -->
+    <!-- Zype, Evgeny Cherkasov -->
+<!--
     <string name="receipt_verification_service_iap">
         com.amazon.inapppurchase.DefaultReceiptVerificationService
+    </string>
+-->
+    <string name="receipt_verification_service_iap">
+        com.zype.fire.api.Subscription.ZypeReceiptVerificationService
     </string>
 </resources>

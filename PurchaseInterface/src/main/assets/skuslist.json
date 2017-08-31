@@ -1,14 +1,16 @@
 {
   "skusList": [
     {
-      "sku": "com.zype.aftv.testsubscriptionmonthly",
+      "sku": "com.zype.aftv.template.testsubscriptionmonthly.monthly",
       "productType": "SUBSCRIBE",
-      "purchaseSku": "com.zype.aftv.testsubscriptionmonthly"
+      "purchaseSku": "com.zype.aftv.template.testsubscriptionmonthly.monthly",
+      "id": "aftvmonthly"
     },
     {
       "sku": "com.zype.aftv.testsubscriptionyearly",
       "productType": "SUBSCRIBE",
-      "purchaseSku": "com.zype.aftv.testsubscriptionyearly"
+      "purchaseSku": "com.zype.aftv.testsubscriptionyearly",
+      "id": "aftvyearly"
     },
     {
       "sku": "RentUnPurchased",

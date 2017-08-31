@@ -58,5 +58,6 @@ permissions and limitations under the License.
     -->
     <!-- Create login -->
     <string name="create_consumer_error">Error creating login. Please retry.</string>
+    <string name="verify_subscription_error">Error verifying subscription.</string>
 
 </resources>

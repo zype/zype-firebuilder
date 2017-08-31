@@ -80,6 +80,11 @@ public class ZypeLoginActivity extends Activity {
         if (NetworkUtils.isConnectedToNetwork(this)) {
             (new AsyncTask<Void, Void, Map>() {
                 @Override
+                protected Map<String, Object> doInBackground(Void... params) {
+                    return ZypeAuthentication.getAccessToken(username, password);
+                }
+
+                @Override
                 protected void onPostExecute(Map response) {
                     super.onPostExecute(response);
                     if (response != null) {
@@ -95,11 +100,6 @@ public class ZypeLoginActivity extends Activity {
                         // There was an error authenticating the user entered token.
                         setResultAndReturn(null, AuthenticationConstants.AUTHENTICATION_ERROR_CATEGORY);
                     }
-                }
-
-                @Override
-                protected Map<String, Object> doInBackground(Void... params) {
-                    return ZypeAuthentication.getAccessToken(username, password);
                 }
             }).execute();
         }

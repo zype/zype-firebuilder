@@ -19,6 +19,7 @@ import com.amazon.android.contentbrowser.R;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.event.ProgressOverlayDismissEvent;
 import com.amazon.android.model.event.SubscriptionProductsUpdateEvent;
+import com.amazon.android.model.event.SubscriptionPurchaseEvent;
 import com.amazon.android.module.ModuleManager;
 import com.amazon.android.recipe.Recipe;
 import com.amazon.android.ui.fragments.ProgressDialogFragment;
@@ -41,8 +42,10 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -93,6 +96,9 @@ public class PurchaseHelper {
 
     private static final String TAG = PurchaseHelper.class.getName();
     public static final String ACTIONS = "actions";
+    /* Zype, Evgeny Cherkasov */
+    public static final String SKUS_LIST = "skusList";
+
     private final ContentBrowser mContentBrowser;
     private PurchaseManager mPurchaseManager;
     private final Context mContext;
@@ -405,7 +411,10 @@ public class PurchaseHelper {
                         // make sure rest is running on separate thread.
                 .subscribe(resultBundle -> {
                     Log.e(TAG, "isPurchaseValid subscribe called");
-                    mContentBrowser.updateContentActions();
+                    /* Zype, Evgeny Cherkasov */
+//                    mContentBrowser.updateContentActions();
+                    EventBus.getDefault().post(new SubscriptionPurchaseEvent(resultBundle));
+
                     EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
                 }, throwable -> {
                     EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
@@ -454,11 +463,18 @@ public class PurchaseHelper {
 
     /* Zype,  Evgeny Cherkasov */
     public void handleProductsChain(Activity activity) {
-        Set<String> skuSet = new HashSet<>();
-        skuSet.add("com.zype.aftv.template.testsubscriptionmonthly.monthly");
-        skuSet.add("com.zype.aftv.testsubscriptionyearly");
-
 //        EventBus.getDefault().post(new SubscriptionProductsUpdateEvent(new Bundle()));
+        Set<String> skuSet = null;
+        try {
+            skuSet = getSubscriptionSKUs();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            ErrorHelper.injectErrorFragment(activity, ErrorUtils.ERROR_CATEGORY.NETWORK_ERROR,
+                    (errorDialogFragment, errorButtonType, errorCategory) -> {
+                        errorDialogFragment.dismiss();
+                    });
+        }
         productsObservable(skuSet)
                 .subscribeOn(Schedulers.newThread()) //this needs to be first make sure
                 .observeOn(AndroidSchedulers.mainThread()) //this needs to be last to
@@ -510,7 +526,32 @@ public class PurchaseHelper {
         }
     }
 
+    public Set<String> getSubscriptionSKUs() throws IOException {
+        Set<String> result = new HashSet<>();
+
+        Recipe recipe = Recipe.newInstance(FileHelper.readFile(mContext, mContext.getString(R.string.skus_file)));
+        List<Map<String, String>> skuList = (List<Map<String, String>>) recipe.getMap().get(SKUS_LIST);
+        for (Map<String, String> item : skuList) {
+            if (item.get("productType").equals("SUBSCRIBE")) {
+                result.add(item.get("sku"));
+            }
+        }
+
+        return result;
+    }
+
     public void setSubscriptionSKU(String sku) {
         mSubscriptionSKU = sku;
+    }
+
+    public String getSubscriptionId(String sku) throws IOException {
+        Recipe recipe = Recipe.newInstance(FileHelper.readFile(mContext, mContext.getString(R.string.skus_file)));
+        List<Map<String, String>> skuList = (List<Map<String, String>>) recipe.getMap().get(SKUS_LIST);
+        for (Map<String, String> item : skuList) {
+            if (item.get("sku").equals(sku)) {
+                return item.get("id");
+            }
+        }
+        return null;
     }
 }

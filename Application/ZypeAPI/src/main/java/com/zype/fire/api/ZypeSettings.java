@@ -17,7 +17,7 @@ public class ZypeSettings {
     public static final String ROOT_PLAYLIST_ID = "577e65c85577de0d1000c1ee";
 
     // Template version
-    public static final String TEMPLATE_VERSION = "1.0.8";
+    public static final String TEMPLATE_VERSION = "1.0.9";
 
     // App features
     // TODO: Update app feature settings
@@ -29,5 +29,11 @@ public class ZypeSettings {
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = true;
     public static final boolean NATIVE_AMAZON_SUBSCRIPTION_ENABLED = true;
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = true;
+
+    /**
+     * Amazon shared key is required for native subscription feature. It is used in request to Zype Bifrost
+     * service for verifying subscription.
+     */
+    public static final String AMAZON_SHARED_KEY = "2:QwDSMRWE6-QskpjXS0LDjFOqu9jWadiFvygv15Onw2Xt917Bm-9vHXUfwWmTFyKo:Lntf8F3vQfgCgGjTIh7kVw==";
 }
 

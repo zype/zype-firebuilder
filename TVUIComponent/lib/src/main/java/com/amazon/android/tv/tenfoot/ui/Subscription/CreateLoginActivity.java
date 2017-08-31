@@ -95,7 +95,7 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
                 .isAuthenticated()
                 .subscribe(isAuthenticatedResultBundle -> {
                     if (isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT)) {
-                        if (Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0) {
+                        if (Preferences.getLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT) > 0) {
                             finish();
                         }
                         else {
@@ -111,7 +111,7 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
                                                 .handleErrorBundle(resultBundle));
                                     }
                                     else {
-                                        if (Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0) {
+                                        if (Preferences.getLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT) > 0) {
                                             finish();
                                         }
                                         else {
@@ -250,6 +250,11 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
         if (NetworkUtils.isConnectedToNetwork(this)) {
             (new AsyncTask<Void, Void, Map>() {
                 @Override
+                protected Map<String, Object> doInBackground(Void... params) {
+                    return ZypeAuthentication.getAccessToken(consumer.email, consumer.password);
+                }
+
+                @Override
                 protected void onPostExecute(Map response) {
                     super.onPostExecute(response);
                     if (response != null) {
@@ -265,11 +270,6 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
                         // There was an error authenticating the user entered token.
                         setResultAndReturn(null, AuthenticationConstants.AUTHENTICATION_ERROR_CATEGORY);
                     }
-                }
-
-                @Override
-                protected Map<String, Object> doInBackground(Void... params) {
-                    return ZypeAuthentication.getAccessToken(consumer.email, consumer.password);
                 }
             }).execute();
         }

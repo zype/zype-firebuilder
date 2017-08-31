@@ -154,7 +154,7 @@ public class CardPresenter extends Presenter {
                 /*Zype, EvgenyCherkasov */
                 // Display lock icon for subscription video
                 if (content.isSubscriptionRequired()) {
-                    if (Preferences.getLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT) > 0) {
+                    if (Preferences.getLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT) > 0) {
                         cardView.setBadgeImage(imageUnlocked);
                     }
                     else {

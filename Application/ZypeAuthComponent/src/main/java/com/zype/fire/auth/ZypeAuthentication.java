@@ -7,12 +7,11 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.amazon.android.module.*;
 import com.amazon.android.utils.Preferences;
-import com.amazon.auth.AuthenticationConstants;
 import com.amazon.auth.IAuthentication;
 import com.zype.fire.api.Model.AccessTokenInfoResponse;
 import com.zype.fire.api.Model.AccessTokenResponse;
+import com.zype.fire.api.Model.ConsumerData;
 import com.zype.fire.api.Model.ConsumerResponse;
 import com.zype.fire.api.ZypeApi;
 
@@ -31,8 +30,10 @@ public class ZypeAuthentication implements IAuthentication {
     public static final String PREFERENCE_ACCESS_TOKEN_EXPIRES_IN = "ZypeAccessTokenExpiresIn";
     public static final String PREFERENCE_REFRESH_TOKEN = "ZypeRefreshToken";
     public static final String PREFERENCE_RESOURCE_OWNER_ID = "ZypeResourceOwnerId";
-    public static final String PREFERENCE_SUBSCRIPTION_COUNT = "ZypeSubscriptionCount";
+    public static final String PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT = "ZypeConsumerSubscriptionCount";
     public static final String PREFERENCE_CONSUMER_EMAIL = "ZypeConsumerEmail";
+    public static final String PREFERENCE_CONSUMER_ID = "ZypeConsumerId";
+    public static final String PREFERENCE_CONSUMER_PASSWORD = "ZypeConsumerPassword";
 
     private static final String RESPONSE_ACCESS_TOKEN = "ResponseAccessToken";
     private static final String RESPONSE_ACCESS_TOKEN_INFO = "ResponseAccessTokenInfo";
@@ -132,7 +133,8 @@ public class ZypeAuthentication implements IAuthentication {
         Preferences.setLong(ZypeAuthentication.PREFERENCE_ACCESS_TOKEN_EXPIRES_IN, 0);
         Preferences.setString(ZypeAuthentication.PREFERENCE_REFRESH_TOKEN, "");
         Preferences.setString(ZypeAuthentication.PREFERENCE_RESOURCE_OWNER_ID, "");
-        Preferences.setLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT, 0);
+        Preferences.setLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT, 0);
+        Preferences.setString(ZypeAuthentication.PREFERENCE_CONSUMER_ID, null);
         responseHandler.onSuccess(new Bundle());
     }
 
@@ -144,6 +146,11 @@ public class ZypeAuthentication implements IAuthentication {
     }
 
     public static Map<String, Object> getAccessToken(String username, String password) {
+        // Save user name and password for re-login
+        // TODO: Save encoded password
+        Preferences.setString(ZypeAuthentication.PREFERENCE_CONSUMER_EMAIL, username);
+        Preferences.setString(ZypeAuthentication.PREFERENCE_CONSUMER_PASSWORD, password);
+
         AccessTokenResponse responseAccessToken = ZypeApi.getInstance().retrieveAccessToken(username, password);
         AccessTokenInfoResponse responseAccessTokenInfo = null;
         ConsumerResponse responseConsumer = null;
@@ -216,11 +223,13 @@ public class ZypeAuthentication implements IAuthentication {
             expiresIn = ((AccessTokenInfoResponse) data.get(RESPONSE_ACCESS_TOKEN_INFO)).expiresInSeconds;
             resourceOwnerId = ((AccessTokenInfoResponse) data.get(RESPONSE_ACCESS_TOKEN_INFO)).resourceOwnerId;
         }
-        int subscriptionCount = 0;
-        String email = "";
+        ConsumerData consumer = null;
+//        int subscriptionCount = 0;
+//        String email = "";
         if (data.get(RESPONSE_CONSUMER) != null) {
-            subscriptionCount = ((ConsumerResponse) data.get(RESPONSE_CONSUMER)).consumerData.subscriptionCount;
-            email = ((ConsumerResponse) data.get(RESPONSE_CONSUMER)).consumerData.email;
+            consumer = ((ConsumerResponse) data.get(RESPONSE_CONSUMER)).consumerData;
+//            subscriptionCount = ((ConsumerResponse) data.get(RESPONSE_CONSUMER)).consumerData.subscriptionCount;
+//            email = ((ConsumerResponse) data.get(RESPONSE_CONSUMER)).consumerData.email;
         }
 
         if (com.amazon.android.module.BuildConfig.DEBUG) {
@@ -231,7 +240,8 @@ public class ZypeAuthentication implements IAuthentication {
         Preferences.setLong(ZypeAuthentication.PREFERENCE_ACCESS_TOKEN_EXPIRES_IN, expiresIn);
         Preferences.setString(ZypeAuthentication.PREFERENCE_REFRESH_TOKEN, refreshToken);
         Preferences.setString(ZypeAuthentication.PREFERENCE_RESOURCE_OWNER_ID, resourceOwnerId);
-        Preferences.setLong(ZypeAuthentication.PREFERENCE_SUBSCRIPTION_COUNT, subscriptionCount);
-        Preferences.setString(ZypeAuthentication.PREFERENCE_CONSUMER_EMAIL, email);
+        Preferences.setLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT, consumer.subscriptionCount);
+        Preferences.setString(ZypeAuthentication.PREFERENCE_CONSUMER_EMAIL, consumer.email);
+        Preferences.setString(ZypeAuthentication.PREFERENCE_CONSUMER_ID, consumer.id);
     }
 }

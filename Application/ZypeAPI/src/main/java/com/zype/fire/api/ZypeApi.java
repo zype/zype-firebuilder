@@ -36,6 +36,14 @@ public class ZypeApi {
     private static final String PASSWORD = "password";
     public static final String QUERY = "q";
     private static final String REFRESH_TOKEN = "refresh_token";
+
+    public static final String SUBSCRIPTION_CONSUMER_ID = "consumer_id";
+    public static final String SUBSCRIPTION_DEVICE_TYPE = "device_type";
+    public static final String SUBSCRIPTION_RECEIPT_ID = "receipt_id";
+    public static final String SUBSCRIPTION_SHARED_SECRET = "shared_secret";
+    public static final String SUBSCRIPTION_THIRD_PARTY_ID = "third_party_id";
+    public static final String SUBSCRIPTION_USER_ID = "user_id";
+
     private static final String USERNAME = "username";
     public static final String UUID = "uuid";
 
