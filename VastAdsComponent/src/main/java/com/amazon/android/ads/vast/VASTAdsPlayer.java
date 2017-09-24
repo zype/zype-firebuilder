@@ -341,7 +341,15 @@ public class VASTAdsPlayer implements IAds,
                     cleanUpMediaPlayer();
 
                     if (mIAdsEvents != null) {
-                        mIAdsEvents.onAdSlotEnded(null);
+                        /* Zype, Evgeny Cherkasov */
+//                        mIAdsEvents.onAdSlotEnded(null);
+                        Bundle extras = null;
+                        boolean isMidroll = mExtras.getBoolean(IAds.WAS_A_MID_ROLL, false);
+                        if (isMidroll) {
+                            extras = new Bundle();
+                            extras.putBoolean(IAds.WAS_A_MID_ROLL, true);
+                        }
+                        mIAdsEvents.onAdSlotEnded(extras);
                     }
                 }
             });

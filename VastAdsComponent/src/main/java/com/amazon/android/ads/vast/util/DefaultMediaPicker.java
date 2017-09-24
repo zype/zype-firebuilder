@@ -132,7 +132,9 @@ public class DefaultMediaPicker implements VASTMediaPicker {
                 continue;
             }
             int videoHeight = height.intValue();
-            if (!(0 < videoHeight && videoHeight < maxPixels)) {
+            /* Zype, Evgeny Cherkasov */
+            // Treat height value 0 as valid to play Vidilion ad tag
+            if (!(0 <= videoHeight && videoHeight < maxPixels)) {
                 VASTLog.d(TAG,
                           "Validator error: mediaFile height invalid: "
                                   + videoHeight);
@@ -148,7 +150,9 @@ public class DefaultMediaPicker implements VASTMediaPicker {
                 continue;
             }
             int videoWidth = width.intValue();
-            if (!(0 < videoWidth && videoWidth < maxPixels)) {
+            /* Zype, Evgeny Cherkasov */
+            // Treat width value 0 as valid to play Vidilion ad tag
+            if (!(0 <= videoWidth && videoWidth < maxPixels)) {
                 VASTLog.d(TAG,
                           "Validator error: mediaFile width invalid: "
                                   + videoWidth);
