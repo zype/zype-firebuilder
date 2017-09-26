@@ -1199,13 +1199,17 @@ public class PlaybackActivity extends Activity implements
             int adNumber = mAdsImplementation.getExtra().getInt(IAds.AD_NUMBER);
             if (adNumber >= 0) {
                 if (mSelectedContent.getAdCuePoints().size() > adNumber + 1) {
-                    mAdsImplementation.getExtra().putInt(IAds.AD_NUMBER, adNumber + 1);
+                    adNumber += 1;
+                    mAdsImplementation.getExtra().putInt(IAds.AD_NUMBER, adNumber);
+                    String adTag = AdMacrosHelper.updateAdTagParameters(PlaybackActivity.this, (String) mSelectedContent.getExtraValueAsList(Content.EXTRA_AD_TAGS).get(adNumber));
+                    mAdsImplementation.getExtra().putString("VASTAdTag", adTag);
                     mAdsImplementation.getExtra().putBoolean(IAds.WAS_A_MID_ROLL, true);
                     // Start tracking video position changes.
                     mVideoPositionTrackingHandler.post(mVideoPositionTrackingRunnable);
                 }
                 else {
                     mAdsImplementation.getExtra().putInt(IAds.AD_NUMBER, -1);
+                    mAdsImplementation.getExtra().putString("VASTAdTag", null);
                 }
             }
         }
@@ -1712,7 +1716,6 @@ public class PlaybackActivity extends Activity implements
 
     /* Zype, Evgeny Cherkasov */
     private Content updateContentWithPlayerData(Content content, PlayerData playerData) {
-        // TODO: Use constant for 'adTags' key instead of hardcoded string
         if (playerData != null) {
             content.setUrl(playerData.body.files.get(0).url);
             if (playerData.body.advertising != null && playerData.body.advertising.schedule.size() > 0) {
@@ -1722,17 +1725,17 @@ public class PlaybackActivity extends Activity implements
                     content.getAdCuePoints().add(item.offset);
                     adTags.add(item.tag);
                 }
-                content.setExtraValue("adTags", adTags);
+                content.setExtraValue(Content.EXTRA_AD_TAGS, adTags);
             }
             else {
                 content.setAdCuePoints(null);
-                content.setExtraValue("adTags", null);
+                content.setExtraValue(Content.EXTRA_AD_TAGS, null);
             }
         }
         else {
             content.setUrl("null");
             content.setAdCuePoints(null);
-            content.setExtraValue("adTags", null);
+            content.setExtraValue(Content.EXTRA_AD_TAGS, null);
         }
         return content;
     }
@@ -1760,9 +1763,8 @@ public class PlaybackActivity extends Activity implements
         }
         extras.putInt(IAds.AD_NUMBER, adNumber);
         extras.putBoolean(IAds.WAS_A_MID_ROLL, isMidroll);
-        // TODO: Use constant for 'adTags' key instead of hardcoded string
         if (adNumber != -1) {
-            String adTag = AdMacrosHelper.updateAdTagParameters(this, (String) mSelectedContent.getExtraValueAsList("adTags").get(adNumber));
+            String adTag = AdMacrosHelper.updateAdTagParameters(this, (String) mSelectedContent.getExtraValueAsList(Content.EXTRA_AD_TAGS).get(adNumber));
             extras.putString("VASTAdTag", adTag);
         }
         else {

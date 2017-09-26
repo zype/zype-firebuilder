@@ -294,6 +294,12 @@ public class Content implements Serializable {
      */
     public static final String RECOMMENDATION_ACTIONS_TAG = "recommendationActions";
 
+    /* Zype, Evgeny Cherkasov */
+    /**
+     * Extras key for ad tags list
+     */
+    public static final String EXTRA_AD_TAGS = "AdTags";
+
     /**
      * Creates a {@link Content} with empty values.
      */

@@ -363,7 +363,7 @@ public class VASTAdsPlayer implements IAds,
         @Override
         public void vastComplete() {
 
-            VASTLog.e(TAG, "vastComplete");
+            VASTLog.d(TAG, "vastComplete");
 
             if (mMediaPlayer != null) {
                 mMediaPlayer.stop();
@@ -413,11 +413,13 @@ public class VASTAdsPlayer implements IAds,
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
 
-        VASTLog.e(TAG, "entered onError -- (MediaPlayer callback)");
+        VASTLog.d(TAG, "onCompletion() -- (MediaPlayer callback)");
 
         if (!mIsPlayBackError && !mIsCompleted) {
             mIsCompleted = true;
             this.processEvent(TRACKING_EVENTS_TYPE.complete);
+            /* Zype, Evgeny Cherkasov */
+            mQuartile = 0;
 
             if (mVASTPlayerListener != null) {
                 mVASTPlayerListener.vastComplete();
