@@ -20,6 +20,6 @@
   ],
   "actions": {
     "CONTENT_ACTION_DAILY_PASS": "RentUnPurchased",
-    "CONTENT_ACTION_SUBSCRIPTION": "com.zype.aftv.testsubscriptionmonthly"
+    "CONTENT_ACTION_SUBSCRIPTION": "com.zype.aftv.template.testsubscriptionmonthly"
   }
 }

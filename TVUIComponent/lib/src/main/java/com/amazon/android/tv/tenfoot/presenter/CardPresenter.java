@@ -29,6 +29,7 @@
  */
 package com.amazon.android.tv.tenfoot.presenter;
 
+import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.tv.tenfoot.utils.ContentHelper;
@@ -39,6 +40,7 @@ import com.amazon.android.utils.Preferences;
 import com.bumptech.glide.Glide;
 import com.zype.fire.auth.ZypeAuthentication;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -70,11 +72,14 @@ public class CardPresenter extends Presenter {
     /* Zype, Evgeny Cherkasov */
     private Drawable imageLocked;
     private Drawable imageUnlocked;
+    private ContentBrowser contentBrowser;
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
 
         mContext = parent.getContext();
+        /* Zype, Evgeny Cherkasov */
+        contentBrowser = ContentBrowser.getInstance((Activity) mContext);
         try {
             mDefaultCardImage = ContextCompat.getDrawable(mContext, R.drawable.movie);
             sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused);
@@ -151,15 +156,18 @@ public class CardPresenter extends Presenter {
                                               new GlideHelper.LoggingListener<>(),
                                               R.drawable.movie);
 
-                /*Zype, EvgenyCherkasov */
+                /* Zype, Evgeny Cherkasov */
                 // Display lock icon for subscription video
                 if (content.isSubscriptionRequired()) {
-                    if (Preferences.getLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT) > 0) {
+                    if (contentBrowser.isUserSubscribed()) {
                         cardView.setBadgeImage(imageUnlocked);
                     }
                     else {
                         cardView.setBadgeImage(imageLocked);
                     }
+                }
+                else {
+                    cardView.setBadgeImage(null);
                 }
             }
         }

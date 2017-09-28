@@ -21,6 +21,6 @@ permissions and limitations under the License.
     </string>
 -->
     <string name="receipt_verification_service_iap">
-        com.zype.fire.api.Subscription.ZypeReceiptVerificationService
+        com.amazon.inapppurchase.ZypeReceiptVerificationService
     </string>
 </resources>

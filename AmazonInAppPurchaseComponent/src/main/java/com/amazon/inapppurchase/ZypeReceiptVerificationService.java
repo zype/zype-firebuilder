@@ -1,9 +1,8 @@
-package com.zype.fire.api.Subscription;
+package com.amazon.inapppurchase;
 
 import android.content.Context;
 
 import com.amazon.android.utils.Preferences;
-import com.amazon.inapppurchase.AReceiptVerifier;
 import com.amazon.purchase.IPurchase;
 import com.amazon.purchase.model.Receipt;
 import com.amazon.purchase.model.Response;
@@ -37,10 +36,14 @@ public class ZypeReceiptVerificationService extends AReceiptVerifier {
         fieldParams.put(ZypeApi.SUBSCRIPTION_DEVICE_TYPE, "amazon");
         fieldParams.put(ZypeApi.SUBSCRIPTION_RECEIPT_ID, receipt.getReceiptId());
         fieldParams.put(ZypeApi.SUBSCRIPTION_SHARED_SECRET, ZypeSettings.AMAZON_SHARED_KEY);
-        // This hack is removing all dots from sku because Bifrost service does not allows any symbols
+        // Need to remove all dots from sku because Bifrost service does not allows any symbols
         // except letters and numbers
         fieldParams.put(ZypeApi.SUBSCRIPTION_THIRD_PARTY_ID, sku.replaceAll("\\.", ""));
         fieldParams.put(ZypeApi.SUBSCRIPTION_USER_ID, userData.getUserId());
+        // TODO: Comment 3 below lines for release build
+//        Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
+//        listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
+//        return requestId;
         try {
             retrofit2.Response response = ZypeApi.getInstance().getApi().verifySubscription(fieldParams).execute();
             if (response.isSuccessful()) {

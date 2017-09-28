@@ -218,10 +218,6 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
                                                     .handleErrorBundle(resultBundle));
                                         }
                                     }
-                                    if (resultBundle != null && !resultBundle.getBoolean(AuthHelper.RESULT)) {
-                                        contentBrowser.getNavigator().runOnUpcomingActivity(() -> contentBrowser.getAuthHelper()
-                                                .handleErrorBundle(resultBundle));
-                                    }
                                     else {
                                         updateViews();
                                     }
@@ -300,13 +296,10 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
             consumer.email = Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_EMAIL);
             consumer.password = Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_PASSWORD);
             login(consumer);
-            contentBrowser.updateContentActions();
-            finish();
         }
         else {
             dialogError = ErrorDialogFragment.newInstance(SubscriptionActivity.this, ErrorUtils.ERROR_CATEGORY.ZYPE_VERIFY_SUBSCRIPTION_ERROR, SubscriptionActivity.this);
             dialogError.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
-            return;
         }
     }
 
@@ -324,6 +317,9 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
                     if (response != null) {
                         // Successful login.
                         ZypeAuthentication.saveAccessToken(response);
+
+                        contentBrowser.onAuthenticationStatusUpdateEvent(new AuthHelper.AuthenticationStatusUpdateEvent(true));
+                        EventBus.getDefault().post(new AuthHelper.AuthenticationStatusUpdateEvent(true));
 
                         setResult(RESULT_OK);
                         buttonLogin.setEnabled(true);

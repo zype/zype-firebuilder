@@ -26,6 +26,8 @@ import com.zype.fire.api.ZypeSettings;
 import com.amazon.android.tv.tenfoot.ui.Subscription.Model.Consumer;
 import com.zype.fire.auth.ZypeAuthentication;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -96,11 +98,12 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
                 .subscribe(isAuthenticatedResultBundle -> {
                     if (isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT)) {
                         if (Preferences.getLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT) > 0) {
-                            finish();
+                            contentBrowser.setSubscribed(true);
                         }
                         else {
-                            finish();
+                            contentBrowser.setSubscribed(false);
                         }
+                        finish();
                     }
                     else {
                         contentBrowser.getAuthHelper()
@@ -111,12 +114,16 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
                                                 .handleErrorBundle(resultBundle));
                                     }
                                     else {
+                                        contentBrowser.onAuthenticationStatusUpdateEvent(new AuthHelper.AuthenticationStatusUpdateEvent(true));
+                                        EventBus.getDefault().post(new AuthHelper.AuthenticationStatusUpdateEvent(true));
+
                                         if (Preferences.getLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT) > 0) {
-                                            finish();
+                                            contentBrowser.setSubscribed(true);
                                         }
                                         else {
-                                            finish();
+                                            contentBrowser.setSubscribed(false);
                                         }
+                                        finish();
                                     }
                                 });
                     }
@@ -260,6 +267,9 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
                     if (response != null) {
                         // Successful login.
                         ZypeAuthentication.saveAccessToken(response);
+
+                        contentBrowser.onAuthenticationStatusUpdateEvent(new AuthHelper.AuthenticationStatusUpdateEvent(true));
+                        EventBus.getDefault().post(new AuthHelper.AuthenticationStatusUpdateEvent(true));
 
                         setResult(RESULT_OK);
                         buttonLogin.setEnabled(true);

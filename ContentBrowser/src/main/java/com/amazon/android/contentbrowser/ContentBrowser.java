@@ -717,17 +717,34 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                           LogoutSettingsFragment.TYPE_LOGIN);
         }
         /* Zype, Evgeny Cherkasov */
-        // Update user logged in flag
+        // Update user logged in and subscription flags
+        // TODO: Consider other way to get subscription count preference to avoid dependency of ZypeAuthComponent
         userLoggedIn = authenticationStatusUpdateEvent.isUserAuthenticated();
         if (userLoggedIn) {
-            mSubscribed = Preferences.getBoolean(PurchaseHelper.CONFIG_PURCHASE_VERIFIED)
-                || Preferences.getLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT) > 0;
+            boolean hasNativeSubscription = Preferences.getBoolean(PurchaseHelper.CONFIG_PURCHASE_VERIFIED);
+            boolean hasZypeSubscription = Preferences.getLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT) > 0;
+            // For testing with Amazon App Tester uncomment following line since Zype service does not
+            // validate App Tester purchase receipt and does not create Zype subscription
+            // TODO: This line must be commented for release build
+//            hasZypeSubscription = true;
+            if (ZypeSettings.NATIVE_AMAZON_SUBSCRIPTION_ENABLED) {
+                if (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
+                    setSubscribed(hasNativeSubscription && hasZypeSubscription);
+                }
+                else {
+                    setSubscribed(hasNativeSubscription);
+                }
+            }
+            else {
+                if (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
+                    setSubscribed(hasZypeSubscription);
+                }
+            }
         }
         else {
-            mSubscribed = false;
+            setSubscribed(false);
         }
         updateLoginAction();
-
     }
 
     /**
@@ -1110,9 +1127,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     /* Zype, Evgeny Cherkasov */
                     // Check is user logged in and has subscription.
                     if (userLoggedIn) {
-                        // TODO: Consider another way to get preference name to avoid dependemcy on ZypeAuthComponent in this module
                         // User is logged in and has subscription. Add all videos
-                        if (Preferences.getLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT) > 0) {
+                        if (isUserSubscribed()) {
                             for (Content relatedContent : parentContainer.getContents()) {
                                 if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId())) {
                                     recommendedContentContainer.addContent(relatedContent);
@@ -1667,9 +1683,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             mAuthHelper.isAuthenticated().subscribe(isAuthenticatedResultBundle -> {
                 boolean result = isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT);
                 if (result) {
-                    // TODO: Consider another way to get preference name to avoid dependemcy on ZypeAuthComponent in this module
-                    if (Preferences.getLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT) > 0
-                            || actionId == CONTENT_ACTION_SWAF) {
+                    if (isUserSubscribed() || actionId == CONTENT_ACTION_SWAF) {
                         switchToRendererScreen(content, actionId);
                     }
                     else {
@@ -2472,7 +2486,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     public boolean isUserSubscribed() {
-        return mSubscribed || Preferences.getLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT) > 0;
+//        return mSubscribed || Preferences.getLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT) > 0;
+        return mSubscribed;
     }
 
     public void updateSubscriptionSku(String sku) {
