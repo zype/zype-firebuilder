@@ -97,12 +97,7 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
                 .isAuthenticated()
                 .subscribe(isAuthenticatedResultBundle -> {
                     if (isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT)) {
-                        if (Preferences.getLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT) > 0) {
-                            contentBrowser.setSubscribed(true);
-                        }
-                        else {
-                            contentBrowser.setSubscribed(false);
-                        }
+                        contentBrowser.updateUserSubscribed();
                         finish();
                     }
                     else {
@@ -116,13 +111,6 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
                                     else {
                                         contentBrowser.onAuthenticationStatusUpdateEvent(new AuthHelper.AuthenticationStatusUpdateEvent(true));
                                         EventBus.getDefault().post(new AuthHelper.AuthenticationStatusUpdateEvent(true));
-
-                                        if (Preferences.getLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT) > 0) {
-                                            contentBrowser.setSubscribed(true);
-                                        }
-                                        else {
-                                            contentBrowser.setSubscribed(false);
-                                        }
                                         finish();
                                     }
                                 });

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -14,10 +13,8 @@ import android.widget.TextView;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.helper.AuthHelper;
-import com.amazon.android.contentbrowser.helper.ErrorHelper;
 import com.amazon.android.contentbrowser.helper.PurchaseHelper;
 import com.amazon.android.model.event.ProgressOverlayDismissEvent;
-import com.amazon.android.model.event.SubscriptionProductsUpdateEvent;
 import com.amazon.android.model.event.SubscriptionPurchaseEvent;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.ui.Subscription.Model.Consumer;
@@ -26,24 +23,13 @@ import com.amazon.android.ui.fragments.ErrorDialogFragment;
 import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.NetworkUtils;
 import com.amazon.android.utils.Preferences;
-import com.amazon.auth.AuthenticationConstants;
-import com.zype.fire.api.Model.BifrostResponse;
-import com.zype.fire.api.Model.ConsumerResponse;
-import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by Evgeny Cherkasov on 07.08.2017.
@@ -164,14 +150,19 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
         if (mode == MODE_CHOOSE_PLAN) {
             layoutChoosePlan.setVisibility(View.VISIBLE);
             layoutConfirm.setVisibility(View.GONE);
-            if (contentBrowser.isUserLoggedIn()) {
-                layoutLoggedIn.setVisibility(View.VISIBLE);
+            if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+                layoutLoggedIn.setVisibility(View.GONE);
                 layoutLogin.setVisibility(View.GONE);
-                textConsumerEmail.setText(Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_EMAIL));
             }
             else {
-                layoutLoggedIn.setVisibility(View.GONE);
-                layoutLogin.setVisibility(View.VISIBLE);
+                if (contentBrowser.isUserLoggedIn()) {
+                    layoutLoggedIn.setVisibility(View.VISIBLE);
+                    layoutLogin.setVisibility(View.GONE);
+                    textConsumerEmail.setText(Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_EMAIL));
+                } else {
+                    layoutLoggedIn.setVisibility(View.GONE);
+                    layoutLogin.setVisibility(View.VISIBLE);
+                }
             }
         }
         else if (mode == MODE_CONFIRM) {
@@ -183,6 +174,15 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
     private void showConfirm() {
         mode = MODE_CONFIRM;
         updateViews();
+    }
+
+    private void closeScreen() {
+        contentBrowser.onAuthenticationStatusUpdateEvent(new AuthHelper.AuthenticationStatusUpdateEvent(true));
+        EventBus.getDefault().post(new AuthHelper.AuthenticationStatusUpdateEvent(true));
+
+        setResult(RESULT_OK);
+        buttonLogin.setEnabled(true);
+        finish();
     }
 
     // //////////
@@ -253,12 +253,16 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
     @Override
     public void onSubscriptionSelected(SubscriptionItem item) {
         selectedSubscription = item;
-        if (contentBrowser.isUserLoggedIn()) {
+        if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
             showConfirm();
         }
         else {
-            Intent intent = new Intent(SubscriptionActivity.this, CreateLoginActivity.class);
-            startActivityForResult(intent, REQUEST_CREATE_LOGIN);
+            if (contentBrowser.isUserLoggedIn()) {
+                showConfirm();
+            } else {
+                Intent intent = new Intent(SubscriptionActivity.this, CreateLoginActivity.class);
+                startActivityForResult(intent, REQUEST_CREATE_LOGIN);
+            }
         }
     }
 
@@ -292,10 +296,16 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
     @Subscribe
     public void onSubscriptionPurchaseEvent(SubscriptionPurchaseEvent event) {
         if (event.getExtras().getBoolean(PurchaseHelper.RESULT_VALIDITY)) {
-            Consumer consumer = new Consumer();
-            consumer.email = Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_EMAIL);
-            consumer.password = Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_PASSWORD);
-            login(consumer);
+            if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+                closeScreen();
+            }
+            else {
+                // Relogin required after successful purchase validation by Bifrost
+                Consumer consumer = new Consumer();
+                consumer.email = Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_EMAIL);
+                consumer.password = Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_PASSWORD);
+                login(consumer);
+            }
         }
         else {
             dialogError = ErrorDialogFragment.newInstance(SubscriptionActivity.this, ErrorUtils.ERROR_CATEGORY.ZYPE_VERIFY_SUBSCRIPTION_ERROR, SubscriptionActivity.this);
@@ -317,13 +327,7 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
                     if (response != null) {
                         // Successful login.
                         ZypeAuthentication.saveAccessToken(response);
-
-                        contentBrowser.onAuthenticationStatusUpdateEvent(new AuthHelper.AuthenticationStatusUpdateEvent(true));
-                        EventBus.getDefault().post(new AuthHelper.AuthenticationStatusUpdateEvent(true));
-
-                        setResult(RESULT_OK);
-                        buttonLogin.setEnabled(true);
-                        finish();
+                        closeScreen();
                     }
                     else {
                         dialogError = ErrorDialogFragment.newInstance(SubscriptionActivity.this, ErrorUtils.ERROR_CATEGORY.ZYPE_VERIFY_SUBSCRIPTION_ERROR, SubscriptionActivity.this);

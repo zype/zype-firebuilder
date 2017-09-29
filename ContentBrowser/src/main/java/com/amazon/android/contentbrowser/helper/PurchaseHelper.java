@@ -242,13 +242,16 @@ public class PurchaseHelper {
      */
     private void setSubscription(boolean subscribe, String sku) {
 
-        mContentBrowser.setSubscribed(subscribe);
+        /* Zype, Evgeny Cherkasov */
+//        mContentBrowser.setSubscribed(subscribe);
         //Send purchase status update event
         mEventBus.post(new PurchaseUpdateEvent(subscribe));
         Preferences.setBoolean(PurchaseHelper.CONFIG_PURCHASE_VERIFIED, subscribe);
         if (sku != null) {
             Preferences.setString(PurchaseHelper.CONFIG_PURCHASED_SKU, sku);
         }
+        /* Zype, Evgeny Cherkasov */
+        mContentBrowser.updateUserSubscribed();
     }
 
     /**

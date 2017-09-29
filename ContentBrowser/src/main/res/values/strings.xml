@@ -62,4 +62,6 @@ permissions and limitations under the License.
     <string name="action_swaf_2">Ad Free</string>
     <string name="action_subscription_1">Subscribe</string>
     <string name="action_subscription_2"> to Watch</string>
+    <string name="subscription_alert_title">Subscription</string>
+    <string name="subscription_alert_message">You must have a subscription to play this video</string>
 </resources>
