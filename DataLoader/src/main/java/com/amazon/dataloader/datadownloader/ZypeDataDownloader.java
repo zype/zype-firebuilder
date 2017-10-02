@@ -4,6 +4,7 @@ import android.content.Context;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 
 import com.amazon.android.recipe.Recipe;
 import com.amazon.android.utils.Helpers;
@@ -14,6 +15,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.zype.fire.api.Model.PlaylistData;
 import com.zype.fire.api.Model.PlaylistsResponse;
+import com.zype.fire.api.Model.VideoData;
+import com.zype.fire.api.Model.VideosResponse;
 import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeSettings;
 
@@ -36,6 +39,8 @@ import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import rx.Observable;
 
 /**
  * Created by Evgeny Cherkasov on 04.03.2017.
@@ -116,53 +121,62 @@ public class ZypeDataDownloader extends ADataDownloader {
         List<PlaylistData> playlists = loadPlaylists();
         Log.d(TAG, "fetchData(): Playlists loaded");
 
-        Map<String, Object> params;
-        // Url to retrieve playlist videos
-        params = new HashMap<>();
-        params.put("url_index", "1");
-        String urlPlaylistVideos = urlGenerator.getUrl(params);
+//        Map<String, Object> params;
+//        // Url to retrieve playlist videos
+//        params = new HashMap<>();
+//        params.put("url_index", "1");
+//        String urlPlaylistVideos = urlGenerator.getUrl(params);
 
         // Result data
         JSONArray jsonCategories = new JSONArray();
         JSONArray jsonContents = new JSONArray();
 
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+
         for (PlaylistData playlistData : playlists) {
-            // Skip not direct root child playlist
+            // Skip playlist that are not direct child of the root playlist
             if (TextUtils.isEmpty(playlistData.parentId) || !playlistData.parentId.equals(ZypeSettings.ROOT_PLAYLIST_ID)) {
                 continue;
             }
 
-            String playlistId = playlistData.id;
-
+//            String playlistId = playlistData.id;
+//
             if (playlistData.playlistItemCount > 0) {
                 Log.d(TAG, "fetchData(): Loading videos for " + playlistData.title);
-                String url = String.format(urlPlaylistVideos, playlistId);
-                try {
-                    String playlistVideosResponse = NetworkUtils.getDataLocatedAtUrl(url);
-                    JSONObject jsonPlaylistVideosResponse = new JSONObject(playlistVideosResponse);
-                    JSONArray jsonPlaylistVideos = jsonPlaylistVideosResponse.getJSONArray("response");
-                    for (int j = 0; j < jsonPlaylistVideos.length(); j++) {
-                        JSONObject jsonVideoData = jsonPlaylistVideos.getJSONObject(j);
-                        // Put a space string for description if it is not specified to avoid crashing
-                        // because 'description' is mandatory field in the Content model
-                        if (TextUtils.isEmpty(jsonVideoData.getString("description")) || jsonVideoData.getString("description").equals("null")) {
-                            jsonVideoData.put("description", " ");
-                        }
-                        // Add reference to playlist
-                        jsonVideoData.put("playlistId", playlistId);
-                        // Set dummy player url. We get real url before switch to renderer screen
-                        jsonVideoData.put("playerUrl", "null");
 
-                        jsonContents.put(jsonVideoData);
-                    }
+                List<VideoData> videos = loadPlaylistVideos(playlistData);
+                for (VideoData videoData : videos) {
+                    jsonContents.put(new JSONObject(gson.toJson(videoData)));
                 }
-                catch (IOException e) {
-                    Log.d(TAG, "Error get playlist videos. playlistId=" + playlistId);
-                }
-            }
-            else {
 
+//                String url = String.format(urlPlaylistVideos, playlistId);
+//                try {
+//                    String playlistVideosResponse = NetworkUtils.getDataLocatedAtUrl(url);
+//                    JSONObject jsonPlaylistVideosResponse = new JSONObject(playlistVideosResponse);
+//                    JSONArray jsonPlaylistVideos = jsonPlaylistVideosResponse.getJSONArray("response");
+//                    for (int j = 0; j < jsonPlaylistVideos.length(); j++) {
+//                        JSONObject jsonVideoData = jsonPlaylistVideos.getJSONObject(j);
+//                        // Put a space string for description if it is not specified to avoid crashing
+//                        // because 'description' is mandatory field in the Content model
+//                        if (TextUtils.isEmpty(jsonVideoData.getString("description")) || jsonVideoData.getString("description").equals("null")) {
+//                            jsonVideoData.put("description", " ");
+//                        }
+//                        // Add reference to playlist
+//                        jsonVideoData.put("playlistId", playlistId);
+//                        // Set dummy player url. We get real url before switch to renderer screen
+//                        jsonVideoData.put("playerUrl", "null");
+//
+//                        jsonContents.put(jsonVideoData);
+//                    }
+//                }
+//                catch (IOException e) {
+//                    Log.d(TAG, "Error get playlist videos. playlistId=" + playlistId);
+//                }
             }
+//            else {
+//
+//            }
         }
         Log.d(TAG, "fetchData(): Videos loaded");
 
@@ -178,8 +192,8 @@ public class ZypeDataDownloader extends ADataDownloader {
             }
             return valA.compareTo(valB);
         });
-        GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder.create();
+//        GsonBuilder builder = new GsonBuilder();
+//        Gson gson = builder.create();
         for (PlaylistData playlistData : playlists) {
             String playlistId = playlistData.id;
             if (playlistId.equals(ZypeSettings.ROOT_PLAYLIST_ID) || TextUtils.isEmpty(playlistData.parentId)) {
@@ -215,4 +229,36 @@ public class ZypeDataDownloader extends ADataDownloader {
         return result;
     }
 
+    private List<VideoData> loadPlaylistVideos(PlaylistData playlist) {
+        Log.d(TAG, "loadPlaylistVideos(): " + playlist.title);
+        List<VideoData> result = new ArrayList<>();
+
+        VideosResponse response = ZypeApi.getInstance().getPlaylistVideos(playlist.id);
+        if (response != null) {
+            Log.d(TAG, "loadPlaylistVideos(): size=" + response.videoData.size());
+            for (VideoData videoData : response.videoData) {
+                // Put a space string for description if it is not specified to avoid crashing
+                // because 'description' is mandatory field in the Content model
+                if (TextUtils.isEmpty(videoData.description) || videoData.description.equals("null")) {
+                    videoData.description = " ";
+                }
+                // Add reference to playlist
+                videoData.playlistId = playlist.id;
+                // Set dummy player url. We get real url before switch to renderer screen
+                videoData.playerUrl = "null";
+            }
+            result.addAll(response.videoData);
+        }
+        return result;
+    }
+
+    public String getPlaylistFeed(PlaylistData playlist) {
+        List<VideoData> videos = loadPlaylistVideos(playlist);
+        if (videos == null || videos.isEmpty()) {
+            return null;
+        }
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+        return gson.toJson(videos);
+    }
 }

@@ -587,8 +587,8 @@ public class ContentLoader {
         return mNavigatorModel.getConfig().numberOfRelatedRecommendations;
     }
 
-    /* Zype, Evgeny Cherkasov
-
+    /*
+     * Zype, Evgeny Cherkasov
      */
     private Observable<Object> getLoadContentsObservable(Observable<Object> observable, Recipe recipeDynamicParser) {
 //        Recipe recipe = Recipe.newInstance(mAppContext, "recipes/ZypeSearchContentsRecipe.json");
@@ -598,6 +598,7 @@ public class ContentLoader {
                     if (DEBUG_RECIPE_CHAIN) {
                         Log.d(TAG, "getLoadContentsObservable:" + contentContainer.getName());
                     }
+                    // TODO: Move videos loading code to ZypeDataDownloader and use its method here
                     VideosResponse response = ZypeApi.getInstance().getPlaylistVideos((String) contentContainer.getExtraStringValue("keyDataType"));
                     if (response != null) {
                         Log.d(TAG, "getLoadContentsObservable(): size=" + response.videoData.size());

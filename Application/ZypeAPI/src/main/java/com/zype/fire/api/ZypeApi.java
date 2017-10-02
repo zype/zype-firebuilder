@@ -92,7 +92,8 @@ public class ZypeApi {
             else {
                 return null;
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
             return null;
         }
@@ -112,7 +113,8 @@ public class ZypeApi {
             else {
                 return null;
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
             return null;
         }
@@ -127,7 +129,8 @@ public class ZypeApi {
             else {
                 return null;
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
             return null;
         }
@@ -144,7 +147,8 @@ public class ZypeApi {
             else {
                 return null;
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
             return null;
         }
@@ -162,7 +166,8 @@ public class ZypeApi {
             else {
                 return null;
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
             return null;
         }
@@ -180,7 +185,8 @@ public class ZypeApi {
             else {
                 return null;
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
             return null;
         }
@@ -199,7 +205,8 @@ public class ZypeApi {
             else {
                 return null;
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
             return null;
         }
