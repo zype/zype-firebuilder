@@ -530,7 +530,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         mIAPDisabled = mAppContext.getResources().getBoolean(R.bool.is_iap_disabled);
         /* Zype, Evgeny Cherkasov */
-        if (!ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+        if (!ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED && !ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
             mIAPDisabled = true;
         }
 

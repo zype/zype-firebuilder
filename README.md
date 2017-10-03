@@ -14,18 +14,14 @@ Full Documentation for Fire App Builder is located [here](https://developer.amaz
 
 ## Prerequisites
 
-```
-Android Studio
-```
+- Android Studio
 
 ## Installing
 
-```
-1. Clon repo
-2. Open Application folder in Android Studio
+1. Clone repo. Answer 'No' when Android Studio asked to create new project.
+2. Open Application folder as existing project in Android Studio
 3. Wait for Gradle to finish building 
-4. Run in tv emulator
-```
+4. Run in TV emulator
 
 ## Supported Features
 
@@ -34,19 +30,18 @@ Android Studio
 - Live Streaming videos
 - Resume watch functionality
 - Pre-roll ads
+- Midroll ads
 
 ## Unsupported Features
 
 - Video Favorites 
 - Dynamic theme colors
-- Midroll ads
 - Closed Caption Support
-- Native SVOD via In App Purchases
-- Universal SVOD via login
 
 ## Monetizations Supported
 
- - Not yet supported
+- Native SVOD via In App Purchases
+- Universal SVOD via login
 
 
 ## Creating new Fire TV app based of Zype Template
@@ -76,19 +71,9 @@ In ```app\res\mipmap``` folders (```-mdpi```, ```-hdpi```, ```-xhdpi```, ```-xxh
 
 You can use icon generatir in Android Studio to produce icons with required dimensions from 512x512 source icon image.   
 
-**Action buttons**
+**Action buttons and other widgets**
 
-To make focused action button appear with brand color:
-
-1. Prepare drawable resource for button background.
-    
-    Background image should be resizible bitmap (9-Patch image). Follow this [guide](https://developer.android.com/studio/write/draw9patch.html) to create 9-Patch images. 
-2. Put these files to ```app\res\drawable``` and ```app\res\drawable-xhdpi``` folders.
-3. In the ```app\res\values\custom.xml``` file update ```action_button_focused``` element with your background drawable resource id.
-
-**Other widgets and buttons**
-
-To use your brand color for highlighting of buttons and widgets update ```accent``` color resource in the ```app\res\values\custom.xml``` file.  
+To use your brand color for highlighting buttons and widgets update ```accent``` color resource in the ```app\res\values\custom.xml``` file.  
 
 ## Built With
 
