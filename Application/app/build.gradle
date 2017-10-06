@@ -83,8 +83,8 @@ android {
         demo {
         }
         template {
-//            applicationId "[APPLICATION_ID]"
-            applicationId "com.zype.aftv.template"
+            applicationId "[APPLICATION_ID]"
+//            applicationId "com.zype.aftv.template"
         }
     }
 
