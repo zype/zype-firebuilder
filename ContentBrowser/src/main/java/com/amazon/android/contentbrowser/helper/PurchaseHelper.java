@@ -449,7 +449,6 @@ public class PurchaseHelper {
         /* Zype, Evgeny Cherkasov */
         else if (actionId == ContentBrowser.CONTENT_ACTION_CHOOSE_PLAN) {
             mContentBrowser.switchToSubscriptionScreen(new Bundle());
-//            handleProductsChain(activity);
         }
 
     }
@@ -466,7 +465,7 @@ public class PurchaseHelper {
 
     /* Zype,  Evgeny Cherkasov */
     public void handleProductsChain(Activity activity) {
-//        EventBus.getDefault().post(new SubscriptionProductsUpdateEvent(new Bundle()));
+        triggerProgress(activity);
         Set<String> skuSet = null;
         try {
             skuSet = getSubscriptionSKUs();
