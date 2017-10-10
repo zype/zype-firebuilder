@@ -1,7 +1,7 @@
 {
   "skusList": [
     {
-      "sku": "com.zype.aftv.template.testsubscriptionmonthly.monthly",
+      "sku": "com.zype.aftv.template.testsubscriptionmonthly",
       "productType": "SUBSCRIBE",
       "purchaseSku": "com.zype.aftv.template.testsubscriptionmonthly.monthly",
       "id": "aftvmonthly"
