@@ -57,11 +57,14 @@ permissions and limitations under the License.
     <!-- Used in recommendations. Should be no more than 15 characters. -->
     <string name="app_name_short">@string/app_name</string>
 
-    <!-- Zype, Evgeny Cherkasov -->
+    <!--
+        Zype, Evgeny Cherkasov
+    -->
     <string name="action_swaf_1">Watch</string>
     <string name="action_swaf_2">Ad Free</string>
     <string name="action_subscription_1">Subscribe</string>
     <string name="action_subscription_2"> to Watch</string>
+    <string name="my_library_label">My Library</string>
     <string name="subscription_alert_title">Subscription</string>
     <string name="subscription_alert_message">You must have a subscription to play this video</string>
 </resources>

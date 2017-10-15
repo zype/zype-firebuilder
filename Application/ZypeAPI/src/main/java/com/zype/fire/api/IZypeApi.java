@@ -6,12 +6,16 @@ import com.zype.fire.api.Model.BifrostResponse;
 import com.zype.fire.api.Model.ConsumerResponse;
 import com.zype.fire.api.Model.PlayerResponse;
 import com.zype.fire.api.Model.PlaylistsResponse;
+import com.zype.fire.api.Model.VideoData;
+import com.zype.fire.api.Model.VideoEntitlementsResponse;
+import com.zype.fire.api.Model.VideoResponse;
 import com.zype.fire.api.Model.VideosResponse;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -48,6 +52,9 @@ public interface IZypeApi {
     @POST("/consumers")
     Call<ConsumerResponse> createConsumer(@QueryMap HashMap<String, String> queryParams, @FieldMap HashMap<String, String> fieldParams);
 
+    @GET("/consumer/videos")
+    Call<VideoEntitlementsResponse> getVideoEntitlements(@Query(PARAM_PAGE) int page, @QueryMap HashMap<String, String> params);
+
     @GET("https://player.zype.com/embed/{video_id}.json")
     Call<PlayerResponse> getPlayer(@Header("User-Agent") String header, @Path("video_id") String videoId, @QueryMap HashMap<String, String> params);
 
@@ -59,4 +66,8 @@ public interface IZypeApi {
 
     @GET("/videos")
     Call<VideosResponse> getVideos(@Query(PARAM_PAGE) int page, @QueryMap HashMap<String, String> params);
+
+    @GET("/videos/{video_id}")
+    Call<VideoResponse> getVideo(@Path("video_id") String videoId, @QueryMap HashMap<String, String> params);
+
 }

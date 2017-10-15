@@ -55,10 +55,15 @@ import com.amazon.android.contentbrowser.helper.AuthHelper;
 import com.amazon.android.model.Action;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
+import com.amazon.android.recipe.Recipe;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
 import com.amazon.android.tv.tenfoot.presenter.SettingsCardPresenter;
+import com.amazon.android.tv.tenfoot.ui.Subscription.CreateLoginActivity;
+import com.amazon.android.ui.fragments.ErrorDialogFragment;
+import com.amazon.android.utils.ErrorUtils;
+import com.zype.fire.api.ZypeSettings;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -79,7 +84,10 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
     private ArrayObjectAdapter settingsAdapter = null;
     ArrayObjectAdapter mRowsAdapter = null;
 
+    private ErrorDialogFragment dialogError = null;
     private BroadcastReceiver receiver;
+
+    private boolean dataUpdated = false;
 
     // Container Activity must implement this interface.
     public interface OnBrowseRowListener {
@@ -140,6 +148,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                dataUpdated = true;
                 loadRootContentContainer(mRowsAdapter);
             }
         };
@@ -182,6 +191,15 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
 
         for (ContentContainer contentContainer : rootContentContainer.getContentContainers()) {
 
+            if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.MY_LIBRARY_PLAYLIST_ID)) {
+                if (contentContainer.getContents().isEmpty() && dataUpdated) {
+                    dialogError = ErrorDialogFragment.newInstance(getActivity(),
+                            ErrorUtils.ERROR_CATEGORY.ZYPE_PLAYLIST_NO_VIDEOS_ERROR,
+                            (ErrorDialogFragment.ErrorDialogFragmentListener) getActivity());
+                    dialogError.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
+                }
+            }
+
             HeaderItem header = new HeaderItem(0, contentContainer.getName());
             ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
 
@@ -196,6 +214,8 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
 //            rowsAdapter.add(rowsAdapter.size() - 1, new ListRow(header, listRowAdapter));
             rowsAdapter.add(new ListRow(header, listRowAdapter));
         }
+
+        dataUpdated = false;
     }
 
     private void addSettingsActionsToRowAdapter(ArrayObjectAdapter arrayObjectAdapter) {

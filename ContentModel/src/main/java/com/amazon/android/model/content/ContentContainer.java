@@ -245,6 +245,21 @@ public class ContentContainer implements Iterable<Content> {
         return mExtras.get(key).toString();
     }
 
+    /* Zype, Evgeny CHerkasov */
+    /**
+     * Get extra data as an integer from the internal map.
+     *
+     * @param key Key value as a string.
+     * @return Value as integer.
+     */
+    public Integer getExtraIntegerValue(String key) {
+
+        if (mExtras == null || mExtras.get(key) == null) {
+            return 0;
+        }
+        return Integer.valueOf(mExtras.get(key).toString());
+    }
+
     /**
      * Set extra data into a map. The map will be created the first time a value is set. If the key
      * already exists, its value will be overwritten with the newly supplied value.

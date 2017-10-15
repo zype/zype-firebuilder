@@ -59,5 +59,7 @@ permissions and limitations under the License.
     <!-- Create login -->
     <string name="create_consumer_error">Error creating login. Please retry.</string>
     <string name="verify_subscription_error">Error verifying subscription.</string>
+    <!-- Other -->
+    <string name="playlist_error_no_videos">No videos found for this playlist</string>
 
 </resources>

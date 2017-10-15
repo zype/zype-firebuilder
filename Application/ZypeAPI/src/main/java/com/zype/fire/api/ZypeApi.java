@@ -4,11 +4,14 @@ import com.zype.fire.api.Model.AccessTokenInfoResponse;
 import com.zype.fire.api.Model.AccessTokenResponse;
 import com.zype.fire.api.Model.ConsumerResponse;
 import com.zype.fire.api.Model.PlaylistsResponse;
+import com.zype.fire.api.Model.VideoEntitlementsResponse;
+import com.zype.fire.api.Model.VideoResponse;
 import com.zype.fire.api.Model.VideosResponse;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.prefs.Preferences;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -154,6 +157,25 @@ public class ZypeApi {
         }
     }
 
+    public VideoEntitlementsResponse getVideoEntitlements(String accessToken, int page, int perPage) {
+        try {
+            HashMap<String, String> params = new HashMap<>();
+            params.put(ACCESS_TOKEN, accessToken);
+            params.put(PER_PAGE, String.valueOf(perPage));
+            Response response = apiImpl.getVideoEntitlements(page, params).execute();
+            if (response.isSuccessful()) {
+                return (VideoEntitlementsResponse) response.body();
+            }
+            else {
+                return null;
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public PlaylistsResponse getPlaylists(int page) {
         try {
             HashMap<String, String> params = new HashMap<>();
@@ -181,6 +203,24 @@ public class ZypeApi {
             Response response = apiImpl.getPlaylistVideos(playlistId, 1, params).execute();
             if (response.isSuccessful()) {
                 return (VideosResponse) response.body();
+            }
+            else {
+                return null;
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public VideoResponse getVideo(String videoId) {
+        try {
+            HashMap<String, String> params = new HashMap<>();
+            params.put(APP_KEY, ZypeSettings.APP_KEY);
+            Response response = apiImpl.getVideo(videoId, params).execute();
+            if (response.isSuccessful()) {
+                return (VideoResponse) response.body();
             }
             else {
                 return null;

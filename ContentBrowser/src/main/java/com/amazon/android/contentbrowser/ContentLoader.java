@@ -17,6 +17,7 @@ package com.amazon.android.contentbrowser;
 import com.amazon.android.interfaces.ICancellableLoad;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
+import com.amazon.android.model.content.constants.ExtraKeys;
 import com.amazon.android.model.translators.ContentContainerTranslator;
 import com.amazon.android.model.translators.ContentTranslator;
 import com.amazon.android.model.translators.ZypeContentContainerTranslator;
@@ -25,15 +26,20 @@ import com.amazon.android.navigator.Navigator;
 import com.amazon.android.navigator.NavigatorModel;
 import com.amazon.android.navigator.NavigatorModelParser;
 import com.amazon.android.recipe.Recipe;
+import com.amazon.android.utils.Preferences;
 import com.amazon.dataloader.dataloadmanager.DataLoadManager;
 import com.amazon.dynamicparser.DynamicParser;
 import com.amazon.utils.model.Data;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.zype.fire.api.Model.VideoData;
+import com.zype.fire.api.Model.VideoEntitlementData;
+import com.zype.fire.api.Model.VideoEntitlementsResponse;
+import com.zype.fire.api.Model.VideoResponse;
 import com.zype.fire.api.Model.VideosResponse;
 import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeSettings;
+import com.zype.fire.auth.ZypeAuthentication;
 
 import android.app.Activity;
 import android.content.Context;
@@ -591,7 +597,6 @@ public class ContentLoader {
      * Zype, Evgeny Cherkasov
      */
     private Observable<Object> getLoadContentsObservable(Observable<Object> observable, Recipe recipeDynamicParser) {
-//        Recipe recipe = Recipe.newInstance(mAppContext, "recipes/ZypeSearchContentsRecipe.json");
         return observable
                 .concatMap(contentContainerAsObject -> {
                     ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
@@ -599,23 +604,13 @@ public class ContentLoader {
                         Log.d(TAG, "getLoadContentsObservable:" + contentContainer.getName());
                     }
                     // TODO: Move videos loading code to ZypeDataDownloader and use its method here
-                    VideosResponse response = ZypeApi.getInstance().getPlaylistVideos((String) contentContainer.getExtraStringValue("keyDataType"));
-                    if (response != null) {
-                        Log.d(TAG, "getLoadContentsObservable(): size=" + response.videoData.size());
-                        for (VideoData videoData : response.videoData) {
-                            if (TextUtils.isEmpty(videoData.description) || videoData.description.equals("null")) {
-                                videoData.description = " ";
-                            }
-                            videoData.playlistId = (String) contentContainer.getExtraStringValue("keyDataType");
-                            videoData.playerUrl = "null";
-                        }
-                        GsonBuilder builder = new GsonBuilder();
-                        Gson gson = builder.create();
-                        String feed = gson.toJson(response.videoData);
-                        return Observable.just(Pair.create(contentContainerAsObject, feed));
+                    if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.MY_LIBRARY_PLAYLIST_ID)) {
+                        // Loading My Library videos
+                        return getMyLibraryVideosObservable(contentContainerAsObject);
                     }
                     else {
-                        return Observable.just(Pair.create(contentContainerAsObject, ""));
+                        // Loading playlist videos
+                        return getPlaylistVideosFeedObservable(contentContainerAsObject);
                     }
                 })
                 .concatMap(objectPair -> {
@@ -641,6 +636,72 @@ public class ContentLoader {
                         return Pair.create(contentContainer, contentAsObject);
                     });
                 });
+    }
+
+    public Observable<Pair> getPlaylistVideosFeedObservable(Object contentContainerAsObject) {
+        ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
+        VideosResponse response = ZypeApi.getInstance().getPlaylistVideos(contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+        if (response != null) {
+            Log.d(TAG, "getPlaylistVideosFeedObservable(): size=" + response.videoData.size());
+            for (VideoData videoData : response.videoData) {
+                if (TextUtils.isEmpty(videoData.description) || videoData.description.equals("null")) {
+                    videoData.description = " ";
+                }
+                videoData.playlistId = contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG);
+                videoData.playerUrl = "null";
+            }
+            GsonBuilder builder = new GsonBuilder();
+            Gson gson = builder.create();
+            String feed = gson.toJson(response.videoData);
+            return Observable.just(Pair.create(contentContainerAsObject, feed));
+        }
+        else {
+            Log.e(TAG, "getPlaylistVideosFeedObservable(): no videos found");
+            return Observable.just(Pair.create(contentContainerAsObject, ""));
+        }
+    }
+
+    public Observable<Pair> getMyLibraryVideosObservable(Object contentContainerAsObject) {
+        ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
+
+        int nextPage = getRootContentContainer().findContentContainerByName(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)
+                .getExtraIntegerValue(ExtraKeys.NEXT_PAGE);
+        if (nextPage <= 0) {
+            Log.e(TAG, "getMyLibraryVideosObservable(): incorrect page: " + nextPage);
+            return Observable.just(Pair.create(contentContainerAsObject, ""));
+        }
+
+        String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
+        // TODO: Change per page parameter value to 20 and implement paging loading
+        VideoEntitlementsResponse response = ZypeApi.getInstance().getVideoEntitlements(accessToken, nextPage, 100);
+        if (response != null) {
+            Log.d(TAG, "getMyLibraryVideosObservable(): size=" + response.videoEntitlements.size());
+            List<VideoData> videos = new ArrayList<>();
+            for (VideoEntitlementData data : response.videoEntitlements) {
+                VideoResponse responseVideo = ZypeApi.getInstance().getVideo(data.videoId);
+                if (responseVideo != null) {
+                    VideoData videoData = responseVideo.videoData;
+                    if (TextUtils.isEmpty(videoData.description) || videoData.description.equals("null")) {
+                        videoData.description = " ";
+                    }
+                    videoData.playlistId = contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG);
+                    videoData.playerUrl = "null";
+                    videos.add(videoData);
+                }
+                else {
+                    Log.e(TAG, "getMyLibraryVideosObservable(): error loading video, id=" + data.videoId);
+                }
+            }
+
+            GsonBuilder builder = new GsonBuilder();
+            Gson gson = builder.create();
+            String feed = gson.toJson(videos);
+            return Observable.just(Pair.create(contentContainerAsObject, feed));
+        }
+        else {
+            Log.e(TAG, "getMyLibraryVideosObservable(): no videos found");
+            return Observable.just(Pair.create(contentContainerAsObject, ""));
+        }
     }
 
     public Observable<Object> runZypeGlobalRecipeAtIndex(NavigatorModel.GlobalRecipes recipe, Recipe recipeDynamicParserVideos,
@@ -795,6 +856,60 @@ public class ContentLoader {
 
             @Override
             public void onFailure(Call<VideosResponse> call, Throwable t) {
+                // TODO: Handle exception
+            }
+        });
+    }
+
+    public void loadContentForMyLibraryContentContainer(ContentContainer contentContainer, Context context, ILoadContentForContentContainer callback) {
+        HashMap<String, String> params = new HashMap<>();
+        String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
+        params.put(ZypeApi.ACCESS_TOKEN, accessToken);
+        params.put(ZypeApi.PER_PAGE, String.valueOf(ZypeApi.PER_PAGE_DEFAULT));
+        ZypeApi.getInstance().getApi().getVideoEntitlements(1, params).enqueue(new Callback<VideoEntitlementsResponse>() {
+            @Override
+            public void onResponse(Call<VideoEntitlementsResponse> call, Response<VideoEntitlementsResponse> response) {
+                if (response.isSuccessful()) {
+                    if (!response.body().videoEntitlements.isEmpty()) {
+                        Log.d(TAG, "loadContentForMyLibraryContentContainer(): size=" + response.body().videoEntitlements.size());
+//                        for (VideoEntitlementDataData data : response.body().videoEntitlements) {
+//                            if (TextUtils.isEmpty(data.description) || videoData.description.equals("null")) {
+//                                videoData.description = " ";
+//                            }
+//                            videoData.playlistId = (String) contentContainer.getExtraStringValue("keyDataType");
+//                            videoData.playerUrl = "null";
+//                        }
+//                        GsonBuilder builder = new GsonBuilder();
+//                        Gson gson = builder.create();
+//                        String feed = gson.toJson(response.body().videoData);
+//                        // TODO: Rename the recipe file
+//                        Recipe recipe = Recipe.newInstance(context, "recipes/ZypeSearchContentsRecipe.json");
+//                        Subscription subscription = getContentsForContentContainerObservable(feed, recipe, contentContainer)
+//                                .subscribeOn(Schedulers.newThread())
+//                                .observeOn(AndroidSchedulers.mainThread())
+//                                .subscribe(result -> {
+//                                        },
+//                                        throwable -> {
+//                                        },
+//                                        () -> {
+//                                            callback.onContentsLoaded();
+//                                        });
+
+//                        mCompositeSubscription.add(subscription);
+                    }
+                    else {
+
+                    }
+                }
+                else {
+                    Log.e(TAG, "loadContentForMyLibraryContentContainer(): error: " + response.errorBody());
+                    // TODO: Handle error
+                }
+            }
+
+            @Override
+            public void onFailure(Call<VideoEntitlementsResponse> call, Throwable t) {
+                Log.e(TAG, "loadContentForMyLibraryContentContainer(): failed. " + t.toString());
                 // TODO: Handle exception
             }
         });

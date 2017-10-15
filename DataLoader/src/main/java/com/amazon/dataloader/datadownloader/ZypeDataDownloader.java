@@ -120,12 +120,7 @@ public class ZypeDataDownloader extends ADataDownloader {
 
         List<PlaylistData> playlists = loadPlaylists();
         Log.d(TAG, "fetchData(): Playlists loaded");
-
-//        Map<String, Object> params;
-//        // Url to retrieve playlist videos
-//        params = new HashMap<>();
-//        params.put("url_index", "1");
-//        String urlPlaylistVideos = urlGenerator.getUrl(params);
+        addMyLibraryPlaylists(playlists);
 
         // Result data
         JSONArray jsonCategories = new JSONArray();
@@ -140,8 +135,6 @@ public class ZypeDataDownloader extends ADataDownloader {
                 continue;
             }
 
-//            String playlistId = playlistData.id;
-//
             if (playlistData.playlistItemCount > 0) {
                 Log.d(TAG, "fetchData(): Loading videos for " + playlistData.title);
 
@@ -149,34 +142,7 @@ public class ZypeDataDownloader extends ADataDownloader {
                 for (VideoData videoData : videos) {
                     jsonContents.put(new JSONObject(gson.toJson(videoData)));
                 }
-
-//                String url = String.format(urlPlaylistVideos, playlistId);
-//                try {
-//                    String playlistVideosResponse = NetworkUtils.getDataLocatedAtUrl(url);
-//                    JSONObject jsonPlaylistVideosResponse = new JSONObject(playlistVideosResponse);
-//                    JSONArray jsonPlaylistVideos = jsonPlaylistVideosResponse.getJSONArray("response");
-//                    for (int j = 0; j < jsonPlaylistVideos.length(); j++) {
-//                        JSONObject jsonVideoData = jsonPlaylistVideos.getJSONObject(j);
-//                        // Put a space string for description if it is not specified to avoid crashing
-//                        // because 'description' is mandatory field in the Content model
-//                        if (TextUtils.isEmpty(jsonVideoData.getString("description")) || jsonVideoData.getString("description").equals("null")) {
-//                            jsonVideoData.put("description", " ");
-//                        }
-//                        // Add reference to playlist
-//                        jsonVideoData.put("playlistId", playlistId);
-//                        // Set dummy player url. We get real url before switch to renderer screen
-//                        jsonVideoData.put("playerUrl", "null");
-//
-//                        jsonContents.put(jsonVideoData);
-//                    }
-//                }
-//                catch (IOException e) {
-//                    Log.d(TAG, "Error get playlist videos. playlistId=" + playlistId);
-//                }
             }
-//            else {
-//
-//            }
         }
         Log.d(TAG, "fetchData(): Videos loaded");
 
@@ -192,8 +158,7 @@ public class ZypeDataDownloader extends ADataDownloader {
             }
             return valA.compareTo(valB);
         });
-//        GsonBuilder builder = new GsonBuilder();
-//        Gson gson = builder.create();
+
         for (PlaylistData playlistData : playlists) {
             String playlistId = playlistData.id;
             if (playlistId.equals(ZypeSettings.ROOT_PLAYLIST_ID) || TextUtils.isEmpty(playlistData.parentId)) {
@@ -227,6 +192,23 @@ public class ZypeDataDownloader extends ADataDownloader {
             }
         }
         return result;
+    }
+
+    private void addMyLibraryPlaylists(List<PlaylistData> playlists) {
+        PlaylistData item = new PlaylistData();
+        item.id = ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID;
+        item.description = " ";
+        item.parentId = ZypeSettings.ROOT_PLAYLIST_ID;
+        item.title = ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID;
+        playlists.add(item);
+
+        item = new PlaylistData();
+        item.id = ZypeSettings.MY_LIBRARY_PLAYLIST_ID;
+        item.description = " ";
+        item.parentId = ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID;
+        item.playlistItemCount = 1;
+        item.title = "My library";
+        playlists.add(item);
     }
 
     private List<VideoData> loadPlaylistVideos(PlaylistData playlist) {

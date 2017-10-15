@@ -34,10 +34,12 @@ import com.amazon.android.contentbrowser.helper.AuthHelper;
 import com.amazon.android.model.Action;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
+import com.amazon.android.recipe.Recipe;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
 import com.amazon.android.tv.tenfoot.presenter.SettingsCardPresenter;
+import com.zype.fire.api.ZypeSettings;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -165,6 +167,12 @@ public class ContentBrowseFragment extends RowsFragment {
         CardPresenter cardPresenter = new CardPresenter();
 
         for (ContentContainer contentContainer : rootContentContainer.getContentContainers()) {
+
+            /* Zype, Evgeny Cherkasob */
+            // Don't show My Library content container
+            if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)) {
+                continue;
+            }
 
             HeaderItem header = new HeaderItem(0, contentContainer.getName());
             ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);

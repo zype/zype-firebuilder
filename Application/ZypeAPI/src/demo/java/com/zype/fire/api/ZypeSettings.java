@@ -14,12 +14,13 @@ public class ZypeSettings {
     public static final String CLIENT_SECRET = "06f45687da00bbe3cf51dddc7dbd7a288d1c852cf0b9a6e76e25bb115dcf872c";
     // Playlist
     public static final String ROOT_PLAYLIST_ID = "577e65c85577de0d1000c1ee";
+    public static final String ROOT_MY_LIBRARY_PLAYLIST_ID = "RootMyLibrary";
+    public static final String MY_LIBRARY_PLAYLIST_ID = "MyLibrary";
 
     // Template version
-    public static final String TEMPLATE_VERSION = "1.0.9";
+    public static final String TEMPLATE_VERSION = "1.2.0";
 
     // App features
-    // TODO: Update app feature settings
 //    public static final boolean BACKGROUND_PLAYBACK_ENABLED = false;
 //    public static final boolean DOWNLOADS_ENABLED = true;
 //    public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = true;
@@ -29,6 +30,7 @@ public class ZypeSettings {
     public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = false;
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = true;
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = false;
+    public static final boolean UNIVERSAL_TVOD = true;
 
     /**
      * Amazon shared key is required for native subscription feature. It is used in request to Zype Bifrost

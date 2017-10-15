@@ -27,6 +27,7 @@ import com.amazon.android.interfaces.IContentBrowser;
 import com.amazon.android.model.Action;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
+import com.amazon.android.model.content.constants.ExtraKeys;
 import com.amazon.android.model.content.constants.PreferencesConstants;
 import com.amazon.android.model.event.ActionUpdateEvent;
 import com.amazon.android.navigator.Navigator;
@@ -180,6 +181,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      * Slide show setting constant.
      */
     public static final String SLIDESHOW_SETTING = "SlideShowSetting";
+
+    /* Zype, Evgeny Cherkasov */
+    public static final String MY_LIBRARY = "MyLibrary";
 
     /**
      * Constant for the "watch now" action.
@@ -452,9 +456,16 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 }
             }
             if (Navigator.isScreenAccessVerificationRequired(mNavigator.getNavigatorModel())
-                    && (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED || userLoggedIn)) {
+                    && (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED || ZypeSettings.UNIVERSAL_TVOD
+                        || userLoggedIn)) {
                 addSettingsAction(mLoginAction);
             }
+        }
+    }
+
+    private void setupMyLibraryAction() {
+        if (ZypeSettings.UNIVERSAL_TVOD) {
+            addSettingsAction(createMyLibrarySettingsAction());
         }
     }
 
@@ -546,49 +557,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         addSettingsAction(createTermsOfUseSettingsAction());
         //addSettingsAction(createSlideShowSettingAction());
         setupLogoutAction();
-
-//        try {
-//            mDataLoadManager = DataLoadManager.getInstance(mAppContext);
-//            mDynamicParser = new DynamicParser();
-//
-//            // Register content translator parser recipes use translation.
-//            ContentTranslator contentTranslator = new ContentTranslator();
-//            mDynamicParser.addTranslatorImpl(contentTranslator.getName(), contentTranslator);
-//
-//            // Register content container translator in case parser recipes use translation.
-//            ContentContainerTranslator containerTranslator = new ContentContainerTranslator();
-//            mDynamicParser.addTranslatorImpl(containerTranslator.getName(), containerTranslator);
-//
-//            /* Zype */
-//            // Register Zype content translator parser recipes use translation.
-//            ZypeContentTranslator zypeContentTranslator = new ZypeContentTranslator();
-//            mDynamicParser.addTranslatorImpl(zypeContentTranslator.getName(), zypeContentTranslator);
-//            // Register content container translator in case parser recipes use translation.
-//            ZypeContentContainerTranslator zypeContainerTranslator = new ZypeContentContainerTranslator();
-//            mDynamicParser.addTranslatorImpl(zypeContainerTranslator.getName(), zypeContainerTranslator);
-//        }
-//        catch (Exception e) {
-//            Log.e(TAG, "DataLoadManager init failed!!!", e);
-//        }
-//
-//        mDataLoadManager.registerUpdateListener(new DataLoadManager.IDataUpdateListener() {
-//            @Override
-//            public void onSuccess(Data data) {
-//
-//                if (data != null) {
-//                    mContentReloadRequired = true;
-//                }
-//                else {
-//                    Log.i(TAG, "Data reload not required by data updater");
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Throwable throwable) {
-//
-//                Log.e(TAG, "registerUpdateListener onFailure!!!", throwable);
-//            }
-//        });
+        setupMyLibraryAction();
 
         mSearchManager.addSearchAlgo(DEFAULT_SEARCH_ALGO_NAME, new ISearchAlgo<Content>() {
             @Override
@@ -1011,6 +980,18 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     /**
+     * Create My Library Action.
+     *
+     * @return action.
+     */
+    private Action createMyLibrarySettingsAction() {
+        return new Action().setAction(MY_LIBRARY)
+                // TODO: Change action icon
+                .setIconResourceId(R.drawable.ic_terms_text)
+                .setLabel1(mAppContext.getString(R.string.my_library_label));
+    }
+
+    /**
      * Add action to widget action list.
      *
      * @param action The action to add.
@@ -1273,6 +1254,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             case SLIDESHOW_SETTING:
                 slideShowSettingActionTriggered(activity, settingsAction);
                 break;
+            /* Zype, Evgeny Cherkasov */
+            case MY_LIBRARY:
+                myLibraryActionTriggered(activity);
+                break;
             default:
                 Log.e(TAG, "Unsupported action " + settingsAction);
                 break;
@@ -1321,6 +1306,40 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                         });
                     }
                 });
+    }
+
+    /* Zype, Evgeny Cherkasov */
+    private void myLibraryActionTriggered(Activity activity) {
+        ContentContainer contentContainer = getRootContentContainer()
+                .findContentContainerByName(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID);
+        if (contentContainer != null) {
+            // Set next page to 1 for initial loading
+            contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, 1);
+            // If user is logged in then open browsing screen for My Library. Otherwise switch to
+            // login screen.
+            mAuthHelper.isAuthenticated()
+                    .subscribe(isAuthenticatedResultBundle -> {
+                        boolean result = isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT);
+                        if (result) {
+                            ContentLoader.ILoadContentForContentContainer listener = new ContentLoader.ILoadContentForContentContainer() {
+                                @Override
+                                public void onContentsLoaded() {
+//                                    setLastSelectedContentContainer(contentContainer);
+//                                    switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
+                                }
+                            };
+                            // TODO: Add mCompositeSubscription parameter from ContentBrowser
+                            mContentLoader.loadContentForMyLibraryContentContainer(contentContainer, activity, listener);
+
+                            setLastSelectedContentContainer(contentContainer);
+                            switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
+                        }
+                        else {
+                            mAuthHelper.handleAuthChain(extra -> mNavigator.startActivity(CONTENT_HOME_SCREEN, intent -> {
+                            }));
+                        }
+                    });
+        }
     }
 
     /**
@@ -2232,7 +2251,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                         }, () -> {
                             Log.v(TAG, "Recipe chain completed");
                             // Remove empty sub containers.
-                            root.removeEmptySubContainers();
+                            if (!root.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)) {
+                                root.removeEmptySubContainers();
+                            }
 
 //                            mContentLoader.setRootContentContainer(root);
                             if (mIRootContentContainerListener != null) {
@@ -2483,7 +2504,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public void updateUserSubscribed() {
         boolean hasNativeSubscription = Preferences.getBoolean(PurchaseHelper.CONFIG_PURCHASE_VERIFIED);
         boolean hasZypeSubscription = Preferences.getLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT) > 0;
-        // For testing with Amazon App Tester uncomment following line since Zype service does not
+        // For testing Native to Universal case with Amazon App Tester
+        // uncomment following line since Zype service does not
         // validate App Tester purchase receipt and does not create Zype subscription
         // TODO: This line must be commented for release build
 //            hasZypeSubscription = true;

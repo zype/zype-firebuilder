@@ -60,8 +60,10 @@ import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment;
 import com.amazon.android.tv.tenfoot.ui.fragments.ZypePlaylistContentBrowseFragment;
 import com.amazon.android.ui.constants.ConfigurationConstants;
+import com.amazon.android.ui.fragments.ErrorDialogFragment;
 import com.amazon.android.ui.fragments.LogoutSettingsFragment;
 import com.amazon.android.ui.utils.BackgroundImageUtils;
+import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.GlideHelper;
 import com.amazon.android.utils.Helpers;
 
@@ -77,8 +79,9 @@ import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 /**
  * ContentBrowseActivity class that loads the ContentBrowseFragment.
  */
-public class ZypePlaylistContentBrowseActivity extends BaseActivity implements ZypePlaylistContentBrowseFragment
-        .OnBrowseRowListener {
+public class ZypePlaylistContentBrowseActivity extends BaseActivity
+        implements ZypePlaylistContentBrowseFragment.OnBrowseRowListener,
+                    ErrorDialogFragment.ErrorDialogFragmentListener {
 
     private final String TAG = ZypePlaylistContentBrowseActivity.class.getSimpleName();
 
@@ -267,5 +270,24 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity implements Z
             mContentImageLoadSubscription.unsubscribe();
         }
     }
+
+    //
+    // ErrorDialogFragmentListener
+    //
+    /**
+     * Callback method to define the button behaviour for this activity.
+     *
+     * @param errorDialogFragment The fragment listener.
+     * @param errorButtonType     The display text on the button
+     * @param errorCategory       The error category determined by the client.
+     */
+    @Override
+    public void doButtonClick(ErrorDialogFragment errorDialogFragment, ErrorUtils.ERROR_BUTTON_TYPE errorButtonType, ErrorUtils.ERROR_CATEGORY errorCategory) {
+        if (errorDialogFragment != null) {
+            errorDialogFragment.dismiss();
+            finish();
+        }
+    }
+
 
 }
