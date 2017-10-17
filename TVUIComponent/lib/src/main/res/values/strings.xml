@@ -89,4 +89,5 @@ permissions and limitations under the License.
     <string name="subscription_title_choose_plan">Choose a plan</string>
     <string name="subscription_title_confirm">Confirm Subscription</string>
 
+    <string name="action_load_more">Load more…</string>
 </resources>

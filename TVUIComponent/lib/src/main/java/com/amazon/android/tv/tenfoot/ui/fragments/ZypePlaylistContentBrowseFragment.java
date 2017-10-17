@@ -55,12 +55,12 @@ import com.amazon.android.contentbrowser.helper.AuthHelper;
 import com.amazon.android.model.Action;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
+import com.amazon.android.model.content.constants.ExtraKeys;
 import com.amazon.android.recipe.Recipe;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
 import com.amazon.android.tv.tenfoot.presenter.SettingsCardPresenter;
-import com.amazon.android.tv.tenfoot.ui.Subscription.CreateLoginActivity;
 import com.amazon.android.ui.fragments.ErrorDialogFragment;
 import com.amazon.android.utils.ErrorUtils;
 import com.zype.fire.api.ZypeSettings;
@@ -186,18 +186,17 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
 //        addSettingsActionsToRowAdapter(rowsAdapter);
 
         ContentContainer rootContentContainer = ContentBrowser.getInstance(getActivity()).getLastSelectedContentContainer();
+        boolean isMyLibrary = rootContentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID);
 
         CardPresenter cardPresenter = new CardPresenter();
 
         for (ContentContainer contentContainer : rootContentContainer.getContentContainers()) {
 
-            if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.MY_LIBRARY_PLAYLIST_ID)) {
-                if (contentContainer.getContents().isEmpty() && dataUpdated) {
-                    dialogError = ErrorDialogFragment.newInstance(getActivity(),
-                            ErrorUtils.ERROR_CATEGORY.ZYPE_PLAYLIST_NO_VIDEOS_ERROR,
-                            (ErrorDialogFragment.ErrorDialogFragmentListener) getActivity());
-                    dialogError.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
-                }
+            if (isMyLibrary && contentContainer.getContents().isEmpty() && dataUpdated) {
+                dialogError = ErrorDialogFragment.newInstance(getActivity(),
+                        ErrorUtils.ERROR_CATEGORY.ZYPE_MY_LIBRARY_ERROR_EMPTY,
+                        (ErrorDialogFragment.ErrorDialogFragmentListener) getActivity());
+                dialogError.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
             }
 
             HeaderItem header = new HeaderItem(0, contentContainer.getName());
@@ -211,6 +210,12 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                 listRowAdapter.add(content);
             }
 
+            if (isMyLibrary && rootContentContainer.getExtraIntegerValue(ExtraKeys.NEXT_PAGE) > 0) {
+                Action action = new Action().setAction(ContentBrowser.MY_LIBRARY_NEXT_PAGE)
+                        .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
+                        .setLabel1(getString(R.string.action_load_more));
+                listRowAdapter.add(action);
+            }
 //            rowsAdapter.add(rowsAdapter.size() - 1, new ListRow(header, listRowAdapter));
             rowsAdapter.add(new ListRow(header, listRowAdapter));
         }
@@ -291,11 +296,15 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                         .switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
             }
             else if (item instanceof Action) {
-                Action settingsAction = (Action) item;
-                Log.d(TAG, "Settings with title " + settingsAction.getAction() + " was clicked");
-                ContentBrowser.getInstance(getActivity())
-                        .settingsActionTriggered(getActivity(),
-                                settingsAction);
+                Action action = (Action) item;
+                if (action.getAction().equals(ContentBrowser.MY_LIBRARY_NEXT_PAGE)) {
+                    Log.d(TAG, "Next page button was clicked");
+                    ContentBrowser.getInstance(getActivity()).runGlobalRecipesForLastSelected(getActivity(), ContentBrowser.getInstance(getActivity()));
+                }
+                else {
+                    Log.d(TAG, "Settings with title " + action.getAction() + " was clicked");
+                    ContentBrowser.getInstance(getActivity()).settingsActionTriggered(getActivity(),action);
+                }
             }
         }
     }

@@ -30,8 +30,10 @@
 package com.amazon.android.tv.tenfoot.presenter;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
+import com.amazon.android.model.Action;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
+import com.amazon.android.tv.tenfoot.base.TenFootApp;
 import com.amazon.android.tv.tenfoot.utils.ContentHelper;
 import com.amazon.android.utils.GlideHelper;
 import com.amazon.android.utils.Helpers;
@@ -52,6 +54,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -187,6 +190,21 @@ public class CardPresenter extends Presenter {
             }
             else {
                 cardView.getMainImageView().setImageDrawable(mDefaultCardImage);
+            }
+        }
+        /* Zype, Evgeny CHerkasov */
+        else if (item instanceof Action) {
+            Action action = (Action) item;
+            cardView.setContentText(action.getLabel1());
+            cardView.setMainImageScaleType(ImageView.ScaleType.CENTER);
+            cardView.setMainImageDimensions(mCardWidthDp, mCardHeightDp);
+            try {
+                cardView.setMainImage(ContextCompat.getDrawable(TenFootApp.getInstance().getApplicationContext(),
+                        action.getIconResourceId()));
+            }
+            catch (Resources.NotFoundException e) {
+                Log.e(TAG, "Resource not found", e);
+                throw e;
             }
         }
     }

@@ -184,6 +184,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
     /* Zype, Evgeny Cherkasov */
     public static final String MY_LIBRARY = "MyLibrary";
+    public static final String MY_LIBRARY_NEXT_PAGE = "MyLibraryNextPage";
 
     /**
      * Constant for the "watch now" action.
@@ -987,7 +988,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     private Action createMyLibrarySettingsAction() {
         return new Action().setAction(MY_LIBRARY)
                 // TODO: Change action icon
-                .setIconResourceId(R.drawable.ic_terms_text)
+                .setIconResourceId(R.drawable.ic_video_library_white_48dp)
                 .setLabel1(mAppContext.getString(R.string.my_library_label));
     }
 

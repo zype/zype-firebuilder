@@ -615,7 +615,15 @@ public class ContentLoader {
                 })
                 .concatMap(objectPair -> {
                     ContentContainer contentContainer = (ContentContainer) objectPair.first;
-                    contentContainer.getContents().clear();
+                    if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.MY_LIBRARY_PLAYLIST_ID)) {
+                        ContentContainer rootMyLibrary = getRootContentContainer().findContentContainerByName(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID);
+                        if (rootMyLibrary.getExtraIntegerValue(ExtraKeys.NEXT_PAGE) == 1) {
+                            contentContainer.getContents().clear();
+                        }
+                    }
+                    else {
+                        contentContainer.getContents().clear();
+                    }
                     String feed = (String) objectPair.second;
                     String[] params = new String[]{(String) contentContainer
                             .getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG)
@@ -664,17 +672,22 @@ public class ContentLoader {
     public Observable<Pair> getMyLibraryVideosObservable(Object contentContainerAsObject) {
         ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
 
-        int nextPage = getRootContentContainer().findContentContainerByName(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)
-                .getExtraIntegerValue(ExtraKeys.NEXT_PAGE);
+        ContentContainer rootMyLibrary = getRootContentContainer().findContentContainerByName(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID);
+        int nextPage = rootMyLibrary.getExtraIntegerValue(ExtraKeys.NEXT_PAGE);
         if (nextPage <= 0) {
             Log.e(TAG, "getMyLibraryVideosObservable(): incorrect page: " + nextPage);
             return Observable.just(Pair.create(contentContainerAsObject, ""));
         }
 
         String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
-        // TODO: Change per page parameter value to 20 and implement paging loading
-        VideoEntitlementsResponse response = ZypeApi.getInstance().getVideoEntitlements(accessToken, nextPage, 100);
+        VideoEntitlementsResponse response = ZypeApi.getInstance().getVideoEntitlements(accessToken, nextPage, ZypeApi.PER_PAGE_DEFAULT);
         if (response != null) {
+            if (response.pagination.current == response.pagination.pages) {
+                rootMyLibrary.setExtraValue(ExtraKeys.NEXT_PAGE, -1);
+            }
+            else {
+                rootMyLibrary.setExtraValue(ExtraKeys.NEXT_PAGE, response.pagination.next);
+            }
             Log.d(TAG, "getMyLibraryVideosObservable(): size=" + response.videoEntitlements.size());
             List<VideoData> videos = new ArrayList<>();
             for (VideoEntitlementData data : response.videoEntitlements) {
