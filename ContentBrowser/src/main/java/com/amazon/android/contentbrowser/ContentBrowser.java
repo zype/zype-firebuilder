@@ -71,6 +71,7 @@ import static com.amazon.android.contentbrowser.helper.LauncherIntegrationManage
         .getSourceOfContentPlayRequest;
 
 /* Zype */
+import com.zype.fire.api.Model.PlaylistData;
 import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
 
@@ -1360,9 +1361,62 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         /* Zype, Evgeny Cherkasov */
 //        if (mSubscribed || isSubscriptionNotRequired || mIAPDisabled) {
-        if (isUserSubscribed() || isSubscriptionNotRequired || mIAPDisabled) {
+        boolean showWatch = false;
+        boolean showSubscribe = false;
+        boolean showPurchase = false;
+        boolean showAdFree = false;
 
+        boolean purchaseRequired = false;
+        boolean entitled = false;
+        if (ZypeSettings.UNIVERSAL_TVOD) {
+            purchaseRequired = content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED);
+            if (content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
+                entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
+            }
+        }
 
+        if (isSubscriptionNotRequired && !purchaseRequired || mIAPDisabled) {
+            showWatch = true;
+        }
+        else if (!isSubscriptionNotRequired && purchaseRequired) {
+            if (!isUserSubscribed() && !entitled) {
+                showSubscribe = true;
+                showPurchase = true;
+            }
+            else {
+                showWatch = true;
+            }
+        }
+        else {
+            if (!isSubscriptionNotRequired) {
+                if (isUserSubscribed()) {
+                    showWatch = true;
+                }
+                else {
+                    if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED
+                            || ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
+                        showSubscribe = true;
+                    }
+                    else {
+                        showWatch = true;
+                    }
+                }
+            }
+            if (purchaseRequired) {
+                if (entitled) {
+                    showWatch = true;
+                }
+                else {
+                    showPurchase = true;
+                }
+            }
+        }
+        if (ZypeSettings.SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED && !ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED
+                && !userLoggedIn) {
+            showAdFree = true;
+        }
+
+        if (showWatch) {
             // Check if the content is meant for live watching. Live content requires only a
             // watch now button.
             boolean liveContent = content.getExtraValue(Recipe.LIVE_FEED_TAG) != null &&
@@ -1376,47 +1430,39 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
                 // Add "Resume" button if content playback is not complete.
                 if (record != null && !record.isPlaybackComplete()) {
-                    contentActionList.add(
-                            new Action().setId(CONTENT_ACTION_RESUME)
-                                        .setLabel1(mAppContext.getResources()
-                                                              .getString(R.string.resume_1))
-                                        .setLabel2(mAppContext.getResources()
-                                                              .getString(R.string.resume_2)));
+                    contentActionList.add(new Action().setId(CONTENT_ACTION_RESUME)
+                            .setLabel1(mAppContext.getResources().getString(R.string.resume_1))
+                            .setLabel2(mAppContext.getResources().getString(R.string.resume_2)));
                 }
                 // Add "Watch From Beginning" button to start content over.
-                contentActionList.add(
-                        new Action().setId(CONTENT_ACTION_WATCH_FROM_BEGINNING)
-                                    .setLabel1(mAppContext.getResources()
-                                                          .getString(
-                                                                  R.string.watch_from_beginning_1))
-                                    .setLabel2(mAppContext.getResources()
-                                                          .getString(
-                                                                  R.string.watch_from_beginning_2)));
-                /* Zype, Evgeny Cherkasov */
-                if (ZypeSettings.SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED
-                        && !ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED && !userLoggedIn) {
-                    contentActionList.add(new Action().setId(CONTENT_ACTION_SWAF)
-                            .setLabel1(mAppContext.getResources().getString(R.string.action_swaf_1))
-                            .setLabel2(mAppContext.getResources().getString(R.string.action_swaf_2)));
-                }
+                contentActionList.add(new Action().setId(CONTENT_ACTION_WATCH_FROM_BEGINNING)
+                        .setLabel1(mAppContext.getResources().getString(R.string.watch_from_beginning_1))
+                        .setLabel2(mAppContext.getResources().getString(R.string.watch_from_beginning_2)));
             }
-
-
             else {
                 contentActionList.add(new Action().setId(CONTENT_ACTION_WATCH_NOW)
                         .setLabel1(mAppContext.getResources().getString(R.string.watch_now_1))
                         .setLabel2(mAppContext.getResources().getString(R.string.watch_now_2)));
-                /* Zype, Evgeny Cherkasov */
-                if (ZypeSettings.SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED
-                        && !ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED && !userLoggedIn) {
-                    contentActionList.add(new Action().setId(CONTENT_ACTION_SWAF)
-                            .setLabel1(mAppContext.getResources().getString(R.string.action_swaf_1))
-                            .setLabel2(mAppContext.getResources().getString(R.string.action_swaf_2)));
-                }
             }
         }
-        else {
-            /* Zype, Evgeny Cherkasov */
+        if (showSubscribe) {
+            contentActionList.add(new Action()
+                    .setId(CONTENT_ACTION_CHOOSE_PLAN)
+                    .setLabel1(mAppContext.getResources().getString(R.string.action_subscription_1))
+                    .setLabel2(mAppContext.getResources().getString(R.string.action_subscription_2)));
+        }
+        if (showPurchase) {
+            // TODO: Display button to purchase video
+            contentActionList.add(new Action()
+                    .setId(CONTENT_ACTION_CHOOSE_PLAN)
+                    .setLabel1(mAppContext.getResources().getString(R.string.action_subscription_1))
+                    .setLabel2(mAppContext.getResources().getString(R.string.action_subscription_2)));
+        }
+        if (showAdFree) {
+            contentActionList.add(new Action().setId(CONTENT_ACTION_SWAF)
+                    .setLabel1(mAppContext.getResources().getString(R.string.action_swaf_1))
+                    .setLabel2(mAppContext.getResources().getString(R.string.action_swaf_2)));
+        }
 //            contentActionList.add(new Action()
 //                                          .setId(CONTENT_ACTION_SUBSCRIPTION)
 //                                          .setLabel1(mAppContext.getResources()
@@ -1430,22 +1476,6 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 //                                                                .getString(R.string.daily_pass_1))
 //                                          .setLabel2(mAppContext.getResources()
 //                                                                .getString(R.string.daily_pass_2)));
-            if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED
-                    || ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
-                contentActionList.add(new Action()
-                        .setId(CONTENT_ACTION_CHOOSE_PLAN)
-                        .setLabel1(mAppContext.getResources().getString(R.string.action_subscription_1))
-                        .setLabel2(mAppContext.getResources().getString(R.string.action_subscription_2)));
-            }
-            else {
-                contentActionList.add(
-                        new Action().setId(CONTENT_ACTION_WATCH_NOW)
-                                .setLabel1(mAppContext.getResources()
-                                        .getString(R.string.watch_now_1))
-                                .setLabel2(mAppContext.getResources()
-                                        .getString(R.string.watch_now_2)));
-            }
-        }
 
         contentActionList.addAll(mGlobalContentActionList);
 

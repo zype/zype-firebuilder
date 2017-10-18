@@ -617,7 +617,7 @@ public class ContentLoader {
                     ContentContainer contentContainer = (ContentContainer) objectPair.first;
                     if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.MY_LIBRARY_PLAYLIST_ID)) {
                         ContentContainer rootMyLibrary = getRootContentContainer().findContentContainerByName(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID);
-                        if (rootMyLibrary.getExtraIntegerValue(ExtraKeys.NEXT_PAGE) == 1) {
+                        if (rootMyLibrary.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) == 1) {
                             contentContainer.getContents().clear();
                         }
                     }
@@ -673,7 +673,7 @@ public class ContentLoader {
         ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
 
         ContentContainer rootMyLibrary = getRootContentContainer().findContentContainerByName(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID);
-        int nextPage = rootMyLibrary.getExtraIntegerValue(ExtraKeys.NEXT_PAGE);
+        int nextPage = rootMyLibrary.getExtraValueAsInt(ExtraKeys.NEXT_PAGE);
         if (nextPage <= 0) {
             Log.e(TAG, "getMyLibraryVideosObservable(): incorrect page: " + nextPage);
             return Observable.just(Pair.create(contentContainerAsObject, ""));

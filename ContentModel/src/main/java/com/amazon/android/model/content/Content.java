@@ -296,9 +296,14 @@ public class Content implements Serializable {
 
     /* Zype, Evgeny Cherkasov */
     /**
-     * Extras key for ad tags list
+     * Extra keys
      */
+    // Ad tag list
     public static final String EXTRA_AD_TAGS = "AdTags";
+    // Purchase required flag
+    public static final String EXTRA_PURCHASE_REQUIRED = "PurchaseRequired";
+    // Entitled flag
+    public static final String EXTRA_ENTITLED = "Entitled";
 
     /**
      * Creates a {@link Content} with empty values.

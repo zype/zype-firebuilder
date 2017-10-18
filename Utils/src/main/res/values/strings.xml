@@ -60,7 +60,7 @@ permissions and limitations under the License.
     <string name="create_consumer_error">Error creating login. Please retry.</string>
     <string name="verify_subscription_error">Error verifying subscription.</string>
     <!-- My library -->
-    <string name="my_library_error_empty">You have not purchased any videos yet.\n
-        Any videos you have purchased will automatically appear in your library</string>
+    <string name="my_library_error_empty">You have not purchased any videos.\n
+        Any videos you purchase will automatically appear in your library.</string>
 
 </resources>

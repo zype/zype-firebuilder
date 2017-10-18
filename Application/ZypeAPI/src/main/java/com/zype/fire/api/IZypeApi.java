@@ -14,6 +14,7 @@ import com.zype.fire.api.Model.VideosResponse;
 import java.util.HashMap;
 import java.util.Map;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.http.FieldMap;
@@ -45,6 +46,7 @@ public interface IZypeApi {
     @POST("https://bifrost.stg.zype.com/api/v1/subscribe")
     Call<BifrostResponse> verifySubscription(@FieldMap Map<String, String> params);
 
+    // Consumers
     @GET("consumers/{consumer_id}")
     Call<ConsumerResponse> getConsumer(@Path("consumer_id") String consumerId, @QueryMap HashMap<String, String> params);
 
@@ -52,22 +54,28 @@ public interface IZypeApi {
     @POST("/consumers")
     Call<ConsumerResponse> createConsumer(@QueryMap HashMap<String, String> queryParams, @FieldMap HashMap<String, String> fieldParams);
 
+    // Video entitlements
+    @GET("/videos/{video_id}/entitled")
+    Call<ResponseBody> checkVideoEntitlement(@Path("video_id") String videoId, @QueryMap HashMap<String, String> params);
+
     @GET("/consumer/videos")
     Call<VideoEntitlementsResponse> getVideoEntitlements(@Query(PARAM_PAGE) int page, @QueryMap HashMap<String, String> params);
 
-    @GET("https://player.zype.com/embed/{video_id}.json")
-    Call<PlayerResponse> getPlayer(@Header("User-Agent") String header, @Path("video_id") String videoId, @QueryMap HashMap<String, String> params);
-
+    // Playlist
     @GET("/playlists")
     Call<PlaylistsResponse> getPlaylists(@Query(PARAM_PAGE) int page, @QueryMap HashMap<String, String> params);
 
     @GET("/playlists/{playlist_id}/videos")
     Call<VideosResponse> getPlaylistVideos(@Path("playlist_id") String playlistId, @Query(PARAM_PAGE) int page, @QueryMap HashMap<String, String> params);
 
+    // Videos
     @GET("/videos")
     Call<VideosResponse> getVideos(@Query(PARAM_PAGE) int page, @QueryMap HashMap<String, String> params);
 
     @GET("/videos/{video_id}")
     Call<VideoResponse> getVideo(@Path("video_id") String videoId, @QueryMap HashMap<String, String> params);
+
+    @GET("https://player.zype.com/embed/{video_id}.json")
+    Call<PlayerResponse> getPlayer(@Header("User-Agent") String header, @Path("video_id") String videoId, @QueryMap HashMap<String, String> params);
 
 }

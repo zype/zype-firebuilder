@@ -39,7 +39,10 @@ import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
 import com.amazon.android.tv.tenfoot.presenter.SettingsCardPresenter;
+import com.amazon.android.utils.Preferences;
+import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeSettings;
+import com.zype.fire.auth.ZypeAuthentication;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -61,7 +64,13 @@ import android.support.v17.leanback.widget.VerticalGridView;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * This fragment displays content in horizontal rows for browsing. Each row has its title displayed
@@ -250,10 +259,49 @@ public class ContentBrowseFragment extends RowsFragment {
                 Content content = (Content) item;
                 Log.d(TAG, "Content with title " + content.getTitle() + " was clicked");
 
-                ContentBrowser.getInstance(getActivity())
-                              .setLastSelectedContent(content)
-                              .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                /* Zype, Evgeny Cherkasov */
+                // Get video entitlement
+                if (ZypeSettings.UNIVERSAL_TVOD) {
+                    if (!content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
+                        String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
+                        HashMap<String, String> params = new HashMap<>();
+                        params.put(ZypeApi.ACCESS_TOKEN, accessToken);
+                        ZypeApi.getInstance().getApi().checkVideoEntitlement(content.getId(), params).enqueue(new Callback<ResponseBody>() {
+                            @Override
+                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                Log.e(TAG, "onItemClicked(): check video entitlement: code=" + response.code());
+                                if (response.isSuccessful()) {
+                                    content.setExtraValue(Content.EXTRA_ENTITLED, true);
+                                }
+                                else {
+                                    content.setExtraValue(Content.EXTRA_ENTITLED, false);
+                                }
+                                ContentBrowser.getInstance(getActivity())
+                                        .setLastSelectedContent(content)
+                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                            }
 
+                            @Override
+                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                Log.e(TAG, "onItemClicked(): check video entitlement: failed");
+                                content.setExtraValue(Content.EXTRA_ENTITLED, false);
+                                ContentBrowser.getInstance(getActivity())
+                                        .setLastSelectedContent(content)
+                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                            }
+                        });
+                    }
+                    else {
+                        ContentBrowser.getInstance(getActivity())
+                                .setLastSelectedContent(content)
+                                .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                    }
+                }
+                else {
+                    ContentBrowser.getInstance(getActivity())
+                            .setLastSelectedContent(content)
+                            .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                }
             }
             else if (item instanceof ContentContainer) {
                 ContentContainer contentContainer = (ContentContainer) item;

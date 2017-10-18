@@ -247,17 +247,19 @@ public class ContentContainer implements Iterable<Content> {
 
     /* Zype, Evgeny CHerkasov */
     /**
-     * Get extra data as an integer from the internal map.
+     * Get a value from the extras map as an int. Warning: This method expects that the value that
+     * the key maps to is an int. If its not, errors may occur.
      *
-     * @param key Key value as a string.
-     * @return Value as integer.
+     * @param key The key to the value.
+     * @return A long value; 0 if the value doesn't exist in the extras.
      */
-    public Integer getExtraIntegerValue(String key) {
+    public int getExtraValueAsInt(String key) {
 
         if (mExtras == null || mExtras.get(key) == null) {
             return 0;
         }
-        return Integer.valueOf(mExtras.get(key).toString());
+
+        return (int) mExtras.get(key);
     }
 
     /**

@@ -63,12 +63,21 @@ import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
 import com.amazon.android.tv.tenfoot.presenter.SettingsCardPresenter;
 import com.amazon.android.ui.fragments.ErrorDialogFragment;
 import com.amazon.android.utils.ErrorUtils;
+import com.amazon.android.utils.Preferences;
+import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeSettings;
+import com.zype.fire.auth.ZypeAuthentication;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.HashMap;
 import java.util.List;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /* Zype, Evgeny Cherkasov */
 
@@ -210,7 +219,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                 listRowAdapter.add(content);
             }
 
-            if (isMyLibrary && rootContentContainer.getExtraIntegerValue(ExtraKeys.NEXT_PAGE) > 0) {
+            if (isMyLibrary && rootContentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
                 Action action = new Action().setAction(ContentBrowser.MY_LIBRARY_NEXT_PAGE)
                         .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
                         .setLabel1(getString(R.string.action_load_more));
@@ -281,10 +290,49 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                 Content content = (Content) item;
                 Log.d(TAG, "Content with title " + content.getTitle() + " was clicked");
 
-                ContentBrowser.getInstance(getActivity())
-                        .setLastSelectedContent(content)
-                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                /* Zype, Evgeny Cherkasov */
+                // Get video entitlement
+                if (ZypeSettings.UNIVERSAL_TVOD) {
+                    if (!content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
+                        String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
+                        HashMap<String, String> params = new HashMap<>();
+                        params.put(ZypeApi.ACCESS_TOKEN, accessToken);
+                        ZypeApi.getInstance().getApi().checkVideoEntitlement(content.getId(), params).enqueue(new Callback<ResponseBody>() {
+                            @Override
+                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                Log.e(TAG, "onItemClicked(): check video entitlement: code=" + response.code());
+                                if (response.isSuccessful()) {
+                                    content.setExtraValue(Content.EXTRA_ENTITLED, true);
+                                }
+                                else {
+                                    content.setExtraValue(Content.EXTRA_ENTITLED, false);
+                                }
+                                ContentBrowser.getInstance(getActivity())
+                                        .setLastSelectedContent(content)
+                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                            }
 
+                            @Override
+                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                Log.e(TAG, "onItemClicked(): check video entitlement: failed");
+                                content.setExtraValue(Content.EXTRA_ENTITLED, false);
+                                ContentBrowser.getInstance(getActivity())
+                                        .setLastSelectedContent(content)
+                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                            }
+                        });
+                    }
+                    else {
+                        ContentBrowser.getInstance(getActivity())
+                                .setLastSelectedContent(content)
+                                .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                    }
+                }
+                else {
+                    ContentBrowser.getInstance(getActivity())
+                            .setLastSelectedContent(content)
+                            .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                }
             }
             else if (item instanceof ContentContainer) {
                 ContentContainer contentContainer = (ContentContainer) item;

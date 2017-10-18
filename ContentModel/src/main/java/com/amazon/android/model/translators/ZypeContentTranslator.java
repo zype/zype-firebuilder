@@ -88,7 +88,7 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
 //                    model.setId(Long.valueOf(String.valueOf(((String) value).hashCode())));
                     // TODO: Id type changes to String, so we probably don't need save original id anymore
                     // Put original id as extra value
-                    model.setExtraValue("_id", value);
+//                    model.setExtraValue("_id", value);
                     break;
                 case Content.SUBTITLE_FIELD_NAME:
                     model.setSubtitle(value.toString());
@@ -108,9 +108,6 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
                     // Expecting value to be a list.
                     model.setTags(value.toString());
                     break;
-//                case FIELD_SUBSCRIPTION_REQUIRED: {
-//                    model.setSubscriptionRequired((Boolean) value);
-//                }
                 case Content.CLOSED_CAPTION_FIELD_NAME:
                     model.setCloseCaptionUrls((List) value);
                     break;
