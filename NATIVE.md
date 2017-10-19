@@ -18,13 +18,13 @@ An [Amazon Developer Account](https://developer.amazon.com/why-amazon) will be n
 #### Subscription Options
 2. After you hit create, look towards the top and go to `In-App Items`. Then click the `Add Subscription` button.
 
-    <a href="https://drive.google.com/file/d/0B_Ab_j5EmMA4cDJaMk82MWk2aFE/view?usp=sharing"><img src="https://drive.google.com/file/d/0B_Ab_j5EmMA4cDJaMk82MWk2aFE/view?usp=sharing" style="width: 500px; max-width: 100%; height: auto" title="Click for the larger version." /></a>
+    <a href="https://drive.google.com/uc?export=view&id=0B_Ab_j5EmMA4cDJaMk82MWk2aFE"><img src="https://drive.google.com/uc?export=view&id=0B_Ab_j5EmMA4cDJaMk82MWk2aFE" style="width: 500px; max-width: 100%; height: auto" title="Click for the larger version." /></a>
 
 3. Create subscription item following [this guide](https://developer.amazon.com/docs/fire-app-builder/amazon-in-app-purchase-component.html#creategopremiumitem). Take a note of subscription item SKU and subscription period SKU. You will need them further.
 
-    <a href="https://drive.google.com/file/d/0B_Ab_j5EmMA4V1hkempUY1BXcFE/view?usp=sharing"><img src="https://drive.google.com/file/d/0B_Ab_j5EmMA4V1hkempUY1BXcFE/view?usp=sharing" style="width: 500px; max-width: 100%; height: auto" title="Click for the larger version." /></a>
+    <a href="https://drive.google.com/uc?export=view&id=0B_Ab_j5EmMA4V1hkempUY1BXcFE"><img src="https://drive.google.com/uc?export=view&id=0B_Ab_j5EmMA4V1hkempUY1BXcFE" style="width: 500px; max-width: 100%; height: auto" title="Click for the larger version." /></a>
 
-    <a href="https://drive.google.com/file/d/0B_Ab_j5EmMA4S2pYLXZtdE9WTFU/view?usp=sharing"><img src="https://drive.google.com/file/d/0B_Ab_j5EmMA4S2pYLXZtdE9WTFU/view?usp=sharing" style="width: 500px; max-width: 100%; height: auto" title="Click for the larger version." /></a>
+    <a href="https://drive.google.com/uc?export=view&id=0B_Ab_j5EmMA4S2pYLXZtdE9WTFU"><img src="https://drive.google.com/uc?export=view&id=0B_Ab_j5EmMA4S2pYLXZtdE9WTFU" style="width: 500px; max-width: 100%; height: auto" title="Click for the larger version." /></a>
 
 4. Repeat the process for any other subscription options you would like to offer - yearly, weekly, etc.
 
@@ -48,7 +48,7 @@ An [Amazon Developer Account](https://developer.amazon.com/why-amazon) will be n
 #### Map In-App items
 8. Expand the `PurchaseInterface` folder and go to `assets`. Then open the `skuslist.json` file.
 
-    <a href="https://drive.google.com/file/d/0B_Ab_j5EmMA4TUNjM29xbHJTVzg/view?usp=sharing"><img src="https://drive.google.com/file/d/0B_Ab_j5EmMA4TUNjM29xbHJTVzg/view?usp=sharing" style="width: 500px; max-width: 100%; height: auto" title="Click for the larger version." /></a>
+    <a href="https://drive.google.com/uc?export=view&id=0B_Ab_j5EmMA4TUNjM29xbHJTVzg"><img src="https://drive.google.com/uc?export=view&id=0B_Ab_j5EmMA4TUNjM29xbHJTVzg" style="width: 500px; max-width: 100%; height: auto" title="Click for the larger version." /></a>
 
 9. In the `skulist.json` file add item to `skuList` array for each your subscription option. Set `sku` attribute value to your subscription item's SKU and set `purchaseSku` attribute value to your subscription period SKU.
  
