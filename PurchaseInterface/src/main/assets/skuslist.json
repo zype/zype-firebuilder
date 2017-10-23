@@ -1,15 +1,15 @@
 {
   "skusList": [
     {
-      "sku": "com.zype.aftv.template.testsubscriptionmonthly",
+      "sku": "com.zype.aftv.demo.month",
       "productType": "SUBSCRIBE",
-      "purchaseSku": "com.zype.aftv.template.testsubscriptionmonthly.monthly",
+      "purchaseSku": "com.zype.aftv.demo.month.month",
       "id": "aftvmonthly"
     },
     {
-      "sku": "com.zype.aftv.testsubscriptionyearly",
+      "sku": "com.zype.aftv.demo.year",
       "productType": "SUBSCRIBE",
-      "purchaseSku": "com.zype.aftv.testsubscriptionyearly",
+      "purchaseSku": "com.zype.aftv.demo.year.year",
       "id": "aftvyearly"
     },
     {
@@ -20,6 +20,6 @@
   ],
   "actions": {
     "CONTENT_ACTION_DAILY_PASS": "RentUnPurchased",
-    "CONTENT_ACTION_SUBSCRIPTION": "com.zype.aftv.template.testsubscriptionmonthly"
+    "CONTENT_ACTION_SUBSCRIPTION": "com.zype.aftv.demo.month"
   }
 }

@@ -1370,7 +1370,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         boolean entitled = false;
         if (ZypeSettings.UNIVERSAL_TVOD) {
             purchaseRequired = content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED);
-            if (content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
+            if (purchaseRequired && content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
                 entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
             }
         }
@@ -1411,7 +1411,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 }
             }
         }
-        if (ZypeSettings.SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED && !ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED
+        if (ZypeSettings.SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED && !showSubscribe
+                && !ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED
                 && !userLoggedIn) {
             showAdFree = true;
         }
@@ -1759,7 +1760,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         /* Zype, Evgeny Cherkasov */
 //        if (mIAPDisabled) {
-        if (mIAPDisabled || ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+        if (mIAPDisabled || !content.isSubscriptionRequired() || ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
             switchToRendererScreen(content, actionId);
         }
         else {

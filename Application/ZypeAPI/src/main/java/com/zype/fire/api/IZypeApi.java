@@ -43,7 +43,7 @@ public interface IZypeApi {
     Call<AccessTokenInfoResponse> getAccessTokenInfo(@Query("access_token") String accessToken);
 
     @FormUrlEncoded
-    @POST("https://bifrost.stg.zype.com/api/v1/subscribe")
+    @POST("https://bifrost.zype.com/api/v1/subscribe")
     Call<BifrostResponse> verifySubscription(@FieldMap Map<String, String> params);
 
     // Consumers

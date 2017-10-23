@@ -50,7 +50,7 @@ public class ZypeApi {
     private static final String USERNAME = "username";
     public static final String UUID = "uuid";
 
-    public static final int PER_PAGE_DEFAULT = 100;
+    public static final int PER_PAGE_DEFAULT = 20;
 
     private static ZypeApi instance;
     private static IZypeApi apiImpl;
@@ -162,6 +162,8 @@ public class ZypeApi {
             HashMap<String, String> params = new HashMap<>();
             params.put(ACCESS_TOKEN, accessToken);
             params.put(PER_PAGE, String.valueOf(perPage));
+            params.put("sort", "created_at");
+            params.put("order", "desc");
             Response response = apiImpl.getVideoEntitlements(page, params).execute();
             if (response.isSuccessful()) {
                 return (VideoEntitlementsResponse) response.body();

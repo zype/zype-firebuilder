@@ -14,9 +14,11 @@ public class ZypeSettings {
     public static final String CLIENT_SECRET = "[CLIENT_SECRET]";
     // Playlist
     public static final String ROOT_PLAYLIST_ID = "[ROOT_PLAYLIST_ID]";
+    public static final String ROOT_MY_LIBRARY_PLAYLIST_ID = "RootMyLibrary";
+    public static final String MY_LIBRARY_PLAYLIST_ID = "MyLibrary";
 
     // Template version
-    public static final String TEMPLATE_VERSION = "1.1.0";
+    public static final String TEMPLATE_VERSION = "1.2.0";
 
     // App features
 //    public static final boolean BACKGROUND_PLAYBACK_ENABLED = false;
@@ -28,6 +30,7 @@ public class ZypeSettings {
     public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = Boolean.valueOf("[NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED]");
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = Boolean.valueOf("[SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED]");
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = Boolean.valueOf("[UNIVERSAL_SUBSCRIPTION_ENABLED]");
+    public static final boolean UNIVERSAL_TVOD = Boolean.valueOf("[UNIVERSAL_TVOD_ENABLED]");
 
     /**
      * Amazon shared key is required for native subscription feature. It is used in request to Zype Bifrost
