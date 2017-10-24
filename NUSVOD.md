@@ -1,6 +1,6 @@
-# Native Subscription
+# Native to Universal Subscription
 
-This document outlines step-by-step instructions for setting up native subscription for your Amazon Fire TV app powered by Zype's Endpoint API service and app production software and SDK template.
+This document outlines step-by-step instructions for setting up native to universal subscription for your Amazon Fire TV app powered by Zype's Endpoint API service and app production software and SDK template.
 
 ## Requirements and Prerequisites
 
@@ -9,6 +9,9 @@ IT or developer support strongly recommended. Completing app submission and publ
 
 #### Amazon Developer Portal
 An [Amazon Developer Account](https://developer.amazon.com/why-amazon) will be needed.
+
+#### Zype Platform
+Admin access to your property on the [Zype Platform](https://admin.zype.com/) will be needed.
 
 ## Amazon Developer Portal
 
@@ -36,11 +39,11 @@ An [Amazon Developer Account](https://developer.amazon.com/why-amazon) will be n
 #### Turn on Native subscription feature
 6. Expand the `ZypeAPI` folder and go to `java/com.zype.fire.api(template)` folder. Then open the `ZypeSettings.java` file.
 
-7. Set following constants as stated below::
+7. Set following constants as stated below:
     
     ```
-    public static final boolean NATIVE_SUBSCRIPTION_ENABLED = true;
-    public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = false;
+    public static final boolean NATIVE_SUBSCRIPTION_ENABLED = false;
+    public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = true;
     ```
     
     _Note: In-App Purchasing Component is enabled in the app by default. You can use [this documentation](https://developer.amazon.com/docs/fire-app-builder/amazon-in-app-purchase-component.html#enableiap) if you need to verify it is enabled._
@@ -81,7 +84,24 @@ An [Amazon Developer Account](https://developer.amazon.com/why-amazon) will be n
     }
     ```
 
+## Zype Platform
+10. Log in into your Zype Platform and select `Make Money` section in the left menu, then select `Subscription Plans`.
+
+    <a href="https://drive.google.com/uc?export=view&id=0B_Ab_j5EmMA4YVpXUzFiLUpTbjQ"><img src="https://drive.google.com/uc?export=view&id=0B_Ab_j5EmMA4YVpXUzFiLUpTbjQ" style="width: 500px; max-width: 100%; height: auto" title="Click for the larger version." /></a>
+
+11. For each your subscription option mapped to Appstore items in the step 9 create corresponding Subscription Plan (or open if it is already exist). 
+
+    <a href="https://drive.google.com/uc?export=view&id=0B_Ab_j5EmMA4bmdlLVNoV1h4azA"><img src="https://drive.google.com/uc?export=view&id=0B_Ab_j5EmMA4bmdlLVNoV1h4azA" style="width: 500px; max-width: 100%; height: auto" title="Click for the larger version." /></a>
+
+12. Set `Custom Third Party ID` value to corresponding subscription item's sku. Remove all symbols except letters and numbers from this value.
+
+    <a href="https://drive.google.com/uc?export=view&id=0B_Ab_j5EmMA4SzRBYjRTdHZIR0E"><img src="https://drive.google.com/uc?export=view&id=0B_Ab_j5EmMA4SzRBYjRTdHZIR0E" style="width: 500px; max-width: 100%; height: auto" title="Click for the larger version." /></a>
+
+    _Example: If you would have `com.zype.aftv.demo.month.month` sku of the subscription item, then result Custom Third Party ID value should be `comzypeaftvdemomonthmonth`._
+
 ## Testing
 Now that you’ve set up your in-app items and configured your app, it’s time to test out the integration and see how IAP interacts with your media.
 
 Follow [this guide](https://developer.amazon.com/docs/fire-app-builder/amazon-in-app-purchase-component.html#apptester) to test native subscription feature in your app.
+
+_Note: You would not able to test Zype verification service when you test In-App purchases locally on the device with App Tester tool. To test verification of navtive subscription you should submit your app to Amazon Appstore for Live App Testing._ 
