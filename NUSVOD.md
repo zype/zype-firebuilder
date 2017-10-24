@@ -93,11 +93,11 @@ Admin access to your property on the [Zype Platform](https://admin.zype.com/) wi
 
     <a href="https://drive.google.com/uc?export=view&id=0B_Ab_j5EmMA4bmdlLVNoV1h4azA"><img src="https://drive.google.com/uc?export=view&id=0B_Ab_j5EmMA4bmdlLVNoV1h4azA" style="width: 500px; max-width: 100%; height: auto" title="Click for the larger version." /></a>
 
-12. Set `Custom Third Party ID` value to corresponding subscription item's sku. Remove all symbols except letters and numbers from this value.
+12. Set `Custom Third Party ID` value to the corresponding subscription item's period sku (`purchaseSku` field in the `skulist.json` file). Remove all symbols except letters and numbers from this value.
 
     <a href="https://drive.google.com/uc?export=view&id=0B_Ab_j5EmMA4SzRBYjRTdHZIR0E"><img src="https://drive.google.com/uc?export=view&id=0B_Ab_j5EmMA4SzRBYjRTdHZIR0E" style="width: 500px; max-width: 100%; height: auto" title="Click for the larger version." /></a>
 
-    _Example: If you would have `com.zype.aftv.demo.month.month` sku of the subscription item, then result Custom Third Party ID value should be `comzypeaftvdemomonthmonth`._
+    _Example: If you would have `com.zype.aftv.demo.month.month` sku of the subscription item's period, then result Custom Third Party ID value should be `comzypeaftvdemomonthmonth`._
 
 ## Testing
 Now that you’ve set up your in-app items and configured your app, it’s time to test out the integration and see how IAP interacts with your media.
