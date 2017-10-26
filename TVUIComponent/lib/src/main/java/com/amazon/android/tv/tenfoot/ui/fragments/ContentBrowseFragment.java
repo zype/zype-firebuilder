@@ -38,6 +38,7 @@ import com.amazon.android.recipe.Recipe;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
+import com.amazon.android.tv.tenfoot.presenter.PosterCardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.SettingsCardPresenter;
 import com.amazon.android.utils.Preferences;
 import com.zype.fire.api.ZypeApi;
@@ -185,6 +186,10 @@ public class ContentBrowseFragment extends RowsFragment {
 
             HeaderItem header = new HeaderItem(0, contentContainer.getName());
             ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
+            /* Zype, Evgeny Cherkasov */
+            if (contentContainer.getExtraStringValue(ContentContainer.EXTRA_THUMBNAIL_LAYOUT).equals("poster")) {
+                listRowAdapter = new ArrayObjectAdapter(new PosterCardPresenter());
+            }
 
             for (ContentContainer innerContentContainer : contentContainer.getContentContainers()) {
                 listRowAdapter.add(innerContentContainer);

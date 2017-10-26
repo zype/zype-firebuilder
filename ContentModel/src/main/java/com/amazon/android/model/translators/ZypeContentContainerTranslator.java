@@ -69,9 +69,13 @@ public class ZypeContentContainerTranslator extends AModelTranslator<ContentCont
             if (field.equals(ContentContainer.NAME_FIELD_NAME)) {
                 model.setName((String) value);
             }
-            else if (field.equals("thumbnails")) {
-                model.setExtraValue(Content.CARD_IMAGE_URL_FIELD_NAME, findImageUrl(Content.CARD_IMAGE_URL_FIELD_NAME, value));
-                model.setExtraValue(Content.BACKGROUND_IMAGE_URL_FIELD_NAME, findImageUrl(Content.BACKGROUND_IMAGE_URL_FIELD_NAME, value));
+            else if (field.equals(ContentContainer.FIELD_IMAGES)) {
+                model.setExtraValue(ContentContainer.EXTRA_IMAGE_POSTER_URL, findImagePosterUrl(value));
+            }
+            else if (field.equals(ContentContainer.FIELD_THUMBNAILES)) {
+                model.setExtraValue(Content.CARD_IMAGE_URL_FIELD_NAME, findThumbnailUrl(Content.CARD_IMAGE_URL_FIELD_NAME, value));
+                model.setExtraValue(Content.BACKGROUND_IMAGE_URL_FIELD_NAME, findThumbnailUrl(Content.BACKGROUND_IMAGE_URL_FIELD_NAME, value));
+                model.setExtraValue(ContentContainer.EXTRA_THUMBNAIL_POSTER_URL, findThumbnailUrl(ContentContainer.EXTRA_THUMBNAIL_POSTER_URL, value));
             }
             else {
                 model.setExtraValue(field, value);
@@ -107,8 +111,9 @@ public class ZypeContentContainerTranslator extends AModelTranslator<ContentCont
         return ZypeContentContainerTranslator.class.getSimpleName();
     }
 
-    private String findImageUrl(String field, Object value) {
-        final int IMAGE_HEIGHT_CARD = 452;
+    private String findThumbnailUrl(String field, Object value) {
+        final int IMAGE_HEIGHT_CARD = 120;
+        final int IMAGE_HEIGHT_CARD_POSTER = 160;
         final int IMAGE_HEIGHT_BACKGROUND = 1080;
 
         String result = "null";
@@ -122,20 +127,43 @@ public class ZypeContentContainerTranslator extends AModelTranslator<ContentCont
                 requiredImageHeight = IMAGE_HEIGHT_BACKGROUND;
                 break;
             }
-
+            case ContentContainer.EXTRA_THUMBNAIL_POSTER_URL: {
+                requiredImageHeight = IMAGE_HEIGHT_CARD_POSTER;
+            }
         }
         try {
             JSONArray jsonValue = new JSONArray(value.toString());
             JSONObject jsonImage = null;
             for (int i = 0; i < jsonValue.length(); i++) {
+                JSONObject jsonObject = jsonValue.getJSONObject(i);
                 if (jsonImage == null) {
-                    jsonImage = jsonValue.getJSONObject(i);
+                    jsonImage = jsonObject;
                 }
                 else {
-                    JSONObject jsonObject = jsonValue.getJSONObject(i);
                     if (Math.abs(jsonObject.getInt("height") - requiredImageHeight) < Math.abs(jsonImage.getInt("height") - requiredImageHeight)) {
                         jsonImage = jsonObject;
                     }
+                }
+            }
+            if (jsonImage != null) {
+                result = jsonImage.getString("url");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    private String findImagePosterUrl(Object value) {
+        String result = "null";
+        try {
+            JSONArray jsonValue = new JSONArray(value.toString());
+            JSONObject jsonImage = null;
+            for (int i = 0; i < jsonValue.length(); i++) {
+                JSONObject jsonObject = jsonValue.getJSONObject(i);
+                if (jsonObject.getString("layout").equals("poster")) {
+                    jsonImage = jsonObject;
+                    break;
                 }
             }
             if (jsonImage != null) {

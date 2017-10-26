@@ -50,6 +50,9 @@ public class VideoData {
     public String foreignId;
 
     @Expose
+    public List<Image> images = new ArrayList<>();
+
+    @Expose
     public List<String> keywords = new ArrayList<>();
 
     @SerializedName("published_at")

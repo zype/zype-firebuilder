@@ -295,15 +295,26 @@ public class Content implements Serializable {
     public static final String RECOMMENDATION_ACTIONS_TAG = "recommendationActions";
 
     /* Zype, Evgeny Cherkasov */
+
+    /**
+     * Field names
+     */
+    // Images
+    public static final String FIELD_IMAGES = "Images";
+
     /**
      * Extra keys
      */
     // Ad tag list
     public static final String EXTRA_AD_TAGS = "AdTags";
-    // Purchase required flag
-    public static final String EXTRA_PURCHASE_REQUIRED = "PurchaseRequired";
     // Entitled flag
     public static final String EXTRA_ENTITLED = "Entitled";
+    // Poster image url
+    public static final String EXTRA_IMAGE_POSTER_URL = "ImagePosterUrl";
+    // Purchase required flag
+    public static final String EXTRA_PURCHASE_REQUIRED = "PurchaseRequired";
+    // Poster thumbnail url
+    public static final String EXTRA_THUMBNAIL_POSTER_URL = "ThumbnailPosterUrl";
 
     /**
      * Creates a {@link Content} with empty values.
@@ -807,6 +818,23 @@ public class Content implements Serializable {
 
         return (int) mExtras.get(key);
     }
+
+    /* Zype, Evgeny Cherkasov */
+
+    /**
+     * Get extra data as a string from the internal map.
+     *
+     * @param key Key value as a string.
+     * @return Value as a string.
+     */
+    public String getExtraValueAsString(String key) {
+
+        if (mExtras == null || mExtras.get(key) == null) {
+            return null;
+        }
+        return mExtras.get(key).toString();
+    }
+
 
     /**
      * Get content tags.

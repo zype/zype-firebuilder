@@ -35,8 +35,6 @@ import java.util.List;
 public class ZypeContentTranslator extends AModelTranslator<Content> {
     private static final String TAG = ZypeContentTranslator.class.getSimpleName();
 
-    private static final String FIELD_SUBSCRIPTION_REQUIRED = "subscriptionRequired";
-
     /**
      * {@inheritDoc}
      *
@@ -76,19 +74,9 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
                     break;
                 case Content.DESCRIPTION_FIELD_NAME:
                     model.setDescription(value.toString());
-//                    if (TextUtils.isEmpty(model.getDescription())) {
-//                        model.setDescription(" ");
-//                    }
                     break;
                 case Content.ID_FIELD_NAME:
                     model.setId(value.toString());
-//                    // Convert Zype hex 24 digit id to long by getting hash code of id String
-//                    // The result long id may be not unique.
-//                    // TODO: Consider another way to convert original id to long value
-//                    model.setId(Long.valueOf(String.valueOf(((String) value).hashCode())));
-                    // TODO: Id type changes to String, so we probably don't need save original id anymore
-                    // Put original id as extra value
-//                    model.setExtraValue("_id", value);
                     break;
                 case Content.SUBTITLE_FIELD_NAME:
                     model.setSubtitle(value.toString());
@@ -97,11 +85,12 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
                     model.setUrl(value.toString());
                     break;
                 case Content.CARD_IMAGE_URL_FIELD_NAME: {
-                    model.setCardImageUrl(findImageUrl(field, value));
+                    model.setCardImageUrl(findThumbnailUrl(field, value));
+                    model.setExtraValue(Content.EXTRA_THUMBNAIL_POSTER_URL, findThumbnailUrl(Content.EXTRA_THUMBNAIL_POSTER_URL, value));
                     break;
                 }
                 case Content.BACKGROUND_IMAGE_URL_FIELD_NAME: {
-                    model.setBackgroundImageUrl(findImageUrl(field, value));
+                    model.setBackgroundImageUrl(findThumbnailUrl(field, value));
                     break;
                 }
                 case Content.TAGS_FIELD_NAME:
@@ -135,6 +124,9 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
                     break;
                 case Content.FORMAT_FIELD_NAME:
                     model.setFormat(value.toString());
+                    break;
+                case Content.FIELD_IMAGES:
+                    model.setExtraValue(Content.EXTRA_IMAGE_POSTER_URL, findImagePosterUrl(value));
                     break;
                 default:
                     model.setExtraValue(field, value);
@@ -183,8 +175,9 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
         return ZypeContentTranslator.class.getSimpleName();
     }
 
-    private String findImageUrl(String field, Object value) {
-        final int IMAGE_HEIGHT_CARD = 452;
+    private String findThumbnailUrl(String field, Object value) {
+        final int IMAGE_HEIGHT_CARD = 120;
+        final int IMAGE_HEIGHT_CARD_POSTER = 160;
         final int IMAGE_HEIGHT_BACKGROUND = 1080;
 
         String result = "null";
@@ -198,20 +191,44 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
                 requiredImageHeight = IMAGE_HEIGHT_BACKGROUND;
                 break;
             }
-
+            case Content.EXTRA_THUMBNAIL_POSTER_URL: {
+                requiredImageHeight = IMAGE_HEIGHT_CARD_POSTER;
+            }
         }
         try {
             JSONArray jsonValue = new JSONArray(value.toString());
             JSONObject jsonImage = null;
             for (int i = 0; i < jsonValue.length(); i++) {
+                JSONObject jsonObject = jsonValue.getJSONObject(i);
                 if (jsonImage == null) {
-                    jsonImage = jsonValue.getJSONObject(i);
+                    jsonImage = jsonObject;
                 }
                 else {
-                    JSONObject jsonObject = jsonValue.getJSONObject(i);
                     if (Math.abs(jsonObject.getInt("height") - requiredImageHeight) < Math.abs(jsonImage.getInt("height") - requiredImageHeight)) {
                         jsonImage = jsonObject;
                     }
+                }
+            }
+            if (jsonImage != null) {
+                result = jsonImage.getString("url");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
+    private String findImagePosterUrl(Object value) {
+        String result = "null";
+        try {
+            JSONArray jsonValue = new JSONArray(value.toString());
+            JSONObject jsonImage = null;
+            for (int i = 0; i < jsonValue.length(); i++) {
+                JSONObject jsonObject = jsonValue.getJSONObject(i);
+                if (jsonObject.getString("layout").equals("poster")) {
+                    jsonImage = jsonObject;
+                    break;
                 }
             }
             if (jsonImage != null) {

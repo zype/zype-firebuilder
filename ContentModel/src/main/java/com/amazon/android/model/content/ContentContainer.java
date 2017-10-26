@@ -65,6 +65,25 @@ public class ContentContainer implements Iterable<Content> {
      */
     public static final String NAME_FIELD_NAME = "name";
 
+    /* Zype, Evgeny Cherkasov */
+    /**
+     * Field name constants
+     */
+    // Images
+    public static final String FIELD_IMAGES = "Images";
+    // Thumbnails
+    public static final String FIELD_THUMBNAILES = "Thumbnails";
+
+    /**
+     * Extra keys
+     */
+    // Poster image url
+    public static final String EXTRA_IMAGE_POSTER_URL = "ImagePosterUrl";
+    // Thumbnail layout
+    public static final String EXTRA_THUMBNAIL_LAYOUT = "ThumbnailLayout";
+    // Poster thumbnail url
+    public static final String EXTRA_THUMBNAIL_POSTER_URL = "ThumbnailPosterUrl";
+
     /**
      * Constructs an empty ContentContainer.
      */

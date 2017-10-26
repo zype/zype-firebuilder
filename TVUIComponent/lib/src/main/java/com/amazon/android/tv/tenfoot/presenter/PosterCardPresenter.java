@@ -29,19 +29,6 @@
  */
 package com.amazon.android.tv.tenfoot.presenter;
 
-import com.amazon.android.contentbrowser.ContentBrowser;
-import com.amazon.android.model.Action;
-import com.amazon.android.model.content.Content;
-import com.amazon.android.model.content.ContentContainer;
-import com.amazon.android.tv.tenfoot.base.TenFootApp;
-import com.amazon.android.tv.tenfoot.utils.ContentHelper;
-import com.amazon.android.utils.GlideHelper;
-import com.amazon.android.utils.Helpers;
-import com.amazon.android.tv.tenfoot.R;
-import com.amazon.android.utils.Preferences;
-import com.bumptech.glide.Glide;
-import com.zype.fire.auth.ZypeAuthentication;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
@@ -57,13 +44,25 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.amazon.android.contentbrowser.ContentBrowser;
+import com.amazon.android.model.Action;
+import com.amazon.android.model.content.Content;
+import com.amazon.android.model.content.ContentContainer;
+import com.amazon.android.tv.tenfoot.R;
+import com.amazon.android.tv.tenfoot.base.TenFootApp;
+import com.amazon.android.tv.tenfoot.utils.ContentHelper;
+import com.amazon.android.utils.GlideHelper;
+import com.amazon.android.utils.Helpers;
+
 /**
- * A CardPresenter is used to generate Views and bind Objects to them on demand.
+ * Zype, Evgeny Cherkasov
+ *
+ * A PosterCardPresenter is used to generate Views and bind Objects to them on demand.
  * It contains an Image CardView
  */
-public class CardPresenter extends Presenter {
+public class PosterCardPresenter extends Presenter {
 
-    private static final String TAG = CardPresenter.class.getSimpleName();
+    private static final String TAG = PosterCardPresenter.class.getSimpleName();
 
     private int mCardWidthDp;
     private int mCardHeightDp;
@@ -72,7 +71,6 @@ public class CardPresenter extends Presenter {
     private static Drawable sFocusedFadeMask;
     private View mInfoField;
     private Context mContext;
-    /* Zype, Evgeny Cherkasov */
     private Drawable imageLocked;
     private Drawable imageUnlocked;
     private ContentBrowser contentBrowser;
@@ -81,12 +79,10 @@ public class CardPresenter extends Presenter {
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
 
         mContext = parent.getContext();
-        /* Zype, Evgeny Cherkasov */
         contentBrowser = ContentBrowser.getInstance((Activity) mContext);
         try {
             mDefaultCardImage = ContextCompat.getDrawable(mContext, R.drawable.movie);
             sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused);
-            /* Zype, Evgeny Cherkasov */
             imageLocked = ContextCompat.getDrawable(mContext, R.drawable.locked);
             imageUnlocked = ContextCompat.getDrawable(mContext, R.drawable.unlocked);
         }
@@ -112,13 +108,11 @@ public class CardPresenter extends Presenter {
         cardView.setCardType(BaseCardView.CARD_TYPE_INFO_OVER);
         cardView.setInfoVisibility(BaseCardView.CARD_REGION_VISIBLE_ALWAYS);
 
-        /* Zype, Evgeny Cherkasov */
-        // Make card size 16:9
-//        int CARD_WIDTH_PX = 160;
-        int CARD_WIDTH_PX = 210;
+        // Poster card size
+        int CARD_WIDTH_PX = 120;
         mCardWidthDp = Helpers.convertPixelToDp(mContext, CARD_WIDTH_PX);
 
-        int CARD_HEIGHT_PX = 120;
+        int CARD_HEIGHT_PX = 160;
         mCardHeightDp = Helpers.convertPixelToDp(mContext, CARD_HEIGHT_PX);
 
         TextView subtitle = (TextView) cardView.findViewById(R.id.content_text);
@@ -135,7 +129,7 @@ public class CardPresenter extends Presenter {
     }
 
     @Override
-    public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
+    public void onBindViewHolder(ViewHolder viewHolder, Object item) {
 
         ImageCardView cardView = (ImageCardView) viewHolder.view;
 
@@ -153,13 +147,16 @@ public class CardPresenter extends Presenter {
 
                 cardView.setContentText(content.getTitle());
                 cardView.setMainImageDimensions(mCardWidthDp, mCardHeightDp);
+                String url = content.getExtraValueAsString(Content.EXTRA_IMAGE_POSTER_URL);
+                if (TextUtils.isEmpty(url) || url.equals("null")) {
+                    url = content.getExtraValueAsString(Content.EXTRA_THUMBNAIL_POSTER_URL);
+                }
                 GlideHelper.loadImageIntoView(cardView.getMainImageView(),
                                               viewHolder.view.getContext(),
-                                              content.getCardImageUrl(),
+                                              url,
                                               new GlideHelper.LoggingListener<>(),
                                               R.drawable.movie);
 
-                /* Zype, Evgeny Cherkasov */
                 // Display lock icon for subscription video
                 if (content.isSubscriptionRequired()) {
                     if (contentBrowser.isUserSubscribed()) {
@@ -178,26 +175,22 @@ public class CardPresenter extends Presenter {
             ContentContainer contentContainer = (ContentContainer) item;
             cardView.setContentText(contentContainer.getName());
             cardView.setMainImageDimensions(mCardWidthDp, mCardHeightDp);
-            /* Zype, Evgeny Cherkasov */
             // Show image for playlist
-            if (contentContainer.getExtraStringValue(Content.CARD_IMAGE_URL_FIELD_NAME) != null) {
+            String url = contentContainer.getExtraStringValue(ContentContainer.EXTRA_IMAGE_POSTER_URL);
+            if (TextUtils.isEmpty(url) || url.equals("null")) {
+                url = contentContainer.getExtraStringValue(ContentContainer.EXTRA_THUMBNAIL_POSTER_URL);
+            }
+            if (url != null) {
                 GlideHelper.loadImageIntoView(cardView.getMainImageView(),
                         viewHolder.view.getContext(),
-                        contentContainer.getExtraStringValue(Content.CARD_IMAGE_URL_FIELD_NAME),
+                        url,
                         new GlideHelper.LoggingListener<>(),
                         R.drawable.movie);
-//                Glide.with(viewHolder.view.getContext())
-//                        .load(contentContainer.getExtraStringValue(Content.CARD_IMAGE_URL_FIELD_NAME))
-//                        .listener(new GlideHelper.LoggingListener<>())
-//                        .centerCrop()
-//                        .error(mDefaultCardImage)
-//                        .into(cardView.getMainImageView());
             }
             else {
                 cardView.getMainImageView().setImageDrawable(mDefaultCardImage);
             }
         }
-        /* Zype, Evgeny CHerkasov */
         else if (item instanceof Action) {
             Action action = (Action) item;
             cardView.setContentText(action.getLabel1());
@@ -215,7 +208,7 @@ public class CardPresenter extends Presenter {
     }
 
     @Override
-    public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {
+    public void onUnbindViewHolder(ViewHolder viewHolder) {
 
         ImageCardView cardView = (ImageCardView) viewHolder.view;
         // Remove references to images so that the garbage collector can free up memory.

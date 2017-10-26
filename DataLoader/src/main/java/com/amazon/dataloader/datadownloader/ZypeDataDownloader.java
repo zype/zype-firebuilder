@@ -199,6 +199,7 @@ public class ZypeDataDownloader extends ADataDownloader {
         item.id = ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID;
         item.description = " ";
         item.parentId = ZypeSettings.ROOT_PLAYLIST_ID;
+        item.thumbnailLayout = "landscape";
         item.title = ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID;
         playlists.add(item);
 
@@ -207,6 +208,7 @@ public class ZypeDataDownloader extends ADataDownloader {
         item.description = " ";
         item.parentId = ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID;
         item.playlistItemCount = 1;
+        item.thumbnailLayout = "landscape";
         item.title = "My library";
         playlists.add(item);
     }

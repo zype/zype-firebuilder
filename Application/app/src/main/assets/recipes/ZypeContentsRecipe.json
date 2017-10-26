@@ -9,6 +9,7 @@
     "title@title",
     "_id@id",
     "description@description",
+    "images@Images",
     "playerUrl@url",
     "thumbnails@cardImageUrl",
     "thumbnails@backgroundImageUrl",

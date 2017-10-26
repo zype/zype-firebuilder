@@ -6,9 +6,11 @@
   "modelType": "single",
   "query": "$.categories[?(@.parent_id in [$$par0$$])]",
   "matchList": [
+    "images@Images",
     "title@name",
     "parent_id@parentId",
-    "thumbnails@thumbnails",
+    "thumbnail_layout@ThumbnailLayout",
+    "thumbnails@Thumbnails",
     "playlist_item_count@playlistItemCount",
     "description@description"
   ],

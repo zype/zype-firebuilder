@@ -30,9 +30,19 @@ public class PlaylistData {
     @Expose
     public String description;
 
+    @Expose
+    public List<Image> images = new ArrayList<>();
+
     @SerializedName("site_id")
     @Expose
     public String siteId;
+
+    @SerializedName("thumbnail_layout")
+    @Expose
+    public String thumbnailLayout;
+
+    @Expose
+    public List<Thumbnail> thumbnails = new ArrayList<>();
 
     @SerializedName("title")
     @Expose
@@ -57,6 +67,4 @@ public class PlaylistData {
     @Expose
     public List<String> values = new ArrayList<>();
 
-    @Expose
-    public List<Thumbnail> thumbnails = new ArrayList<>();
 }

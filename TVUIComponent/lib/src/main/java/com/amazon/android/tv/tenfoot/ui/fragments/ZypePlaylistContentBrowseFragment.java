@@ -60,6 +60,7 @@ import com.amazon.android.recipe.Recipe;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
+import com.amazon.android.tv.tenfoot.presenter.PosterCardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.SettingsCardPresenter;
 import com.amazon.android.ui.fragments.ErrorDialogFragment;
 import com.amazon.android.utils.ErrorUtils;
@@ -135,7 +136,6 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
 
         mRowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
 
-//        addSettingsActionsToRowAdapter(mRowsAdapter);
         loadRootContentContainer(mRowsAdapter);
 
         setAdapter(mRowsAdapter);
@@ -183,6 +183,16 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                                                           authenticationStatusUpdateEvent) {
 
         if (settingsAdapter != null) {
+            settingsAdapter.clear();
+            List<Action> settings = ContentBrowser.getInstance(getActivity()).getSettingsActions();
+            if (settings != null && !settings.isEmpty()) {
+                for (Action item : settings) {
+                    settingsAdapter.add(item);
+                }
+            }
+            else {
+                Log.d(TAG, "No settings were found");
+            }
             settingsAdapter.notifyArrayItemRangeChanged(0, settingsAdapter.size());
         }
         if (mRowsAdapter != null) {
@@ -192,7 +202,6 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
 
     private void loadRootContentContainer(ArrayObjectAdapter rowsAdapter) {
         rowsAdapter.clear();
-//        addSettingsActionsToRowAdapter(rowsAdapter);
 
         ContentContainer rootContentContainer = ContentBrowser.getInstance(getActivity()).getLastSelectedContentContainer();
         boolean isMyLibrary = rootContentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID);
@@ -210,6 +219,9 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
 
             HeaderItem header = new HeaderItem(0, contentContainer.getName());
             ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
+            if (contentContainer.getExtraStringValue(ContentContainer.EXTRA_THUMBNAIL_LAYOUT).equals("poster")) {
+                listRowAdapter = new ArrayObjectAdapter(new PosterCardPresenter());
+            }
 
             for (ContentContainer innerContentContainer : contentContainer.getContentContainers()) {
                 listRowAdapter.add(innerContentContainer);
@@ -225,10 +237,11 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                         .setLabel1(getString(R.string.action_load_more));
                 listRowAdapter.add(action);
             }
-//            rowsAdapter.add(rowsAdapter.size() - 1, new ListRow(header, listRowAdapter));
+
             rowsAdapter.add(new ListRow(header, listRowAdapter));
         }
 
+        addSettingsActionsToRowAdapter(mRowsAdapter);
         dataUpdated = false;
     }
 
@@ -241,9 +254,9 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
             SettingsCardPresenter cardPresenter = new SettingsCardPresenter();
             settingsAdapter = new ArrayObjectAdapter(cardPresenter);
 
-            for (Action item : settings) {
-                settingsAdapter.add(item);
-            }
+//            for (Action item : settings) {
+//                settingsAdapter.add(item);
+//            }
         }
         else {
             Log.d(TAG, "No settings were found");
@@ -251,8 +264,9 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
 
         if (settingsAdapter != null) {
             // Create settings header and row
-            HeaderItem header = new HeaderItem(0, getString(R.string.settings_title));
-            arrayObjectAdapter.add(0, new ListRow(header, settingsAdapter));
+//            HeaderItem header = new HeaderItem(0, getString(R.string.settings_title));
+            HeaderItem header = new HeaderItem(0, " ");
+            arrayObjectAdapter.add(new ListRow(header, settingsAdapter));
         }
     }
 
