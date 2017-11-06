@@ -75,6 +75,35 @@ You can use icon generatir in Android Studio to produce icons with required dime
 
 To use your brand color for highlighting buttons and widgets update ```accent``` color resource in the ```app\res\values\custom.xml``` file.  
 
+### Building app with the template variant
+
+Note: 
+- Build `app` and `ZypeApi` as `templateDebug` or `templateRelease` in the Build Variants section
+- Update `ZypeApi/build.gradle` to use `templateDebug` as defaultConfig instead of `demoDebug`
+
+Update the following resources in each file:
+
+In ```Application/ZypeAPI/src/template/java/com/zype/fire/api/ZypeSettings.java```
+- ```[APP_KEY]```
+- ```[CLIENT_ID]```
+- ```[CLIENT_SECRET]```
+- ```[ROOT_PLAYLIST_ID]```
+
+Also, set subscription details to `true/false` as you see fit.
+
+In ```Application/app/build.gradle```
+- ```[APPLICATION_ID```
+
+In ```Application/app/src/template/res/values/custom.xml```
+- ```[BRAND_COLOR]```
+
+In ```Application/app/src/template/res/values-en/strings.xml```
+- ```[APP_NAME]```
+
+In ```Application/app/src/template/res/values/strings.xml```
+- ```[APP_NAME]```
+- ```[APP_NAME_SHORT]```
+
 ## Built With
 
 * [Zype API](http://dev.zype.com/api_docs/intro/) - Zype API docs
