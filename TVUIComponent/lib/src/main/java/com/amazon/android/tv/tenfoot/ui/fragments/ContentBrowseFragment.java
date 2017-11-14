@@ -42,6 +42,7 @@ import com.amazon.android.tv.tenfoot.presenter.PosterCardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.SettingsCardPresenter;
 import com.amazon.android.utils.Preferences;
 import com.zype.fire.api.ZypeApi;
+import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
 
@@ -266,7 +267,7 @@ public class ContentBrowseFragment extends RowsFragment {
 
                 /* Zype, Evgeny Cherkasov */
                 // Get video entitlement
-                if (ZypeSettings.UNIVERSAL_TVOD) {
+                if (ZypeConfiguration.isUniversalTVODEnabled(getActivity())) {
                     if (!content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
                         String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
                         HashMap<String, String> params = new HashMap<>();

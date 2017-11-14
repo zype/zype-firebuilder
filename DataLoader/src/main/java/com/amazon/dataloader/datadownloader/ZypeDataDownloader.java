@@ -13,11 +13,14 @@ import com.amazon.dataloader.R;
 import com.amazon.utils.model.Data;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.zype.fire.api.Model.AppData;
+import com.zype.fire.api.Model.AppResponse;
 import com.zype.fire.api.Model.PlaylistData;
 import com.zype.fire.api.Model.PlaylistsResponse;
 import com.zype.fire.api.Model.VideoData;
 import com.zype.fire.api.Model.VideosResponse;
 import com.zype.fire.api.ZypeApi;
+import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 
 import org.json.JSONArray;
@@ -118,6 +121,10 @@ public class ZypeDataDownloader extends ADataDownloader {
     protected Data fetchData(Recipe dataLoadRecipe) throws Exception {
         Log.d(TAG, "fetchData(): Started");
 
+        AppData appData = loadAppConfiguration();
+        Log.d(TAG, "fetchData(): App configuration loaded");
+        ZypeConfiguration.update(appData, mContext);
+
         List<PlaylistData> playlists = loadPlaylists();
         Log.d(TAG, "fetchData(): Playlists loaded");
         addMyLibraryPlaylists(playlists);
@@ -173,6 +180,17 @@ public class ZypeDataDownloader extends ADataDownloader {
 
         Log.d(TAG, "fetchData(): finished");
         return Data.createDataForPayload(jsonResult.toString());
+    }
+
+    private AppData loadAppConfiguration() {
+        AppData result = new AppData();
+
+        AppResponse appResponse = ZypeApi.getInstance().getApp();
+        if (appResponse != null && appResponse.data != null) {
+            result = appResponse.data;
+        }
+
+        return result;
     }
 
     private List<PlaylistData> loadPlaylists() {

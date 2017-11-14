@@ -2,6 +2,7 @@ package com.zype.fire.api;
 
 import com.zype.fire.api.Model.AccessTokenInfoResponse;
 import com.zype.fire.api.Model.AccessTokenResponse;
+import com.zype.fire.api.Model.AppResponse;
 import com.zype.fire.api.Model.BifrostResponse;
 import com.zype.fire.api.Model.ConsumerResponse;
 import com.zype.fire.api.Model.PlayerResponse;
@@ -45,6 +46,10 @@ public interface IZypeApi {
     @FormUrlEncoded
     @POST("https://bifrost.zype.com/api/v1/subscribe")
     Call<BifrostResponse> verifySubscription(@FieldMap Map<String, String> params);
+
+    // App
+    @GET("/app")
+    Call<AppResponse> getApp(@QueryMap HashMap<String, String> params);
 
     // Consumers
     @GET("consumers/{consumer_id}")
