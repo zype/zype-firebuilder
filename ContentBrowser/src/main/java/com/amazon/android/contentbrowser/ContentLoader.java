@@ -27,6 +27,7 @@ import com.amazon.android.navigator.NavigatorModel;
 import com.amazon.android.navigator.NavigatorModelParser;
 import com.amazon.android.recipe.Recipe;
 import com.amazon.android.utils.Preferences;
+import com.amazon.dataloader.datadownloader.ZypeDataDownloaderHelper;
 import com.amazon.dataloader.dataloadmanager.DataLoadManager;
 import com.amazon.dynamicparser.DynamicParser;
 import com.amazon.utils.model.Data;
@@ -206,7 +207,7 @@ public class ContentLoader {
             params = new String[] { ZypeSettings.ROOT_PLAYLIST_ID };
         }
         else {
-            params = new String[] { (String) root.getExtraStringValue("keyDataType") };
+            params = new String[] { (String) root.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG) };
         }
 
         return mDataLoadManager.cookRecipeObservable(
@@ -241,6 +242,13 @@ public class ContentLoader {
                         root.addContentContainer(contentContainer);
                         alreadyAvailableContentContainer = contentContainer;
                     }
+                        /* Zype, Evgeny Cherkasov */
+                    if (alreadyAvailableContentContainer.getExtraValueAsInt(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT) > 0) {
+                        alreadyAvailableContentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, 1);
+                    }
+                    else {
+                        alreadyAvailableContentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, -1);
+                    }
 
                     if (DEBUG_RECIPE_CHAIN) {
                         Log.d(TAG, "Dynamic parser got an container");
@@ -272,27 +280,29 @@ public class ContentLoader {
                                 return feedDataForCategories;
                             })
                             .concatMap(feedDataForCategories -> {
-                                String[] params = new String[]{(String) parentContentContainer.getExtraStringValue("keyDataType")};
+                                String[] params = new String[]{(String) parentContentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG)};
                                 return mDynamicParser.cookRecipeObservable(dynamicParserRecipeForCategories, feedDataForCategories, null, params);
-//                                        .concatMap(contentSubContainer -> getSubCategoriesObservable(contentSubContainer, dataLoaderRecipeForCategories, dynamicParserRecipeForCategories));
                             })
                             .filter(contentSubContainerAsObject -> contentSubContainerAsObject != null)
                             .map(contentSubContainerAsObject -> {
-//                                            if (contentSubContainerAsObject == null) {
-//                                                return contentContainer;
-//                                            }
                                 ContentContainer contentSubContainer = (ContentContainer) contentSubContainerAsObject;
                                 if (DEBUG_RECIPE_CHAIN) {
                                     Log.d(TAG, "getSubCategoriesObservable(): " + contentSubContainer.getName());
                                 }
-                                parentContentContainer.getContentContainers().add(contentSubContainer);
-                                if (Integer.valueOf(contentSubContainer.getExtraStringValue("playlistItemCount")) > 0) {
-//                                    return contentSubContainer;
-                                    return parentContentContainer;
+                                if (contentSubContainer.getExtraValueAsInt(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT) > 0) {
+                                    contentSubContainer.setExtraValue(ExtraKeys.NEXT_PAGE, 1);
                                 }
                                 else {
-                                    return parentContentContainer;
+                                    contentSubContainer.setExtraValue(ExtraKeys.NEXT_PAGE, -1);
                                 }
+                                parentContentContainer.getContentContainers().add(contentSubContainer);
+                                return parentContentContainer;
+//                                if (Integer.valueOf(contentSubContainer.getExtraStringValue("playlistItemCount")) > 0) {
+//                                    return parentContentContainer;
+//                                }
+//                                else {
+//                                    return parentContentContainer;
+//                                }
                             })
                             .distinct()
             );
@@ -596,15 +606,30 @@ public class ContentLoader {
     /*
      * Zype, Evgeny Cherkasov
      */
-    private Observable<Object> getLoadContentsObservable(Observable<Object> observable, Recipe recipeDynamicParser) {
+    public Observable<Object> getLoadContentsObservable(Observable<Object> observable, Recipe recipeDynamicParser) {
         return observable
+                .map(contentContainerAsObject -> {
+                    ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
+                    if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.MY_LIBRARY_PLAYLIST_ID)) {
+                        ContentContainer rootMyLibrary = getRootContentContainer().findContentContainerByName(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID);
+                        if (rootMyLibrary.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) == 1) {
+                            contentContainer.getContents().clear();
+                        }
+                    }
+                    else {
+                        if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) == 1) {
+                            contentContainer.getContents().clear();
+                        }
+                    }
+                    return contentContainerAsObject;
+                })
                 .concatMap(contentContainerAsObject -> {
                     ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
                     if (DEBUG_RECIPE_CHAIN) {
                         Log.d(TAG, "getLoadContentsObservable:" + contentContainer.getName());
                     }
-                    // TODO: Move videos loading code to ZypeDataDownloader and use its method here
                     if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.MY_LIBRARY_PLAYLIST_ID)) {
+                        // TODO: Move videos loading code to ZypeDataDownloader and use its method here
                         // Loading My Library videos
                         return getMyLibraryVideosObservable(contentContainerAsObject);
                     }
@@ -615,49 +640,43 @@ public class ContentLoader {
                 })
                 .concatMap(objectPair -> {
                     ContentContainer contentContainer = (ContentContainer) objectPair.first;
-                    if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.MY_LIBRARY_PLAYLIST_ID)) {
-                        ContentContainer rootMyLibrary = getRootContentContainer().findContentContainerByName(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID);
-                        if (rootMyLibrary.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) == 1) {
-                            contentContainer.getContents().clear();
-                        }
-                    }
-                    else {
-                        contentContainer.getContents().clear();
-                    }
                     String feed = (String) objectPair.second;
-                    String[] params = new String[]{(String) contentContainer
-                            .getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG)
-                    };
+                    String[] params = new String[] { contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG) };
 
-                    return mDynamicParser.cookRecipeObservable(
-                            recipeDynamicParser,
-                            feed,
-                            null,
-                            params).map(contentAsObject -> {
-                        if (DEBUG_RECIPE_CHAIN) {
-                            Log.d(TAG, "Parser got an content");
-                        }
-                        Content content = (Content) contentAsObject;
-                        if (content != null) {
-                            contentContainer.addContent(content);
-                        }
-                        return Pair.create(contentContainer, contentAsObject);
-                    });
+                    return mDynamicParser
+                            .cookRecipeObservable(recipeDynamicParser, feed, null, params)
+                            .map(contentAsObject -> {
+                                if (DEBUG_RECIPE_CHAIN) {
+                                    Log.d(TAG, "Parser got an content");
+                                }
+                                Content content = (Content) contentAsObject;
+                                if (content != null) {
+                                    contentContainer.addContent(content);
+                                }
+                                return Pair.create(contentContainer, contentAsObject);
+                            });
                 });
     }
 
     public Observable<Pair> getPlaylistVideosFeedObservable(Object contentContainerAsObject) {
         ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
-        VideosResponse response = ZypeApi.getInstance().getPlaylistVideos(contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+
+        int nextPage = contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE);
+        if (nextPage <= 0) {
+            Log.e(TAG, "getPlaylistVideosFeedObservable(): incorrect page: " + nextPage);
+            return Observable.just(Pair.create(contentContainerAsObject, ""));
+        }
+
+        VideosResponse response = ZypeDataDownloaderHelper.loadPlaylistVideos(contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG), nextPage);
         if (response != null) {
-            Log.d(TAG, "getPlaylistVideosFeedObservable(): size=" + response.videoData.size());
-            for (VideoData videoData : response.videoData) {
-                if (TextUtils.isEmpty(videoData.description) || videoData.description.equals("null")) {
-                    videoData.description = " ";
-                }
-                videoData.playlistId = contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG);
-                videoData.playerUrl = "null";
+            if (response.pagination.current == response.pagination.pages) {
+                contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, -1);
             }
+            else {
+                contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, response.pagination.next);
+            }
+
+            Log.d(TAG, "getPlaylistVideosFeedObservable(): size=" + response.videoData.size());
             GsonBuilder builder = new GsonBuilder();
             Gson gson = builder.create();
             String feed = gson.toJson(response.videoData);
@@ -766,58 +785,6 @@ public class ContentLoader {
         return getLoadContentsObservable(observable, dynamicParserRecipeForContents);
     }
 
-    private void loadContentForSubcontainers(Activity activity, ICancellableLoad cancellable, ContentContainer parentContainer) {
-        List<ContentContainer> subContainers = new ArrayList<>();
-        for (ContentContainer contentContainer : parentContainer.getContentContainers()) {
-            for (ContentContainer innerContentContainer : contentContainer.getContentContainers()) {
-                if (Integer.valueOf(innerContentContainer.getExtraStringValue("playlistItemCount")) > 0) {
-                    loadContentForContentContainer(innerContentContainer, activity, new ILoadContentForContentContainer() {
-                        @Override
-                        public void onContentsLoaded() {
-                            if (DEBUG_RECIPE_CHAIN) {
-                                Log.d(TAG, "loadContentForSubcontainers(): " + innerContentContainer.getName());
-                            }
-                        }
-                    });
-//                    subContainers.add(innerContentContainer);
-                }
-            }
-        }
-
-//        NavigatorModel.GlobalRecipes recipe = mNavigator.getNavigatorModel().getGlobalRecipes().get(0);
-//        Recipe dataLoaderRecipeForContents = recipe.getContents().dataLoaderRecipe;
-//        Recipe dynamicParserRecipeForContents = recipe.getContents().dynamicParserRecipe;
-//
-//        Subscription subscription = Observable.from(subContainers)
-//                .subscribeOn(Schedulers.newThread())
-//                .concatMap(contentContainer -> {
-//                    if (DEBUG_RECIPE_CHAIN) {
-//                        Log.d(TAG, "loadContentForSubcontainers(): " + contentContainer.getName());
-//                    }
-//                    return getContentsObservable(Observable.just(contentContainer), dataLoaderRecipeForContents, dynamicParserRecipeForContents);
-//                })
-//                .onBackpressureBuffer() // This must be right after concatMap.
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(objectPair -> { },
-//                        throwable -> {
-//                            Log.e(TAG, "Recipe chain failed:", throwable);
-//                            ErrorHelper.injectErrorFragment(
-//                                    mNavigator.getActiveActivity(),
-//                                    ErrorUtils.ERROR_CATEGORY.FEED_ERROR,
-//                                    (errorDialogFragment, errorButtonType,
-//                                     errorCategory) -> {
-//                                        if (errorButtonType ==
-//                                                ErrorUtils.ERROR_BUTTON_TYPE.EXIT_APP) {
-//                                            mNavigator.getActiveActivity().finishAffinity();
-//                                        }
-//                                    });
-//
-//                            },
-//                        () -> { });
-//
-//        mCompositeSubscription.add(subscription);
-    }
-
     public interface ILoadContentForContentContainer {
         void onContentsLoaded();
     }
@@ -830,7 +797,7 @@ public class ContentLoader {
         HashMap<String, String> params = new HashMap<>();
         params.put(ZypeApi.APP_KEY, ZypeSettings.APP_KEY);
         params.put(ZypeApi.PER_PAGE, String.valueOf(ZypeApi.PER_PAGE_DEFAULT));
-        ZypeApi.getInstance().getApi().getPlaylistVideos((String) contentContainer.getExtraStringValue("keyDataType"), 1, params).enqueue(new Callback<VideosResponse>() {
+        ZypeApi.getInstance().getApi().getPlaylistVideos(contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG), 1, params).enqueue(new Callback<VideosResponse>() {
             @Override
             public void onResponse(Call<VideosResponse> call, Response<VideosResponse> response) {
                 if (response.isSuccessful()) {
@@ -840,7 +807,7 @@ public class ContentLoader {
                             if (TextUtils.isEmpty(videoData.description) || videoData.description.equals("null")) {
                                 videoData.description = " ";
                             }
-                            videoData.playlistId = (String) contentContainer.getExtraStringValue("keyDataType");
+                            videoData.playlistId = (String) contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG);
                             videoData.playerUrl = "null";
                         }
                         GsonBuilder builder = new GsonBuilder();
@@ -930,8 +897,9 @@ public class ContentLoader {
 
     private Observable<Object> getContentsForContentContainerObservable(String feed, Recipe recipeDynamicParserVideos,
                                                                         ContentContainer contentContainer) {
-        String[] params = new String[] { (String) contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG) };
-        return Observable.just(contentContainer)
+        String[] params = new String[] { contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG) };
+        return Observable
+                .just(contentContainer)
                 .concatMap(o -> mDynamicParser.cookRecipeObservable(recipeDynamicParserVideos, feed, null, params)
                         .map(contentAsObject -> {
                             Content content = (Content) contentAsObject;

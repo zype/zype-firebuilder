@@ -138,9 +138,11 @@ public class ZypeDataDownloader extends ADataDownloader {
             if (playlistData.playlistItemCount > 0) {
                 Log.d(TAG, "fetchData(): Loading videos for " + playlistData.title);
 
-                List<VideoData> videos = loadPlaylistVideos(playlistData);
-                for (VideoData videoData : videos) {
-                    jsonContents.put(new JSONObject(gson.toJson(videoData)));
+                VideosResponse videosResponse = ZypeDataDownloaderHelper.loadPlaylistVideos(playlistData.id, 1);
+                if (videosResponse != null) {
+                    for (VideoData videoData : videosResponse.videoData) {
+                        jsonContents.put(new JSONObject(gson.toJson(videoData)));
+                    }
                 }
             }
         }
@@ -213,36 +215,36 @@ public class ZypeDataDownloader extends ADataDownloader {
         playlists.add(item);
     }
 
-    private List<VideoData> loadPlaylistVideos(PlaylistData playlist) {
-        Log.d(TAG, "loadPlaylistVideos(): " + playlist.title);
-        List<VideoData> result = new ArrayList<>();
+//    private List<VideoData> loadPlaylistVideos(PlaylistData playlist) {
+//        Log.d(TAG, "loadPlaylistVideos(): " + playlist.title);
+//        List<VideoData> result = new ArrayList<>();
+//
+//        VideosResponse response = ZypeApi.getInstance().getPlaylistVideos(playlist.id, 1);
+//        if (response != null) {
+//            Log.d(TAG, "loadPlaylistVideos(): size=" + response.videoData.size());
+//            for (VideoData videoData : response.videoData) {
+//                // Put a space string for description if it is not specified to avoid crashing
+//                // because 'description' is mandatory field in the Content model
+//                if (TextUtils.isEmpty(videoData.description) || videoData.description.equals("null")) {
+//                    videoData.description = " ";
+//                }
+//                // Add reference to playlist
+//                videoData.playlistId = playlist.id;
+//                // Set dummy player url. We get real url before switch to renderer screen
+//                videoData.playerUrl = "null";
+//            }
+//            result.addAll(response.videoData);
+//        }
+//        return result;
+//    }
 
-        VideosResponse response = ZypeApi.getInstance().getPlaylistVideos(playlist.id);
-        if (response != null) {
-            Log.d(TAG, "loadPlaylistVideos(): size=" + response.videoData.size());
-            for (VideoData videoData : response.videoData) {
-                // Put a space string for description if it is not specified to avoid crashing
-                // because 'description' is mandatory field in the Content model
-                if (TextUtils.isEmpty(videoData.description) || videoData.description.equals("null")) {
-                    videoData.description = " ";
-                }
-                // Add reference to playlist
-                videoData.playlistId = playlist.id;
-                // Set dummy player url. We get real url before switch to renderer screen
-                videoData.playerUrl = "null";
-            }
-            result.addAll(response.videoData);
-        }
-        return result;
-    }
-
-    public String getPlaylistFeed(PlaylistData playlist) {
-        List<VideoData> videos = loadPlaylistVideos(playlist);
-        if (videos == null || videos.isEmpty()) {
-            return null;
-        }
-        GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder.create();
-        return gson.toJson(videos);
-    }
+//    public String getPlaylistFeed(PlaylistData playlist) {
+//        List<VideoData> videos = loadPlaylistVideos(playlist);
+//        if (videos == null || videos.isEmpty()) {
+//            return null;
+//        }
+//        GsonBuilder builder = new GsonBuilder();
+//        Gson gson = builder.create();
+//        return gson.toJson(videos);
+//    }
 }

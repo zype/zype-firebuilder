@@ -14,6 +14,7 @@
  */
 package com.amazon.android.model.content;
 
+import com.amazon.android.recipe.Recipe;
 import com.amazon.utils.StringManipulation;
 
 import android.util.Log;
@@ -77,8 +78,11 @@ public class ContentContainer implements Iterable<Content> {
     /**
      * Extra keys
      */
+    // TODO: Move extra field names to the ExtraKeys helper class
     // Poster image url
     public static final String EXTRA_IMAGE_POSTER_URL = "ImagePosterUrl";
+    // Playlist item count
+    public static final String EXTRA_PLAYLIST_ITEM_COUNT = "playlistItemCount";
     // Thumbnail layout
     public static final String EXTRA_THUMBNAIL_LAYOUT = "ThumbnailLayout";
     // Poster thumbnail url
@@ -210,6 +214,24 @@ public class ContentContainer implements Iterable<Content> {
             }
         }
 
+        return result;
+    }
+
+    /**
+     * Find content container by id.
+     *
+     * @param id Container id to be searched.
+     * @return Found content container reference.
+     */
+    public ContentContainer findContentContainerById(String id) {
+        ContentContainer result = null;
+        Iterator<ContentContainer> contentContainerIterator = new FlatContentContainerIterator();
+        while (contentContainerIterator.hasNext()) {
+            ContentContainer contentContainer = contentContainerIterator.next();
+            if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(id)) {
+                return contentContainer;
+            }
+        }
         return result;
     }
 
@@ -502,4 +524,66 @@ public class ContentContainer implements Iterable<Content> {
         }
         return null;
     }
+
+    /* Zype, Evgeny Cherkasov */
+    private class FlatContentContainerIterator implements Iterator<ContentContainer> {
+        /**
+         * Stack of all content containers under a container recursively.
+         */
+        private Stack<ContentContainer> contentContainerStack = new Stack<>();
+
+        /**
+         * Constructors a FlatContentContainerIterator.
+         */
+        public FlatContentContainerIterator() {
+            // Add all sub containers of the root to the stack.
+            for (ContentContainer contentContainer : mContentContainers) {
+                addToStack(contentContainerStack, contentContainer);
+            }
+        }
+
+        /**
+         * Recursively add all sub containers to a stack
+         *
+         * @param stack            Stack in use for recursion.
+         * @param contentContainer ContentContainer to be traversed.
+         */
+        private void addToStack(Stack<ContentContainer> stack, ContentContainer contentContainer) {
+            stack.push(contentContainer);
+            // Add all the sub containers recursively.
+            for (ContentContainer subContentContainer : contentContainer.mContentContainers) {
+                addToStack(stack, subContentContainer);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * @return False if there are no {@link Content} objects left to be traversed.
+         */
+        @Override
+        public boolean hasNext() {
+            // hasNext if stack still has containers
+            return !(contentContainerStack.size() == 0);
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * @return The next {@link Content} object from the flattened list.
+         */
+        @Override
+        public ContentContainer next() {
+            return contentContainerStack.pop();
+        }
+
+        /**
+         * Remove is unsupported!
+         */
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+    }
+
 }

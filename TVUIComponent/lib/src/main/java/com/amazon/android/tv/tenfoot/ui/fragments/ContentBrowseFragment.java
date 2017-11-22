@@ -32,8 +32,10 @@ import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.ContentLoader;
 import com.amazon.android.contentbrowser.helper.AuthHelper;
 import com.amazon.android.model.Action;
+import com.amazon.android.model.PlaylistAction;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
+import com.amazon.android.model.content.constants.ExtraKeys;
 import com.amazon.android.recipe.Recipe;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
@@ -48,6 +50,10 @@ import com.zype.fire.auth.ZypeAuthentication;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -62,9 +68,9 @@ import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowHeaderPresenter;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v17.leanback.widget.VerticalGridView;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -85,11 +91,21 @@ public class ContentBrowseFragment extends RowsFragment {
     private ArrayObjectAdapter settingsAdapter = null;
     /* Zype, Evgeny Cherkasov */
     ArrayObjectAdapter mRowsAdapter = null;
+    private BroadcastReceiver receiver;
 
     // Container Activity must implement this interface.
     public interface OnBrowseRowListener {
 
         void onItemSelected(Object item);
+    }
+
+    /* Zype, Evgeny Cherkasov */
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (receiver != null) {
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, new IntentFilter("DataUpdated"));
+        }
     }
 
     @Override
@@ -136,6 +152,26 @@ public class ContentBrowseFragment extends RowsFragment {
                 }
             }
         }, WAIT_BEFORE_FOCUS_REQUEST_MS);
+
+        /* Zype, Evgeny Cherkasov */
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                mRowsAdapter.clear();
+                loadRootContentContainer(mRowsAdapter);
+                addSettingsActionsToRowAdapter(mRowsAdapter);
+            }
+        };
+
+    }
+
+    /* Zype, Evgeny Cherkasov */
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (receiver != null) {
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(receiver);
+        }
     }
 
     /**
@@ -175,6 +211,7 @@ public class ContentBrowseFragment extends RowsFragment {
                                                               .getRootContentContainer();
 
         CardPresenter cardPresenter = new CardPresenter();
+        PosterCardPresenter posterCardPresenter = new PosterCardPresenter();
 
         for (ContentContainer contentContainer : rootContentContainer.getContentContainers()) {
 
@@ -188,7 +225,7 @@ public class ContentBrowseFragment extends RowsFragment {
             ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
             /* Zype, Evgeny Cherkasov */
             if (contentContainer.getExtraStringValue(ContentContainer.EXTRA_THUMBNAIL_LAYOUT).equals("poster")) {
-                listRowAdapter = new ArrayObjectAdapter(new PosterCardPresenter());
+                listRowAdapter = new ArrayObjectAdapter(posterCardPresenter);
             }
 
             for (ContentContainer innerContentContainer : contentContainer.getContentContainers()) {
@@ -197,6 +234,27 @@ public class ContentBrowseFragment extends RowsFragment {
 
             for (Content content : contentContainer.getContents()) {
                 listRowAdapter.add(content);
+            }
+
+            /* Zype, Evgeny Cherkasov */
+            // Update NextPage parameter because the first page of playlist videos was loaded
+            // while running global recipes chain
+            // TODO: Probably it would better to move updating NextPage to the getContentsObservable()
+            if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) == 1) {
+                if (contentContainer.getExtraValueAsInt(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT) > ZypeApi.PER_PAGE_DEFAULT) {
+                    contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, 2);
+                }
+                else {
+                    contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, -1);
+                }
+            }
+            if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
+                PlaylistAction action = new PlaylistAction();
+                action.setAction(ContentBrowser.NEXT_PAGE)
+                        .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
+                        .setLabel1(getString(R.string.action_load_more));
+                action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+                listRowAdapter.add(action);
             }
 
             rowsAdapter.add(new ListRow(header, listRowAdapter));
@@ -316,6 +374,14 @@ public class ContentBrowseFragment extends RowsFragment {
                 ContentBrowser.getInstance(getActivity())
                               .setLastSelectedContentContainer(contentContainer)
                               .switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
+            }
+            /* Zype, Evgeny Cherkasov */
+            else if (item instanceof PlaylistAction) {
+                PlaylistAction action = (PlaylistAction) item;
+                if (action.getAction().equals(ContentBrowser.NEXT_PAGE)) {
+                    Log.d(TAG, "Next page button was clicked");
+                    ContentBrowser.getInstance(getActivity()).loadPlaylistVideos(action.getExtraValueAsString(PlaylistAction.EXTRA_PLAYLIST_ID));
+                }
             }
             else if (item instanceof Action) {
                 Action settingsAction = (Action) item;

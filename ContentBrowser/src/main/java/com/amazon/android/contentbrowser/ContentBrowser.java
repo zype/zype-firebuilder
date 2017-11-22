@@ -185,7 +185,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
     /* Zype, Evgeny Cherkasov */
     public static final String MY_LIBRARY = "MyLibrary";
-    public static final String MY_LIBRARY_NEXT_PAGE = "MyLibraryNextPage";
+    public static final String NEXT_PAGE = "NextPage";
 
     /**
      * Constant for the "watch now" action.
@@ -2450,6 +2450,45 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         mCompositeSubscription.add(subscription);
     }
 
+    public void loadPlaylistVideos(String playlistId) {
+        ContentContainer contentContainer = getRootContentContainer().findContentContainerById(playlistId);
+        if (contentContainer == null) {
+            Log.e(TAG, "loadPlaylistVideos(): Can't find content container for playlist, playlistId=" + playlistId);
+            return;
+        }
+
+        Observable<Object> observable = Observable.just(contentContainer);
+        Recipe recipeDynamicParserVideos = Recipe.newInstance(mAppContext, "recipes/ZypeSearchContentsRecipe.json");
+        Subscription subscription = observable
+                .subscribeOn(Schedulers.newThread())
+                .concatMap(contentContainerAsObject -> {
+                    return mContentLoader.getLoadContentsObservable(Observable.just(contentContainerAsObject), recipeDynamicParserVideos);
+                })
+                .onBackpressureBuffer() // This must be right after concatMap.
+                .doOnNext(o -> { })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    objectPair -> {
+                    },
+                    throwable -> {
+                        Log.e(TAG, "loadPlaylistVideos(): failed: ", throwable);
+                        ErrorHelper.injectErrorFragment(
+                                mNavigator.getActiveActivity(),
+                                ErrorUtils.ERROR_CATEGORY.FEED_ERROR,
+                                (errorDialogFragment, errorButtonType, errorCategory) -> {
+                                    if (errorButtonType == ErrorUtils.ERROR_BUTTON_TYPE.EXIT_APP) {
+                                        mNavigator.getActiveActivity().finishAffinity();
+                                    }
+                                });
+                    },
+                    () -> {
+                        Log.v(TAG, "loadPlaylistVideos(): completed");
+                        // TODO: Consider to use event bus instead of broadcast
+                        // This broadcast is handled in ZypePlaylistContentBrowseFragment to update content
+                        LocalBroadcastManager.getInstance(mNavigator.getActiveActivity()).sendBroadcast(new Intent("DataUpdated"));
+                    });
+        mCompositeSubscription.add(subscription);
+    }
     //
 
     /**

@@ -53,6 +53,7 @@ import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.ContentLoader;
 import com.amazon.android.contentbrowser.helper.AuthHelper;
 import com.amazon.android.model.Action;
+import com.amazon.android.model.PlaylistAction;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.model.content.constants.ExtraKeys;
@@ -207,6 +208,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
         boolean isMyLibrary = rootContentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID);
 
         CardPresenter cardPresenter = new CardPresenter();
+        PosterCardPresenter posterCardPresenter = new PosterCardPresenter();
 
         for (ContentContainer contentContainer : rootContentContainer.getContentContainers()) {
 
@@ -220,7 +222,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
             HeaderItem header = new HeaderItem(0, contentContainer.getName());
             ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
             if (contentContainer.getExtraStringValue(ContentContainer.EXTRA_THUMBNAIL_LAYOUT).equals("poster")) {
-                listRowAdapter = new ArrayObjectAdapter(new PosterCardPresenter());
+                listRowAdapter = new ArrayObjectAdapter(posterCardPresenter);
             }
 
             for (ContentContainer innerContentContainer : contentContainer.getContentContainers()) {
@@ -231,17 +233,29 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                 listRowAdapter.add(content);
             }
 
-            if (isMyLibrary && rootContentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
-                Action action = new Action().setAction(ContentBrowser.MY_LIBRARY_NEXT_PAGE)
-                        .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
-                        .setLabel1(getString(R.string.action_load_more));
-                listRowAdapter.add(action);
+            if (isMyLibrary) {
+                if (rootContentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
+                    Action action = new Action().setAction(ContentBrowser.NEXT_PAGE)
+                            .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
+                            .setLabel1(getString(R.string.action_load_more));
+                    listRowAdapter.add(action);
+                }
+            }
+            else {
+                if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
+                    PlaylistAction action = new PlaylistAction();
+                    action.setAction(ContentBrowser.NEXT_PAGE)
+                            .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
+                            .setLabel1(getString(R.string.action_load_more));
+                    action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+                    listRowAdapter.add(action);
+                }
             }
 
             rowsAdapter.add(new ListRow(header, listRowAdapter));
         }
 
-        addSettingsActionsToRowAdapter(mRowsAdapter);
+//        addSettingsActionsToRowAdapter(rowsAdapter);
         dataUpdated = false;
     }
 
@@ -265,7 +279,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
         if (settingsAdapter != null) {
             // Create settings header and row
 //            HeaderItem header = new HeaderItem(0, getString(R.string.settings_title));
-            HeaderItem header = new HeaderItem(0, " ");
+            HeaderItem header = new HeaderItem(" ");
             arrayObjectAdapter.add(new ListRow(header, settingsAdapter));
         }
     }
@@ -357,9 +371,20 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                         .setLastSelectedContentContainer(contentContainer)
                         .switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
             }
+            else if (item instanceof PlaylistAction) {
+                PlaylistAction action = (PlaylistAction) item;
+                if (action.getAction().equals(ContentBrowser.NEXT_PAGE)) {
+                    Log.d(TAG, "Next page button was clicked");
+                    ContentBrowser.getInstance(getActivity()).loadPlaylistVideos(action.getExtraValueAsString(PlaylistAction.EXTRA_PLAYLIST_ID));
+                }
+                else {
+                    Log.d(TAG, "Settings with title " + action.getAction() + " was clicked");
+                    ContentBrowser.getInstance(getActivity()).settingsActionTriggered(getActivity(),action);
+                }
+            }
             else if (item instanceof Action) {
                 Action action = (Action) item;
-                if (action.getAction().equals(ContentBrowser.MY_LIBRARY_NEXT_PAGE)) {
+                if (action.getAction().equals(ContentBrowser.NEXT_PAGE)) {
                     Log.d(TAG, "Next page button was clicked");
                     ContentBrowser.getInstance(getActivity()).runGlobalRecipesForLastSelected(getActivity(), ContentBrowser.getInstance(getActivity()));
                 }

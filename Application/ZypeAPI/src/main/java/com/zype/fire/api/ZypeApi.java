@@ -50,7 +50,7 @@ public class ZypeApi {
     private static final String USERNAME = "username";
     public static final String UUID = "uuid";
 
-    public static final int PER_PAGE_DEFAULT = 20;
+    public static final int PER_PAGE_DEFAULT = 3;
 
     private static ZypeApi instance;
     private static IZypeApi apiImpl;
@@ -197,12 +197,12 @@ public class ZypeApi {
         }
     }
 
-    public VideosResponse getPlaylistVideos(String playlistId) {
+    public VideosResponse getPlaylistVideos(String playlistId, int page) {
         try {
             HashMap<String, String> params = new HashMap<>();
             params.put(APP_KEY, ZypeSettings.APP_KEY);
             params.put(PER_PAGE, String.valueOf(PER_PAGE_DEFAULT));
-            Response response = apiImpl.getPlaylistVideos(playlistId, 1, params).execute();
+            Response response = apiImpl.getPlaylistVideos(playlistId, page, params).execute();
             if (response.isSuccessful()) {
                 return (VideosResponse) response.body();
             }

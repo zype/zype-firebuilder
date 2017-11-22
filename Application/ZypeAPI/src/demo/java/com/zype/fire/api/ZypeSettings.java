@@ -18,7 +18,7 @@ public class ZypeSettings {
     public static final String MY_LIBRARY_PLAYLIST_ID = "MyLibrary";
 
     // Template version
-    public static final String TEMPLATE_VERSION = "1.2.0";
+    public static final String TEMPLATE_VERSION = "1.4.0";
 
     // App features
 //    public static final boolean BACKGROUND_PLAYBACK_ENABLED = false;
