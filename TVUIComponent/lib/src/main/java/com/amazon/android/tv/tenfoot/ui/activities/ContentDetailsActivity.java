@@ -32,6 +32,8 @@ import com.amazon.android.model.event.ActionUpdateEvent;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentDetailsFragment;
+import com.zype.fire.auth.ZypeAuthentication;
+import com.zype.fire.auth.ZypeLoginActivity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -42,7 +44,7 @@ import android.util.Log;
 /**
  * Details activity class that loads the LeanbackDetailsFragment class.
  */
-public class ContentDetailsActivity extends BaseActivity {
+public class ContentDetailsActivity extends BaseActivity implements ZypeAuthentication.IAuthenticationActivityParameters {
 
     private static final String TAG = ContentDetailsActivity.class.getSimpleName();
 
@@ -83,4 +85,12 @@ public class ContentDetailsActivity extends BaseActivity {
         EventBus.getDefault().unregister(this);
         super.onStop();
     }
+
+    @Override
+    public Bundle getAuthenticationActivityParameters() {
+        Bundle parameters = new Bundle();
+        parameters.putString(ZypeLoginActivity.PARAMETERS_MESSAGE, getString(R.string.login_message));
+        return parameters;
+    }
+
 }

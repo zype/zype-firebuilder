@@ -44,6 +44,10 @@ public class ZypeAuthentication implements IAuthentication {
      */
     private String accessToken;
 
+    public interface IAuthenticationActivityParameters {
+        Bundle getAuthenticationActivityParameters();
+    }
+
     /**
      * Initialize the authentication framework.
      *
@@ -77,7 +81,11 @@ public class ZypeAuthentication implements IAuthentication {
      */
     @Override
     public Intent getAuthenticationActivityIntent(Context context) {
-        return new Intent(context, ZypeLoginActivity.class);
+        Intent intent = new Intent(context, ZypeLoginActivity.class);
+        if (context instanceof IAuthenticationActivityParameters) {
+            intent.putExtras(((IAuthenticationActivityParameters) context).getAuthenticationActivityParameters());
+        }
+        return intent;
     }
 
     /**

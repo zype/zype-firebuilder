@@ -53,6 +53,7 @@ public class ZypeApi {
     public static final int PER_PAGE_DEFAULT = 20;
 
     private static ZypeApi instance;
+    private static Retrofit retrofit;
     private static IZypeApi apiImpl;
 
     private ZypeApi() {}
@@ -66,7 +67,7 @@ public class ZypeApi {
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
-            Retrofit retrofit = new Retrofit.Builder()
+            retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .client(client)
                     .addConverterFactory(GsonConverterFactory.create())
@@ -74,6 +75,10 @@ public class ZypeApi {
             apiImpl = retrofit.create(IZypeApi.class);
         }
         return instance;
+    }
+
+    public Retrofit retrofit() {
+        return retrofit;
     }
 
     public IZypeApi getApi() {

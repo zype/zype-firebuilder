@@ -58,9 +58,11 @@ import com.amazon.mediaplayer.playback.text.Cue;
 import com.amazon.mediaplayer.tracks.TrackType;
 import com.zype.fire.api.IZypeApi;
 import com.zype.fire.api.Model.AdvertisingSchedule;
+import com.zype.fire.api.Model.ErrorBody;
 import com.zype.fire.api.Model.PlayerData;
 import com.zype.fire.api.Model.PlayerResponse;
 import com.zype.fire.api.Util.AdMacrosHelper;
+import com.zype.fire.api.Util.ErrorHelper;
 import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
@@ -1401,6 +1403,17 @@ public class PlaybackActivity extends Activity implements
                 }
                 else {
                     updateContentWithPlayerData(mSelectedContent, null);
+                    if (response.code() == 403) {
+                        String errorMessage = null;
+                        ErrorBody errorBody = ErrorHelper.parseError(response);
+                        if (errorBody != null) {
+                            errorMessage = errorBody.message;
+                        }
+                        mErrorDialogFragment = ErrorDialogFragment.newInstance(PlaybackActivity.this,
+                                ErrorUtils.ERROR_CATEGORY.ZYPE_CUSTOM, errorMessage, PlaybackActivity.this);
+                        mErrorDialogFragment.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
+                        return;
+                    }
                 }
                 if (mSelectedContent.getAdCuePoints() != null) {
                     Log.d(TAG, "openSelectedContent(): Ad tags count = " + mSelectedContent.getAdCuePoints().size());
@@ -1708,6 +1721,13 @@ public class PlaybackActivity extends Activity implements
             case NETWORK_ERROR:
                 if (errorButtonType == ErrorUtils.ERROR_BUTTON_TYPE.NETWORK_SETTINGS) {
                     ErrorUtils.showNetworkSettings(this);
+                }
+                break;
+            /* Zype, Evgeny Cherkasov */
+            case ZYPE_CUSTOM:
+                if (mErrorDialogFragment != null) {
+                    mErrorDialogFragment.dismiss();
+                    finish();
                 }
                 break;
         }

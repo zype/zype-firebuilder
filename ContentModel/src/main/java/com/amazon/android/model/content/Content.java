@@ -311,8 +311,12 @@ public class Content implements Serializable {
     public static final String EXTRA_ENTITLED = "Entitled";
     // Poster image url
     public static final String EXTRA_IMAGE_POSTER_URL = "ImagePosterUrl";
+    // Pass required flag
+    public static final String EXTRA_PASS_REQUIRED = "PassRequired";
     // Purchase required flag
     public static final String EXTRA_PURCHASE_REQUIRED = "PurchaseRequired";
+    // Rental required flag
+    public static final String EXTRA_RENTAL_REQUIRED = "RentalRequired";
     // Poster thumbnail url
     public static final String EXTRA_THUMBNAIL_POSTER_URL = "ThumbnailPosterUrl";
 

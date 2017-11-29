@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.amazon.android.module.*;
 import com.amazon.android.module.BuildConfig;
@@ -33,11 +34,14 @@ import java.util.Map;
 public class ZypeLoginActivity extends Activity {
     private final static String TAG = ZypeLoginActivity.class.getSimpleName();
 
-//    private TextInputLayout layoutUsername;
-//    private TextInputLayout layoutPassword;
+    public static final String PARAMETERS_MESSAGE = "Message";
+
+    private TextView textMessage;
     private EditText editUsername;
     private EditText editPassword;
     private Button buttonLogin;
+
+    private String message;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,8 +49,9 @@ public class ZypeLoginActivity extends Activity {
 
         setContentView(R.layout.activity_zype_login);
 
-//        layoutUsername = (TextInputLayout) findViewById(R.id.layoutUsername);
-//        layoutPassword = (TextInputLayout) findViewById(R.id.layoutPassword);
+        initParameters(savedInstanceState);
+
+        textMessage = (TextView) findViewById(R.id.textMessage);
         editUsername = (EditText) findViewById(R.id.editUsername);
         editPassword = (EditText) findViewById(R.id.editPassword);
         buttonLogin = (Button) findViewById(R.id.buttonLogin);
@@ -56,6 +61,28 @@ public class ZypeLoginActivity extends Activity {
                 getAuthenticationToken();
             }
         });
+
+        bindViews();
+    }
+
+    private void initParameters(Bundle savedInstanceState) {
+        Bundle args;
+        if (savedInstanceState != null) {
+            args = savedInstanceState;
+        }
+        else {
+            args = getIntent().getExtras();
+        }
+        if (args != null) {
+            message = args.getString(PARAMETERS_MESSAGE);
+        }
+    }
+
+    // //////////
+    // UI
+    //
+    private void bindViews() {
+        textMessage.setText(message);
     }
 
     // //////////
@@ -67,8 +94,6 @@ public class ZypeLoginActivity extends Activity {
 
     public void getAuthenticationToken() {
         buttonLogin.setEnabled(false);
-//        final String username = layoutUsername.getEditText().getText().toString();
-//        final String password = layoutPassword.getEditText().getText().toString();
         final String username = editUsername.getText().toString();
         final String password = editPassword.getText().toString();
 

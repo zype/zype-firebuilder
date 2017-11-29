@@ -6,36 +6,16 @@
     android:padding="64dp"
     xmlns:tools="http://schemas.android.com/tools"
     >
-    <!--<android.support.design.widget.TextInputLayout-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="center_horizontal"-->
-        <!--android:layout_marginTop="4dp"-->
-        <!--android:layout_marginBottom="16dp"-->
-        <!--android:id="@+id/layoutUsername"-->
-        <!--android:hint="@string/zype_login_username"-->
-        <!--tools:text="Email"-->
-        <!--&gt;-->
-        <!--<android.support.design.widget.TextInputEditText-->
-            <!--android:layout_width="360dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--/>-->
-    <!--</android.support.design.widget.TextInputLayout>-->
-    <!--<android.support.design.widget.TextInputLayout-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="center_horizontal"-->
-        <!--android:layout_marginTop="4dp"-->
-        <!--android:layout_marginBottom="16dp"-->
-        <!--android:id="@+id/layoutPassword"-->
-        <!--android:hint="@string/zype_login_password"-->
-        <!--tools:text="Password"-->
-        <!--&gt;-->
-        <!--<android.support.design.widget.TextInputEditText-->
-            <!--android:layout_width="360dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--/>-->
-    <!--</android.support.design.widget.TextInputLayout>-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:id="@+id/textMessage"
+        android:textSize="24sp"
+        android:textColor="@color/login_instructions_color"
+        android:gravity="center_horizontal"
+        tools:text="Sign in"
+        />
     <EditText
         android:layout_width="360dp"
         android:layout_height="wrap_content"
@@ -64,6 +44,17 @@
         android:layout_marginTop="4dp"
         android:layout_marginBottom="16dp"
         android:id="@+id/buttonLogin"
+        android:background="@drawable/action_button_background"
+        android:textColor="@drawable/action_button_text_color_selector"
         android:text="@string/zype_login_button"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/login_description1"
+        android:textSize="14sp"
+        android:textColor="@color/login_instructions_color"
+        android:gravity="center_horizontal"
         />
 </LinearLayout>

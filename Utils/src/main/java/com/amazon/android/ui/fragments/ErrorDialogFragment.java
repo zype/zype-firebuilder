@@ -25,6 +25,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -97,6 +98,37 @@ public class ErrorDialogFragment extends DialogFragment {
         args.putSerializable(ARG_ERROR_CATEGORY, errorCategory);
         // Get the error message.
         args.putString(ARG_ERROR_MESSAGE, ErrorUtils.getErrorMessage(context, errorCategory));
+        // Get the button details.
+        args.putStringArrayList(ARG_ACTION_LABELS, (ArrayList<String>) ErrorUtils
+                .getButtonLabelsList(context, errorCategory));
+        // Get the button behavior.
+        errorDialogFragment.setArguments(args);
+        return errorDialogFragment;
+    }
+
+
+    /* Zype, Evgeny Cherkasov */
+    public static ErrorDialogFragment newInstance(Context context,
+                                                  ErrorUtils.ERROR_CATEGORY errorCategory,
+                                                  String errorMessage,
+                                                  ErrorDialogFragmentListener
+                                                          errorDialogFragmentListener) {
+
+        ErrorDialogFragment errorDialogFragment = new ErrorDialogFragment();
+        errorDialogFragment.mListener = errorDialogFragmentListener;
+        errorDialogFragment.setStyle(DialogFragment.STYLE_NO_TITLE, R.style.error_dialog);
+        // Setting it as non-cancelable prevents back button press issues.
+        errorDialogFragment.setCancelable(false);
+        Bundle args = new Bundle();
+        // Set the error category.
+        args.putSerializable(ARG_ERROR_CATEGORY, errorCategory);
+        // Get the error message.
+        if (errorMessage == null) {
+            args.putString(ARG_ERROR_MESSAGE, ErrorUtils.getErrorMessage(context, errorCategory));
+        }
+        else {
+            args.putString(ARG_ERROR_MESSAGE, errorMessage);
+        }
         // Get the button details.
         args.putStringArrayList(ARG_ACTION_LABELS, (ArrayList<String>) ErrorUtils
                 .getButtonLabelsList(context, errorCategory));

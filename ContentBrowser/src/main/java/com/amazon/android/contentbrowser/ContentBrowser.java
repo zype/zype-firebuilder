@@ -1712,33 +1712,41 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                            boolean showErrorDialog) {
 
         /* Zype, Evgeny Cherkasov */
-        // Check if subscription video available to user
+        // Check if user logged in when the video requires any sort of monetization
         if (content.isSubscriptionRequired()
+                || content.getExtraValueAsBoolean(Content.EXTRA_PASS_REQUIRED)
+                || content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED)
+                || content.getExtraValueAsBoolean(Content.EXTRA_RENTAL_REQUIRED)
                 || (ZypeSettings.SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED && actionId == CONTENT_ACTION_SWAF)) {
             mAuthHelper.isAuthenticated()
                     .subscribe(isAuthenticatedResultBundle -> {
                         boolean result = isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT);
                         if (result) {
-                            if (isUserSubscribed() || actionId == CONTENT_ACTION_SWAF) {
-                                switchToRendererScreen(content, actionId);
+                            if (content.isSubscriptionRequired()) {
+                                if (isUserSubscribed() || actionId == CONTENT_ACTION_SWAF) {
+                                    switchToRendererScreen(content, actionId);
+                                }
+                                else {
+                                    AlertDialogFragment.createAndShowAlertDialogFragment(mNavigator.getActiveActivity(),
+                                            mAppContext.getResources().getString(R.string.subscription_alert_title),
+                                            mAppContext.getResources().getString(R.string.subscription_alert_message),
+                                            null,
+                                            mAppContext.getString(R.string.ok),
+                                            new AlertDialogFragment.IAlertDialogListener() {
+                                                @Override
+                                                public void onDialogPositiveButton(AlertDialogFragment alertDialogFragment) {
+                                                }
+
+                                                @Override
+                                                public void onDialogNegativeButton(AlertDialogFragment alertDialogFragment) {
+                                                    alertDialogFragment.dismiss();
+                                                }
+                                            }
+                                    );
+                                }
                             }
                             else {
-                                AlertDialogFragment.createAndShowAlertDialogFragment(mNavigator.getActiveActivity(),
-                                        mAppContext.getResources().getString(R.string.subscription_alert_title),
-                                        mAppContext.getResources().getString(R.string.subscription_alert_message),
-                                        null,
-                                        mAppContext.getString(R.string.ok),
-                                        new AlertDialogFragment.IAlertDialogListener() {
-                                            @Override
-                                            public void onDialogPositiveButton(AlertDialogFragment alertDialogFragment) {
-                                            }
-
-                                            @Override
-                                            public void onDialogNegativeButton(AlertDialogFragment alertDialogFragment) {
-                                                alertDialogFragment.dismiss();
-                                            }
-                                        }
-                                );
+                                switchToRendererScreen(content, actionId);
                             }
                         }
                         else {

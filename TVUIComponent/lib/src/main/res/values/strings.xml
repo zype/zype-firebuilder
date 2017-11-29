@@ -78,6 +78,9 @@ permissions and limitations under the License.
     <string name="create_login_description">You will be able to enjoy watching from any device</string>
     <string name="create_login_title">Create a login</string>
 
+    <!-- Login -->>
+    <string name="login_message">Please sign in to watch</string>
+
     <!-- Subscription -->
     <string name="subscription_button_cancel">Cancel and continue browsing</string>
     <string name="subscription_button_confirm">Subscribe and Watch</string>

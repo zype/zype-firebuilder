@@ -43,6 +43,7 @@ public class ErrorUtils {
         PLAYER_ERROR,
         /* Zype, Evgeny Cherkasov */
         ZYPE_CREATE_CONSUMER_ERROR,
+        ZYPE_CUSTOM,
         ZYPE_MY_LIBRARY_ERROR_EMPTY,
         ZYPE_VERIFY_SUBSCRIPTION_ERROR
     }
@@ -93,6 +94,9 @@ public class ErrorUtils {
             case ZYPE_CREATE_CONSUMER_ERROR:
                 errorMessage = context.getResources().getString(R.string.create_consumer_error);
                 break;
+            case ZYPE_CUSTOM:
+                errorMessage = "";
+                break;
             case ZYPE_MY_LIBRARY_ERROR_EMPTY:
                 errorMessage = context.getResources().getString(R.string.my_library_error_empty);
                 break;
@@ -138,6 +142,9 @@ public class ErrorUtils {
                 break;
             /* Zype, Evgeny Cherkasov */
             case ZYPE_CREATE_CONSUMER_ERROR:
+                buttonLabelsList.add(context.getResources().getString(R.string.dismiss_label));
+                break;
+            case ZYPE_CUSTOM:
                 buttonLabelsList.add(context.getResources().getString(R.string.dismiss_label));
                 break;
             case ZYPE_MY_LIBRARY_ERROR_EMPTY:

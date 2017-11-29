@@ -643,18 +643,23 @@ public class ContentLoader {
                     String feed = (String) objectPair.second;
                     String[] params = new String[] { contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG) };
 
-                    return mDynamicParser
-                            .cookRecipeObservable(recipeDynamicParser, feed, null, params)
-                            .map(contentAsObject -> {
-                                if (DEBUG_RECIPE_CHAIN) {
-                                    Log.d(TAG, "Parser got an content");
-                                }
-                                Content content = (Content) contentAsObject;
-                                if (content != null) {
-                                    contentContainer.addContent(content);
-                                }
-                                return Pair.create(contentContainer, contentAsObject);
-                            });
+                    if (TextUtils.isEmpty(feed)) {
+                        return Observable.just(Pair.create(contentContainer, null));
+                    }
+                    else {
+                        return mDynamicParser
+                                .cookRecipeObservable(recipeDynamicParser, feed, null, params)
+                                .map(contentAsObject -> {
+                                    if (DEBUG_RECIPE_CHAIN) {
+                                        Log.d(TAG, "Parser got an content");
+                                    }
+                                    Content content = (Content) contentAsObject;
+                                    if (content != null) {
+                                        contentContainer.addContent(content);
+                                    }
+                                    return Pair.create(contentContainer, contentAsObject);
+                                });
+                    }
                 });
     }
 
