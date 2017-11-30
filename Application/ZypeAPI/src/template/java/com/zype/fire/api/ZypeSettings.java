@@ -18,7 +18,7 @@ public class ZypeSettings {
     public static final String MY_LIBRARY_PLAYLIST_ID = "MyLibrary";
 
     // Template version
-    public static final String TEMPLATE_VERSION = "1.4.1";
+    public static final String TEMPLATE_VERSION = "1.4.2";
 
     // App features
     public static final boolean NATIVE_SUBSCRIPTION_ENABLED = Boolean.valueOf("[NATIVE_SUBSCRIPTION_ENABLED]");

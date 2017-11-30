@@ -157,9 +157,7 @@ public class ContentBrowseFragment extends RowsFragment {
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                mRowsAdapter.clear();
-                loadRootContentContainer(mRowsAdapter);
-                addSettingsActionsToRowAdapter(mRowsAdapter);
+                updateContents(mRowsAdapter);
             }
         };
 
@@ -402,4 +400,43 @@ public class ContentBrowseFragment extends RowsFragment {
             mCallback.onItemSelected(item);
         }
     }
+
+    /* Zype, Evgeny Cherkasov */
+    private void updateContents(ArrayObjectAdapter rowsAdapter) {
+
+        ContentContainer rootContentContainer = ContentBrowser.getInstance(getActivity())
+                .getRootContentContainer();
+
+        int index = 0;
+        for (ContentContainer contentContainer : rootContentContainer.getContentContainers()) {
+            // Skip 'My Library' content container
+            if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)) {
+                continue;
+            }
+
+            ListRow row = (ListRow) rowsAdapter.get(index);
+            ArrayObjectAdapter listRowAdapter = (ArrayObjectAdapter) row.getAdapter();
+
+            // Remove 'Load more' action button
+            if (listRowAdapter.size() > 0 && listRowAdapter.get(listRowAdapter.size() - 1) instanceof PlaylistAction) {
+                listRowAdapter.remove(listRowAdapter.get(listRowAdapter.size() - 1));
+            }
+            // Add new contents
+            for (int i = listRowAdapter.size() - contentContainer.getContentContainerCount(); i < contentContainer.getContentCount(); i++) {
+                listRowAdapter.add(contentContainer.getContents().get(i));
+            }
+            // Add a button for loading next page of playlist videos
+            if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
+                PlaylistAction action = new PlaylistAction();
+                action.setAction(ContentBrowser.NEXT_PAGE)
+                        .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
+                        .setLabel1(getString(R.string.action_load_more));
+                action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+                listRowAdapter.add(action);
+            }
+
+            index++;
+        }
+    }
+
 }

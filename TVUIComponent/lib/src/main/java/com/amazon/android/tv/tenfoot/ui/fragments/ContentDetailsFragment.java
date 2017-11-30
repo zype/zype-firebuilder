@@ -118,8 +118,6 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
     /* Zype, Evgeny Cherkasov */
     private BroadcastReceiver receiver;
 
-    private boolean dataUpdated = false;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
@@ -135,8 +133,7 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                dataUpdated = true;
-                setupRelatedContentRow();
+                updateRelatedContentRow();
             }
         };
 
@@ -394,25 +391,11 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
             listRowAdapter.add(action);
         }
 
-        // Find a row for related content and remove it
-        for (int i = 0; i < mAdapter.size(); i++) {
-            Object item = mAdapter.get(i);
-            if (item instanceof ListRow) {
-                ListRow listRow = (ListRow) item;
-                if (listRow.getHeaderItem().getName().equals(recommended.getName())) {
-                    mAdapter.remove(item);
-                    break;
-                }
-            }
-        }
-
         // Only add the header and row for recommendations if there are any recommended content.
         if (listRowAdapter.size() > 0) {
             HeaderItem header = new HeaderItem(0, recommended.getName());
             mAdapter.add(new ListRow(header, listRowAdapter));
         }
-        /* Zype, Evgeny Cherkasov */
-        dataUpdated = false;
     }
 
     private void setupContentListRowPresenter() {
@@ -509,5 +492,47 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
                 }
             }
         }, 400);
+    }
+
+    /* Zype, Evgeny Cherkasov */
+    private void updateRelatedContentRow() {
+
+        ContentContainer recommended = ContentBrowser.getInstance(getActivity())
+                .getRecommendedListOfAContentAsAContainer(mSelectedContent);
+
+        // Find a row for related content
+        ListRow row = null;
+        for (int i = 0; i < mAdapter.size(); i++) {
+            Object item = mAdapter.get(i);
+            if (item instanceof ListRow) {
+                row = (ListRow) item;
+                break;
+            }
+        }
+        if (row == null) {
+            return;
+        }
+
+        ArrayObjectAdapter listRowAdapter = (ArrayObjectAdapter) row.getAdapter();
+        // Remove 'Load more' action button
+        if (listRowAdapter.size() > 0 && listRowAdapter.get(listRowAdapter.size() - 1) instanceof PlaylistAction) {
+            listRowAdapter.remove(listRowAdapter.get(listRowAdapter.size() - 1));
+        }
+        // Add new contents
+        for (int i = listRowAdapter.size(); i < recommended.getContentCount(); i++) {
+            listRowAdapter.add(recommended.getContents().get(i));
+        }
+        // Add a button for loading next page of playlist videos
+        ContentContainer contentContainer = ContentBrowser.getInstance(getActivity())
+                .getRootContentContainer()
+                .findContentContainerById(mSelectedContent.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+        if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
+            PlaylistAction action = new PlaylistAction();
+            action.setAction(ContentBrowser.NEXT_PAGE)
+                    .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
+                    .setLabel1(getString(R.string.action_load_more));
+            action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+            listRowAdapter.add(action);
+        }
     }
 }

@@ -98,7 +98,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
     private ErrorDialogFragment dialogError = null;
     private BroadcastReceiver receiver;
 
-    private boolean dataUpdated = false;
+    private boolean isDataLoaded = false;
 
     // Container Activity must implement this interface.
     public interface OnBrowseRowListener {
@@ -112,6 +112,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
         if (receiver != null) {
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, new IntentFilter("DataUpdated"));
         }
+        updateContents(mRowsAdapter);
     }
 
     @Override
@@ -158,8 +159,13 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                dataUpdated = true;
-                loadRootContentContainer(mRowsAdapter);
+                if (isDataLoaded) {
+                    updateContents(mRowsAdapter);
+                }
+                else {
+                    loadRootContentContainer(mRowsAdapter);
+                }
+                isDataLoaded = true;
             }
         };
 
@@ -212,7 +218,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
 
         for (ContentContainer contentContainer : rootContentContainer.getContentContainers()) {
 
-            if (isMyLibrary && contentContainer.getContents().isEmpty() && dataUpdated) {
+            if (isMyLibrary && contentContainer.getContents().isEmpty() && isDataLoaded) {
                 dialogError = ErrorDialogFragment.newInstance(getActivity(),
                         ErrorUtils.ERROR_CATEGORY.ZYPE_MY_LIBRARY_ERROR_EMPTY,
                         (ErrorDialogFragment.ErrorDialogFragmentListener) getActivity());
@@ -235,7 +241,8 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
 
             if (isMyLibrary) {
                 if (rootContentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
-                    Action action = new Action().setAction(ContentBrowser.NEXT_PAGE)
+                    PlaylistAction action = new PlaylistAction();
+                    action.setAction(ContentBrowser.NEXT_PAGE)
                             .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
                             .setLabel1(getString(R.string.action_load_more));
                     listRowAdapter.add(action);
@@ -256,7 +263,60 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
         }
 
 //        addSettingsActionsToRowAdapter(rowsAdapter);
-        dataUpdated = false;
+//        isDataLoaded = false;
+    }
+
+    /* Zype, Evgeny Cherkasov */
+    private void updateContents(ArrayObjectAdapter rowsAdapter) {
+
+        ContentContainer rootContentContainer = ContentBrowser.getInstance(getActivity())
+                .getLastSelectedContentContainer();
+        boolean isMyLibrary = rootContentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID);
+
+        int index = 0;
+        for (ContentContainer contentContainer : rootContentContainer.getContentContainers()) {
+            if (index >= rowsAdapter.size()) {
+                break;
+            }
+            // Skip 'My Library' content container
+            if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)) {
+                continue;
+            }
+
+            ListRow row = (ListRow) rowsAdapter.get(index);
+            ArrayObjectAdapter listRowAdapter = (ArrayObjectAdapter) row.getAdapter();
+
+            // Remove 'Load more' action button
+            if (listRowAdapter.size() > 0 && listRowAdapter.get(listRowAdapter.size() - 1) instanceof PlaylistAction) {
+                listRowAdapter.remove(listRowAdapter.get(listRowAdapter.size() - 1));
+            }
+            // Add new contents
+            for (int i = listRowAdapter.size() - contentContainer.getContentContainerCount(); i < contentContainer.getContentCount(); i++) {
+                listRowAdapter.add(contentContainer.getContents().get(i));
+            }
+            // Add a button for loading next page of playlist videos
+            if (isMyLibrary) {
+                if (rootContentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
+                    PlaylistAction action = new PlaylistAction();
+                    action.setAction(ContentBrowser.NEXT_PAGE)
+                            .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
+                            .setLabel1(getString(R.string.action_load_more));
+                    listRowAdapter.add(action);
+                }
+            }
+            else {
+                if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
+                    PlaylistAction action = new PlaylistAction();
+                    action.setAction(ContentBrowser.NEXT_PAGE)
+                            .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
+                            .setLabel1(getString(R.string.action_load_more));
+                    action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+                    listRowAdapter.add(action);
+                }
+            }
+
+            index++;
+        }
     }
 
     private void addSettingsActionsToRowAdapter(ArrayObjectAdapter arrayObjectAdapter) {
@@ -375,7 +435,15 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                 PlaylistAction action = (PlaylistAction) item;
                 if (action.getAction().equals(ContentBrowser.NEXT_PAGE)) {
                     Log.d(TAG, "Next page button was clicked");
-                    ContentBrowser.getInstance(getActivity()).loadPlaylistVideos(action.getExtraValueAsString(PlaylistAction.EXTRA_PLAYLIST_ID));
+                    ContentContainer rootContentContainer = ContentBrowser.getInstance(getActivity())
+                            .getLastSelectedContentContainer();
+                    boolean isMyLibrary = rootContentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID);
+                    if (isMyLibrary) {
+                        ContentBrowser.getInstance(getActivity()).runGlobalRecipesForLastSelected(getActivity(), ContentBrowser.getInstance(getActivity()));
+                    }
+                    else {
+                        ContentBrowser.getInstance(getActivity()).loadPlaylistVideos(action.getExtraValueAsString(PlaylistAction.EXTRA_PLAYLIST_ID));
+                    }
                 }
                 else {
                     Log.d(TAG, "Settings with title " + action.getAction() + " was clicked");
@@ -384,14 +452,8 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
             }
             else if (item instanceof Action) {
                 Action action = (Action) item;
-                if (action.getAction().equals(ContentBrowser.NEXT_PAGE)) {
-                    Log.d(TAG, "Next page button was clicked");
-                    ContentBrowser.getInstance(getActivity()).runGlobalRecipesForLastSelected(getActivity(), ContentBrowser.getInstance(getActivity()));
-                }
-                else {
-                    Log.d(TAG, "Settings with title " + action.getAction() + " was clicked");
-                    ContentBrowser.getInstance(getActivity()).settingsActionTriggered(getActivity(),action);
-                }
+                Log.d(TAG, "Settings with title " + action.getAction() + " was clicked");
+                ContentBrowser.getInstance(getActivity()).settingsActionTriggered(getActivity(),action);
             }
         }
     }
