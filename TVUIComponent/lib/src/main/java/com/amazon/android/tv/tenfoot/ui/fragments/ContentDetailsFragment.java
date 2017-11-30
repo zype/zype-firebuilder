@@ -30,8 +30,11 @@ package com.amazon.android.tv.tenfoot.ui.fragments;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.model.Action;
+import com.amazon.android.model.PlaylistAction;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
+import com.amazon.android.model.content.constants.ExtraKeys;
+import com.amazon.android.recipe.Recipe;
 import com.amazon.android.utils.GlideHelper;
 import com.amazon.android.utils.Helpers;
 import com.amazon.android.tv.tenfoot.R;
@@ -43,8 +46,10 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -71,6 +76,7 @@ import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -109,6 +115,11 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
     // Decides whether the action button should be enabled or not.
     private boolean actionInProgress = false;
 
+    /* Zype, Evgeny Cherkasov */
+    private BroadcastReceiver receiver;
+
+    private boolean dataUpdated = false;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
@@ -119,6 +130,16 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
 
         mSelectedContent = ContentBrowser.getInstance(getActivity()).getLastSelectedContent();
         mShowRelatedContent = ContentBrowser.getInstance(getActivity()).isShowRelatedContent();
+
+        /* Zype, Evgeny Cherkasov */
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                dataUpdated = true;
+                setupRelatedContentRow();
+            }
+        };
+
     }
 
     @Override
@@ -142,6 +163,15 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
             Log.v(TAG, "Start CONTENT_HOME_SCREEN.");
             ContentBrowser.getInstance(getActivity())
                           .switchToScreen(ContentBrowser.CONTENT_HOME_SCREEN);
+        }
+    }
+
+    /* Zype, Evgeny Cherkasov */
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (receiver != null) {
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(receiver);
         }
     }
 
@@ -350,11 +380,39 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
         for (Content c : recommended) {
             listRowAdapter.add(c);
         }
+
+        /* Zype, Evgeny Cherkasov */
+        // Add a button for loading next page of playlist videos
+        ContentContainer contentContainer = ContentBrowser.getInstance(getActivity()).getRootContentContainer()
+                .findContentContainerById(mSelectedContent.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+        if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
+            PlaylistAction action = new PlaylistAction();
+            action.setAction(ContentBrowser.NEXT_PAGE)
+                    .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
+                    .setLabel1(getString(R.string.action_load_more));
+            action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+            listRowAdapter.add(action);
+        }
+
+        // Find a row for related content and remove it
+        for (int i = 0; i < mAdapter.size(); i++) {
+            Object item = mAdapter.get(i);
+            if (item instanceof ListRow) {
+                ListRow listRow = (ListRow) item;
+                if (listRow.getHeaderItem().getName().equals(recommended.getName())) {
+                    mAdapter.remove(item);
+                    break;
+                }
+            }
+        }
+
         // Only add the header and row for recommendations if there are any recommended content.
         if (listRowAdapter.size() > 0) {
             HeaderItem header = new HeaderItem(0, recommended.getName());
             mAdapter.add(new ListRow(header, listRowAdapter));
         }
+        /* Zype, Evgeny Cherkasov */
+        dataUpdated = false;
     }
 
     private void setupContentListRowPresenter() {
@@ -384,6 +442,18 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
                               .setLastSelectedContent(content)
                               .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, bundle);
             }
+            /* Zype, Evgeny Cherkasov */
+            else if (item instanceof PlaylistAction) {
+                PlaylistAction action = (PlaylistAction) item;
+                if (action.getAction().equals(ContentBrowser.NEXT_PAGE)) {
+                    Log.d(TAG, "Next page button was clicked");
+                    ContentBrowser.getInstance(getActivity()).loadPlaylistVideos(action.getExtraValueAsString(PlaylistAction.EXTRA_PLAYLIST_ID));
+                }
+                else {
+                    Log.d(TAG, "Settings with title " + action.getAction() + " was clicked");
+                    ContentBrowser.getInstance(getActivity()).settingsActionTriggered(getActivity(),action);
+                }
+            }
         }
     }
 
@@ -394,6 +464,10 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
         super.onResume();
         updateActionsProperties();
         actionInProgress = false;
+        /* Zype, Evgeny Cherkasov */
+        if (receiver != null) {
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, new IntentFilter("DataUpdated"));
+        }
     }
 
     /**

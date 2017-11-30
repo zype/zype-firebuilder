@@ -313,6 +313,8 @@ public class Content implements Serializable {
     public static final String EXTRA_IMAGE_POSTER_URL = "ImagePosterUrl";
     // Pass required flag
     public static final String EXTRA_PASS_REQUIRED = "PassRequired";
+    // Playlist id
+    public static final String EXTRA_PLAYLIST_ID = "playlistId";
     // Purchase required flag
     public static final String EXTRA_PURCHASE_REQUIRED = "PurchaseRequired";
     // Rental required flag
