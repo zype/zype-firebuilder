@@ -88,6 +88,9 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -184,6 +187,14 @@ public class PlaybackActivity extends Activity implements
      */
     private static final int VIDEO_POSITION_TRACKING_POLL_TIME_MS = 1000;
 
+    /* Zype, Evgeny Cherkasov */
+    // Need to setup cookie policy to make ExoPlayer play live streams from Akamai
+    private static final CookieManager DEFAULT_COOKIE_MANAGER;
+    static {
+        DEFAULT_COOKIE_MANAGER = new CookieManager();
+        DEFAULT_COOKIE_MANAGER.setCookiePolicy(CookiePolicy.ACCEPT_ORIGINAL_SERVER);
+    }
+
     /**
      * Called when the activity is first created.
      */
@@ -191,6 +202,11 @@ public class PlaybackActivity extends Activity implements
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        /* Zype, Evgney Cherkasov */
+        if (CookieHandler.getDefault() != DEFAULT_COOKIE_MANAGER) {
+            CookieHandler.setDefault(DEFAULT_COOKIE_MANAGER);
+        }
 
         // Create video position tracking handler.
         mVideoPositionTrackingHandler = new Handler();
