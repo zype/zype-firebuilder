@@ -10,13 +10,14 @@
     "_id@id",
     "description@description",
     "images@Images",
+    "on_air@live",
     "playerUrl@url",
-    "thumbnails@cardImageUrl",
-    "thumbnails@backgroundImageUrl",
     "pass_required@PassRequired",
     "playlistId@playlistId",
     "purchase_required@PurchaseRequired",
     "rental_required@RentalRequired",
-    "subscription_required@subscriptionRequired"
+    "subscription_required@subscriptionRequired",
+    "thumbnails@cardImageUrl",
+    "thumbnails@backgroundImageUrl"
   ]
 }

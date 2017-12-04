@@ -55,6 +55,10 @@ public class VideoData {
     @Expose
     public List<String> keywords = new ArrayList<>();
 
+    @SerializedName("on_air")
+    @Expose
+    public boolean onAir;
+
     @SerializedName("published_at")
     @Expose
     public String publishedAt;
