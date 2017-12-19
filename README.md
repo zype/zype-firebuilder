@@ -38,6 +38,19 @@ Full Documentation for Fire App Builder is located [here](https://developer.amaz
 - Dynamic theme colors
 - Closed Caption Support
 
+## Supported Devices
+
+Please only select the following devices when submitting your app to Amazon.
+
+- Fire TV (2014)
+- Fire TV (2015)
+- Fire TV (Gen 3)
+- Fire TV Stick
+- Fire TV Stick with Alexa Voice Remote
+- Amazon Fire TV Edition
+
+Non-Amazon Android devices and Amazon Fire phones and tablets are not supported and should be deselected. 
+
 ## Monetizations Supported
 
 - Native SVOD via In App Purchases
