@@ -12,6 +12,10 @@ public class AppData {
     @Expose
     public String Id;
 
+    @SerializedName("featured_playlist_id")
+    @Expose
+    public String featuredPlaylistId;
+
     @SerializedName("native_subscription")
     @Expose
     public String nativeSubscription;

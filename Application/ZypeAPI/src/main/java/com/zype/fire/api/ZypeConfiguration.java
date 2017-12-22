@@ -15,6 +15,7 @@ import com.zype.fire.api.Model.AppData;
 public class ZypeConfiguration {
     private static final String PREFERENCE_NATIVE_SUBSCRIPTION = "ZypeNativeSubscription";
     private static final String PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION = "ZypeNativeToUniversalSubscription";
+    private static final String PREFERENCE_ROOT_PLAYLIST_ID = "ZypeRootPlaylistId";
     private static final String PREFERENCE_SUBSCRIBE_TO_WATCH_AD_FREE = "ZypeSubscribeToWatchAdFree";
     private static final String PREFERENCE_UNIVERSAL_SUBSCRIPTION = "ZypeUniversalSubscription";
     private static final String PREFERENCE_UNIVERSAL_TVOD = "ZypeUniversalTVOD";
@@ -33,6 +34,9 @@ public class ZypeConfiguration {
         }
         if (!TextUtils.isEmpty(appData.nativeToUniversalSubscription)) {
             editor.putBoolean(PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION, Boolean.valueOf(appData.nativeToUniversalSubscription));
+        }
+        if (!TextUtils.isEmpty(appData.featuredPlaylistId)) {
+            editor.putString(PREFERENCE_ROOT_PLAYLIST_ID, appData.featuredPlaylistId);
         }
         if (!TextUtils.isEmpty(appData.subscribeToWatchAdFree)) {
             editor.putBoolean(PREFERENCE_SUBSCRIBE_TO_WATCH_AD_FREE, Boolean.valueOf(appData.subscribeToWatchAdFree));
@@ -62,6 +66,20 @@ public class ZypeConfiguration {
         else {
             return defaultValue;
         }
+    }
+
+    private static String getStringPreference(String key, String defaultValue, Context context) {
+        SharedPreferences prefs = getPreferences(context);
+        if (prefs.contains(key)) {
+            return prefs.getString(key, defaultValue);
+        }
+        else {
+            return defaultValue;
+        }
+    }
+
+    public static String getRootPlaylistId(Context context) {
+        return getStringPreference(PREFERENCE_ROOT_PLAYLIST_ID, ZypeSettings.ROOT_PLAYLIST_ID, context);
     }
 
     public static boolean isNativeSubscriptionEnabled(Context context) {

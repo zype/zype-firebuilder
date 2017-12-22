@@ -2107,6 +2107,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public void runGlobalRecipes(Activity activity, ICancellableLoad cancellable) {
 
         final ContentContainer root = new ContentContainer("Root");
+        /* Zype, Evgeny Cherkasov */
+        // Set Zype playlist id to the root container
+        root.setExtraValue(Recipe.KEY_DATA_TYPE_TAG, ZypeConfiguration.getRootPlaylistId(mAppContext));
+
         Subscription subscription =
                 Observable.range(0, mNavigator.getNavigatorModel().getGlobalRecipes().size())
                           // Do this first to make sure were running in new thread right a way.

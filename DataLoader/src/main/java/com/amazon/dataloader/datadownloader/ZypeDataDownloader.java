@@ -138,7 +138,8 @@ public class ZypeDataDownloader extends ADataDownloader {
 
         for (PlaylistData playlistData : playlists) {
             // Skip playlist that are not direct child of the root playlist
-            if (TextUtils.isEmpty(playlistData.parentId) || !playlistData.parentId.equals(ZypeSettings.ROOT_PLAYLIST_ID)) {
+            if (TextUtils.isEmpty(playlistData.parentId)
+                    || !playlistData.parentId.equals(ZypeConfiguration.getRootPlaylistId(mContext))) {
                 continue;
             }
 
@@ -168,7 +169,8 @@ public class ZypeDataDownloader extends ADataDownloader {
 
         for (PlaylistData playlistData : playlists) {
             String playlistId = playlistData.id;
-            if (playlistId.equals(ZypeSettings.ROOT_PLAYLIST_ID) || TextUtils.isEmpty(playlistData.parentId)) {
+            if (playlistId.equals(ZypeConfiguration.getRootPlaylistId(mContext))
+                    || TextUtils.isEmpty(playlistData.parentId)) {
                 continue;
             }
             jsonCategories.put(new JSONObject(gson.toJson(playlistData)));
@@ -216,7 +218,7 @@ public class ZypeDataDownloader extends ADataDownloader {
         PlaylistData item = new PlaylistData();
         item.id = ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID;
         item.description = " ";
-        item.parentId = ZypeSettings.ROOT_PLAYLIST_ID;
+        item.parentId = ZypeConfiguration.getRootPlaylistId(mContext);
         item.thumbnailLayout = "landscape";
         item.title = ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID;
         playlists.add(item);
