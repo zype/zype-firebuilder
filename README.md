@@ -38,6 +38,11 @@ Full Documentation for Fire App Builder is located [here](https://developer.amaz
 - Dynamic theme colors
 - Closed Caption Support
 
+## Monetizations Supported
+
+- Native SVOD via In App Purchases
+- Universal SVOD via login
+
 ## Supported Devices
 
 Please only select the following devices when submitting your app to Amazon.
@@ -50,12 +55,6 @@ Please only select the following devices when submitting your app to Amazon.
 - Amazon Fire TV Edition
 
 Non-Amazon Android devices and Amazon Fire phones and tablets are not supported and should be deselected. 
-
-## Monetizations Supported
-
-- Native SVOD via In App Purchases
-- Universal SVOD via login
-
 
 ## Creating new Fire TV app based of Zype Template
 
@@ -97,25 +96,25 @@ Note:
 Update the following resources in each file:
 
 In ```Application/ZypeAPI/src/template/java/com/zype/fire/api/ZypeSettings.java```
-- ```[APP_KEY]```
-- ```[CLIENT_ID]```
-- ```[CLIENT_SECRET]```
-- ```[ROOT_PLAYLIST_ID]```
+- ```<APP_KEY>```
+- ```<CLIENT_ID>```
+- ```<CLIENT_SECRET>```
+- ```<ROOT_PLAYLIST_ID>```
 
 Also, set subscription details to `true/false` as you see fit.
 
 In ```Application/app/build.gradle```
-- ```[APPLICATION_ID```
+- ```<APPLICATION_ID>```
 
 In ```Application/app/src/template/res/values/custom.xml```
-- ```[BRAND_COLOR]```
+- ```<BRAND_COLOR>```
 
 In ```Application/app/src/template/res/values-en/strings.xml```
-- ```[APP_NAME]```
+- ```<APP_NAME>```
 
 In ```Application/app/src/template/res/values/strings.xml```
-- ```[APP_NAME]```
-- ```[APP_NAME_SHORT]```
+- ```<APP_NAME>```
+- ```<APP_NAME_SHORT>```
 
 ## Built With
 
