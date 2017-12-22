@@ -9,6 +9,7 @@ import com.amazon.purchase.model.Response;
 import com.amazon.purchase.model.UserData;
 import com.zype.fire.api.Model.BifrostResponse;
 import com.zype.fire.api.ZypeApi;
+import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class ZypeReceiptVerificationService extends AReceiptVerifier {
     public String validateReceipt(Context context, String requestId, String sku, UserData
             userData, Receipt receipt, IPurchase.PurchaseListener listener) {
 
-        if (ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
+        if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(context)) {
             Map<String, String> fieldParams = new HashMap<>();
             // TODO: Get preference id from ZypeAuthentication
             fieldParams.put(ZypeApi.APP_KEY, ZypeSettings.APP_KEY);

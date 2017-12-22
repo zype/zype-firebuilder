@@ -23,6 +23,7 @@ import com.amazon.android.ui.fragments.ErrorDialogFragment;
 import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.NetworkUtils;
 import com.amazon.android.utils.Preferences;
+import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
 
@@ -150,7 +151,7 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
         if (mode == MODE_CHOOSE_PLAN) {
             layoutChoosePlan.setVisibility(View.VISIBLE);
             layoutConfirm.setVisibility(View.GONE);
-            if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+            if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
                 layoutLoggedIn.setVisibility(View.GONE);
                 layoutLogin.setVisibility(View.GONE);
             }
@@ -253,7 +254,7 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
     @Override
     public void onSubscriptionSelected(SubscriptionItem item) {
         selectedSubscription = item;
-        if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(SubscriptionActivity.this)) {
             showConfirm();
         }
         else {
@@ -296,7 +297,7 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
     @Subscribe
     public void onSubscriptionPurchaseEvent(SubscriptionPurchaseEvent event) {
         if (event.getExtras().getBoolean(PurchaseHelper.RESULT_VALIDITY)) {
-            if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+            if (ZypeConfiguration.isNativeSubscriptionEnabled(SubscriptionActivity.this)) {
                 closeScreen();
             }
             else {

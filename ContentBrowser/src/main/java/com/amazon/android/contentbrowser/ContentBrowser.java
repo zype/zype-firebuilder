@@ -72,6 +72,7 @@ import static com.amazon.android.contentbrowser.helper.LauncherIntegrationManage
 
 /* Zype */
 import com.zype.fire.api.Model.PlaylistData;
+import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
 
@@ -458,7 +459,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 }
             }
             if (Navigator.isScreenAccessVerificationRequired(mNavigator.getNavigatorModel())
-                    && (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED || ZypeSettings.UNIVERSAL_TVOD
+                    && (ZypeConfiguration.isUniversalSubscriptionEnabled(mAppContext)
+                        || ZypeConfiguration.isUniversalTVODEnabled(mAppContext)
                         || userLoggedIn)) {
                 addSettingsAction(mLoginAction);
             }
@@ -466,7 +468,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     private void setupMyLibraryAction() {
-        if (ZypeSettings.UNIVERSAL_TVOD) {
+        if (ZypeConfiguration.isUniversalTVODEnabled(mAppContext)) {
             addSettingsAction(createMyLibrarySettingsAction());
         }
     }
@@ -543,7 +545,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         mIAPDisabled = mAppContext.getResources().getBoolean(R.bool.is_iap_disabled);
         /* Zype, Evgeny Cherkasov */
-        if (!ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED && !ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
+        if (!ZypeConfiguration.isNativeSubscriptionEnabled(mAppContext)
+                && !ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(mAppContext)) {
             mIAPDisabled = true;
         }
 
@@ -1368,7 +1371,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         boolean purchaseRequired = false;
         boolean entitled = false;
-        if (ZypeSettings.UNIVERSAL_TVOD) {
+        if (ZypeConfiguration.isUniversalTVODEnabled(mAppContext)) {
             purchaseRequired = content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED);
             if (purchaseRequired && content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
                 entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
@@ -1393,8 +1396,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     showWatch = true;
                 }
                 else {
-                    if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED
-                            || ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
+                    if (ZypeConfiguration.isNativeSubscriptionEnabled(mAppContext)
+                            || ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(mAppContext)) {
                         showSubscribe = true;
                     }
                     else {
@@ -1411,8 +1414,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 }
             }
         }
-        if (ZypeSettings.SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED && !showSubscribe
-                && !ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED
+        if (ZypeConfiguration.isSubscribeToWatchAdFreeEnabled(mAppContext)
+                && !showSubscribe
+                && !ZypeConfiguration.isNativeSubscriptionEnabled(mAppContext)
                 && !userLoggedIn) {
             showAdFree = true;
         }
@@ -1717,7 +1721,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 || content.getExtraValueAsBoolean(Content.EXTRA_PASS_REQUIRED)
                 || content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED)
                 || content.getExtraValueAsBoolean(Content.EXTRA_RENTAL_REQUIRED)
-                || (ZypeSettings.SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED && actionId == CONTENT_ACTION_SWAF)) {
+                || (ZypeConfiguration.isSubscribeToWatchAdFreeEnabled(mAppContext) && actionId == CONTENT_ACTION_SWAF)) {
             mAuthHelper.isAuthenticated()
                     .subscribe(isAuthenticatedResultBundle -> {
                         boolean result = isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT);
@@ -1752,7 +1756,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                         else {
                             // With Native Subscription feature enabled user can has a subscription
                             // without being logged in as Zype consumer
-                            if (isUserSubscribed() && ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+                            if (isUserSubscribed() && ZypeConfiguration.isNativeSubscriptionEnabled(mAppContext)) {
                                 switchToRendererScreen(content, actionId);
                             }
                             // In other cases switch to login screen
@@ -1768,7 +1772,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         /* Zype, Evgeny Cherkasov */
 //        if (mIAPDisabled) {
-        if (mIAPDisabled || !content.isSubscriptionRequired() || ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+        if (mIAPDisabled || !content.isSubscriptionRequired() || ZypeConfiguration.isNativeSubscriptionEnabled(mAppContext)) {
             switchToRendererScreen(content, actionId);
         }
         else {
@@ -2111,6 +2115,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public void runGlobalRecipes(Activity activity, ICancellableLoad cancellable) {
 
         final ContentContainer root = new ContentContainer("Root");
+        /* Zype, Evgeny Cherkasov */
+        // Set Zype playlist id to the root container
+        root.setExtraValue(Recipe.KEY_DATA_TYPE_TAG, ZypeConfiguration.getRootPlaylistId(mAppContext));
+
         Subscription subscription =
                 Observable.range(0, mNavigator.getNavigatorModel().getGlobalRecipes().size())
                           // Do this first to make sure were running in new thread right a way.
@@ -2588,11 +2596,11 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         // validate App Tester purchase receipt and does not create Zype subscription
         // TODO: This line must be commented for release build
 //            hasZypeSubscription = true;
-        if (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED
-                || ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
+        if (ZypeConfiguration.isUniversalSubscriptionEnabled(mAppContext)
+                || ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(mAppContext)) {
             setSubscribed(hasZypeSubscription);
         }
-        else if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+        else if (ZypeConfiguration.isNativeSubscriptionEnabled(mAppContext)) {
             setSubscribed(hasNativeSubscription);
         }
     }

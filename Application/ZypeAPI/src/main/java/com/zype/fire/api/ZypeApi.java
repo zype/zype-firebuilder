@@ -2,6 +2,7 @@ package com.zype.fire.api;
 
 import com.zype.fire.api.Model.AccessTokenInfoResponse;
 import com.zype.fire.api.Model.AccessTokenResponse;
+import com.zype.fire.api.Model.AppResponse;
 import com.zype.fire.api.Model.ConsumerResponse;
 import com.zype.fire.api.Model.PlaylistsResponse;
 import com.zype.fire.api.Model.VideoEntitlementsResponse;
@@ -133,6 +134,24 @@ public class ZypeApi {
             Response response = apiImpl.getAccessTokenInfo(accessToken).execute();
             if (response.isSuccessful()) {
                 return (AccessTokenInfoResponse) response.body();
+            }
+            else {
+                return null;
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public AppResponse getApp() {
+        try {
+            HashMap<String, String> params = new HashMap<>();
+            params.put(APP_KEY, ZypeSettings.APP_KEY);
+            Response response = apiImpl.getApp(params).execute();
+            if (response.isSuccessful()) {
+                return (AppResponse) response.body();
             }
             else {
                 return null;

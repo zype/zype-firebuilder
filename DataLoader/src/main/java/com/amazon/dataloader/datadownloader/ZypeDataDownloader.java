@@ -13,11 +13,14 @@ import com.amazon.dataloader.R;
 import com.amazon.utils.model.Data;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.zype.fire.api.Model.AppData;
+import com.zype.fire.api.Model.AppResponse;
 import com.zype.fire.api.Model.PlaylistData;
 import com.zype.fire.api.Model.PlaylistsResponse;
 import com.zype.fire.api.Model.VideoData;
 import com.zype.fire.api.Model.VideosResponse;
 import com.zype.fire.api.ZypeApi;
+import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 
 import org.json.JSONArray;
@@ -118,6 +121,10 @@ public class ZypeDataDownloader extends ADataDownloader {
     protected Data fetchData(Recipe dataLoadRecipe) throws Exception {
         Log.d(TAG, "fetchData(): Started");
 
+        AppData appData = loadAppConfiguration();
+        Log.d(TAG, "fetchData(): App configuration loaded");
+        ZypeConfiguration.update(appData, mContext);
+
         List<PlaylistData> playlists = loadPlaylists();
         Log.d(TAG, "fetchData(): Playlists loaded");
         addMyLibraryPlaylists(playlists);
@@ -131,7 +138,8 @@ public class ZypeDataDownloader extends ADataDownloader {
 
         for (PlaylistData playlistData : playlists) {
             // Skip playlist that are not direct child of the root playlist
-            if (TextUtils.isEmpty(playlistData.parentId) || !playlistData.parentId.equals(ZypeSettings.ROOT_PLAYLIST_ID)) {
+            if (TextUtils.isEmpty(playlistData.parentId)
+                    || !playlistData.parentId.equals(ZypeConfiguration.getRootPlaylistId(mContext))) {
                 continue;
             }
 
@@ -163,7 +171,8 @@ public class ZypeDataDownloader extends ADataDownloader {
 
         for (PlaylistData playlistData : playlists) {
             String playlistId = playlistData.id;
-            if (playlistId.equals(ZypeSettings.ROOT_PLAYLIST_ID) || TextUtils.isEmpty(playlistData.parentId)) {
+            if (playlistId.equals(ZypeConfiguration.getRootPlaylistId(mContext))
+                    || TextUtils.isEmpty(playlistData.parentId)) {
                 continue;
             }
             jsonCategories.put(new JSONObject(gson.toJson(playlistData)));
@@ -175,6 +184,17 @@ public class ZypeDataDownloader extends ADataDownloader {
 
         Log.d(TAG, "fetchData(): finished");
         return Data.createDataForPayload(jsonResult.toString());
+    }
+
+    private AppData loadAppConfiguration() {
+        AppData result = new AppData();
+
+        AppResponse appResponse = ZypeApi.getInstance().getApp();
+        if (appResponse != null && appResponse.data != null) {
+            result = appResponse.data;
+        }
+
+        return result;
     }
 
     private List<PlaylistData> loadPlaylists() {
@@ -200,7 +220,7 @@ public class ZypeDataDownloader extends ADataDownloader {
         PlaylistData item = new PlaylistData();
         item.id = ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID;
         item.description = " ";
-        item.parentId = ZypeSettings.ROOT_PLAYLIST_ID;
+        item.parentId = ZypeConfiguration.getRootPlaylistId(mContext);
         item.thumbnailLayout = "landscape";
         item.title = ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID;
         playlists.add(item);

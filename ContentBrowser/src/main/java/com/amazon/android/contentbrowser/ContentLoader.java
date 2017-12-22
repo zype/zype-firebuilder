@@ -39,6 +39,7 @@ import com.zype.fire.api.Model.VideoEntitlementsResponse;
 import com.zype.fire.api.Model.VideoResponse;
 import com.zype.fire.api.Model.VideosResponse;
 import com.zype.fire.api.ZypeApi;
+import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
 
@@ -139,12 +140,17 @@ public class ContentLoader {
             mDynamicParser.addTranslatorImpl(containerTranslator.getName(),
                                              containerTranslator);
             /* Zype, Evgeny Cherkasov */
+
             // Register Zype content translator parser recipes use translation.
             ZypeContentTranslator zypeContentTranslator = new ZypeContentTranslator();
             mDynamicParser.addTranslatorImpl(zypeContentTranslator.getName(), zypeContentTranslator);
+
             // Register content container translator in case parser recipes use translation.
             ZypeContentContainerTranslator zypeContainerTranslator = new ZypeContentContainerTranslator();
             mDynamicParser.addTranslatorImpl(zypeContainerTranslator.getName(), zypeContainerTranslator);
+
+            // Set Zype playlist id to the root container
+            mRootContentContainer.setExtraValue(Recipe.KEY_DATA_TYPE_TAG, ZypeConfiguration.getRootPlaylistId(context));
 
             mDataLoadManager.registerUpdateListener(new DataLoadManager.IDataUpdateListener() {
                 @Override
@@ -202,13 +208,7 @@ public class ContentLoader {
 
         /* Zype, Evgeny Cherkasov */
         // Set parent playlist id in receipt params to fetch only its child playlists
-        String[] params;
-        if (root.getName().equals("Root")) {
-            params = new String[] { ZypeSettings.ROOT_PLAYLIST_ID };
-        }
-        else {
-            params = new String[] { (String) root.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG) };
-        }
+        String[] params = new String[] { root.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG) };
 
         return mDataLoadManager.cookRecipeObservable(
                 dataLoaderRecipeForCategories,
