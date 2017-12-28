@@ -38,4 +38,8 @@ public class AppData {
     @SerializedName("universal_tvod")
     @Expose
     public String universalTVOD;
+
+    @SerializedName("device_linking")
+    @Expose
+    public String universalSubscription;
 }

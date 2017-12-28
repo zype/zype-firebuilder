@@ -41,6 +41,9 @@ public class ZypeConfiguration {
         if (!TextUtils.isEmpty(appData.subscribeToWatchAdFree)) {
             editor.putBoolean(PREFERENCE_SUBSCRIBE_TO_WATCH_AD_FREE, Boolean.valueOf(appData.subscribeToWatchAdFree));
         }
+        if (!TextUtils.isEmpty(appData.universalSubscription)) {
+            editor.putBoolean(PREFERENCE_UNIVERSAL_SUBSCRIPTION, Boolean.valueOf(appData.universalSubscription));
+        }
         if (!TextUtils.isEmpty(appData.universalTVOD)) {
             editor.putBoolean(PREFERENCE_UNIVERSAL_TVOD, Boolean.valueOf(appData.universalTVOD));
         }
@@ -52,6 +55,7 @@ public class ZypeConfiguration {
         SharedPreferences.Editor editor = prefs.edit();
         editor.remove(PREFERENCE_NATIVE_SUBSCRIPTION);
         editor.remove(PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION);
+        editor.remove(PREFERENCE_ROOT_PLAYLIST_ID);
         editor.remove(PREFERENCE_SUBSCRIBE_TO_WATCH_AD_FREE);
         editor.remove(PREFERENCE_UNIVERSAL_SUBSCRIPTION);
         editor.remove(PREFERENCE_UNIVERSAL_TVOD);
