@@ -113,7 +113,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
         if (receiver != null) {
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, new IntentFilter("DataUpdated"));
         }
-        updateContents(mRowsAdapter);
+        updateContents();
     }
 
     @Override
@@ -161,7 +161,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (isDataLoaded) {
-                    updateContents(mRowsAdapter);
+                    updateContents();
                 }
                 else {
                     loadRootContentContainer(mRowsAdapter);
@@ -268,8 +268,9 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
     }
 
     /* Zype, Evgeny Cherkasov */
-    private void updateContents(ArrayObjectAdapter rowsAdapter) {
+    public void updateContents() {
 
+        ArrayObjectAdapter rowsAdapter = mRowsAdapter;
         ContentContainer rootContentContainer = ContentBrowser.getInstance(getActivity())
                 .getLastSelectedContentContainer();
         boolean isMyLibrary = rootContentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID);
@@ -279,8 +280,9 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
             if (index >= rowsAdapter.size()) {
                 break;
             }
-            // Skip 'My Library' content container
-            if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)) {
+            // Skip 'My Library' and 'Favorites' content container
+            if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)
+                    || contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID)) {
                 continue;
             }
 

@@ -216,7 +216,8 @@ public class ContentBrowseFragment extends RowsFragment {
 
             /* Zype, Evgeny Cherkasob */
             // Don't show My Library content container
-            if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)) {
+            if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)
+                    || contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID)) {
                 continue;
             }
 
@@ -410,8 +411,9 @@ public class ContentBrowseFragment extends RowsFragment {
 
         int index = 0;
         for (ContentContainer contentContainer : rootContentContainer.getContentContainers()) {
-            // Skip 'My Library' content container
-            if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)) {
+            // Skip 'My Library' and 'Favorites' content containers
+            if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)
+                    || contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID)) {
                 continue;
             }
 

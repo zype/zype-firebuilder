@@ -159,4 +159,5 @@ public class VideoData {
 
     public String playlistId;
     public String playerUrl;
+    public String videoFavoriteId;
 }

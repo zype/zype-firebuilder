@@ -8,6 +8,11 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class AppData {
+
+    @SerializedName("favorites_via_api")
+    @Expose
+    public String favoritesViaApi;
+
     @SerializedName("_id")
     @Expose
     public String Id;

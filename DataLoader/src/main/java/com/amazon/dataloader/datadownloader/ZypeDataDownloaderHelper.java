@@ -3,7 +3,12 @@ package com.amazon.dataloader.datadownloader;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.amazon.android.recipe.Recipe;
 import com.zype.fire.api.Model.VideoData;
+import com.zype.fire.api.Model.VideoEntitlementData;
+import com.zype.fire.api.Model.VideoFavoriteData;
+import com.zype.fire.api.Model.VideoFavoritesResponse;
+import com.zype.fire.api.Model.VideoResponse;
 import com.zype.fire.api.Model.VideosResponse;
 import com.zype.fire.api.ZypeApi;
 
@@ -16,6 +21,11 @@ import java.util.List;
 
 public class ZypeDataDownloaderHelper {
     private static final String TAG = ZypeDataDownloaderHelper.class.getSimpleName();
+
+    public static class VideosResult {
+        public List<VideoData> videos;
+        public int nextPage;
+    }
 
     public static VideosResponse loadPlaylistVideos(String playlistId, int page) {
         Log.d(TAG, "loadPlaylistVideos(): id=" + playlistId);
@@ -40,4 +50,46 @@ public class ZypeDataDownloaderHelper {
         }
         return response;
     }
+
+    public static VideosResult loadFavoriteVideos(String favoritesPlaylistId, String consumerId, String accessToken, int page) {
+        Log.d(TAG, "loadFavoriteVideos(): consumerId=" + consumerId);
+
+        VideosResult result = null;
+
+        VideoFavoritesResponse response = ZypeApi.getInstance().getVideoFavorites(consumerId, accessToken, page);
+        if (response != null) {
+            Log.d(TAG, "loadFavoriteVideos(): size=" + response.videoFavorites.size());
+
+            result = new VideosResult();
+            result.videos = new ArrayList<>();
+            if (response.pagination.current == response.pagination.pages) {
+                result.nextPage = -1;
+            }
+            else {
+                result.nextPage = response.pagination.next;
+            }
+
+            for (VideoFavoriteData data : response.videoFavorites) {
+                VideoResponse responseVideo = ZypeApi.getInstance().getVideo(data.videoId);
+                if (responseVideo != null) {
+                    VideoData videoData = responseVideo.videoData;
+                    if (TextUtils.isEmpty(videoData.description) || videoData.description.equals("null")) {
+                        videoData.description = " ";
+                    }
+                    videoData.playlistId = favoritesPlaylistId;
+                    videoData.playerUrl = "null";
+                    videoData.videoFavoriteId = data.id;
+                    result.videos.add(videoData);
+                }
+                else {
+                    Log.e(TAG, "loadFavoriteVideos(): error loading video, id=" + data.videoId);
+                }
+            }
+        }
+        else {
+            Log.e(TAG, "loadFavoriteVideos(): failed");
+        }
+        return result;
+    }
+
 }

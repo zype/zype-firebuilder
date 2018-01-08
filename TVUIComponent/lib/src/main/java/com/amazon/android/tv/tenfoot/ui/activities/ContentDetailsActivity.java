@@ -29,6 +29,7 @@
 package com.amazon.android.tv.tenfoot.ui.activities;
 
 import com.amazon.android.model.event.ActionUpdateEvent;
+import com.amazon.android.model.event.FavoritesLoadEvent;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentDetailsFragment;
@@ -92,5 +93,16 @@ public class ContentDetailsActivity extends BaseActivity implements ZypeAuthenti
         parameters.putString(ZypeLoginActivity.PARAMETERS_MESSAGE, getString(R.string.login_message));
         return parameters;
     }
+
+    /* Zype, Evgeny Cherkasov */
+
+    // //////////
+    // Event bus listeners
+    //
+    @Subscribe
+    public void onFavoritesLoadEvent(FavoritesLoadEvent event) {
+        mContentDetailsFragment.updateActions();
+    }
+
 
 }

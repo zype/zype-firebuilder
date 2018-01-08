@@ -9,6 +9,8 @@ import com.zype.fire.api.Model.PlayerResponse;
 import com.zype.fire.api.Model.PlaylistsResponse;
 import com.zype.fire.api.Model.VideoData;
 import com.zype.fire.api.Model.VideoEntitlementsResponse;
+import com.zype.fire.api.Model.VideoFavoriteResponse;
+import com.zype.fire.api.Model.VideoFavoritesResponse;
 import com.zype.fire.api.Model.VideoResponse;
 import com.zype.fire.api.Model.VideosResponse;
 
@@ -18,6 +20,7 @@ import java.util.Map;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
+import retrofit2.http.DELETE;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -53,19 +56,38 @@ public interface IZypeApi {
 
     // Consumers
     @GET("consumers/{consumer_id}")
-    Call<ConsumerResponse> getConsumer(@Path("consumer_id") String consumerId, @QueryMap HashMap<String, String> params);
+    Call<ConsumerResponse> getConsumer(@Path("consumer_id") String consumerId,
+                                       @QueryMap HashMap<String, String> params);
 
     @FormUrlEncoded
     @POST("/consumers")
-    Call<ConsumerResponse> createConsumer(@QueryMap HashMap<String, String> queryParams, @FieldMap HashMap<String, String> fieldParams);
+    Call<ConsumerResponse> createConsumer(@QueryMap HashMap<String, String> queryParams,
+                                          @FieldMap HashMap<String, String> fieldParams);
 
     // Video entitlements
     @GET("/videos/{video_id}/entitled")
-    Call<ResponseBody> checkVideoEntitlement(@Path("video_id") String videoId, @QueryMap HashMap<String, String> params);
+    Call<ResponseBody> checkVideoEntitlement(@Path("video_id") String videoId,
+                                             @QueryMap HashMap<String, String> params);
 
     @GET("/consumer/videos")
-    Call<VideoEntitlementsResponse> getVideoEntitlements(@Query(PARAM_PAGE) int page, @QueryMap HashMap<String, String> params);
+    Call<VideoEntitlementsResponse> getVideoEntitlements(@Query(PARAM_PAGE) int page,
+                                                         @QueryMap HashMap<String, String> params);
 
+    // Video Favorites
+    @GET("/consumers/{consumer_id}/video_favorites")
+    Call<VideoFavoritesResponse> getVideoFavorites(@Path("consumer_id") String consumerId,
+                                                   @QueryMap HashMap<String, String> params);
+
+    @FormUrlEncoded
+    @POST("/consumers/{consumer_id}/video_favorites")
+    Call<VideoFavoriteResponse> addVideoFavorite(@Path("consumer_id") String consumerId,
+                                                 @QueryMap HashMap<String, String> queryParams,
+                                                 @FieldMap HashMap<String, String> fieldParams);
+
+    @DELETE("/consumers/{consumer_id}/video_favorites/{video_favorite_id}")
+    Call<ResponseBody> removeVideoFavorite(@Path("consumer_id") String consumerId,
+                                       @Path("video_favorite_id") String videoFavoriteId,
+                                       @QueryMap HashMap<String, String> queryParams);
     // Playlist
     @GET("/playlists")
     Call<PlaylistsResponse> getPlaylists(@Query(PARAM_PAGE) int page, @QueryMap HashMap<String, String> params);

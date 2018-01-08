@@ -18,6 +18,7 @@
     "rental_required@RentalRequired",
     "subscription_required@subscriptionRequired",
     "thumbnails@cardImageUrl",
-    "thumbnails@backgroundImageUrl"
+    "thumbnails@backgroundImageUrl",
+    "videoFavoriteId@VideoFavoriteId"
   ]
 }

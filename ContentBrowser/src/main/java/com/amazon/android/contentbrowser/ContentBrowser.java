@@ -30,6 +30,7 @@ import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.model.content.constants.ExtraKeys;
 import com.amazon.android.model.content.constants.PreferencesConstants;
 import com.amazon.android.model.event.ActionUpdateEvent;
+import com.amazon.android.model.event.FavoritesLoadEvent;
 import com.amazon.android.navigator.Navigator;
 import com.amazon.android.navigator.NavigatorModel;
 import com.amazon.android.navigator.UINode;
@@ -53,6 +54,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -71,7 +73,7 @@ import static com.amazon.android.contentbrowser.helper.LauncherIntegrationManage
         .getSourceOfContentPlayRequest;
 
 /* Zype */
-import com.zype.fire.api.Model.PlaylistData;
+import com.google.gson.Gson;
 import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
@@ -185,6 +187,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final String SLIDESHOW_SETTING = "SlideShowSetting";
 
     /* Zype, Evgeny Cherkasov */
+    public static final String FAVORITES = "Favorites";
     public static final String MY_LIBRARY = "MyLibrary";
     public static final String NEXT_PAGE = "NextPage";
 
@@ -261,6 +264,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     /* Zype, Evgeny Cherkasov */
     // Choose plan action
     public static final int CONTENT_ACTION_CHOOSE_PLAN = 50;
+    // Favorites actions
+    public static final int CONTENT_ACTION_FAVORITES_ADD = 51;
+    public static final int CONTENT_ACTION_FAVORITES_REMOVE = 52;
     // Watch ad free action
     public static final int CONTENT_ACTION_SWAF = 55;
 
@@ -413,6 +419,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     /* Zype, Evgeny Cherkasov */
     private boolean userLoggedIn = false;
 
+    private boolean favoritesLoaded = false;
+
     /**
      * Returns AuthHelper instance.
      *
@@ -464,6 +472,12 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                         || userLoggedIn)) {
                 addSettingsAction(mLoginAction);
             }
+        }
+    }
+
+    private void setupFavoritesAction() {
+        if (ZypeConfiguration.isFavoritesViaApiEnabled(mAppContext)) {
+            addSettingsAction(createFavoritesSettingsAction());
         }
     }
 
@@ -562,6 +576,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         addSettingsAction(createTermsOfUseSettingsAction());
         //addSettingsAction(createSlideShowSettingAction());
         setupLogoutAction();
+        setupFavoritesAction();
         setupMyLibraryAction();
 
         mSearchManager.addSearchAlgo(DEFAULT_SEARCH_ALGO_NAME, new ISearchAlgo<Content>() {
@@ -984,6 +999,19 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                            .setState(LogoutSettingsFragment.TYPE_LOGIN);
     }
 
+    /* Zype, Evgeny Cherkasov */
+
+    /**
+     * Create favorites Action.
+     *
+     * @return action.
+     */
+    private Action createFavoritesSettingsAction() {
+        return new Action().setAction(FAVORITES)
+                .setIconResourceId(R.drawable.ic_star_white_48dp)
+                .setLabel1(mAppContext.getString(R.string.favorites_label));
+    }
+
     /**
      * Create My Library Action.
      *
@@ -1181,42 +1209,6 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         return parentContainer;
     }
 
-//    /* Zype, Evgeny Cherkasov */
-//    public ContentContainer getContainerForContentContainer(ContentContainer contentContainer) {
-//
-//        // Container that contains the current content container
-//        ContentContainer parentContainer = null;
-//
-//        // Stack of all content containers from root container.
-//        Stack<ContentContainer> contentContainerStack = new Stack<>();
-//
-//        contentContainerStack.push(mContentLoader.getRootContentContainer());
-//
-//        while (!contentContainerStack.isEmpty()) {
-//            // Get a sub container.
-//            ContentContainer subContainer = contentContainerStack.pop();
-//
-//            for (ContentContainer cc : subContainer.getContentContainers()) {
-//
-//                if (cc.getName().equals(contentContainer.getName())) {
-//                    parentContainer = subContainer;
-//                }
-//            }
-//
-//            if (parentContainer != null) {
-//                break;
-//            }
-//
-//            // Add all the sub containers.
-//            if (subContainer.hasSubContainers()) {
-//                for (ContentContainer cc : subContainer.getContentContainers()) {
-//                    contentContainerStack.push(cc);
-//                }
-//            }
-//        }
-//        return parentContainer;
-//    }
-
     /**
      * Search content.
      *
@@ -1260,6 +1252,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 slideShowSettingActionTriggered(activity, settingsAction);
                 break;
             /* Zype, Evgeny Cherkasov */
+            case FAVORITES:
+                favoritesActionTriggered(activity);
+                break;
             case MY_LIBRARY:
                 myLibraryActionTriggered(activity);
                 break;
@@ -1314,6 +1309,39 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     /* Zype, Evgeny Cherkasov */
+    private void favoritesActionTriggered(Activity activity) {
+        ContentContainer contentContainer = getRootContentContainer()
+                .findContentContainerByName(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID);
+        if (contentContainer != null) {
+            // Set next page to 1 for initial loading
+            contentContainer.getContentContainers().get(0).setExtraValue(ExtraKeys.NEXT_PAGE, 1);
+            // If user is logged in then open browsing screen for Favorites. Otherwise switch to
+            // login screen.
+            mAuthHelper.isAuthenticated()
+                    .subscribe(isAuthenticatedResultBundle -> {
+                        boolean result = isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT);
+                        if (result) {
+                            setLastSelectedContentContainer(contentContainer);
+                            switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
+                            if (!isFavoritesLoaded()) {
+                                loadFavoritesVideos(contentContainer);
+                            }
+//                            if (!contentContainer.getContents().isEmpty()) {
+//                                setLastSelectedContent(contentContainer.getContents().get(0));
+//                                switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+//                            }
+//                            else {
+//                                loadFavoritesVideos(contentContainer);
+//                            }
+                        }
+                        else {
+                            mAuthHelper.handleAuthChain(extra -> mNavigator.startActivity(CONTENT_HOME_SCREEN, intent -> {
+                            }));
+                        }
+                    });
+        }
+    }
+
     private void myLibraryActionTriggered(Activity activity) {
         ContentContainer contentContainer = getRootContentContainer()
                 .findContentContainerByName(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID);
@@ -1368,6 +1396,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         boolean showSubscribe = false;
         boolean showPurchase = false;
         boolean showAdFree = false;
+        boolean showFavorites = false;
 
         boolean purchaseRequired = false;
         boolean entitled = false;
@@ -1420,6 +1449,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 && !userLoggedIn) {
             showAdFree = true;
         }
+        if (ZypeConfiguration.isFavoritesViaApiEnabled(mAppContext)
+                && isUserLoggedIn()) {
+            showFavorites = true;
+        }
 
         if (showWatch) {
             // Check if the content is meant for live watching. Live content requires only a
@@ -1467,6 +1500,28 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             contentActionList.add(new Action().setId(CONTENT_ACTION_SWAF)
                     .setLabel1(mAppContext.getResources().getString(R.string.action_swaf_1))
                     .setLabel2(mAppContext.getResources().getString(R.string.action_swaf_2)));
+        }
+        if (showFavorites) {
+            ContentContainer favoritesContainer = getRootContentContainer()
+                    .findContentContainerById(ZypeSettings.FAVORITES_PLAYLIST_ID);
+            if (favoritesContainer != null) {
+                if (isFavoritesLoaded()) {
+                    if (favoritesContainer.findContentById(content.getId()) == null) {
+                        contentActionList.add(new Action().setId(CONTENT_ACTION_FAVORITES_ADD)
+                                .setLabel1(mAppContext.getResources().getString(R.string.action_favorites_add_1))
+                                .setLabel2(mAppContext.getResources().getString(R.string.action_favorites_add_2)));
+                    } else {
+                        contentActionList.add(new Action().setId(CONTENT_ACTION_FAVORITES_REMOVE)
+                                .setLabel1(mAppContext.getResources().getString(R.string.action_favorites_remove_1))
+                                .setLabel2(mAppContext.getResources().getString(R.string.action_favorites_remove_2)));
+                    }
+                }
+                else {
+                    // Set next page to 1 for initial loading
+                    favoritesContainer.setExtraValue(ExtraKeys.NEXT_PAGE, 1);
+                    loadFavoritesVideos(favoritesContainer);
+                }
+            }
         }
 //            contentActionList.add(new Action()
 //                                          .setId(CONTENT_ACTION_SUBSCRIPTION)
@@ -1863,251 +1918,66 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             case CONTENT_ACTION_CHOOSE_PLAN:
                 mPurchaseHelper.handleAction(activity, content, actionId);
                 break;
+            case CONTENT_ACTION_FAVORITES_ADD:
+                favoritesAddActionTriggered(content);
+                break;
+            case CONTENT_ACTION_FAVORITES_REMOVE:
+                favoritesRemoveActionTriggered(content);
+                break;
             case CONTENT_ACTION_SWAF:
                 handleRendererScreenSwitch(activity, content, actionId, true);
                 break;
         }
     }
 
-//    /**
-//     * Get categories observable.
-//     *
-//     * @param root                             Content container.
-//     * @param dataLoaderRecipeForCategories    Data loader recipe for getting categories.
-//     * @param dynamicParserRecipeForCategories Dynamic parser recipe for getting categories.
-//     * @return RX Observable.
-//     */
-//    private Observable<Object> getCategoriesObservable(ContentContainer root,
-//                                                       Recipe dataLoaderRecipeForCategories,
-//                                                       Recipe dynamicParserRecipeForCategories) {
-//
-//        /* Zype, Evgeny Cherkasov */
-//        // Set parent playlist id in receipt params to fetch only its child playlists
-//        String[] params;
-//        if (root.getName().equals("Root")) {
-//            params = new String[] { ZypeSettings.ROOT_PLAYLIST_ID };
-//        }
-//        else {
-//            params = new String[] { (String) root.getExtraStringValue("keyDataType") };
-//        }
-//
-//        return mDataLoadManager.cookRecipeObservable(
-//                dataLoaderRecipeForCategories,
-//                null,
-//                null,
-//                null).map(
-//                feedDataForCategories -> {
-//                    if (DEBUG_RECIPE_CHAIN) {
-//                        Log.d(TAG, "Feed download complete");
-//                    }
-//
-//                    if (CAUSE_A_FEED_ERROR_FOR_DEBUGGING) {
-//                        return Observable.error(new Exception());
-//                    }
-//                    return feedDataForCategories;
-//                }).concatMap(
-//                feedDataForCategories -> mDynamicParser.cookRecipeObservable
-//                        (dynamicParserRecipeForCategories,
-//                                feedDataForCategories,
-//                                null,
-//                                params)).map(
-//                contentContainerAsObject -> {
-//                    ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
-//
-//                    ContentContainer alreadyAvailableContentContainer =
-//                            root.findContentContainerByName(contentContainer.getName());
-//
-//                    if (alreadyAvailableContentContainer == null) {
-//                        root.addContentContainer(contentContainer);
-//                        alreadyAvailableContentContainer = contentContainer;
-//                    }
-//
-//                    if (DEBUG_RECIPE_CHAIN) {
-//                        Log.d(TAG, "Dynamic parser got an container");
-//                    }
-//                    return alreadyAvailableContentContainer;
-//                })
-//                /* Zype, Evgeny Cherkasov */
-//                // Get all nested playlists for each playlist in root
-//                .concatMap(contentContainer -> getSubCategoriesObservable(contentContainer, dataLoaderRecipeForCategories, dynamicParserRecipeForCategories));
-//    }
+    /* Zype, Evgeny Cherkasov */
+    private void favoritesAddActionTriggered(Content content) {
+        mContentLoader
+                .addVideoFavorite(content)
+                .subscribe(resultContent -> {
+                    if (!TextUtils.isEmpty(resultContent.getExtraValueAsString(Content.EXTRA_VIDEO_FAVORITE_ID))) {
+                        // Add video to Favorites container
+                        ContentContainer favoritesContainer = getRootContentContainer().findContentContainerById(ZypeSettings.FAVORITES_PLAYLIST_ID);
+                        if (favoritesContainer != null) {
+                            Gson gson = new Gson();
+                            String jsonFavoriteVideo = gson.toJson(resultContent);
+                            Content favoriteVideo = gson.fromJson(jsonFavoriteVideo, resultContent.getClass());
+                            favoriteVideo.setExtraValue(Content.EXTRA_PLAYLIST_ID, ZypeSettings.FAVORITES_PLAYLIST_ID);
+                            favoritesContainer.getContents().add(0, favoriteVideo);
+                        }
+                        // Update action buttons
+                        updateContentActions();
+                    }
+                    else {
+                        // TODO: Handke error
+                    }
+                });
+    }
 
-//    /* Zype, Evgeny Cherkasov */
-//    private Observable<Object> getSubCategoriesObservable(ContentContainer parentContentContainer,
-//                                                          Recipe dataLoaderRecipeForCategories,
-//                                                          Recipe dynamicParserRecipeForCategories) {
-//        parentContentContainer.getContentContainers().clear();
-//        if ((Integer) parentContentContainer.getExtraStringValue("playlistItemCount") > 0) {
-//            // If playlist contains videos just return itself and ignore nested playlists
-//            return Observable.just(parentContentContainer);
-//        }
-//        else {
-//            return Observable.concat(
-//                    Observable.just(parentContentContainer),
-//                    mDataLoadManager.cookRecipeObservable(dataLoaderRecipeForCategories, null, null, null)
-//                            .map(feedDataForCategories -> {
-//                                if (CAUSE_A_FEED_ERROR_FOR_DEBUGGING) {
-//                                    return Observable.error(new Exception());
-//                                }
-//                                return feedDataForCategories;
-//                            })
-//                            .concatMap(feedDataForCategories -> {
-//                                String[] params = new String[]{(String) parentContentContainer.getExtraStringValue("keyDataType")};
-//                                return mDynamicParser.cookRecipeObservable(dynamicParserRecipeForCategories, feedDataForCategories, null, params);
-////                                        .concatMap(contentSubContainer -> getSubCategoriesObservable(contentSubContainer, dataLoaderRecipeForCategories, dynamicParserRecipeForCategories));
-//                            })
-//                            .filter(contentSubContainerAsObject -> contentSubContainerAsObject != null)
-//                            .map(contentSubContainerAsObject -> {
-////                                            if (contentSubContainerAsObject == null) {
-////                                                return contentContainer;
-////                                            }
-//                                ContentContainer contentSubContainer = (ContentContainer) contentSubContainerAsObject;
-//                                if (DEBUG_RECIPE_CHAIN) {
-//                                    Log.d(TAG, "getSubCategoriesObservable(): " + contentSubContainer.getName());
-//                                }
-//                                parentContentContainer.getContentContainers().add(contentSubContainer);
-//                                if ((Integer) contentSubContainer.getExtraStringValue("playlistItemCount") > 0) {
-////                                    return contentSubContainer;
-//                                    return parentContentContainer;
-//                                }
-//                                else {
-//                                    return parentContentContainer;
-//                                }
-//                            })
-//                            .distinct()
-//            );
-//        }
-//    }
-
-//    /**
-//     * Get contents observable.
-//     *
-//     * @param observable                     Rx Observable chain to continue on.
-//     * @param dataLoaderRecipeForContents    Data loader recipe for getting contents.
-//     * @param dynamicParserRecipeForContents Dynamic parser  recipe for getting contents.
-//     * @return RX Observable.
-//     */
-//    private Observable<Object> getContentsObservable(Observable<Object> observable,
-//                                                     Recipe dataLoaderRecipeForContents,
-//                                                     Recipe dynamicParserRecipeForContents) {
-//
-//        return observable.concatMap(contentContainerAsObject -> {
-//            ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
-//            if (DEBUG_RECIPE_CHAIN) {
-//                Log.d(TAG, "ContentContainer:" + contentContainer.getName());
-//            }
-//            return mDataLoadManager.cookRecipeObservable(
-//                    dataLoaderRecipeForContents,
-//                    null,
-//                    null,
-//                    null).map(
-//                    feedDataForContent -> {
-//                        if (DEBUG_RECIPE_CHAIN) {
-//                            Log.d(TAG, "Feed for container complete");
-//                        }
-//                        return Pair.create(contentContainerAsObject, feedDataForContent);
-//                    });
-//        }).concatMap(objectPair -> {
-//            ContentContainer contentContainer = (ContentContainer) objectPair.first;
-//            /* Zype, Evgeny Cherkasov */
-//            // Clear content list to avoid duplicate contents for nested playlist (subcategory)
-//            contentContainer.getContents().clear();
-//            String feed = (String) objectPair.second;
-//
-//            String[] params = new String[]{(String) contentContainer
-//                    .getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG)
-//            };
-//
-//            return mDynamicParser.cookRecipeObservable(
-//                    dynamicParserRecipeForContents,
-//                    feed,
-//                    null,
-//                    params).map(contentAsObject -> {
-//                if (DEBUG_RECIPE_CHAIN) {
-//                    Log.d(TAG, "Parser got an content");
-//                }
-//                Content content = (Content) contentAsObject;
-//                if (content != null) {
-//                    contentContainer.addContent(content);
-//                }
-//                return Pair.create(contentContainer, contentAsObject);
-//            });
-//        });
-//    }
-
-//    /**
-//     * Get content chain observable.
-//     *
-//     * @param hardCodedCategoryName            Hard coded category name.
-//     * @param dataLoaderRecipeForCategories    Data loader recipe for getting categories.
-//     * @param dataLoaderRecipeForContents      Data loader recipe for getting contents.
-//     * @param dynamicParserRecipeForCategories Dynamic parser recipe for getting categories.
-//     * @param dynamicParserRecipeForContents   Dynamic parser  recipe for getting contents.
-//     * @param root                             Content container.
-//     * @return RX Observable.
-//     */
-//    private Observable<Object> getContentChainObservable(String hardCodedCategoryName,
-//                                                         Recipe dataLoaderRecipeForCategories,
-//                                                         Recipe dataLoaderRecipeForContents,
-//                                                         Recipe dynamicParserRecipeForCategories,
-//                                                         Recipe dynamicParserRecipeForContents,
-//                                                         ContentContainer root) {
-//
-//        Observable<Object> observable;
-//
-//        if (hardCodedCategoryName == null) {
-//            observable = getCategoriesObservable(root, dataLoaderRecipeForCategories,
-//                    dynamicParserRecipeForCategories);
-//        }
-//        else {
-//            observable = Observable.just(hardCodedCategoryName)
-//                    .map(s -> {
-//                        ContentContainer contentContainer =
-//                                new ContentContainer(hardCodedCategoryName);
-//                        root.addContentContainer(contentContainer);
-//                        return contentContainer;
-//                    });
-//        }
-//
-//        return getContentsObservable(observable, dataLoaderRecipeForContents,
-//                dynamicParserRecipeForContents);
-//    }
-
-//    /**
-//     * Run global recipes at index.
-//     *
-//     * @param index Index.
-//     * @param root  Content container.
-//     * @return RX Observable.
-//     */
-//    private Observable<Object> runGlobalRecipeAtIndex(int index, ContentContainer root) {
-//
-//
-//        NavigatorModel.GlobalRecipes recipe = mNavigator.getNavigatorModel().getGlobalRecipes()
-//                .get(index);
-//
-//        Recipe dataLoaderRecipeForCategories = recipe.getCategories().dataLoaderRecipe;
-//        Recipe dataLoaderRecipeForContents = recipe.getContents().dataLoaderRecipe;
-//
-//        Recipe dynamicParserRecipeForCategories = recipe.getCategories().dynamicParserRecipe;
-//        Recipe dynamicParserRecipeForContents = recipe.getContents().dynamicParserRecipe;
-//
-//        // Add any extra configurations that the parser recipe needs from the navigator recipe.
-//        if (recipe.getRecipeConfig() != null) {
-//            // Add if the recipe is for live feed data.
-//            dynamicParserRecipeForContents.getMap().put(Recipe.LIVE_FEED_TAG,
-//                    recipe.getRecipeConfig().liveContent);
-//        }
-//
-//        String hardCodedCategoryName = recipe.getCategories().name;
-//
-//        return getContentChainObservable(hardCodedCategoryName,
-//                dataLoaderRecipeForCategories,
-//                dataLoaderRecipeForContents,
-//                dynamicParserRecipeForCategories,
-//                dynamicParserRecipeForContents,
-//                root);
-//    }
+    private void favoritesRemoveActionTriggered(Content content) {
+        ContentContainer favoritesContainer = getRootContentContainer().findContentContainerById(ZypeSettings.FAVORITES_PLAYLIST_ID);
+        if (favoritesContainer == null) {
+            return;
+        }
+        Content favoriteVideo = favoritesContainer.findContentById(content.getId());
+        if (favoriteVideo == null) {
+            return;
+        }
+        String videoFavoriteId = favoriteVideo.getExtraValueAsString(Content.EXTRA_VIDEO_FAVORITE_ID);
+        mContentLoader
+                .removeVideoFavorite(content, videoFavoriteId)
+                .subscribe(resultContent -> {
+                    if (TextUtils.isEmpty(resultContent.getExtraValueAsString(Content.EXTRA_VIDEO_FAVORITE_ID))) {
+                        // Remove video from Favorites container
+                        favoritesContainer.getContents().remove(favoriteVideo);
+                        // Update action buttons
+                        updateContentActions();
+                    }
+                    else {
+                        // TODO: Handke error
+                    }
+                });
+    }
 
     /**
      * Run global recipes.
@@ -2153,6 +2023,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                               Log.v(TAG, "Recipe chain completed");
                               // Remove empty sub containers.
                               root.removeEmptySubContainers();
+//                              /* Zype, Evgeny Cherkasov */
+//                              addPredefinedContainers(root);
 
                               mContentLoader.setRootContentContainer(root);
                               if (mIRootContentContainerListener != null) {
@@ -2260,6 +2132,31 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     /* Zype, Evgeny Cherkasov */
+    private void addPredefinedContainers(ContentContainer root) {
+        // Add Favorites
+        ContentContainer contentContainer = root.findContentContainerByName(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID);
+        if (contentContainer == null) {
+            root.getContentContainers().add(createFavoritesContentContainer(root));
+        }
+    }
+
+    private ContentContainer createFavoritesContentContainer(ContentContainer parent) {
+        ContentContainer rootFavorites = new ContentContainer(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID);
+        rootFavorites.setExtraValue(Recipe.KEY_DATA_TYPE_TAG, ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID);
+        rootFavorites.setExtraValue("description", ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID);
+        rootFavorites.setExtraValue("parentId", parent.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+        rootFavorites.setExtraValue(ContentContainer.EXTRA_THUMBNAIL_LAYOUT, "landscape");
+
+        ContentContainer favorites = new ContentContainer(ZypeSettings.FAVORITES_PLAYLIST_ID);
+        favorites.setExtraValue(Recipe.KEY_DATA_TYPE_TAG, ZypeSettings.FAVORITES_PLAYLIST_ID);
+        favorites.setExtraValue("description", ZypeSettings.FAVORITES_PLAYLIST_ID);
+        favorites.setExtraValue("parentId", ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID);
+        favorites.setExtraValue(ContentContainer.EXTRA_THUMBNAIL_LAYOUT, "landscape");
+
+        rootFavorites.getContentContainers().add(favorites);
+        return rootFavorites;
+    }
+
     public void runGlobalRecipesForLastSelected(Activity activity, ICancellableLoad cancellable) {
         final ContentContainer root = getLastSelectedContentContainer();
         Subscription subscription =
@@ -2299,7 +2196,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                         }, () -> {
                             Log.v(TAG, "Recipe chain completed");
                             // Remove empty sub containers.
-                            if (!root.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)) {
+                            if (!root.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)
+                                    && !root.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID)) {
                                 root.removeEmptySubContainers();
                             }
 
@@ -2505,6 +2403,46 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     });
         mCompositeSubscription.add(subscription);
     }
+
+    public void loadFavoritesVideos(ContentContainer contentContainer) {
+        Observable<Object> observable = Observable.just(contentContainer.getContentContainers().get(0));
+        Recipe recipeDynamicParserVideos = Recipe.newInstance(mAppContext, "recipes/ZypeSearchContentsRecipe.json");
+        Subscription subscription = observable
+                .subscribeOn(Schedulers.newThread())
+                .concatMap(contentContainerAsObject -> {
+                    return mContentLoader.getLoadContentsObservable(Observable.just(contentContainerAsObject), recipeDynamicParserVideos);
+                })
+                .onBackpressureBuffer() // This must be right after concatMap.
+                .doOnNext(o -> { })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        result -> {
+                        },
+                        throwable -> {
+                            Log.e(TAG, "loadPlaylistVideos(): failed: ", throwable);
+                            ErrorHelper.injectErrorFragment(
+                                    mNavigator.getActiveActivity(),
+                                    ErrorUtils.ERROR_CATEGORY.FEED_ERROR,
+                                    (errorDialogFragment, errorButtonType, errorCategory) -> {
+                                        if (errorButtonType == ErrorUtils.ERROR_BUTTON_TYPE.EXIT_APP) {
+                                            mNavigator.getActiveActivity().finishAffinity();
+                                        }
+                                    });
+                        },
+                        () -> {
+                            Log.v(TAG, "loadPlaylistVideos(): completed");
+                            if (!contentContainer.getContentContainers().get(0).getContents().isEmpty()) {
+                                favoritesLoaded = true;
+                                mEventBus.post(new FavoritesLoadEvent(favoritesLoaded));
+//                                setLastSelectedContent(contentContainer.getContents().get(0));
+//                                switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                            }
+                            else {
+                                // TODO: Display error message
+                            }
+                        });
+        mCompositeSubscription.add(subscription);
+    }
     //
 
     /**
@@ -2580,6 +2518,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     /* Zype, Evgeny Cherkasov */
+    public boolean isFavoritesLoaded() { return favoritesLoaded; }
     public boolean isUserLoggedIn() {
         return userLoggedIn;
     }

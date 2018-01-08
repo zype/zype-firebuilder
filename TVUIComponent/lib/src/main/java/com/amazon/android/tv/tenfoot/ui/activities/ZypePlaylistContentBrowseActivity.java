@@ -55,9 +55,11 @@ import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.model.Action;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
+import com.amazon.android.model.event.FavoritesLoadEvent;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment;
+import com.amazon.android.tv.tenfoot.ui.fragments.ContentDetailsFragment;
 import com.amazon.android.tv.tenfoot.ui.fragments.ZypePlaylistContentBrowseFragment;
 import com.amazon.android.ui.constants.ConfigurationConstants;
 import com.amazon.android.ui.fragments.ErrorDialogFragment;
@@ -66,6 +68,9 @@ import com.amazon.android.ui.utils.BackgroundImageUtils;
 import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.GlideHelper;
 import com.amazon.android.utils.Helpers;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.concurrent.TimeUnit;
 
@@ -263,6 +268,20 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
     }
 
     @Override
+    protected void onStart() {
+
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    @Override
     protected void onDestroy() {
 
         super.onDestroy();
@@ -289,5 +308,13 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
         }
     }
 
+    // //////////
+    // Event bus listeners
+    //
+    @Subscribe
+    public void onFavoritesLoadEvent(FavoritesLoadEvent event) {
+        ((ZypePlaylistContentBrowseFragment) getFragmentManager()
+                .findFragmentById(R.id.full_content_browse_fragment)).updateContents();
+    }
 
 }

@@ -1,14 +1,10 @@
 package com.amazon.dataloader.datadownloader;
 
 import android.content.Context;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.Pair;
 
 import com.amazon.android.recipe.Recipe;
-import com.amazon.android.utils.Helpers;
-import com.amazon.android.utils.NetworkUtils;
 import com.amazon.dataloader.R;
 import com.amazon.utils.model.Data;
 import com.google.gson.Gson;
@@ -24,26 +20,11 @@ import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-
-import rx.Observable;
 
 /**
  * Created by Evgeny Cherkasov on 04.03.2017.
@@ -127,6 +108,7 @@ public class ZypeDataDownloader extends ADataDownloader {
 
         List<PlaylistData> playlists = loadPlaylists();
         Log.d(TAG, "fetchData(): Playlists loaded");
+        addFavoritesPlaylist(playlists);
         addMyLibraryPlaylists(playlists);
 
         // Result data
@@ -214,6 +196,25 @@ public class ZypeDataDownloader extends ADataDownloader {
             }
         }
         return result;
+    }
+
+    private void addFavoritesPlaylist(List<PlaylistData> playlists) {
+        PlaylistData item = new PlaylistData();
+        item.id = ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID;
+        item.description = " ";
+        item.parentId = ZypeConfiguration.getRootPlaylistId(mContext);
+        item.thumbnailLayout = "landscape";
+        item.title = ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID;
+        playlists.add(item);
+
+        item = new PlaylistData();
+        item.id = ZypeSettings.FAVORITES_PLAYLIST_ID;
+        // TODO: Use string resources for description and title instead of hardcoded strings
+        item.description = "Favorites";
+        item.parentId = ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID;
+        item.thumbnailLayout = "landscape";
+        item.title = ZypeSettings.FAVORITES_PLAYLIST_ID;
+        playlists.add(item);
     }
 
     private void addMyLibraryPlaylists(List<PlaylistData> playlists) {

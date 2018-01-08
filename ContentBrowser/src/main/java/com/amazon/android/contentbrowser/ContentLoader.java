@@ -14,6 +14,7 @@
  */
 package com.amazon.android.contentbrowser;
 
+import com.amazon.android.contentbrowser.helper.ErrorHelper;
 import com.amazon.android.interfaces.ICancellableLoad;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
@@ -26,6 +27,7 @@ import com.amazon.android.navigator.Navigator;
 import com.amazon.android.navigator.NavigatorModel;
 import com.amazon.android.navigator.NavigatorModelParser;
 import com.amazon.android.recipe.Recipe;
+import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.Preferences;
 import com.amazon.dataloader.datadownloader.ZypeDataDownloaderHelper;
 import com.amazon.dataloader.dataloadmanager.DataLoadManager;
@@ -36,6 +38,8 @@ import com.google.gson.GsonBuilder;
 import com.zype.fire.api.Model.VideoData;
 import com.zype.fire.api.Model.VideoEntitlementData;
 import com.zype.fire.api.Model.VideoEntitlementsResponse;
+import com.zype.fire.api.Model.VideoFavoriteResponse;
+import com.zype.fire.api.Model.VideoFavoritesResponse;
 import com.zype.fire.api.Model.VideoResponse;
 import com.zype.fire.api.Model.VideosResponse;
 import com.zype.fire.api.ZypeApi;
@@ -45,6 +49,8 @@ import com.zype.fire.auth.ZypeAuthentication;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
@@ -52,7 +58,9 @@ import android.util.Pair;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -256,7 +264,7 @@ public class ContentLoader {
                     return alreadyAvailableContentContainer;
                 })
                 /* Zype, Evgeny Cherkasov */
-                // Get all nested playlists for each playlist in root
+                // Get all nested playlists for each playlist in the root
                 .concatMap(contentContainer -> getSubCategoriesObservable(contentContainer, dataLoaderRecipeForCategories, dynamicParserRecipeForCategories));
     }
 
@@ -608,6 +616,8 @@ public class ContentLoader {
      */
     public Observable<Object> getLoadContentsObservable(Observable<Object> observable, Recipe recipeDynamicParser) {
         return observable
+                // Clear contents of the content container for initial loading (extra parameter
+                // NEXT_PAGE value is 1)
                 .map(contentContainerAsObject -> {
                     ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
                     if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.MY_LIBRARY_PLAYLIST_ID)) {
@@ -623,6 +633,7 @@ public class ContentLoader {
                     }
                     return contentContainerAsObject;
                 })
+                // Load videos via Zype API and convert the result to JSON feed
                 .concatMap(contentContainerAsObject -> {
                     ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
                     if (DEBUG_RECIPE_CHAIN) {
@@ -633,11 +644,16 @@ public class ContentLoader {
                         // Loading My Library videos
                         return getMyLibraryVideosObservable(contentContainerAsObject);
                     }
+                    else if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.FAVORITES_PLAYLIST_ID)) {
+                        // Load favorites videos
+                        return getFavoriteVideosFeedObservable(contentContainerAsObject);
+                    }
                     else {
                         // Loading playlist videos
                         return getPlaylistVideosFeedObservable(contentContainerAsObject);
                     }
                 })
+                // Parse videos feed to Content objects
                 .concatMap(objectPair -> {
                     ContentContainer contentContainer = (ContentContainer) objectPair.first;
                     String feed = (String) objectPair.second;
@@ -691,6 +707,99 @@ public class ContentLoader {
             Log.e(TAG, "getPlaylistVideosFeedObservable(): no videos found");
             return Observable.just(Pair.create(contentContainerAsObject, ""));
         }
+    }
+
+    public Observable<Pair> getFavoriteVideosFeedObservable(Object contentContainerAsObject) {
+        ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
+
+        int nextPage = contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE);
+        if (nextPage <= 0) {
+            Log.e(TAG, "getFavoriteVideosFeedObservable(): incorrect page: " + nextPage);
+            return Observable.just(Pair.create(contentContainerAsObject, ""));
+        }
+
+        String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
+        String consumerId = Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_ID);
+        ZypeDataDownloaderHelper.VideosResult videosResult = ZypeDataDownloaderHelper.loadFavoriteVideos(
+                contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG), consumerId, accessToken, nextPage);
+        if (videosResult != null) {
+            contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, videosResult.nextPage);
+
+            GsonBuilder builder = new GsonBuilder();
+            Gson gson = builder.create();
+            String feed = gson.toJson(videosResult.videos);
+            return Observable.just(Pair.create(contentContainerAsObject, feed));
+        }
+        else {
+            Log.e(TAG, "getFavoriteVideosFeedObservable(): no videos found");
+            return Observable.just(Pair.create(contentContainerAsObject, ""));
+        }
+    }
+
+    public Observable<Content> addVideoFavorite(Content content) {
+        return Observable.create(subscriber -> {
+            String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
+            String consumerId = Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_ID);
+            HashMap<String, String> queryParams = new HashMap<>();
+            queryParams.put(ZypeApi.ACCESS_TOKEN, accessToken);
+            HashMap<String, String> fieldParams = new HashMap<>();
+            fieldParams.put("video_id", content.getId());
+            ZypeApi.getInstance().getApi().addVideoFavorite(consumerId, queryParams, fieldParams)
+                    .enqueue(new Callback<VideoFavoriteResponse>() {
+                        @Override
+                        public void onResponse(Call<VideoFavoriteResponse> call, Response<VideoFavoriteResponse> response) {
+                            Content resultContent = null;
+                            if (response.isSuccessful()) {
+                                resultContent = content;
+                                resultContent.setExtraValue(Content.EXTRA_VIDEO_FAVORITE_ID, response.body().data.id);
+                            }
+                            if (!subscriber.isUnsubscribed()) {
+                                subscriber.onNext(resultContent);
+                            }
+                            subscriber.onCompleted();
+                        }
+
+                        @Override
+                        public void onFailure(Call<VideoFavoriteResponse> call, Throwable t) {
+                            if (!subscriber.isUnsubscribed()) {
+                                subscriber.onError(t);
+                            }
+                            subscriber.onCompleted();
+                        }
+                    });
+        });
+    }
+
+    public Observable<Content> removeVideoFavorite(Content content, String videoFavoriteId) {
+        return Observable.create(subscriber -> {
+            String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
+            String consumerId = Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_ID);
+            HashMap<String, String> queryParams = new HashMap<>();
+            queryParams.put(ZypeApi.ACCESS_TOKEN, accessToken);
+            ZypeApi.getInstance().getApi().removeVideoFavorite(consumerId, videoFavoriteId, queryParams)
+                    .enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            Content resultContent = null;
+                            if (response.isSuccessful()) {
+                                resultContent = content;
+                                resultContent.setExtraValue(Content.EXTRA_VIDEO_FAVORITE_ID, null);
+                            }
+                            if (!subscriber.isUnsubscribed()) {
+                                subscriber.onNext(resultContent);
+                            }
+                            subscriber.onCompleted();
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                            if (!subscriber.isUnsubscribed()) {
+                                subscriber.onError(t);
+                            }
+                            subscriber.onCompleted();
+                        }
+                    });
+        });
     }
 
     public Observable<Pair> getMyLibraryVideosObservable(Object contentContainerAsObject) {

@@ -6,6 +6,7 @@ import com.zype.fire.api.Model.AppResponse;
 import com.zype.fire.api.Model.ConsumerResponse;
 import com.zype.fire.api.Model.PlaylistsResponse;
 import com.zype.fire.api.Model.VideoEntitlementsResponse;
+import com.zype.fire.api.Model.VideoFavoritesResponse;
 import com.zype.fire.api.Model.VideoResponse;
 import com.zype.fire.api.Model.VideosResponse;
 
@@ -191,6 +192,28 @@ public class ZypeApi {
             Response response = apiImpl.getVideoEntitlements(page, params).execute();
             if (response.isSuccessful()) {
                 return (VideoEntitlementsResponse) response.body();
+            }
+            else {
+                return null;
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public VideoFavoritesResponse getVideoFavorites(String consumerId, String accessToken, int page) {
+        try {
+            HashMap<String, String> params = new HashMap<>();
+            params.put(ACCESS_TOKEN, accessToken);
+            params.put(PAGE, String.valueOf(page));
+            params.put(PER_PAGE, String.valueOf(PER_PAGE_DEFAULT));
+            params.put("sort", "created_at");
+            params.put("order", "desc");
+            Response response = apiImpl.getVideoFavorites(consumerId, params).execute();
+            if (response.isSuccessful()) {
+                return (VideoFavoritesResponse) response.body();
             }
             else {
                 return null;
