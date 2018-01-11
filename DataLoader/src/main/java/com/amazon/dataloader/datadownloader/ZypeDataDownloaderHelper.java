@@ -27,6 +27,34 @@ public class ZypeDataDownloaderHelper {
         public int nextPage;
     }
 
+    public static VideosResult loadVideos(List<String> videoIds, String playlistId) {
+        Log.d(TAG, "loadVideos(): ");
+
+        VideosResult result = new VideosResult();
+        result.videos = new ArrayList<>();
+        result.nextPage = -1;
+
+        for (String videoId : videoIds) {
+            VideoResponse responseVideo = ZypeApi.getInstance().getVideo(videoId);
+            if (responseVideo != null) {
+                VideoData videoData = responseVideo.videoData;
+                if (TextUtils.isEmpty(videoData.description) || videoData.description.equals("null")) {
+                    videoData.description = " ";
+                }
+                videoData.playlistId = playlistId;
+                videoData.playerUrl = "null";
+                videoData.videoFavoriteId = null;
+                result.videos.add(videoData);
+            }
+            else {
+                Log.e(TAG, "loadFavoriteVideos(): error loading video, id=" + videoId);
+                return null;
+            }
+        }
+
+        return result;
+    }
+
     public static VideosResponse loadPlaylistVideos(String playlistId, int page) {
         Log.d(TAG, "loadPlaylistVideos(): id=" + playlistId);
 
@@ -54,40 +82,53 @@ public class ZypeDataDownloaderHelper {
     public static VideosResult loadFavoriteVideos(String favoritesPlaylistId, String consumerId, String accessToken, int page) {
         Log.d(TAG, "loadFavoriteVideos(): consumerId=" + consumerId);
 
-        VideosResult result = null;
+        VideosResult result = new VideosResult();
+        result.nextPage = page;
 
-        VideoFavoritesResponse response = ZypeApi.getInstance().getVideoFavorites(consumerId, accessToken, page);
-        if (response != null) {
-            Log.d(TAG, "loadFavoriteVideos(): size=" + response.videoFavorites.size());
+        boolean loadNext = true;
 
-            result = new VideosResult();
-            result.videos = new ArrayList<>();
-            if (response.pagination.current == response.pagination.pages) {
-                result.nextPage = -1;
-            }
-            else {
-                result.nextPage = response.pagination.next;
-            }
+        while (loadNext) {
+            VideoFavoritesResponse response = ZypeApi.getInstance()
+                    .getVideoFavorites(consumerId, accessToken, result.nextPage);
+            if (response != null) {
+                Log.d(TAG, "loadFavoriteVideos(): size=" + response.videoFavorites.size());
 
-            for (VideoFavoriteData data : response.videoFavorites) {
-                VideoResponse responseVideo = ZypeApi.getInstance().getVideo(data.videoId);
-                if (responseVideo != null) {
-                    VideoData videoData = responseVideo.videoData;
-                    if (TextUtils.isEmpty(videoData.description) || videoData.description.equals("null")) {
-                        videoData.description = " ";
-                    }
-                    videoData.playlistId = favoritesPlaylistId;
-                    videoData.playerUrl = "null";
-                    videoData.videoFavoriteId = data.id;
-                    result.videos.add(videoData);
+                if (result.videos == null) {
+                    result.videos = new ArrayList<>();
+                }
+
+                if (response.pagination.current == response.pagination.pages) {
+                    result.nextPage = -1;
                 }
                 else {
-                    Log.e(TAG, "loadFavoriteVideos(): error loading video, id=" + data.videoId);
+                    result.nextPage = response.pagination.next;
+                }
+
+                for (VideoFavoriteData data : response.videoFavorites) {
+                    VideoResponse responseVideo = ZypeApi.getInstance().getVideo(data.videoId);
+                    if (responseVideo != null) {
+                        VideoData videoData = responseVideo.videoData;
+                        if (TextUtils.isEmpty(videoData.description) || videoData.description.equals("null")) {
+                            videoData.description = " ";
+                        }
+                        videoData.playlistId = favoritesPlaylistId;
+                        videoData.playerUrl = "null";
+                        videoData.videoFavoriteId = data.id;
+                        result.videos.add(videoData);
+                    }
+                    else {
+                        Log.e(TAG, "loadFavoriteVideos(): error loading video, id=" + data.videoId);
+                        return null;
+                    }
                 }
             }
-        }
-        else {
-            Log.e(TAG, "loadFavoriteVideos(): failed");
+            else {
+                Log.e(TAG, "loadFavoriteVideos(): failed");
+                return null;
+            }
+
+            // Load all favorites
+            loadNext = (result.nextPage == -1);
         }
         return result;
     }

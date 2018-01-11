@@ -48,7 +48,7 @@ public class ContentDatabaseHelper extends SQLiteOpenHelper {
      * The database version. If this is changed onUpgrade will be called. Put any logic needed to
      * change or maintain database in that method.
      */
-    private static int DATABASE_VERSION = 1;
+    private static int DATABASE_VERSION = 2;
 
     /**
      * The SQLiteDatabase instance.
@@ -129,6 +129,16 @@ public class ContentDatabaseHelper extends SQLiteOpenHelper {
         Log.i(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion);
         // Insert logic here if you need to update database. Please try not to destroy all old
         // user data.
+
+        /* Zype, Evgeny Cherkasov */
+        // Create video favorites table
+        try {
+            db.execSQL(VideoFavoritesTable.SQL_CREATE_TABLE);
+        }
+        catch (Exception e) {
+
+        }
+
     }
 
     /**
@@ -142,6 +152,8 @@ public class ContentDatabaseHelper extends SQLiteOpenHelper {
         try {
             db.execSQL(RecommendationTable.SQL_CREATE_TABLE);
             db.execSQL(RecentTable.SQL_CREATE_TABLE);
+            /* Zype, Evgeny Cherkasov */
+            db.execSQL(VideoFavoritesTable.SQL_CREATE_TABLE);
         }
         catch (Exception e) {
             Log.e(TAG, "Error creating database tables: " + e);
@@ -173,6 +185,8 @@ public class ContentDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getDatabaseInstance();
         RecommendationTable.deleteAll(db);
         RecentTable.deleteAll(db);
+        /* Zype, Evgeny Cherkasov */
+        VideoFavoritesTable.deleteAll(db);
     }
 
     /**
@@ -487,6 +501,65 @@ public class ContentDatabaseHelper extends SQLiteOpenHelper {
 
         return RecommendationTable.getRecommendationIds(getDatabaseInstance());
     }
+
+    /* Zype, Evgeny Cherkasov */
+
+    /**
+     * Get all video favorites records.
+     *
+     * @return List of video favorites records.
+     */
+    public List<VideoFavoriteRecord> getVideoFavorites() {
+        SQLiteDatabase db = getDatabaseInstance();
+        return VideoFavoritesTable.readMultipleRecords(db, VideoFavoritesTable.SQL_SELECT_ALL_COLUMNS);
+    }
+
+    /**
+     * Tests for the existence of a video favorite by video id.
+     *
+     * @param videoId The video id.
+     * @return True if a video favorite record exists with the given video id; false otherwise.
+     */
+    public boolean videoFavoriteWithVideoIdExists(String videoId) {
+        SQLiteDatabase db = getDatabaseInstance();
+        long rowId = VideoFavoritesTable.findRowId(db, videoId);
+        return (rowId != -1);
+    }
+
+    /**
+     * Store or update a video favorite in the database. If an existing entry is found for
+     * the given video id, the record is updated with the new information.
+     *
+     * @param videoId        The video id.
+     * @param videoFavoriteId The video favorite id.
+     * @return True if a record was entered or updated in the database; false otherwise.
+     */
+    public boolean addVideoFavorite(String videoId, String videoFavoriteId) {
+        if (StringManipulation.isNullOrEmpty(videoId)) {
+            Log.e(TAG, "Parameters cannot be null or empty when saving a video favorite to " +
+                    "database: videoId=" + videoId);
+            return false;
+        }
+        SQLiteDatabase db = getDatabaseInstance();
+
+        long rowId = VideoFavoritesTable.write(db, new VideoFavoriteRecord(videoId, videoFavoriteId));
+        return rowId != -1;
+    }
+
+    /**
+     * Deletes the video favorite record for the given video id.
+     *
+     * @param videoId The video id.
+     * @return True if the record was deleted; false otherwise.
+     */
+    public boolean deleteVideoFavoriteByVideoId(String videoId) {
+        if (StringManipulation.isNullOrEmpty(videoId)) {
+            Log.e(TAG, "Video id cannot be null or empty when deleting a recommendation from database");
+            return false;
+        }
+        return VideoFavoritesTable.delete(getDatabaseInstance(), videoId);
+    }
+
 }
 
 

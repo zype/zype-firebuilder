@@ -274,6 +274,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
         ContentContainer rootContentContainer = ContentBrowser.getInstance(getActivity())
                 .getLastSelectedContentContainer();
         boolean isMyLibrary = rootContentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID);
+        boolean isFavorites = rootContentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID);
 
         int index = 0;
         for (ContentContainer contentContainer : rootContentContainer.getContentContainers()) {
@@ -316,6 +317,14 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                     action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
                     listRowAdapter.add(action);
                 }
+            }
+
+            // Display message if the Favorites list is empty
+            if (isFavorites && contentContainer.getContents().isEmpty()) {
+                dialogError = ErrorDialogFragment.newInstance(getActivity(),
+                        ErrorUtils.ERROR_CATEGORY.ZYPE_FAVORITES_ERROR_EMPTY,
+                        (ErrorDialogFragment.ErrorDialogFragmentListener) getActivity());
+                dialogError.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
             }
 
             index++;

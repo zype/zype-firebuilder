@@ -679,6 +679,70 @@ public class ContentLoader {
                 });
     }
 
+    public Observable<Object> getLoadContentsByVideoIdsObservable(Observable<Object> observable,
+                                                                  Recipe recipeDynamicParser,
+                                                                  List<String> videoIds) {
+        return observable
+                // Clear contents of the content container
+                .map(contentContainerAsObject -> {
+                    ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
+                    contentContainer.getContents().clear();
+                    contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, -1);
+                    return contentContainerAsObject;
+                })
+                // Load videos via Zype API and convert the result to JSON feed
+                .concatMap(contentContainerAsObject -> {
+                    ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
+                    if (DEBUG_RECIPE_CHAIN) {
+                        Log.d(TAG, "getLoadContentsByVideoIdsObservable(): " + contentContainer.getName());
+                    }
+                    // Loading videos
+                    return getVideosFeedObservable(contentContainerAsObject, videoIds);
+                })
+                // Parse videos feed to Content objects
+                .concatMap(objectPair -> {
+                    ContentContainer contentContainer = (ContentContainer) objectPair.first;
+                    String feed = (String) objectPair.second;
+                    String[] params = new String[] { contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG) };
+
+                    if (TextUtils.isEmpty(feed)) {
+                        return Observable.just(Pair.create(contentContainer, null));
+                    }
+                    else {
+                        return mDynamicParser
+                                .cookRecipeObservable(recipeDynamicParser, feed, null, params)
+                                .map(contentAsObject -> {
+                                    if (DEBUG_RECIPE_CHAIN) {
+                                        Log.d(TAG, "Parser got an content");
+                                    }
+                                    Content content = (Content) contentAsObject;
+                                    if (content != null) {
+                                        contentContainer.addContent(content);
+                                    }
+                                    return Pair.create(contentContainer, contentAsObject);
+                                });
+                    }
+                });
+    }
+
+    public Observable<Pair> getVideosFeedObservable(Object contentContainerAsObject, List<String> videoIds) {
+        ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
+
+        ZypeDataDownloaderHelper.VideosResult videosResult = ZypeDataDownloaderHelper.loadVideos(videoIds, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+        if (videosResult != null) {
+            contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, videosResult.nextPage);
+
+            GsonBuilder builder = new GsonBuilder();
+            Gson gson = builder.create();
+            String feed = gson.toJson(videosResult.videos);
+            return Observable.just(Pair.create(contentContainerAsObject, feed));
+        }
+        else {
+            Log.e(TAG, "getVideosFeedObservable(): no videos found");
+            return Observable.just(Pair.create(contentContainerAsObject, ""));
+        }
+    }
+
     public Observable<Pair> getPlaylistVideosFeedObservable(Object contentContainerAsObject) {
         ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
 

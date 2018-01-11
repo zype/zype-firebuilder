@@ -16,9 +16,11 @@ package com.amazon.android.contentbrowser;
 
 import com.amazon.android.contentbrowser.database.ContentDatabaseHelper;
 import com.amazon.android.contentbrowser.database.RecentRecord;
+import com.amazon.android.contentbrowser.database.VideoFavoriteRecord;
 import com.amazon.android.contentbrowser.helper.AnalyticsHelper;
 import com.amazon.android.contentbrowser.helper.AuthHelper;
 import com.amazon.android.contentbrowser.helper.ErrorHelper;
+import com.amazon.android.contentbrowser.Favorites.FavoritesManager;
 import com.amazon.android.contentbrowser.helper.LauncherIntegrationManager;
 import com.amazon.android.contentbrowser.helper.PurchaseHelper;
 import com.amazon.android.contentbrowser.recommendations.RecommendationManager;
@@ -419,6 +421,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     /* Zype, Evgeny Cherkasov */
     private boolean userLoggedIn = false;
 
+    private FavoritesManager favoritesManager;
     private boolean favoritesLoaded = false;
 
     /**
@@ -476,9 +479,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     private void setupFavoritesAction() {
-        if (ZypeConfiguration.isFavoritesViaApiEnabled(mAppContext)) {
-            addSettingsAction(createFavoritesSettingsAction());
-        }
+        addSettingsAction(createFavoritesSettingsAction());
     }
 
     private void setupMyLibraryAction() {
@@ -752,6 +753,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         mRecommendationManager = new RecommendationManager(mAppContext);
         // First reading of the database upon app launch. Created off of main thread.
         mRecommendationManager.cleanDatabase();
+
+        /* Zype, Evgeny Cherkasov */
+        favoritesManager = new FavoritesManager(mAppContext, this);
     }
 
     /**
@@ -1315,30 +1319,34 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         if (contentContainer != null) {
             // Set next page to 1 for initial loading
             contentContainer.getContentContainers().get(0).setExtraValue(ExtraKeys.NEXT_PAGE, 1);
-            // If user is logged in then open browsing screen for Favorites. Otherwise switch to
-            // login screen.
-            mAuthHelper.isAuthenticated()
-                    .subscribe(isAuthenticatedResultBundle -> {
-                        boolean result = isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT);
-                        if (result) {
-                            setLastSelectedContentContainer(contentContainer);
-                            switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
-                            if (!isFavoritesLoaded()) {
-                                loadFavoritesVideos(contentContainer);
+
+            if (ZypeConfiguration.isFavoritesViaApiEnabled(mAppContext)) {
+                // If user is logged in then open browsing screen for Favorites. Otherwise switch to
+                // login screen.
+                mAuthHelper.isAuthenticated()
+                        .subscribe(isAuthenticatedResultBundle -> {
+                            boolean result = isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT);
+                            if (result) {
+                                setLastSelectedContentContainer(contentContainer);
+                                switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
+                                if (!isFavoritesLoaded()) {
+                                    loadFavoritesVideos(contentContainer);
+                                }
                             }
-//                            if (!contentContainer.getContents().isEmpty()) {
-//                                setLastSelectedContent(contentContainer.getContents().get(0));
-//                                switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
-//                            }
-//                            else {
-//                                loadFavoritesVideos(contentContainer);
-//                            }
-                        }
-                        else {
-                            mAuthHelper.handleAuthChain(extra -> mNavigator.startActivity(CONTENT_HOME_SCREEN, intent -> {
-                            }));
-                        }
-                    });
+                            else {
+                                // TODO: Switch to Favorites screen after successful login
+                                mAuthHelper.handleAuthChain(extra -> mNavigator.startActivity(CONTENT_HOME_SCREEN, intent -> {
+                                }));
+                            }
+                        });
+            }
+            else {
+                setLastSelectedContentContainer(contentContainer);
+                switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
+                if (!isFavoritesLoaded()) {
+                    loadLocalFavoritesVideos(contentContainer);
+                }
+            }
         }
     }
 
@@ -1449,10 +1457,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 && !userLoggedIn) {
             showAdFree = true;
         }
-        if (ZypeConfiguration.isFavoritesViaApiEnabled(mAppContext)
-                && isUserLoggedIn()) {
-            showFavorites = true;
-        }
+        showFavorites = true;
 
         if (showWatch) {
             // Check if the content is meant for live watching. Live content requires only a
@@ -1503,23 +1508,30 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         }
         if (showFavorites) {
             ContentContainer favoritesContainer = getRootContentContainer()
-                    .findContentContainerById(ZypeSettings.FAVORITES_PLAYLIST_ID);
+                    .findContentContainerById(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID);
             if (favoritesContainer != null) {
                 if (isFavoritesLoaded()) {
+                    // TODO: Perform checking is video favorite by existing in local db VideoFavorites table
                     if (favoritesContainer.findContentById(content.getId()) == null) {
                         contentActionList.add(new Action().setId(CONTENT_ACTION_FAVORITES_ADD)
                                 .setLabel1(mAppContext.getResources().getString(R.string.action_favorites_add_1))
                                 .setLabel2(mAppContext.getResources().getString(R.string.action_favorites_add_2)));
-                    } else {
+                    }
+                    else {
                         contentActionList.add(new Action().setId(CONTENT_ACTION_FAVORITES_REMOVE)
                                 .setLabel1(mAppContext.getResources().getString(R.string.action_favorites_remove_1))
                                 .setLabel2(mAppContext.getResources().getString(R.string.action_favorites_remove_2)));
                     }
                 }
                 else {
-                    // Set next page to 1 for initial loading
-                    favoritesContainer.setExtraValue(ExtraKeys.NEXT_PAGE, 1);
-                    loadFavoritesVideos(favoritesContainer);
+                    if (ZypeConfiguration.isFavoritesViaApiEnabled(mAppContext)) {
+                        // Set next page to 1 for initial loading
+                        favoritesContainer.setExtraValue(ExtraKeys.NEXT_PAGE, 1);
+                        loadFavoritesVideos(favoritesContainer);
+                    }
+                    else {
+                        loadLocalFavoritesVideos(favoritesContainer);
+                    }
                 }
             }
         }
@@ -1932,51 +1944,34 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
     /* Zype, Evgeny Cherkasov */
     private void favoritesAddActionTriggered(Content content) {
-        mContentLoader
-                .addVideoFavorite(content)
-                .subscribe(resultContent -> {
-                    if (!TextUtils.isEmpty(resultContent.getExtraValueAsString(Content.EXTRA_VIDEO_FAVORITE_ID))) {
-                        // Add video to Favorites container
-                        ContentContainer favoritesContainer = getRootContentContainer().findContentContainerById(ZypeSettings.FAVORITES_PLAYLIST_ID);
-                        if (favoritesContainer != null) {
-                            Gson gson = new Gson();
-                            String jsonFavoriteVideo = gson.toJson(resultContent);
-                            Content favoriteVideo = gson.fromJson(jsonFavoriteVideo, resultContent.getClass());
-                            favoriteVideo.setExtraValue(Content.EXTRA_PLAYLIST_ID, ZypeSettings.FAVORITES_PLAYLIST_ID);
-                            favoritesContainer.getContents().add(0, favoriteVideo);
-                        }
-                        // Update action buttons
-                        updateContentActions();
-                    }
-                    else {
-                        // TODO: Handke error
-                    }
-                });
+        if (ZypeConfiguration.isFavoritesViaApiEnabled(mAppContext)) {
+            if (isUserLoggedIn()) {
+                favoritesManager.handleAddAction(content);
+            }
+            else {
+                mAuthHelper.handleAuthChain(extra -> mNavigator.startActivity(CONTENT_DETAILS_SCREEN, intent -> {
+                }));
+            }
+        }
+        else {
+            favoritesManager.handleAddAction(content);
+        }
+
     }
 
     private void favoritesRemoveActionTriggered(Content content) {
-        ContentContainer favoritesContainer = getRootContentContainer().findContentContainerById(ZypeSettings.FAVORITES_PLAYLIST_ID);
-        if (favoritesContainer == null) {
-            return;
+        if (ZypeConfiguration.isFavoritesViaApiEnabled(mAppContext)) {
+            if (isUserLoggedIn()) {
+                favoritesManager.handleRemoveAction(content);
+            }
+            else {
+                mAuthHelper.handleAuthChain(extra -> mNavigator.startActivity(CONTENT_DETAILS_SCREEN, intent -> {
+                }));
+            }
         }
-        Content favoriteVideo = favoritesContainer.findContentById(content.getId());
-        if (favoriteVideo == null) {
-            return;
+        else {
+            favoritesManager.handleRemoveAction(content);
         }
-        String videoFavoriteId = favoriteVideo.getExtraValueAsString(Content.EXTRA_VIDEO_FAVORITE_ID);
-        mContentLoader
-                .removeVideoFavorite(content, videoFavoriteId)
-                .subscribe(resultContent -> {
-                    if (TextUtils.isEmpty(resultContent.getExtraValueAsString(Content.EXTRA_VIDEO_FAVORITE_ID))) {
-                        // Remove video from Favorites container
-                        favoritesContainer.getContents().remove(favoriteVideo);
-                        // Update action buttons
-                        updateContentActions();
-                    }
-                    else {
-                        // TODO: Handke error
-                    }
-                });
     }
 
     /**
@@ -2431,19 +2426,49 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                         },
                         () -> {
                             Log.v(TAG, "loadPlaylistVideos(): completed");
-                            if (!contentContainer.getContentContainers().get(0).getContents().isEmpty()) {
-                                favoritesLoaded = true;
-                                mEventBus.post(new FavoritesLoadEvent(favoritesLoaded));
-//                                setLastSelectedContent(contentContainer.getContents().get(0));
-//                                switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
-                            }
-                            else {
-                                // TODO: Display error message
-                            }
+                            favoritesLoaded = true;
+                            mEventBus.post(new FavoritesLoadEvent(favoritesLoaded));
                         });
         mCompositeSubscription.add(subscription);
     }
-    //
+
+    public void loadLocalFavoritesVideos(ContentContainer contentContainer) {
+        Observable<Object> observable = Observable.just(contentContainer.getContentContainers().get(0));
+        Recipe recipeDynamicParserVideos = Recipe.newInstance(mAppContext, "recipes/ZypeSearchContentsRecipe.json");
+        Subscription subscription = observable
+                .subscribeOn(Schedulers.newThread())
+                .concatMap(contentContainerAsObject -> {
+                    List<VideoFavoriteRecord> videoFavorites = favoritesManager.getVideoFavorites();
+                    List<String> videoIds = new ArrayList<>();
+                    for (VideoFavoriteRecord record : videoFavorites) {
+                        videoIds.add(record.getVideoId());
+                    }
+                    return mContentLoader.getLoadContentsByVideoIdsObservable(Observable.just(contentContainerAsObject), recipeDynamicParserVideos, videoIds);
+                })
+                .onBackpressureBuffer() // This must be right after concatMap.
+                .doOnNext(o -> { })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        result -> {
+                        },
+                        throwable -> {
+                            Log.e(TAG, "loadPlaylistVideos(): failed: ", throwable);
+                            ErrorHelper.injectErrorFragment(
+                                    mNavigator.getActiveActivity(),
+                                    ErrorUtils.ERROR_CATEGORY.FEED_ERROR,
+                                    (errorDialogFragment, errorButtonType, errorCategory) -> {
+                                        if (errorButtonType == ErrorUtils.ERROR_BUTTON_TYPE.EXIT_APP) {
+                                            mNavigator.getActiveActivity().finishAffinity();
+                                        }
+                                    });
+                        },
+                        () -> {
+                            Log.v(TAG, "loadPlaylistVideos(): completed");
+                            favoritesLoaded = true;
+                            mEventBus.post(new FavoritesLoadEvent(favoritesLoaded));
+                        });
+        mCompositeSubscription.add(subscription);
+    }
 
     /**
      * Switches to home screen.
@@ -2519,6 +2544,11 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
     /* Zype, Evgeny Cherkasov */
     public boolean isFavoritesLoaded() { return favoritesLoaded; }
+
+    public void setFavoritesLoaded(boolean value) {
+        favoritesLoaded = value;
+    }
+
     public boolean isUserLoggedIn() {
         return userLoggedIn;
     }
