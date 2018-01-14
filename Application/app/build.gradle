@@ -80,7 +80,7 @@ android {
         }
     }
     productFlavors {
-        demo {
+        zype {
         }
         template {
             applicationId "<APPLICATION_ID>"

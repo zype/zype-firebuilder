@@ -37,8 +37,6 @@ captures/
 
 # Intellij
 *.iml
-!Application/app/app.iml
-!Application/ZypeAPI/ZypeAPI.iml
 .idea/
 
 # Keystore files

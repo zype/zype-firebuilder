@@ -18,10 +18,19 @@ Full Documentation for Fire App Builder is located [here](https://developer.amaz
 
 ## Installing
 
-1. Clone repo. Answer 'No' when Android Studio asked to create new project.
+1. Clone the repo. Answer 'No' when Android Studio asked to create new project.
+
 2. Open Application folder as existing project in Android Studio
-3. Wait for Gradle to finish building 
-4. Run in TV emulator
+
+3. This SDK has two app versions - Zype demo app and template app
+   - To build Zype demo app select `zypeDebug` build variant for `app` and `ZypeAPI` modules
+
+     <a href="https://drive.google.com/uc?export=view&id=1wz_eFKHcljpUFYuwfIKSCSCVhcKFGDPG"><img src="https://drive.google.com/uc?export=view&id=1wz_eFKHcljpUFYuwfIKSCSCVhcKFGDPG" style="width: auto; height: auto" title="Click for the larger version." /></a>
+
+   - To build custom app based on the template version follow instructions in the [RECIPE.md](./RECIPE.md)
+4. Wait for Gradle to finish building. It may take up to 30 minutes.
+
+5. Run the app on a connected Fire TV device or in TV emulator
 
 ## Supported Features
 
