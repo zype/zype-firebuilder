@@ -24,6 +24,7 @@ import com.amazon.dynamicparser.impl.XmlParser;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -82,7 +83,9 @@ public class AdTagProcessor {
      * @return The {@link AdTagType#vmap} value if a model was successfully created, otherwise an
      * error value.
      */
-    public AdTagType process(String urlString) {
+    /* Zype, Evgeny Cherkasov */
+    //public AdTagType process(String urlString) {
+    public AdTagType process(String urlString, int timeOffset) {
 
         Log.d(TAG, "Processing ad url string");
         String xmlData;
@@ -120,7 +123,12 @@ public class AdTagProcessor {
                         else {
                             Log.d(TAG, "Converting VAST response into VMAP response");
                             VastResponse vastResponse = VastResponse.createInstance(xmlMap);
-                            mVmapResponse = VmapResponse.createInstanceWithVast(vastResponse);
+                            /* Zype, Evgeny Cherkasov */
+                            // mVmapResponse = VmapResponse.createInstanceWithVast(vastResponse);
+                            if (mVmapResponse == null) {
+                                mVmapResponse = new VmapResponse();
+                            }
+                            VmapResponse.addVastResponse(mVmapResponse, vastResponse, timeOffset);
                             type = AdTagType.vast;
                         }
                         return type;
@@ -136,6 +144,19 @@ public class AdTagProcessor {
             }
         }
         return AdTagType.error;
+    }
+
+    /* Zype, Evgeny Cherkasov */
+    public AdTagType processList(ArrayList<String> adTags, int[] timeOffsets) {
+        AdTagType result = null;
+
+        for (int i = 0; i < timeOffsets.length; i++) {
+            int offset = timeOffsets[i];
+            String adTag = adTags.get(i);
+            result = process(adTag, offset);
+        }
+
+        return result;
     }
 
     /**

@@ -19,6 +19,7 @@ import com.amazon.android.ads.vast.model.vast.AdElement;
 import com.amazon.android.ads.vast.model.vast.VastResponse;
 import com.amazon.android.ads.vast.processor.ResponseValidator;
 import com.amazon.dynamicparser.impl.XmlParser;
+import com.amazon.utils.DateAndTimeHelper;
 import com.amazon.utils.ListUtils;
 
 import android.util.Log;
@@ -140,6 +141,42 @@ public class VmapResponse {
 
         return vmapResponse;
     }
+
+    /* Zype, Evgeny Cherkasov */
+    /**
+     * Add VAST response to the VMAP response.
+     * It will set the VAST response ad as a linear pre-roll or mid-roll ad to be played
+     * at corresponding offset.
+     *
+     * @param vastResponse The VAST ad response.
+     * @return Teh VMAP response.
+     */
+    public static VmapResponse addVastResponse(VmapResponse vmapResponse, VastResponse vastResponse, int timeOffset) {
+
+        AdBreak adBreak = new AdBreak();
+        if (timeOffset == 0) {
+            // Create an Ad Break to store the pre-roll ad.
+            adBreak.setBreakId(IAds.PRE_ROLL_AD);
+            adBreak.setTimeOffset(AdBreak.TIME_OFFSET_START);
+            adBreak.setBreakType(AdBreak.BREAK_TYPE_LINEAR);
+        }
+        else {
+            // Create an Ad Break to store the mid-roll ad.
+            adBreak.setBreakId(IAds.MID_ROLL_AD);
+            adBreak.setTimeOffset(DateAndTimeHelper.formatTime(timeOffset));
+            adBreak.setBreakType(AdBreak.BREAK_TYPE_LINEAR);
+        }
+        // Create an Ad Source to store the VAST ad.
+        AdSource adSource = new AdSource();
+        adSource.setVastResponse(vastResponse);
+
+        adBreak.setAdSource(adSource);
+
+        vmapResponse.addAdBreak(adBreak);
+
+        return vmapResponse;
+    }
+
 
     /**
      * Get the vmap version.

@@ -84,6 +84,7 @@ public interface IAds {
      * Extra key for ad number to play
      */
     String AD_NUMBER = "AdNumber";
+    String WAS_A_MID_ROLL = "WasAMidRoll";
 
     /**
      * Major version number.

@@ -104,4 +104,15 @@ public class DateAndTimeHelper {
             return -1;
         }
     }
+
+    /* Zype, Evgeny Cherkasov */
+    public static String formatTime(int milliseconds) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(1970, 1, 1, 0, 0, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.add(Calendar.SECOND, milliseconds / 1000);
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss.SSS");
+        return format.format(calendar.getTime());
+    }
+
 }

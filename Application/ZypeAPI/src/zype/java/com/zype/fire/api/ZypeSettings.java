@@ -22,10 +22,10 @@ public class ZypeSettings {
 
     // App features
     public static final boolean NATIVE_SUBSCRIPTION_ENABLED = false;
-    public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = true;
-    public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = true;
-    public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = false;
-    public static final boolean UNIVERSAL_TVOD = true;
+    public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = false;
+    public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = false;
+    public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = true;
+    public static final boolean UNIVERSAL_TVOD = false;
 
     /**
      * Amazon shared key is required for native subscription feature. It is used in request to Zype Bifrost

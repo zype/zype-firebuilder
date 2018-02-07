@@ -6,18 +6,18 @@
   "modelType": "single",
   "query": "$.[*]",
   "matchList": [
-    "title@title",
-    "_id@id",
-    "description@description",
+    "title@mTitle",
+    "_id@mId",
+    "description@mDescription",
     "images@Images",
     "on_air@live",
-    "playerUrl@url",
+    "playerUrl@mUrl",
     "pass_required@PassRequired",
     "playlistId@playlistId",
     "purchase_required@PurchaseRequired",
     "rental_required@RentalRequired",
-    "subscription_required@subscriptionRequired",
-    "thumbnails@cardImageUrl",
-    "thumbnails@backgroundImageUrl"
+    "subscription_required@mSubscriptionRequired",
+    "thumbnails@mCardImageUrl",
+    "thumbnails@mBackgroundImageUrl"
   ]
 }

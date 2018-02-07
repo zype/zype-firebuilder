@@ -286,7 +286,7 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
 
     private void purchaseSubscription(SubscriptionItem item) {
         contentBrowser.updateSubscriptionSku(item.sku);
-        contentBrowser.actionTriggered(this, contentBrowser.getLastSelectedContent(), ContentBrowser.CONTENT_ACTION_SUBSCRIPTION);
+        contentBrowser.actionTriggered(this, contentBrowser.getLastSelectedContent(), ContentBrowser.CONTENT_ACTION_SUBSCRIPTION, null, null);
     }
 
     /**

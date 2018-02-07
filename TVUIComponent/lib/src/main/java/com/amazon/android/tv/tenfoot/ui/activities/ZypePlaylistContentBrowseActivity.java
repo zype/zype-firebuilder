@@ -59,6 +59,7 @@ import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment;
 import com.amazon.android.tv.tenfoot.ui.fragments.ZypePlaylistContentBrowseFragment;
+import com.amazon.android.tv.tenfoot.utils.BrowseHelper;
 import com.amazon.android.ui.constants.ConfigurationConstants;
 import com.amazon.android.ui.fragments.ErrorDialogFragment;
 import com.amazon.android.ui.fragments.LogoutSettingsFragment;
@@ -289,5 +290,12 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
         }
     }
 
+    //
+    // BaseActivity abstract methods
+    //
+    @Override
+    public void setRestoreActivityValues() {
+        BrowseHelper.saveBrowseActivityState(this);
+    }
 
 }

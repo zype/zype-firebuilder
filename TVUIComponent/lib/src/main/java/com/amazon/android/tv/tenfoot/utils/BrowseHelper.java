@@ -16,14 +16,20 @@ package com.amazon.android.tv.tenfoot.utils;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.model.Action;
+import com.amazon.android.model.PlaylistAction;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
+import com.amazon.android.model.content.constants.ExtraKeys;
+import com.amazon.android.recipe.Recipe;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
+import com.amazon.android.tv.tenfoot.presenter.PosterCardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.SettingsCardPresenter;
 import com.amazon.android.ui.constants.PreferencesConstants;
 import com.amazon.android.utils.Preferences;
 import com.amazon.utils.DateAndTimeHelper;
+import com.zype.fire.api.ZypeApi;
+import com.zype.fire.api.ZypeSettings;
 
 import android.app.Activity;
 import android.content.Context;
@@ -120,11 +126,23 @@ public class BrowseHelper {
                                                               .getRootContentContainer();
 
         CardPresenter cardPresenter = new CardPresenter();
+        /* Zype, Evgeny Cherkasov */
+        PosterCardPresenter posterCardPresenter = new PosterCardPresenter();
 
         for (ContentContainer contentContainer : rootContentContainer.getContentContainers()) {
 
+            /* Zype, Evgeny Cherkasob */
+            // Don't show My Library content container
+            if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)) {
+                continue;
+            }
+
             HeaderItem header = new HeaderItem(0, contentContainer.getName());
             ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
+            /* Zype, Evgeny Cherkasov */
+            if (contentContainer.getExtraStringValue(ContentContainer.EXTRA_THUMBNAIL_LAYOUT).equals("poster")) {
+                listRowAdapter = new ArrayObjectAdapter(posterCardPresenter);
+            }
 
             for (ContentContainer innerContentContainer : contentContainer.getContentContainers()) {
                 listRowAdapter.add(innerContentContainer);
@@ -132,6 +150,27 @@ public class BrowseHelper {
 
             for (Content content : contentContainer.getContents()) {
                 listRowAdapter.add(content);
+            }
+
+            /* Zype, Evgeny Cherkasov */
+            // Update NextPage parameter because the first page of playlist videos was loaded
+            // while running global recipes chain
+            // TODO: Probably it would better to move updating NextPage to the getContentsObservable()
+            if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) == 1) {
+                if (contentContainer.getExtraValueAsInt(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT) > ZypeApi.PER_PAGE_DEFAULT) {
+                    contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, 2);
+                }
+                else {
+                    contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, -1);
+                }
+            }
+            if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
+                PlaylistAction action = new PlaylistAction();
+                action.setAction(ContentBrowser.NEXT_PAGE)
+                        .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
+                        .setLabel1(activity.getString(R.string.action_load_more));
+                action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+                listRowAdapter.add(action);
             }
 
             rowsAdapter.add(new ListRow(header, listRowAdapter));

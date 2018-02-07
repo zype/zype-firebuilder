@@ -449,13 +449,15 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
         // Add a button for loading next page of playlist videos
         ContentContainer contentContainer = ContentBrowser.getInstance(getActivity()).getRootContentContainer()
                 .findContentContainerById(mSelectedContent.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
-        if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
-            PlaylistAction action = new PlaylistAction();
-            action.setAction(ContentBrowser.NEXT_PAGE)
-                    .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
-                    .setLabel1(getString(R.string.action_load_more));
-            action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
-            listRowAdapter.add(action);
+        if (contentContainer != null) {
+            if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
+                PlaylistAction action = new PlaylistAction();
+                action.setAction(ContentBrowser.NEXT_PAGE)
+                        .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
+                        .setLabel1(getString(R.string.action_load_more));
+                action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+                listRowAdapter.add(action);
+            }
         }
 
         // Only add the header and row for recommendations if there are any recommended content.

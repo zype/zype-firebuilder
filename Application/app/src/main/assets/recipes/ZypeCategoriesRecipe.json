@@ -7,7 +7,7 @@
   "query": "$.categories[?(@.parent_id in [$$par0$$])]",
   "matchList": [
     "images@Images",
-    "title@name",
+    "title@mName",
     "parent_id@parentId",
     "thumbnail_layout@ThumbnailLayout",
     "thumbnails@Thumbnails",

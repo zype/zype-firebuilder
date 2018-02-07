@@ -194,7 +194,7 @@ public class VASTAdsPlayer implements IAds,
 //        mExtras.putString(VASTAdsPlayer.VAST_TAG_BUNDLE_KEY,
 //                          mContext.getResources().getString(R.string.vast_preroll_tag));
         if (!mExtras.containsKey(VASTAdsPlayer.VAST_TAG_BUNDLE_KEY)) {
-            mExtras.putString(VASTAdsPlayer.VAST_TAG_BUNDLE_KEY, mContext.getResources().getString(R.string.vast_preroll_tag));
+            mExtras.putString(VASTAdsPlayer.VAST_TAG_BUNDLE_KEY, "");
         }
 
         DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
@@ -238,9 +238,8 @@ public class VASTAdsPlayer implements IAds,
         mCurrentAdType = IAds.PRE_ROLL_AD;
         mAdPlayedCount = 0;
         mIsLastAdSkipped = false;
-        /* Zype, Evgeny Cherkasov */
+
         loadAdFromUrl();
-        loadVideoWithUrl(mExtras.getString(VAST_TAG_BUNDLE_KEY));
     }
 
     @Override
@@ -586,7 +585,16 @@ public class VASTAdsPlayer implements IAds,
                     adUrl = NetworkUtils.addParameterToUrl(adUrl, IAds.CORRELATOR_PARAMETER,
                                                            "" + System.currentTimeMillis());
 
-                    mAdType = adTagProcessor.process(adUrl);
+                    /* Zype, Evgeny Cherkasov */
+                    //mAdType = adTagProcessor.process(adUrl);
+                    Bundle videoExtras = mExtras.getBundle(IAds.VIDEO_EXTRAS);
+                    if (videoExtras.containsKey("mAdCuePoints")) {
+                        mAdType = adTagProcessor.processList(videoExtras.getStringArrayList("AdTags"), videoExtras.getIntArray("mAdCuePoints"));
+                    }
+                    else {
+                        mAdType = adTagProcessor.process("", 0);
+                    }
+
                     if (mAdType == AdTagProcessor.AdTagType.no_ad_break_found) {
                         //No Ad break found just mark this ad as complete.
                         mVASTPlayerListener.vastComplete();
@@ -893,11 +901,11 @@ public class VASTAdsPlayer implements IAds,
                             long adSlotTime = SystemClock.elapsedRealtime() - mAdSlotStartTime;
                             extras.putLong(DURATION_PLAYED, adSlotTime);
                         }
-                        /* Zype, Evgeny Cherkasov */
-                        boolean isMidroll = mExtras.getBoolean(IAds.WAS_A_MID_ROLL, false);
-                        if (isMidroll) {
-                            extras.putBoolean(IAds.WAS_A_MID_ROLL, true);
-                        }
+//                        /* Zype, Evgeny Cherkasov */
+//                        boolean isMidroll = mExtras.getBoolean(IAds.WAS_A_MID_ROLL, false);
+//                        if (isMidroll) {
+//                            extras.putBoolean(IAds.WAS_A_MID_ROLL, true);
+//                        }
                         mIAdsEvents.onAdSlotEnded(extras);
                     }
                     processErrorEvent();
@@ -917,14 +925,14 @@ public class VASTAdsPlayer implements IAds,
             cleanUpSurface();
 
             if (mIAdsEvents != null) {
-                /* Zype, Evgeny Cherkasov */
-                Bundle extras = null;
-                boolean isMidroll = mExtras.getBoolean(IAds.WAS_A_MID_ROLL, false);
-                if (isMidroll) {
-                    extras = new Bundle();
-                    extras.putBoolean(IAds.WAS_A_MID_ROLL, true);
-                }
-                mIAdsEvents.onAdSlotEnded(extras);
+//                /* Zype, Evgeny Cherkasov */
+//                Bundle extras = null;
+//                boolean isMidroll = mExtras.getBoolean(IAds.WAS_A_MID_ROLL, false);
+//                if (isMidroll) {
+//                    extras = new Bundle();
+//                    extras.putBoolean(IAds.WAS_A_MID_ROLL, true);
+//                }
+//                mIAdsEvents.onAdSlotEnded(extras);
             }
         }
 
