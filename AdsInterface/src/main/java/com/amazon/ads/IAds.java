@@ -24,14 +24,60 @@ import android.widget.FrameLayout;
 public interface IAds {
 
     /**
-     * Constant for duration field.
+     * Constant for Ad Id.
      */
-    String DURATION = "duration";
+    String ID = "id";
 
     /**
-     * Constant for wasAMidRoll field.
+     * Constant for duration received from ad metadata.
      */
-    String WAS_A_MID_ROLL = "wasAMidRoll";
+    String DURATION_RECEIVED = "durationReceived";
+
+    /**
+     * Constant for duration calculated during ad play.
+     */
+    String DURATION_PLAYED = "durationPlayed";
+
+    /**
+     * Constant for getting the ad pod complete boolean out of the extras bundle.
+     */
+    String AD_POD_COMPLETE = "adPodComplete";
+
+    /**
+     * Constant for getting the ad type out of the extras bundle.
+     */
+    String AD_TYPE = "ad_type";
+
+    /**
+     * Constant for a pre-roll ad.
+     */
+    String PRE_ROLL_AD = "preroll";
+
+    /**
+     * Constant for a mid-roll ad.
+     */
+    String MID_ROLL_AD = "midroll";
+
+    /**
+     * Constant for a post-roll ad.
+     */
+    String POST_ROLL_AD = "postroll";
+
+    /**
+     * Parameter to add to an ad tag URL with a timestamp so the add will play consecutively if
+     * called upon.
+     */
+    String CORRELATOR_PARAMETER = "correlator";
+
+    /**
+     * Constant for getting the videos extras bundle from the ad implementation's extras bundle.
+     */
+    String VIDEO_EXTRAS = "video";
+
+    /**
+     * Constant for getting the video duration long out of the video extras bundle.
+     */
+    String VIDEO_DURATION = "duration";
 
     /* Zype, Evgeny Cherkasov */
     /**
@@ -52,16 +98,16 @@ public interface IAds {
     /**
      * Init Ads instance.
      *
-     * @param context     Context which Ads consumed in.
-     * @param frameLayout Layout for Ads.
+     * @param context     The context.
+     * @param frameLayout Layout for the Ads player.
      * @param extras      Extra bundle to pass through data.
      */
     void init(Context context, FrameLayout frameLayout, Bundle extras);
 
     /**
-     * Method to show Pre Roll Ads.
+     * Method to show Ads.
      */
-    void showPreRollAd();
+    void showAds();
 
     /**
      * Interface for Ads events.
@@ -98,13 +144,21 @@ public interface IAds {
     void setCurrentVideoPosition(double position);
 
     /**
+     * Return true if there are one or more post roll ads to play; false otherwise.
+     *
+     * @return True if there are one or more post roll ads to play; false otherwise.
+     */
+    boolean isPostRollAvailable();
+
+    /**
      * Activity states for ads implementation consumption.
      */
     enum ActivityState {
         START,
         RESUME,
         PAUSE,
-        STOP
+        STOP,
+        DESTROY
     }
 
     /**
@@ -143,4 +197,23 @@ public interface IAds {
      * @return Bundle for extra data.
      */
     Bundle getExtra();
+
+    /**
+     * Gets the total number of segments in ad.
+     * Indicates the total number of segments of the content media, which is equal to the number of
+     * mid-roll ad pods + 1. Value is 1 if there are no mid-roll ad pods for the content media.
+     *
+     * @return int number of total segments.
+     */
+    int getNumberOfSegments();
+
+    /**
+     * Get the current segment number of the content based on the mid roll ads list.
+     *
+     * @param position playback location of current Content.
+     * @param duration total duration of the current Content.
+     * @return the current segment of the content media. Start with value 1 and calculated based on
+     * mid roll ads.
+     */
+    int getCurrentContentSegmentNumber(long position, long duration);
 }

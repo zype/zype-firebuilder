@@ -53,7 +53,15 @@ public class PassThroughAds implements IAds {
      * {@inheritDoc}
      */
     @Override
-    public void showPreRollAd() {
+    public void showAds() {
+
+        showPreRollAds();
+    }
+
+    /**
+     * Show pre roll Ads in the FrameLayout provided.
+     */
+    private void showPreRollAds() {
 
         if (mIAdsEvents != null) {
             mIAdsEvents.onAdSlotStarted(null);
@@ -76,6 +84,15 @@ public class PassThroughAds implements IAds {
     @Override
     public void setCurrentVideoPosition(double position) {
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isPostRollAvailable() {
+
+        return false;
     }
 
     /**
@@ -112,5 +129,23 @@ public class PassThroughAds implements IAds {
     public Bundle getExtra() {
 
         return this.extra;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getNumberOfSegments(){
+
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getCurrentContentSegmentNumber(long position, long duration){
+
+        return 1;
     }
 }

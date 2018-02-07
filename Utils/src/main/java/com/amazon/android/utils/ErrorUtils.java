@@ -41,6 +41,7 @@ public class ErrorUtils {
         AUTHENTICATION_ERROR,
         AUTHORIZATION_ERROR,
         PLAYER_ERROR,
+        AUTHENTICATION_SYSTEM_ERROR,
         /* Zype, Evgeny Cherkasov */
         ZYPE_CREATE_CONSUMER_ERROR,
         ZYPE_CUSTOM,
@@ -82,6 +83,9 @@ public class ErrorUtils {
             case AUTHENTICATION_ERROR:
                 errorMessage =
                         context.getResources().getString(R.string.authentication_error_message);
+                break;
+            case AUTHENTICATION_SYSTEM_ERROR:
+                errorMessage = context.getString(R.string.authentication_system_error_message);
                 break;
             case AUTHORIZATION_ERROR:
                 errorMessage =
@@ -132,6 +136,9 @@ public class ErrorUtils {
                 break;
             case AUTHENTICATION_ERROR:
                 buttonLabelsList.add(context.getResources().getString(R.string.dismiss_label));
+                break;
+            case AUTHENTICATION_SYSTEM_ERROR:
+                buttonLabelsList.add(context.getResources().getString(R.string.exit_app_label));
                 break;
             case AUTHORIZATION_ERROR:
                 buttonLabelsList.add(context.getResources().getString(R.string.dismiss_label));

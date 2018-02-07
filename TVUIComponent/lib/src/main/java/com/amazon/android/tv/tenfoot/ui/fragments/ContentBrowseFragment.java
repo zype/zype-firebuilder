@@ -47,6 +47,9 @@ import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
+import com.amazon.android.tv.tenfoot.ui.activities.ContentBrowseActivity;
+import com.amazon.android.tv.tenfoot.utils.BrowseHelper;
+import com.amazon.android.ui.constants.PreferencesConstants;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -89,7 +92,10 @@ public class ContentBrowseFragment extends RowsFragment {
     private static final String TAG = ContentBrowseFragment.class.getSimpleName();
     private static final int WAIT_BEFORE_FOCUS_REQUEST_MS = 500;
     private OnBrowseRowListener mCallback;
-    private ArrayObjectAdapter settingsAdapter = null;
+    private ArrayObjectAdapter mSettingsAdapter = null;
+    private ListRow mRecentListRow = null;
+    private ListRow mWatchlistListRow = null;
+    private int mLoginButtonIndex;
     /* Zype, Evgeny Cherkasov */
     ArrayObjectAdapter mRowsAdapter = null;
     private BroadcastReceiver receiver;
@@ -98,15 +104,6 @@ public class ContentBrowseFragment extends RowsFragment {
     public interface OnBrowseRowListener {
 
         void onItemSelected(Object item);
-    }
-
-    /* Zype, Evgeny Cherkasov */
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (receiver != null) {
-            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, new IntentFilter("DataUpdated"));
-        }
     }
 
     @Override
@@ -121,8 +118,7 @@ public class ContentBrowseFragment extends RowsFragment {
         }
         catch (ClassCastException e) {
             throw new ClassCastException(getActivity().toString() +
-                                                 " must implement " +
-                                                 "OnBrowseRowListener: " + e);
+                                                 " must implement OnBrowseRowListener: " + e);
         }
 
         CustomListRowPresenter customListRowPresenter = new CustomListRowPresenter();
@@ -132,11 +128,12 @@ public class ContentBrowseFragment extends RowsFragment {
         //customListRowPresenter.setShadowEnabled(false);
 
         /* Zype, Evgney Cherkasov */
-//        ArrayObjectAdapter mRowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
+//        ArrayObjectAdapter rowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
         mRowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
 
-        loadRootContentContainer(mRowsAdapter);
-        addSettingsActionsToRowAdapter(mRowsAdapter);
+        BrowseHelper.loadRootContentContainer(getActivity(), rowsAdapter);
+        mSettingsAdapter = BrowseHelper.addSettingsActionsToRowAdapter(getActivity(), rowsAdapter);
+        mLoginButtonIndex = BrowseHelper.getLoginButtonIndex(mSettingsAdapter);
 
         setAdapter(mRowsAdapter);
 
@@ -173,8 +170,30 @@ public class ContentBrowseFragment extends RowsFragment {
         }
     }
 
+    @Override
+    public void onResume() {
+
+        super.onResume();
+
+        /* Zype, Evgeny Cherkasov */
+        if (receiver != null) {
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, new IntentFilter("DataUpdated"));
+        }
+
+        ArrayObjectAdapter rowsAdapter = (ArrayObjectAdapter) getAdapter();
+
+        if (ContentBrowser.getInstance(getActivity()).isRecentRowEnabled()) {
+            mRecentListRow = BrowseHelper.updateContinueWatchingRow(getActivity(),
+                                                                    mRecentListRow, rowsAdapter);
+        }
+        if (ContentBrowser.getInstance(getActivity()).isWatchlistRowEnabled()) {
+            mWatchlistListRow = BrowseHelper.updateWatchlistRow(getActivity(), mWatchlistListRow,
+                                                                mRecentListRow, rowsAdapter);
+        }
+    }
+
     /**
-     * Event bus listener method to listen for authentication updates from AUthHelper and update
+     * Event bus listener method to listen for authentication updates from AuthHelper and update
      * the login action status in settings.
      *
      * @param authenticationStatusUpdateEvent Broadcast event for update in authentication status.
@@ -183,20 +202,27 @@ public class ContentBrowseFragment extends RowsFragment {
     public void onAuthenticationStatusUpdateEvent(AuthHelper.AuthenticationStatusUpdateEvent
                                                           authenticationStatusUpdateEvent) {
 
-        if (settingsAdapter != null) {
-//            settingsAdapter.notifyArrayItemRangeChanged(0, settingsAdapter.size());
-            settingsAdapter.clear();
-            List<Action> settings = ContentBrowser.getInstance(getActivity()).getSettingsActions();
-            if (settings != null && !settings.isEmpty()) {
-                for (Action item : settings) {
-                    settingsAdapter.add(item);
+        if (mSettingsAdapter != null) {
+            if (mLoginButtonIndex != -1) {
+                mSettingsAdapter.notifyArrayItemRangeChanged(mLoginButtonIndex, 1);
+
+                // Update the details preview if the action occurred from the home screen.
+                if (Preferences.getString(PreferencesConstants.LAST_ACTIVITY)
+                        .equals(ContentBrowser.CONTENT_HOME_SCREEN)) {
+                    if (authenticationStatusUpdateEvent.isUserAuthenticated()) {
+                        ((ContentBrowseActivity) getActivity()).callImageLoadSubscription(
+                                getString(R.string.logout_label),
+                                getString(R.string.logout_description),
+                                null);
+                    }
+                    else {
+                        ((ContentBrowseActivity) getActivity()).callImageLoadSubscription(
+                                getString(R.string.login_label),
+                                getString(R.string.login_description),
+                                null);
+                    }
                 }
             }
-            else {
-                Log.d(TAG, "No settings were found");
-            }
-//            settingsAdapter.notifyAll();
-            settingsAdapter.notifyArrayItemRangeChanged(0, settingsAdapter.size());
         }
         /* Zype, Evgney Cherkasov */
         if (mRowsAdapter != null) {
@@ -204,85 +230,85 @@ public class ContentBrowseFragment extends RowsFragment {
         }
     }
 
-    private void loadRootContentContainer(ArrayObjectAdapter rowsAdapter) {
-
-        ContentContainer rootContentContainer = ContentBrowser.getInstance(getActivity())
-                                                              .getRootContentContainer();
-
-        CardPresenter cardPresenter = new CardPresenter();
-        PosterCardPresenter posterCardPresenter = new PosterCardPresenter();
-
-        for (ContentContainer contentContainer : rootContentContainer.getContentContainers()) {
-
-            /* Zype, Evgeny Cherkasob */
-            // Don't show My Library content container
-            if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)) {
-                continue;
-            }
-
-            HeaderItem header = new HeaderItem(0, contentContainer.getName());
-            ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
-            /* Zype, Evgeny Cherkasov */
-            if (contentContainer.getExtraStringValue(ContentContainer.EXTRA_THUMBNAIL_LAYOUT).equals("poster")) {
-                listRowAdapter = new ArrayObjectAdapter(posterCardPresenter);
-            }
-
-            for (ContentContainer innerContentContainer : contentContainer.getContentContainers()) {
-                listRowAdapter.add(innerContentContainer);
-            }
-
-            for (Content content : contentContainer.getContents()) {
-                listRowAdapter.add(content);
-            }
-
-            /* Zype, Evgeny Cherkasov */
-            // Update NextPage parameter because the first page of playlist videos was loaded
-            // while running global recipes chain
-            // TODO: Probably it would better to move updating NextPage to the getContentsObservable()
-            if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) == 1) {
-                if (contentContainer.getExtraValueAsInt(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT) > ZypeApi.PER_PAGE_DEFAULT) {
-                    contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, 2);
-                }
-                else {
-                    contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, -1);
-                }
-            }
-            if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
-                PlaylistAction action = new PlaylistAction();
-                action.setAction(ContentBrowser.NEXT_PAGE)
-                        .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
-                        .setLabel1(getString(R.string.action_load_more));
-                action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
-                listRowAdapter.add(action);
-            }
-
-            rowsAdapter.add(new ListRow(header, listRowAdapter));
-        }
-    }
-
-    private void addSettingsActionsToRowAdapter(ArrayObjectAdapter arrayObjectAdapter) {
-
-        List<Action> settings = ContentBrowser.getInstance(getActivity()).getSettingsActions();
-
-        if (settings != null && !settings.isEmpty()) {
-
-            SettingsCardPresenter cardPresenter = new SettingsCardPresenter();
-            settingsAdapter = new ArrayObjectAdapter(cardPresenter);
-
-            for (Action item : settings) {
-                settingsAdapter.add(item);
-            }
-        }
-        else {
-            Log.d(TAG, "No settings were found");
-        }
-
-        if (settingsAdapter != null) {
-            // Create settings header and row
-            HeaderItem header = new HeaderItem(0, getString(R.string.settings_title));
-            arrayObjectAdapter.add(new ListRow(header, settingsAdapter));
-        }
-    }
+//    private void loadRootContentContainer(ArrayObjectAdapter rowsAdapter) {
+//
+//        ContentContainer rootContentContainer = ContentBrowser.getInstance(getActivity())
+//                                                              .getRootContentContainer();
+//
+//        CardPresenter cardPresenter = new CardPresenter();
+//        PosterCardPresenter posterCardPresenter = new PosterCardPresenter();
+//
+//        for (ContentContainer contentContainer : rootContentContainer.getContentContainers()) {
+//
+//            /* Zype, Evgeny Cherkasob */
+//            // Don't show My Library content container
+//            if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)) {
+//                continue;
+//            }
+//
+//            HeaderItem header = new HeaderItem(0, contentContainer.getName());
+//            ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
+//            /* Zype, Evgeny Cherkasov */
+//            if (contentContainer.getExtraStringValue(ContentContainer.EXTRA_THUMBNAIL_LAYOUT).equals("poster")) {
+//                listRowAdapter = new ArrayObjectAdapter(posterCardPresenter);
+//            }
+//
+//            for (ContentContainer innerContentContainer : contentContainer.getContentContainers()) {
+//                listRowAdapter.add(innerContentContainer);
+//            }
+//
+//            for (Content content : contentContainer.getContents()) {
+//                listRowAdapter.add(content);
+//            }
+//
+//            /* Zype, Evgeny Cherkasov */
+//            // Update NextPage parameter because the first page of playlist videos was loaded
+//            // while running global recipes chain
+//            // TODO: Probably it would better to move updating NextPage to the getContentsObservable()
+//            if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) == 1) {
+//                if (contentContainer.getExtraValueAsInt(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT) > ZypeApi.PER_PAGE_DEFAULT) {
+//                    contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, 2);
+//                }
+//                else {
+//                    contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, -1);
+//                }
+//            }
+//            if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
+//                PlaylistAction action = new PlaylistAction();
+//                action.setAction(ContentBrowser.NEXT_PAGE)
+//                        .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
+//                        .setLabel1(getString(R.string.action_load_more));
+//                action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+//                listRowAdapter.add(action);
+//            }
+//
+//            rowsAdapter.add(new ListRow(header, listRowAdapter));
+//        }
+//    }
+//
+//    private void addSettingsActionsToRowAdapter(ArrayObjectAdapter arrayObjectAdapter) {
+//
+//        List<Action> settings = ContentBrowser.getInstance(getActivity()).getSettingsActions();
+//
+//        if (settings != null && !settings.isEmpty()) {
+//
+//            SettingsCardPresenter cardPresenter = new SettingsCardPresenter();
+//            settingsAdapter = new ArrayObjectAdapter(cardPresenter);
+//
+//            for (Action item : settings) {
+//                settingsAdapter.add(item);
+//            }
+//        }
+//        else {
+//            Log.d(TAG, "No settings were found");
+//        }
+//
+//        if (settingsAdapter != null) {
+//            // Create settings header and row
+//            HeaderItem header = new HeaderItem(0, getString(R.string.settings_title));
+//            arrayObjectAdapter.add(new ListRow(header, settingsAdapter));
+//        }
+//    }
 
     private final class ItemViewClickedListener implements OnItemViewClickedListener {
 
@@ -340,7 +366,7 @@ public class ContentBrowseFragment extends RowsFragment {
                                 }
                                 ContentBrowser.getInstance(getActivity())
                                         .setLastSelectedContent(content)
-                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
                             }
 
                             @Override
@@ -349,20 +375,20 @@ public class ContentBrowseFragment extends RowsFragment {
                                 content.setExtraValue(Content.EXTRA_ENTITLED, false);
                                 ContentBrowser.getInstance(getActivity())
                                         .setLastSelectedContent(content)
-                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
                             }
                         });
                     }
                     else {
                         ContentBrowser.getInstance(getActivity())
                                 .setLastSelectedContent(content)
-                                .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                                .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
                     }
                 }
                 else {
                     ContentBrowser.getInstance(getActivity())
                             .setLastSelectedContent(content)
-                            .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                            .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
                 }
             }
             else if (item instanceof ContentContainer) {

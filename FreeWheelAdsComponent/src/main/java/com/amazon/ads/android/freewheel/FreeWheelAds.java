@@ -26,6 +26,7 @@ import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 import tv.freewheel.ad.AdManager;
 import tv.freewheel.ad.interfaces.IAdContext;
@@ -131,6 +132,11 @@ public class FreeWheelAds implements IAds {
     private List<ISlot> mMidRollSlots = new ArrayList<>();
 
     /**
+     * Ordered set for getting ad slots before a given video position.
+     */
+    private TreeSet<Long> mMidRollAdsSegment;
+
+    /**
      * List for MidRoll ad slot played flags.
      */
     private List<Boolean> mMidrollSlotsIsPlayedList = new ArrayList<>();
@@ -139,6 +145,11 @@ public class FreeWheelAds implements IAds {
      * Ad start time.
      */
     private long mAdSlotStartTime;
+
+    /**
+     * Flag to keep track of current Ad state.
+     */
+    private boolean mAdInProgress;
 
     /**
      * Init FreeWheel instance.
@@ -210,13 +221,25 @@ public class FreeWheelAds implements IAds {
                         (position / 1000)) {
                     Log.d(TAG, "Mid roll matches at:" + position);
                     mMidrollSlotsIsPlayedList.set(i, true);
-                    startSlot();
+                    startSlot(IAds.MID_ROLL_AD);
                     slot.play();
                     break;
                 }
                 i++;
             }
         }
+    }
+
+    /**
+     * Return true if post roll ads are available; false otherwise. Currently this component does
+     * not support post roll ads so this method always returns false.
+     *
+     * @return False because post roll ads are not supported.
+     */
+    @Override
+    public boolean isPostRollAvailable() {
+
+        return false;
     }
 
     /**
@@ -243,9 +266,16 @@ public class FreeWheelAds implements IAds {
                 case STOP:
                     state = mAdConstants.ACTIVITY_STATE_STOP();
                     break;
+                case DESTROY:
+                    state = mAdConstants.ACTIVITY_STATE_DESTROY();
+                    break;
             }
 
             mAdContext.setActivityState(state);
+
+            if(activityState == ActivityState.DESTROY) {
+                cleanUpAdContext();
+            }
         }
     }
 
@@ -279,14 +309,42 @@ public class FreeWheelAds implements IAds {
      * {@inheritDoc}
      * Show pre roll Ads in the FrameLayout provided.
      */
-    @Override
-    public void showPreRollAd() {
+    public void showAds() {
 
-        // AdContext is single use so get rid of it.
+        Log.d(TAG, "showAds called");
+        // Ad context is available, no need to cleanup and start with pre-roll ads.
+        if (mAdContext != null && mAdInProgress) {
+
+            if (mIAdsEvents != null) {
+                mIAdsEvents.onAdSlotStarted(getBasicAdDetailBundle());
+            }
+            return;
+        }
+        //Start with a new ad context and pre roll ads.
+        showPreRollAds();
+    }
+
+    /**
+     * Clean up previous ad context.
+     */
+    private void cleanUpAdContext() {
+
+        Log.d(TAG, "entered cleanUpAdContext ");
         if (mAdContext != null) {
             mAdContext.dispose();
         }
         mAdContext = null;
+        mMidRollAdsSegment = new TreeSet<>();
+        mAdInProgress = false;
+    }
+
+    /**
+     * Show pre roll Ads in the FrameLayout provided.
+     */
+    private void showPreRollAds() {
+
+        // AdContext is single use so get rid of it.
+        cleanUpAdContext();
 
         // Get extra video data.
         try {
@@ -300,7 +358,6 @@ public class FreeWheelAds implements IAds {
         }
         catch (Exception e) {
             Log.e(TAG, "Using default video info!!!", e);
-
         }
 
         // Each AdContext instance can only submit ad request once.
@@ -359,8 +416,9 @@ public class FreeWheelAds implements IAds {
                             else {
                                 Log.e(TAG, "Request failed. Playing main content.");
                                 // Ad request failed, continue with the content.
-                                startSlot();
-                                endSlot(false);
+                                startSlot(null);
+                                endSlot(null);
+                                cleanUpAdContext();
                             }
                         }
                     }
@@ -400,6 +458,13 @@ public class FreeWheelAds implements IAds {
             }
         }
 
+        // Start listening slot start message.
+        mAdContext.addEventListener(mAdConstants.EVENT_SLOT_STARTED(), new IEventListener() {
+            public void run(IEvent e) {
+                mAdInProgress = true;
+            }
+        });
+
         // Start listening slot end message.
         mAdContext.addEventListener(mAdConstants.EVENT_SLOT_ENDED(), new IEventListener() {
             public void run(IEvent e) {
@@ -409,6 +474,8 @@ public class FreeWheelAds implements IAds {
 
                 ISlot completedSlot = mAdContext.getSlotByCustomId(completedSlotID);
                 Log.d(TAG, "Completed playing slot: " + completedSlotID);
+
+                mAdInProgress = false;
 
                 // EVENT_SLOT_ENDED could be fired for several types of slots
                 // (pre-, mid-, post-, pause, overlay, display)
@@ -420,7 +487,7 @@ public class FreeWheelAds implements IAds {
                 if (completedSlot.getTimePositionClass() ==
                         mAdConstants.TIME_POSITION_CLASS_MIDROLL()) {
                     // Set mid roll flag and end the ad slot.
-                    endSlot(true);
+                    endSlot(IAds.MID_ROLL_AD);
                 }
             }
         });
@@ -439,30 +506,37 @@ public class FreeWheelAds implements IAds {
                 ISlot nextSlot = mPreRollSlots.remove(0);
                 Log.d(TAG, "Playing preroll slot: " + nextSlot.getCustomId());
                 // Play next pre roll slot.
-                startSlot();
+                startSlot(IAds.PRE_ROLL_AD);
                 nextSlot.play();
             }
             else {
                 Log.d(TAG, "Finished all prerolls. Starting main content.");
-                endSlot(false);
+                endSlot(IAds.PRE_ROLL_AD);
             }
         }
         else {
-            endSlot(false);
+            endSlot(null);
         }
     }
 
     /**
      * Start Ad slot.
      * Notifies listener and captures ad slot start time.
+     *
+     * @param adType type of ad currently being played
      */
-    private void startSlot() {
+    private void startSlot(final String adType) {
 
         new Handler(mActivity.getMainLooper()).post(new Runnable() {
             public void run() {
                 // Let listener know about Ad slot start event.
                 if (mIAdsEvents != null) {
-                    mIAdsEvents.onAdSlotStarted(null);
+                    // Put ad metadata in a Bundle.
+                    Bundle extras = getBasicAdDetailBundle();
+                    if(adType != null) {
+                        extras.putString(AD_TYPE, adType);
+                    }
+                    mIAdsEvents.onAdSlotStarted(extras);
                 }
             }
         });
@@ -475,9 +549,9 @@ public class FreeWheelAds implements IAds {
      * End Ad slot.
      * Notifies listener, sends duration and disposes AdContext.
      *
-     * @param wasAMidRoll True if the ad is a mid roll ad, else false.
+     * @param adType type of ad currently being played
      */
-    private void endSlot(final boolean wasAMidRoll) {
+    private void endSlot(final String adType) {
 
         new Handler(mActivity.getMainLooper()).post(new Runnable() {
             public void run() {
@@ -485,10 +559,12 @@ public class FreeWheelAds implements IAds {
                 if (mIAdsEvents != null) {
                     // Calculate how long Ads played.
                     long adSlotTime = SystemClock.elapsedRealtime() - mAdSlotStartTime;
-                    // Put calculated time in an Bundle.
-                    Bundle extras = new Bundle();
-                    extras.putLong(DURATION, adSlotTime);
-                    extras.putBoolean(WAS_A_MID_ROLL, wasAMidRoll);
+                    // Put calculated time and ad metadata in a Bundle.
+                    Bundle extras = getBasicAdDetailBundle();
+                    extras.putLong(DURATION_PLAYED, adSlotTime);
+                    if(adType != null) {
+                        extras.putString(AD_TYPE, adType);
+                    }
                     // Let listener know about Ad slot stop event.
                     mIAdsEvents.onAdSlotEnded(extras);
                 }
@@ -520,5 +596,51 @@ public class FreeWheelAds implements IAds {
     public Bundle getExtra() {
 
         return mExtras;
+    }
+
+    @Override
+    public int getNumberOfSegments(){
+
+        if(mMidRollSlots != null)
+        {
+            return mMidRollSlots.size() + 1;
+        }
+        return 1;
+    }
+
+    /**
+     * Get the current segment number of the content based on the mid roll ads list.
+     *
+     * @param position playback location of current Content.
+     * @param duration total duration of the current Content.
+     * @return the current segment of the content media. Start with value 1 and based on mid roll
+     * ads.
+     */
+    public int getCurrentContentSegmentNumber(long position, long duration) {
+
+        if (mMidRollAdsSegment.isEmpty() && mMidRollSlots != null && !mMidRollSlots.isEmpty()) {
+            for (ISlot slot : mMidRollSlots) {
+                mMidRollAdsSegment.add((long) slot.getTimePosition());
+            }
+        }
+        if (!mMidRollAdsSegment.isEmpty()) {
+            Long lowerValue = mMidRollAdsSegment.lower(position);
+            if (lowerValue != null) {
+                return mMidRollAdsSegment.headSet(lowerValue, true).size() + 1;
+            }
+        }
+        return 1;
+    }
+
+    /**
+     * provide basic ad details
+     *
+     * @return bundle containing ad details.
+     */
+    private Bundle getBasicAdDetailBundle() {
+
+        Bundle extras = new Bundle();
+        extras.putString(ID, mCurrentVideoAdId);
+        return extras;
     }
 }

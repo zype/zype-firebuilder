@@ -28,10 +28,14 @@
  */
 package com.amazon.android.tv.tenfoot.ui.activities;
 
+import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.model.event.ActionUpdateEvent;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentDetailsFragment;
+import com.amazon.android.ui.constants.PreferencesConstants;
+import com.amazon.android.utils.Preferences;
+import com.amazon.utils.DateAndTimeHelper;
 import com.zype.fire.auth.ZypeAuthentication;
 import com.zype.fire.auth.ZypeLoginActivity;
 
@@ -64,6 +68,15 @@ public class ContentDetailsActivity extends BaseActivity implements ZypeAuthenti
 
         mContentDetailsFragment = (ContentDetailsFragment) getFragmentManager().findFragmentById
                 (R.id.content_details_fragment);
+    }
+
+    @Override
+    public void setRestoreActivityValues() {
+
+        Preferences.setString(PreferencesConstants.LAST_ACTIVITY,
+                              ContentBrowser.CONTENT_DETAILS_SCREEN);
+        Preferences.setLong(PreferencesConstants.TIME_LAST_SAVED,
+                            DateAndTimeHelper.getCurrentDate().getTime());
     }
 
     @Subscribe
