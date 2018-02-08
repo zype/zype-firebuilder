@@ -13,6 +13,7 @@ import com.zype.fire.api.Model.AppData;
  */
 
 public class ZypeConfiguration {
+    private static final String PREFERENCE_FAVORITES_API = "ZypeFavoritesApi";
     private static final String PREFERENCE_NATIVE_SUBSCRIPTION = "ZypeNativeSubscription";
     private static final String PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION = "ZypeNativeToUniversalSubscription";
     private static final String PREFERENCE_ROOT_PLAYLIST_ID = "ZypeRootPlaylistId";
@@ -29,6 +30,9 @@ public class ZypeConfiguration {
 
         SharedPreferences prefs = getPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
+        if (!TextUtils.isEmpty(appData.favoritesViaApi)) {
+            editor.putBoolean(PREFERENCE_FAVORITES_API, Boolean.valueOf(appData.favoritesViaApi));
+        }
         if (!TextUtils.isEmpty(appData.nativeSubscription)) {
             editor.putBoolean(PREFERENCE_NATIVE_SUBSCRIPTION, Boolean.valueOf(appData.nativeSubscription));
         }
@@ -53,6 +57,7 @@ public class ZypeConfiguration {
     public static void clear(Context context) {
         SharedPreferences prefs = getPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
+        editor.remove(PREFERENCE_FAVORITES_API);
         editor.remove(PREFERENCE_NATIVE_SUBSCRIPTION);
         editor.remove(PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION);
         editor.remove(PREFERENCE_ROOT_PLAYLIST_ID);
@@ -84,6 +89,12 @@ public class ZypeConfiguration {
 
     public static String getRootPlaylistId(Context context) {
         return getStringPreference(PREFERENCE_ROOT_PLAYLIST_ID, ZypeSettings.ROOT_PLAYLIST_ID, context);
+    }
+
+    public static boolean isFavoritesViaApiEnabled(Context context) {
+        // TODO: Remove hardcoded return value for release
+        return false;
+//        return getBooleanPreference(PREFERENCE_FAVORITES_API, ZypeSettings.FAVORITES_VIA_API, context);
     }
 
     public static boolean isNativeSubscriptionEnabled(Context context) {

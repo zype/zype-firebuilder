@@ -76,6 +76,9 @@ permissions and limitations under the License.
     <!--
         Zype, Evgeny Cherkasov
     -->
+    <!-- Content details -->
+    <string name="content_details_recommended_header_favorites">Favorites</string>
+
     <!-- Create login -->
     <string name="create_login_email">Email</string>
     <string name="create_login_email_error_empty">Email is required</string>

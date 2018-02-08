@@ -14,13 +14,19 @@ public class ZypeSettings {
     public static final String CLIENT_SECRET = "06f45687da00bbe3cf51dddc7dbd7a288d1c852cf0b9a6e76e25bb115dcf872c";
     // Playlist
     public static final String ROOT_PLAYLIST_ID = "577e65c85577de0d1000c1ee";
-    public static final String ROOT_MY_LIBRARY_PLAYLIST_ID = "RootMyLibrary";
+
+    public static final String FAVORITES_PLAYLIST_ID = "Favorites";
     public static final String MY_LIBRARY_PLAYLIST_ID = "MyLibrary";
+    public static final String ROOT_FAVORITES_PLAYLIST_ID = "RootFavorites";
+    public static final String ROOT_MY_LIBRARY_PLAYLIST_ID = "RootMyLibrary";
 
     // Template version
     public static final String TEMPLATE_VERSION = "1.5.0";
 
-    // App features
+    // Features
+    public static final boolean FAVORITES_VIA_API = true;
+
+    // Monetization
     public static final boolean NATIVE_SUBSCRIPTION_ENABLED = false;
     public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = false;
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = false;
