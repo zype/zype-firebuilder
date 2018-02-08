@@ -3,7 +3,7 @@
     "showRelatedContent": true,
     "useCategoryAsDefaultRelatedContent": true,
     "searchAlgo": "basic",
-    "enableCEA608": true,
+    "enableCEA608": false,
     "enableRecentRow": true,
     "enableWatchlistRow": true,
     "maxNumberOfRecentItems": 5
