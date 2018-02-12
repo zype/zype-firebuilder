@@ -92,7 +92,6 @@ public class ZypeConfiguration {
     }
 
     public static boolean isFavoritesViaApiEnabled(Context context) {
-        // TODO: Remove hardcoded return value for release
         return false;
 //        return getBooleanPreference(PREFERENCE_FAVORITES_API, ZypeSettings.FAVORITES_VIA_API, context);
     }

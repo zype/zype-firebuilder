@@ -12,7 +12,7 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package com.amazon.android.contentbrowser.database;
+package com.amazon.android.contentbrowser.database.records;
 
 
 /**
@@ -20,7 +20,7 @@ package com.amazon.android.contentbrowser.database;
  *
  * This class represents a video favorite stored in the database.
  **/
-public class VideoFavoriteRecord {
+public class VideoFavoriteRecord extends Record {
 
     /**
      * The video id for the video favorite object.
@@ -35,7 +35,7 @@ public class VideoFavoriteRecord {
     /**
      * The video favorite record constructor.
      */
-    VideoFavoriteRecord() {
+    public VideoFavoriteRecord() {
     }
 
     /**

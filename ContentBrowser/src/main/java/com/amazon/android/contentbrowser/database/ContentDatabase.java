@@ -14,9 +14,12 @@
  */
 package com.amazon.android.contentbrowser.database;
 
+import com.amazon.android.contentbrowser.database.records.VideoFavoriteRecord;
 import com.amazon.android.contentbrowser.database.tables.RecentTable;
 import com.amazon.android.contentbrowser.database.tables.RecommendationTable;
+import com.amazon.android.contentbrowser.database.tables.VideoFavoritesTable;
 import com.amazon.android.contentbrowser.database.tables.WatchlistTable;
+import com.amazon.utils.StringManipulation;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -24,6 +27,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * The content database. Contains the SQLiteDatabase instance that has three tables in it.
@@ -44,7 +48,7 @@ public class ContentDatabase extends SQLiteOpenHelper {
      * The database version. If this is changed onUpgrade will be called. Put any logic needed to
      * change or maintain database in that method.
      */
-    private static int DATABASE_VERSION = 3;
+    private static int DATABASE_VERSION = 4;
     
     /**
      * The SQLiteDatabase instance.
@@ -125,6 +129,15 @@ public class ContentDatabase extends SQLiteOpenHelper {
         if (oldVersion < 3 && newVersion >= 3) {
             db.execSQL(WatchlistTable.SQL_CREATE_TABLE);
         }
+        /* Zype, Evgeny Cherkasov */
+        // Create video favorites table
+        try {
+            db.execSQL(VideoFavoritesTable.SQL_CREATE_TABLE);
+        }
+        catch (Exception e) {
+
+        }
+
     }
     
     /**
@@ -139,6 +152,8 @@ public class ContentDatabase extends SQLiteOpenHelper {
             db.execSQL(RecommendationTable.SQL_CREATE_TABLE);
             db.execSQL(RecentTable.SQL_CREATE_TABLE);
             db.execSQL(WatchlistTable.SQL_CREATE_TABLE);
+            /* Zype, Evgeny Cherkasov */
+            db.execSQL(VideoFavoritesTable.SQL_CREATE_TABLE);
         }
         catch (Exception e) {
             Log.e(TAG, "Error creating database tables: " + e);

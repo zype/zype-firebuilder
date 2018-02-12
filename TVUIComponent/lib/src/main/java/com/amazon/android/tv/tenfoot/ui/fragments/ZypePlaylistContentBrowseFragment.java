@@ -113,7 +113,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
         if (receiver != null) {
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, new IntentFilter("DataUpdated"));
         }
-        updateContents();
+//        updateContents();
     }
 
     @Override
@@ -209,6 +209,8 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
     }
 
     private void loadRootContentContainer(ArrayObjectAdapter rowsAdapter) {
+        Log.d(TAG, "loadRootContentContainer()");
+
         rowsAdapter.clear();
 
         ContentContainer rootContentContainer = ContentBrowser.getInstance(getActivity()).getLastSelectedContentContainer();
@@ -269,6 +271,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
 
     /* Zype, Evgeny Cherkasov */
     public void updateContents() {
+        Log.d(TAG, "updateContents()");
 
         ArrayObjectAdapter rowsAdapter = mRowsAdapter;
         ContentContainer rootContentContainer = ContentBrowser.getInstance(getActivity())

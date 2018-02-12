@@ -15,11 +15,10 @@
 package com.amazon.android.contentbrowser;
 
 import com.amazon.android.contentbrowser.database.helpers.RecentDatabaseHelper;
+import com.amazon.android.contentbrowser.database.helpers.VideoFavoritesHelper;
 import com.amazon.android.contentbrowser.database.helpers.WatchlistDatabaseHelper;
 import com.amazon.android.contentbrowser.database.records.RecentRecord;
-import com.amazon.android.contentbrowser.database.ContentDatabaseHelper;
-import com.amazon.android.contentbrowser.database.RecentRecord;
-import com.amazon.android.contentbrowser.database.VideoFavoriteRecord;
+import com.amazon.android.contentbrowser.database.records.VideoFavoriteRecord;
 import com.amazon.android.contentbrowser.helper.AnalyticsHelper;
 import com.amazon.android.contentbrowser.helper.AuthHelper;
 import com.amazon.android.contentbrowser.helper.ErrorHelper;
@@ -63,7 +62,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
-import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -82,7 +80,6 @@ import static com.amazon.android.contentbrowser.helper.LauncherIntegrationManage
         .getSourceOfContentPlayRequest;
 
 /* Zype */
-import com.google.gson.Gson;
 import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
@@ -1492,9 +1489,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                             if (result) {
                                 setLastSelectedContentContainer(contentContainer);
                                 switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
-                                if (!isFavoritesLoaded()) {
-                                    loadFavoritesVideos(contentContainer);
-                                }
+//                                if (!isFavoritesLoaded()) {
+//                                    loadFavoritesVideos(contentContainer);
+//                                }
                             }
                             else {
                                 // TODO: Switch to Favorites screen after successful login
@@ -1506,9 +1503,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             else {
                 setLastSelectedContentContainer(contentContainer);
                 switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
-                if (!isFavoritesLoaded()) {
+//                if (!isFavoritesLoaded()) {
                     loadLocalFavoritesVideos(contentContainer);
-                }
+//                }
             }
         }
     }
@@ -1675,8 +1672,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     .findContentContainerById(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID);
             if (favoritesContainer != null) {
                 if (isFavoritesLoaded()) {
-                    // TODO: Perform checking is video favorite by existing in local db VideoFavorites table
-                    if (favoritesContainer.findContentById(content.getId()) == null) {
+                    if (!VideoFavoritesHelper.getInstance().recordExists(mAppContext, content.getId())) {
                         contentActionList.add(new Action().setId(CONTENT_ACTION_FAVORITES_ADD)
                                 .setLabel1(mAppContext.getResources().getString(R.string.action_favorites_add_1))
                                 .setLabel2(mAppContext.getResources().getString(R.string.action_favorites_add_2)));
@@ -1690,7 +1686,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 else {
                     if (ZypeConfiguration.isFavoritesViaApiEnabled(mAppContext)) {
                         // Set next page to 1 for initial loading
-                        favoritesContainer.setExtraValue(ExtraKeys.NEXT_PAGE, 1);
+                        favoritesContainer.getContentContainers().get(0).setExtraValue(ExtraKeys.NEXT_PAGE, 1);
                         loadFavoritesVideos(favoritesContainer);
                     }
                     else {
@@ -2915,7 +2911,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     public void loadFavoritesVideos(ContentContainer contentContainer) {
-        Observable<Object> observable = Observable.just(contentContainer.getContentContainers().get(0));
+        ContentContainer favoritesContentContainer = contentContainer.getContentContainers().get(0);
+
+        Observable<Object> observable = Observable.just(favoritesContentContainer);
         Recipe recipeDynamicParserVideos = Recipe.newInstance(mAppContext, "recipes/ZypeSearchContentsRecipe.json");
         Subscription subscription = observable
                 .subscribeOn(Schedulers.newThread())
@@ -2929,7 +2927,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                         result -> {
                         },
                         throwable -> {
-                            Log.e(TAG, "loadPlaylistVideos(): failed: ", throwable);
+                            Log.e(TAG, "loadLocalFavoritesVideos(): failed: ", throwable);
                             ErrorHelper.injectErrorFragment(
                                     mNavigator.getActiveActivity(),
                                     ErrorUtils.ERROR_CATEGORY.FEED_ERROR,
@@ -2940,8 +2938,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                     });
                         },
                         () -> {
-                            Log.v(TAG, "loadPlaylistVideos(): completed");
-                            favoritesLoaded = true;
+                            Log.v(TAG, "loadLocalFavoritesVideos(): completed");
+                            setFavoritesLoaded(true);
                             mEventBus.post(new FavoritesLoadEvent(favoritesLoaded));
                         });
         mCompositeSubscription.add(subscription);
@@ -2967,7 +2965,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                         result -> {
                         },
                         throwable -> {
-                            Log.e(TAG, "loadPlaylistVideos(): failed: ", throwable);
+                            Log.e(TAG, "loadLocalFavoritesVideos(): failed: ", throwable);
                             ErrorHelper.injectErrorFragment(
                                     mNavigator.getActiveActivity(),
                                     ErrorUtils.ERROR_CATEGORY.FEED_ERROR,
@@ -2978,8 +2976,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                     });
                         },
                         () -> {
-                            Log.v(TAG, "loadPlaylistVideos(): completed");
-                            favoritesLoaded = true;
+                            Log.v(TAG, "loadLocalFavoritesVideos(): completed");
+                            setFavoritesLoaded(true);
                             mEventBus.post(new FavoritesLoadEvent(favoritesLoaded));
                         });
         mCompositeSubscription.add(subscription);
@@ -3099,7 +3097,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         runGlobalRecipes(activity, ContentBrowser.this);
     }
     /* Zype, Evgeny Cherkasov */
-    public boolean isFavoritesLoaded() { return favoritesLoaded; }
+    public boolean isFavoritesLoaded() {
+        return favoritesLoaded;
+    }
 
     public void setFavoritesLoaded(boolean value) {
         favoritesLoaded = value;

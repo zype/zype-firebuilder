@@ -20,8 +20,8 @@ import android.util.Log;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.ContentLoader;
-import com.amazon.android.contentbrowser.database.ContentDatabaseHelper;
-import com.amazon.android.contentbrowser.database.VideoFavoriteRecord;
+import com.amazon.android.contentbrowser.database.helpers.VideoFavoritesHelper;
+import com.amazon.android.contentbrowser.database.records.VideoFavoriteRecord;
 import com.amazon.android.contentbrowser.helper.ErrorHelper;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
@@ -116,8 +116,7 @@ public class FavoritesManager {
                     .addVideoFavorite(content)
                     .subscribe(resultContent -> {
                         if (!TextUtils.isEmpty(resultContent.getExtraValueAsString(Content.EXTRA_VIDEO_FAVORITE_ID))) {
-                            addVideoToFavoritesContentContainer(resultContent);
-                            contentBrowser.updateContentActions();
+                            addLocalFavorite(resultContent);
                         }
                         else {
                             // TODO: Handke error
@@ -125,31 +124,29 @@ public class FavoritesManager {
                     });
         }
         else {
-            if (addLocalFavorite(content)) {
-                addVideoToFavoritesContentContainer(content);
-                contentBrowser.updateContentActions();
-            }
+            addLocalFavorite(content);
         }
     }
 
     public void handleRemoveAction(Content content) {
         if (ZypeConfiguration.isFavoritesViaApiEnabled(context)) {
-            ContentContainer favoritesContainer = contentLoader.getRootContentContainer()
-                    .findContentContainerById(ZypeSettings.FAVORITES_PLAYLIST_ID);
-            if (favoritesContainer == null) {
-                return;
-            }
-            Content favoriteVideo = favoritesContainer.findContentById(content.getId());
-            if (favoriteVideo == null) {
-                return;
-            }
-            String videoFavoriteId = favoriteVideo.getExtraValueAsString(Content.EXTRA_VIDEO_FAVORITE_ID);
+//            ContentContainer favoritesContainer = contentLoader.getRootContentContainer()
+//                    .findContentContainerById(ZypeSettings.FAVORITES_PLAYLIST_ID);
+//            if (favoritesContainer == null) {
+//                return;
+//            }
+//            Content favoriteVideo = favoritesContainer.findContentById(content.getId());
+//            if (favoriteVideo == null) {
+//                return;
+//            }
+//            String videoFavoriteId = favoriteVideo.getExtraValueAsString(Content.EXTRA_VIDEO_FAVORITE_ID);
+            VideoFavoriteRecord videoFavorite = getVideoFavorite(content);
+            String videoFavoriteId = videoFavorite.getVideoFavoriteId();
             contentLoader
                     .removeVideoFavorite(content, videoFavoriteId)
                     .subscribe(resultContent -> {
                         if (TextUtils.isEmpty(resultContent.getExtraValueAsString(Content.EXTRA_VIDEO_FAVORITE_ID))) {
-                            removeVideoFromFavoritesContentContainer(content);
-                            contentBrowser.updateContentActions();
+                            deleteLocalFavorite(resultContent);
                         }
                         else {
                             // TODO: Handke error
@@ -157,10 +154,7 @@ public class FavoritesManager {
                     });
         }
         else {
-            if (deleteLocalFavorite(content)) {
-                removeVideoFromFavoritesContentContainer(content);
-                contentBrowser.updateContentActions();
-            }
+            deleteLocalFavorite(content);
         }
     }
 
@@ -196,32 +190,26 @@ public class FavoritesManager {
     // CRUD operations in local database for video favorites
     //
     public List<VideoFavoriteRecord> getVideoFavorites() {
-        ContentDatabaseHelper database = ContentDatabaseHelper.getInstance(context);
-        if (database == null) {
-            Log.e(TAG, "getVideoFavorites(): Database is null");
-            return null;
-        }
-
-        return database.getVideoFavorites();
+        return VideoFavoritesHelper.getInstance().getVideoFavorites(context);
     }
 
-    public boolean addLocalFavorite(Content content) {
-        ContentDatabaseHelper database = ContentDatabaseHelper.getInstance(context);
-        if (database == null) {
-            Log.e(TAG, "addLocalFavorite(): Database is null");
-            return false;
-        }
-
-        return database.addVideoFavorite(content.getId(), null);
+    private VideoFavoriteRecord getVideoFavorite(Content content) {
+        return (VideoFavoriteRecord) VideoFavoritesHelper.getInstance().getRecord(context, content.getId());
     }
 
-    public boolean deleteLocalFavorite(Content content) {
-        ContentDatabaseHelper database = ContentDatabaseHelper.getInstance(context);
-        if (database == null) {
-            Log.e(TAG, "deleteLocalFavorite(): Database is null");
-            return false;
+    private void addLocalFavorite(Content content) {
+        VideoFavoritesHelper videoFavoritesHelper = VideoFavoritesHelper.getInstance();
+        if (!videoFavoritesHelper.recordExists(context, content.getId())) {
+            String videoFavoriteId = content.getExtraValueAsString(Content.EXTRA_VIDEO_FAVORITE_ID);
+            videoFavoritesHelper.addVideoFavorite(context, content.getId(), videoFavoriteId);
         }
+        addVideoToFavoritesContentContainer(content);
+        contentBrowser.updateContentActions();
+    }
 
-        return database.deleteVideoFavoriteByVideoId(content.getId());
+    public void deleteLocalFavorite(Content content) {
+        VideoFavoritesHelper.getInstance().deleteRecord(context, content.getId());
+        removeVideoFromFavoritesContentContainer(content);
+        contentBrowser.updateContentActions();
     }
 }

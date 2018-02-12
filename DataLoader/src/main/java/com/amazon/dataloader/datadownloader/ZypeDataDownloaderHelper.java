@@ -118,7 +118,6 @@ public class ZypeDataDownloaderHelper {
                     }
                     else {
                         Log.e(TAG, "loadFavoriteVideos(): error loading video, id=" + data.videoId);
-                        return null;
                     }
                 }
             }
@@ -128,7 +127,7 @@ public class ZypeDataDownloaderHelper {
             }
 
             // Load all favorites
-            loadNext = (result.nextPage == -1);
+            loadNext = !(result.nextPage == -1);
         }
         return result;
     }

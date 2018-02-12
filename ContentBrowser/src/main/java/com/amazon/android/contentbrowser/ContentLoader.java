@@ -14,6 +14,8 @@
  */
 package com.amazon.android.contentbrowser;
 
+import com.amazon.android.contentbrowser.Favorites.FavoritesManager;
+import com.amazon.android.contentbrowser.database.helpers.VideoFavoritesHelper;
 import com.amazon.android.contentbrowser.helper.ErrorHelper;
 import com.amazon.android.interfaces.ICancellableLoad;
 import com.amazon.android.model.content.Content;
@@ -126,6 +128,9 @@ public class ContentLoader {
      */
     private ContentContainer mRootContentContainer = new ContentContainer("Root");
 
+    /* Zype, Evgeny Cherkasov */
+    private Context mContext;
+
     /**
      * Constructor. Initializes the {@link NavigatorModel}, {@link DataLoadManager}, and
      * {@link DynamicParser} that is required to load data.
@@ -148,7 +153,9 @@ public class ContentLoader {
             ContentContainerTranslator containerTranslator = new ContentContainerTranslator();
             mDynamicParser.addTranslatorImpl(containerTranslator.getName(),
                                              containerTranslator);
+
             /* Zype, Evgeny Cherkasov */
+            mContext = context;
 
             // Register Zype content translator parser recipes use translation.
             ZypeContentTranslator zypeContentTranslator = new ZypeContentTranslator();
@@ -256,7 +263,9 @@ public class ContentLoader {
                         alreadyAvailableContentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, 1);
                     }
                     else {
-                        alreadyAvailableContentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, -1);
+                        if (!alreadyAvailableContentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.FAVORITES_PLAYLIST_ID)) {
+                            alreadyAvailableContentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, -1);
+                        }
                     }
 
                     if (DEBUG_RECIPE_CHAIN) {
@@ -813,8 +822,17 @@ public class ContentLoader {
         ZypeDataDownloaderHelper.VideosResult videosResult = ZypeDataDownloaderHelper.loadFavoriteVideos(
                 contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG), consumerId, accessToken, nextPage);
         if (videosResult != null) {
+            // Currently 'loadFavoriteVideos' loads all video favorites, so 'nextPage' value
+            // of the 'videoResult' will be -1, that means there is no more data.
             contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, videosResult.nextPage);
 
+            // Update local database
+            VideoFavoritesHelper.getInstance().clearDatabase(mContext);
+            for (VideoData data : videosResult.videos) {
+                VideoFavoritesHelper.getInstance().addVideoFavorite(mContext, data.Id, data.videoFavoriteId);
+            }
+
+            // Prepare feed
             GsonBuilder builder = new GsonBuilder();
             Gson gson = builder.create();
             String feed = gson.toJson(videosResult.videos);
