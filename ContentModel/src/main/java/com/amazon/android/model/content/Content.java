@@ -305,6 +305,13 @@ public class Content implements Serializable {
     /**
      * Extra keys
      */
+    // Analytics
+    public static final String EXTRA_ANALYTICS_BEACON = "AnalyticsBeacon";
+    public static final String EXTRA_ANALYTICS_DEVICE = "AnalyticsDevice";
+    public static final String EXTRA_ANALYTICS_PLAYER_ID = "AnalyticsPlayerId";
+    public static final String EXTRA_ANALYTICS_SITE_ID = "AnalyticsSiteId";
+    public static final String EXTRA_ANALYTICS_VIDEO_ID = "AnalyticsVideoId";
+
     // Ad tag list
     public static final String EXTRA_AD_TAGS = "AdTags";
     // Entitled flag
