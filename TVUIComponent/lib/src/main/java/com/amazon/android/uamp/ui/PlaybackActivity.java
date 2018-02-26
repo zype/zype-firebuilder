@@ -33,6 +33,7 @@ package com.amazon.android.uamp.ui;
 import com.akamai.android.analytics.AnalyticsPlugin;
 import com.akamai.android.analytics.EndReasonCodes;
 import com.akamai.android.analytics.PluginCallBacks;
+import com.amazon.mediaplayer.tracks.MediaFormat;
 import com.google.android.exoplayer.text.CaptionStyleCompat;
 import com.google.android.exoplayer.text.SubtitleLayout;
 
@@ -226,6 +227,9 @@ public class PlaybackActivity extends Activity implements
     // Akamai analytics
     AnalyticsPlugin akamaiPlugin;
 
+    // Closed captions
+    private String ccTrack = "";
+
     // Need to setup cookie policy to make ExoPlayer play live streams from Akamai
     private static final CookieManager DEFAULT_COOKIE_MANAGER;
     static {
@@ -281,7 +285,7 @@ public class PlaybackActivity extends Activity implements
                 }
 //                /* Zype, Evgeny Cherkasov */
 //                if (!stopTracking) {
-                    mVideoPositionTrackingHandler.postDelayed(this, VIDEO_POSITION_TRACKING_POLL_TIME_MS);
+                mVideoPositionTrackingHandler.postDelayed(this, VIDEO_POSITION_TRACKING_POLL_TIME_MS);
 //                }
             }
         };
@@ -564,10 +568,10 @@ public class PlaybackActivity extends Activity implements
         }
         else {
             ContentBrowser.getInstance(this).verifyScreenSwitch(ContentBrowser
-                                                                        .CONTENT_RENDERER_SCREEN,
-                                                                mSelectedContent, extra ->
-                                                                        resumePlayback(),
-                                                                errorExtra -> finish());
+                            .CONTENT_RENDERER_SCREEN,
+                    mSelectedContent, extra ->
+                            resumePlayback(),
+                    errorExtra -> finish());
         }
     }
 
@@ -582,7 +586,7 @@ public class PlaybackActivity extends Activity implements
         // Persist CC state if user has changed local state.
         if (!mCaptioningHelper.useGlobalSetting()) {
             Preferences.setBoolean(PreferencesConstants.IS_CLOSE_CAPTION_FLAG_PERSISTED,
-                                   mIsClosedCaptionEnabled);
+                    mIsClosedCaptionEnabled);
         }
 
         if (mPlayer.getCurrentPosition() > 0) {
@@ -590,14 +594,14 @@ public class PlaybackActivity extends Activity implements
             storeContentPlaybackState();
             // User has stopped watching content so track it with analytics
             AnalyticsHelper.trackPlaybackFinished(mSelectedContent, mStartingPlaybackPosition,
-                                                  getCurrentPosition());
+                    getCurrentPosition());
 
             // After the user has stopped watching the content, send recommendations for related
             // content of the selected content if any exist.
             if (mSelectedContent.getRecommendations().size() > 0) {
                 ContentBrowser.getInstance(this).getRecommendationManager()
-                              .executeRelatedRecommendationsTask(getApplicationContext(),
-                                                                 mSelectedContent);
+                        .executeRelatedRecommendationsTask(getApplicationContext(),
+                                mSelectedContent);
             }
         }
         mIsActivityResumed = false;
@@ -656,7 +660,7 @@ public class PlaybackActivity extends Activity implements
         super.onActivityResult(requestCode, resultCode, data);
 
         ContentBrowser.getInstance(this)
-                      .handleOnActivityResult(this, requestCode, resultCode, data);
+                .handleOnActivityResult(this, requestCode, resultCode, data);
     }
 
     /**
@@ -678,7 +682,7 @@ public class PlaybackActivity extends Activity implements
 
             mPlaybackOverlayFragment.fastForward();
             mTransportControlsUpdateHandler.postDelayed(new ContinualFwdUpdater(),
-                                                        TRANSPORT_CONTROLS_DELAY_PERIOD);
+                    TRANSPORT_CONTROLS_DELAY_PERIOD);
         }
     }
 
@@ -692,7 +696,7 @@ public class PlaybackActivity extends Activity implements
 
             mPlaybackOverlayFragment.fastRewind();
             mTransportControlsUpdateHandler.postDelayed(new ContinualRewindUpdater(),
-                                                        TRANSPORT_CONTROLS_DELAY_PERIOD);
+                    TRANSPORT_CONTROLS_DELAY_PERIOD);
         }
     }
 
@@ -875,14 +879,14 @@ public class PlaybackActivity extends Activity implements
 
             // User has stopped watching this content so track it with analytics.
             AnalyticsHelper.trackPlaybackFinished(mSelectedContent, mStartingPlaybackPosition,
-                                                  getCurrentPosition());
+                    getCurrentPosition());
 
             // Since the user is done watching this content, send recommendations for related
             // content of the selected content (if any exist) before changing to the next content.
             if (mSelectedContent.getRecommendations().size() > 0) {
                 ContentBrowser.getInstance(this).getRecommendationManager()
-                              .executeRelatedRecommendationsTask(getApplicationContext(),
-                                                                 mSelectedContent);
+                        .executeRelatedRecommendationsTask(getApplicationContext(),
+                                mSelectedContent);
             }
 
             mIsContentChangeRequested = true;
@@ -911,7 +915,7 @@ public class PlaybackActivity extends Activity implements
             if (database.recordExists(getApplicationContext(), mSelectedContent.getId())) {
 
                 RecentRecord record = database.getRecord(getApplicationContext(),
-                                                         mSelectedContent.getId());
+                        mSelectedContent.getId());
                 // Set the playback position to the stored position if a recent position
                 // exists for this content and playback is not complete.
                 if (record != null && !record.isPlaybackComplete()) {
@@ -942,10 +946,10 @@ public class PlaybackActivity extends Activity implements
         // Dismiss the recommendation notification for this content if the content is finished.
         if (isFinished && recommendationDatabaseHelper != null) {
             if (recommendationDatabaseHelper.recordExists(getApplicationContext(),
-                                                          mSelectedContent.getId())) {
+                    mSelectedContent.getId())) {
 
                 ContentBrowser.getInstance(this).getRecommendationManager()
-                              .dismissRecommendation(mSelectedContent.getId());
+                        .dismissRecommendation(mSelectedContent.getId());
                 AnalyticsHelper.trackDismissRecommendationForCompleteContent(mSelectedContent);
             }
         }
@@ -955,9 +959,9 @@ public class PlaybackActivity extends Activity implements
         if (recentDatabaseHelper != null && !isContentLive(mSelectedContent)) {
 
             recentDatabaseHelper.addRecord(getApplicationContext(), mSelectedContent.getId(),
-                                           mPlayer.getCurrentPosition(), isFinished,
-                                           DateAndTimeHelper.getCurrentDate().getTime(),
-                                           mPlayer.getDuration());
+                    mPlayer.getCurrentPosition(), isFinished,
+                    DateAndTimeHelper.getCurrentDate().getTime(),
+                    mPlayer.getDuration());
         }
         else {
             Log.e(TAG, "Cannot update recent content playback state. Database is null");
@@ -1002,7 +1006,13 @@ public class PlaybackActivity extends Activity implements
 
         // The CC button has been pushed so now we don't want to use global settings for CC state.
         mCaptioningHelper.setUseGlobalSetting(false);
-        modifyClosedCaptionState(state);
+        /* Zype, Evgeny Cherkasov */
+        if (state) {
+            showClosedCaptionDialog();
+        }
+        else {
+            modifyClosedCaptionState(state);
+        }
     }
 
     /**
@@ -1016,13 +1026,26 @@ public class PlaybackActivity extends Activity implements
             if (isClosedCaptionAvailable()) {
 
                 // Enable CC. Prioritizing CLOSED_CAPTION before SUBTITLE if enabled
-                if (ContentBrowser.getInstance(this).isEnableCEA608() &&
-                        mPlayer.getTrackCount(TrackType.CLOSED_CAPTION) > 0) {
-                    mPlayer.enableTextTrack(TrackType.CLOSED_CAPTION, state);
+//                if (ContentBrowser.getInstance(this).isEnableCEA608() &&
+//                        mPlayer.getTrackCount(TrackType.CLOSED_CAPTION) > 0) {
+//                    mPlayer.enableTextTrack(TrackType.CLOSED_CAPTION, state);
+//                }
+//                else {
+//                    mPlayer.enableTextTrack(TrackType.SUBTITLE, state);
+//                }
+                /* Zype, Evgeny Cherkasov */
+                int ccTrackIndex = -1;
+                if (state) {
+                    ccTrackIndex = getClosedCaptionsTrackIndex(ccTrack);
+                }
+                TrackType type;
+                if (ContentBrowser.getInstance(this).isEnableCEA608()) {
+                    type = TrackType.CLOSED_CAPTION;
                 }
                 else {
-                    mPlayer.enableTextTrack(TrackType.SUBTITLE, state);
+                    type = TrackType.SUBTITLE;
                 }
+                mPlayer.setSelectedTrack(type, ccTrackIndex);
 
                 // Update internal state.
                 mIsClosedCaptionEnabled = state;
@@ -1226,7 +1249,7 @@ public class PlaybackActivity extends Activity implements
                     playbackOverlayFragment.fastForward();
                 }
                 AnalyticsHelper.trackPlaybackControlAction(AnalyticsTags.ACTION_PLAYBACK_CONTROL_FF,
-                                                           mSelectedContent, getCurrentPosition());
+                        mSelectedContent, getCurrentPosition());
                 return true;
             case KeyEvent.KEYCODE_MEDIA_REWIND:
                 if (mIsLongPress) {
@@ -1247,7 +1270,7 @@ public class PlaybackActivity extends Activity implements
                     playbackOverlayFragment.fastForward();
                 }
                 AnalyticsHelper.trackPlaybackControlAction(AnalyticsTags.ACTION_PLAYBACK_CONTROL_FF,
-                                                           mSelectedContent, getCurrentPosition());
+                        mSelectedContent, getCurrentPosition());
                 return true;
             case KeyEvent.KEYCODE_BUTTON_L1:
                 if (mIsLongPress) {
@@ -1317,8 +1340,8 @@ public class PlaybackActivity extends Activity implements
             // Get default Ads implementation without creating a new one.
             try {
                 mAdsImplementation = (IAds) ModuleManager.getInstance()
-                                                         .getModule(IAds.class.getSimpleName())
-                                                         .getImpl(false);
+                        .getModule(IAds.class.getSimpleName())
+                        .getImpl(false);
                 playerExtras.putBundle("ads", mAdsImplementation.getExtra());
             }
             catch (Exception e) {
@@ -1328,8 +1351,8 @@ public class PlaybackActivity extends Activity implements
             // Create a player interface by using the default hooked implementation.
             String playerInterfaceName = UAMP.class.getSimpleName();
             mPlayer = (UAMP) ModuleManager.getInstance()
-                                          .getModule(playerInterfaceName)
-                                          .createImpl();
+                    .getModule(playerInterfaceName)
+                    .createImpl();
 
             // Init player interface, this is where it is fully created.
             mPlayer.init(this, mVideoView, playerExtras);
@@ -1370,13 +1393,13 @@ public class PlaybackActivity extends Activity implements
         com.google.android.exoplayer.text.Cue aCue;
         for (com.amazon.mediaplayer.playback.text.Cue cue : cues) {
             aCue = new com.google.android.exoplayer.text.Cue(cue.text,
-                                                             cue.textAlignment,
-                                                             cue.line,
-                                                             cue.lineType,
-                                                             cue.lineAnchor,
-                                                             cue.position,
-                                                             cue.positionAnchor,
-                                                             cue.size);
+                    cue.textAlignment,
+                    cue.line,
+                    cue.lineType,
+                    cue.lineAnchor,
+                    cue.position,
+                    cue.positionAnchor,
+                    cue.size);
             convertedCues.add(aCue);
         }
         mSubtitleLayout.setCues(convertedCues);
@@ -1438,13 +1461,13 @@ public class PlaybackActivity extends Activity implements
                 mPlayer.pause();
                 mCurrentPlaybackPosition = getCurrentPosition();
                 AnalyticsHelper.trackPlaybackFinished(mSelectedContent, mStartingPlaybackPosition,
-                                                      mCurrentPlaybackPosition);
+                        mCurrentPlaybackPosition);
                 mStartingPlaybackPosition = mCurrentPlaybackPosition;
             }
 
             hideProgress();
             AnalyticsHelper.trackAdStarted(mSelectedContent, getCurrentPosition(),
-                                           getAdAnalyticsData(extras));
+                    getAdAnalyticsData(extras));
             switchToAdsView();
             disableMediaSession();
         }
@@ -1466,7 +1489,7 @@ public class PlaybackActivity extends Activity implements
             }
 
             AnalyticsHelper.trackAdEnded(mSelectedContent, getCurrentPosition(),
-                                         getAdAnalyticsData(extras));
+                    getAdAnalyticsData(extras));
 
             String adType = null;
             if (extras != null) {
@@ -1847,7 +1870,7 @@ public class PlaybackActivity extends Activity implements
         // If buffering stopped
         if (mPrevState == PlayerState.BUFFERING && mCurrentState != PlayerState.BUFFERING) {
             AnalyticsHelper.trackPlaybackControlAction(AnalyticsTags.ACTION_PLAYBACK_BUFFER_END,
-                                                       mSelectedContent, getCurrentPosition());
+                    mSelectedContent, getCurrentPosition());
             /* Zype, Evgeny Cherkasov */
             // Akamai analytics
             akamaiPlugin.handleBufferEnd();
@@ -1865,7 +1888,7 @@ public class PlaybackActivity extends Activity implements
                 }
                 if (mMediaSessionController != null) {
                     mMediaSessionController.updatePlaybackState(PlaybackState.STATE_NONE,
-                                                                getCurrentPosition());
+                            getCurrentPosition());
                 }
                 break;
             case OPENING:
@@ -1895,6 +1918,8 @@ public class PlaybackActivity extends Activity implements
                 if (mPrevState == PlayerState.PREPARING) {
                     if (mPlaybackOverlayFragment != null) {
                         // Remember CC state for playbacks.
+                        /* Zype, Evgeny Cherkasov */
+                        ccTrack = Preferences.getString(PreferencesConstants.SELECTED_CLOSED_CAPTIONS_TRACK);
                         modifyClosedCaptionState(mIsClosedCaptionEnabled);
 
                         mPlaybackOverlayFragment.updatePlayback();
@@ -1926,14 +1951,14 @@ public class PlaybackActivity extends Activity implements
                     // duration isn't set yet.
                     if (!isContentDurationSetInAds()) {
                         mAdsImplementation.getExtra().putBundle(IAds.VIDEO_EXTRAS,
-                                                                getVideoExtrasBundle
-                                                                        (mSelectedContent));
+                                getVideoExtrasBundle
+                                        (mSelectedContent));
                     }
                     mAdsImplementation.setPlayerState(IAds.PlayerState.PAUSED);
                 }
                 if (mMediaSessionController != null) {
                     mMediaSessionController.updatePlaybackState(PlaybackState.STATE_PAUSED,
-                                                                getCurrentPosition());
+                            getCurrentPosition());
                 }
                 /* Zype, Evgeny Cherkasov */
                 // Akamai analytics
@@ -1961,8 +1986,8 @@ public class PlaybackActivity extends Activity implements
                     // duration isn't set yet.
                     if (!isContentDurationSetInAds()) {
                         mAdsImplementation.getExtra().putBundle(IAds.VIDEO_EXTRAS,
-                                                                getVideoExtrasBundle
-                                                                        (mSelectedContent));
+                                getVideoExtrasBundle
+                                        (mSelectedContent));
                     }
                     mAdsImplementation.setPlayerState(IAds.PlayerState.PLAYING);
                 }
@@ -1976,11 +2001,11 @@ public class PlaybackActivity extends Activity implements
                 }
                 if (mMediaSessionController != null) {
                     mMediaSessionController.updatePlaybackState(PlaybackState.STATE_PLAYING,
-                                                                getCurrentPosition());
+                            getCurrentPosition());
                 }
                 AnalyticsHelper.trackPlaybackStarted(mSelectedContent, getDuration(),
-                                                     mCurrentPlaybackPosition,
-                                                     mTotalSegments, currentSegment);
+                        mCurrentPlaybackPosition,
+                        mTotalSegments, currentSegment);
                 /* Zype, Evgeny Cherkasov */
                 // Akamai analytics
                 akamaiPlugin.handlePlay();
@@ -1989,11 +2014,11 @@ public class PlaybackActivity extends Activity implements
                 showProgress();
                 if (mMediaSessionController != null) {
                     mMediaSessionController.updatePlaybackState(PlaybackState.STATE_BUFFERING,
-                                                                getCurrentPosition());
+                            getCurrentPosition());
                 }
                 AnalyticsHelper.trackPlaybackControlAction(AnalyticsTags
-                                                                   .ACTION_PLAYBACK_BUFFER_START,
-                                                           mSelectedContent, getCurrentPosition());
+                                .ACTION_PLAYBACK_BUFFER_START,
+                        mSelectedContent, getCurrentPosition());
                 /* Zype, Evgeny Cherkasov */
                 // Akamai analytics
                 akamaiPlugin.handleBufferStart();
@@ -2016,7 +2041,7 @@ public class PlaybackActivity extends Activity implements
                 }
                 if (mMediaSessionController != null) {
                     mMediaSessionController.updatePlaybackState(PlaybackState.STATE_STOPPED,
-                                                                getCurrentPosition());
+                            getCurrentPosition());
                 }
                 /* Zype, Evgeny Cherkasov */
                 // Akamai analytics
@@ -2032,7 +2057,7 @@ public class PlaybackActivity extends Activity implements
                 mWindow.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 if (mMediaSessionController != null) {
                     mMediaSessionController.updatePlaybackState(PlaybackState.STATE_ERROR,
-                                                                getCurrentPosition());
+                            getCurrentPosition());
                 }
                 Log.e(TAG, "Player encountered an error!");
                 /* Zype, Evgeny Cherkasov */
@@ -2216,7 +2241,7 @@ public class PlaybackActivity extends Activity implements
         else if (ContentBrowser.getInstance(this).isEnableCEA608() &&
                 mPlayer.getTrackCount(TrackType.CLOSED_CAPTION) > 0) {
             Log.d(TAG, "Closed Caption Tracks Available: " + mPlayer.getTrackCount(TrackType
-                                                                                           .CLOSED_CAPTION));
+                    .CLOSED_CAPTION));
             return true;
         }
         else {
@@ -2330,54 +2355,58 @@ public class PlaybackActivity extends Activity implements
         return mSelectedContent.getExtraValueAsString(Content.EXTRA_ANALYTICS_BEACON);
     }
 
-//    private void initAdsExtras() {
-//        Bundle extras = mAdsImplementation.getExtra();
-//        int adNumber = -1;
-//        boolean isMidroll = false;
-//        if (mSelectedContent.getAdCuePoints() != null && !mSelectedContent.getAdCuePoints().isEmpty()) {
-//            if (mCurrentPlaybackPosition == 0) {
-//                adNumber = 0;
-//                if (mSelectedContent.getAdCuePoints().get(0) != 0) {
-//                    isMidroll = true;
-//                }
-//            }
-//            else {
-//                for (int i = 0; i < mSelectedContent.getAdCuePoints().size(); i++) {
-//                    if (mSelectedContent.getAdCuePoints().get(i) >= mCurrentPlaybackPosition) {
-//                        adNumber = i;
-//                        isMidroll = true;
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//        extras.putInt(IAds.AD_NUMBER, adNumber);
-//        extras.putBoolean(IAds.WAS_A_MID_ROLL, isMidroll);
-//        if (adNumber != -1) {
-//            String adTag = AdMacrosHelper.updateAdTagParameters(this, (String) mSelectedContent.getExtraValueAsList(Content.EXTRA_AD_TAGS).get(adNumber));
-//            extras.putString("VASTAdTag", adTag);
-//        }
-//        else {
-//            extras.putString("VASTAdTag", null);
-//        }
-//    }
-//
-//    private void showMidRollAd() {
-//        // Pause the video if we are already playing a content.
-//        if (mPlayer != null && isPlaying()) {
-//            mPlayer.pause();
-//        }
-//        // Hide videoView which make adsView visible.
-//        switchToAdsView();
-//        // Hide media controller.
-//        if (mPlaybackOverlayFragment != null && mPlaybackOverlayFragment.getView() != null) {
-//            mPlaybackOverlayFragment.getView().setVisibility(View.INVISIBLE);
-//        }
-//        // Show progress before mid roll ad.
-//        showProgress();
-//
-//        mAdsImplementation.init(PlaybackActivity.this, mAdsView, mAdsImplementation.getExtra());
-//        mAdsImplementation.showAds();
-//    }
+    private int getClosedCaptionsTrackIndex(String track) {
+        int result = -1;
+        if (mPlayer != null) {
+            TrackType type;
+            if (ContentBrowser.getInstance(this).isEnableCEA608()) {
+                type = TrackType.CLOSED_CAPTION;
+            }
+            else {
+                type = TrackType.SUBTITLE;
+            }
+            for (int i = 0; i < mPlayer.getTrackCount(type); i++) {
+                MediaFormat mediaFormat = mPlayer.getTrackFormat(type, i);
+                if (track.equalsIgnoreCase(mediaFormat.mTrackId)) {
+                    result = i;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
 
+    private void showClosedCaptionDialog() {
+        if (mPlayer == null) {
+            return;
+        }
+        // Get CC tracks
+        TrackType type;
+        if (ContentBrowser.getInstance(this).isEnableCEA608()) {
+            type = TrackType.CLOSED_CAPTION;
+        }
+        else {
+            type = TrackType.SUBTITLE;
+        }
+        List<CharSequence> tracks = new ArrayList<>();
+        for (int i = 0; i < mPlayer.getTrackCount(type); i++) {
+            MediaFormat mediaFormat = mPlayer.getTrackFormat(type, i);
+            tracks.add(mediaFormat.mTrackId);
+        }
+
+        // Show selection dialog
+        SubtitlesDialogFragment.createAndShowSubtitlesDialogFragment(this,
+                "Select track",
+                tracks.toArray(new CharSequence[tracks.size()]),
+                getClosedCaptionsTrackIndex(Preferences.getString(PreferencesConstants.SELECTED_CLOSED_CAPTIONS_TRACK)),
+                new SubtitlesDialogFragment.ISubtitlesDialogListener() {
+                    @Override
+                    public void onItemSelected(SubtitlesDialogFragment dialog, int selectedItem) {
+                        dialog.dismiss();
+                        ccTrack = tracks.get(selectedItem).toString();
+                        Preferences.setString(PreferencesConstants.SELECTED_CLOSED_CAPTIONS_TRACK, ccTrack);
+                        modifyClosedCaptionState(true);
+                    }
+                });
+    }
 }

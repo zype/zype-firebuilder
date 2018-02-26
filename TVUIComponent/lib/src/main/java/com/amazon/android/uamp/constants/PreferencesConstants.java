@@ -24,4 +24,6 @@ public class PreferencesConstants {
      */
     public static final String IS_CLOSE_CAPTION_FLAG_PERSISTED = "Is_Close_Caption_Flag_Persisted";
 
+    /* Zype, Evgeny Cherkasov */
+    public static final String SELECTED_CLOSED_CAPTIONS_TRACK = "SelectedClosedCaptionsTrack";
 }
