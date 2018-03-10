@@ -492,6 +492,16 @@ public class AnalyticsTags {
     public static final String ATTRIBUTE_AUTHORIZATION_FAILURE_REASON =
             "ATTRIBUTE_AUTHORIZATION_FAILURE_REASON";
 
+    /* Zype */
+    public static final String ATTRIBUTE_CONTENT_ANALYTICS_BEACON = "ATTRIBUTE_CONTENT_ANALYTICS_BEACON";
+    public static final String ATTRIBUTE_CONTENT_ANALYTICS_CONSUMER_ID = "ATTRIBUTE_CONTENT_ANALYTICS_CONSUMER_ID";
+    public static final String ATTRIBUTE_CONTENT_ANALYTICS_DEVICE = "ATTRIBUTE_CONTENT_ANALYTICS_DEVICE";
+    public static final String ATTRIBUTE_CONTENT_ANALYTICS_PLAYER_ID = "ATTRIBUTE_CONTENT_ANALYTICS_PLAYER_ID";
+    public static final String ATTRIBUTE_CONTENT_ANALYTICS_SITE_ID = "ATTRIBUTE_CONTENT_ANALYTICS_SITE_ID";
+    public static final String ATTRIBUTE_CONTENT_ANALYTICS_VIDEO_ID = "ATTRIBUTE_CONTENT_ANALYTICS_VIDEO_ID";
+    public static final String ATTRIBUTE_CONTENT_LIVE = "ATTRIBUTE_CONTENT_LIVE";
+    public static final String ATTRIBUTE_CONTENT_VIDEO_URL = "ATTRIBUTE_CONTENT_VIDEO_URL";
+
     /////////////////////////////////////////////////////////////////////////
     //                  Non-Customizable screen names.                     //
     /////////////////////////////////////////////////////////////////////////

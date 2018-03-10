@@ -307,6 +307,7 @@ public class Content implements Serializable {
      */
     // Analytics
     public static final String EXTRA_ANALYTICS_BEACON = "AnalyticsBeacon";
+    public static final String EXTRA_ANALYTICS_CONSUMER_ID = "AnalyticsConsumerId";
     public static final String EXTRA_ANALYTICS_DEVICE = "AnalyticsDevice";
     public static final String EXTRA_ANALYTICS_PLAYER_ID = "AnalyticsPlayerId";
     public static final String EXTRA_ANALYTICS_SITE_ID = "AnalyticsSiteId";
@@ -330,6 +331,8 @@ public class Content implements Serializable {
     public static final String EXTRA_THUMBNAIL_POSTER_URL = "ThumbnailPosterUrl";
     // Poster thumbnail url
     public static final String EXTRA_VIDEO_FAVORITE_ID = "VideoFavoriteId";
+    // Video player url
+    public static final String EXTRA_VIDEO_URL = "VideoFavoriteId";
 
     /**
      * Creates a {@link Content} with empty values.

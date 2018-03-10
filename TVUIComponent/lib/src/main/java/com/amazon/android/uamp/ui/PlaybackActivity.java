@@ -225,7 +225,7 @@ public class PlaybackActivity extends Activity implements
 
     /* Zype, Evgeny Cherkasov */
     // Akamai analytics
-    AnalyticsPlugin akamaiPlugin;
+//    AnalyticsPlugin akamaiPlugin;
 
     // Closed captions
     private String ccTrack = "";
@@ -619,9 +619,9 @@ public class PlaybackActivity extends Activity implements
 
         /* Zype, Evgeny Cherkasov */
         // Akamai analytics
-        if (akamaiPlugin != null) {
-            akamaiPlugin.handleEnterBackground();
-        }
+//        if (akamaiPlugin != null) {
+//            akamaiPlugin.handleEnterBackground();
+//        }
     }
 
     /**
@@ -1753,7 +1753,7 @@ public class PlaybackActivity extends Activity implements
                 }
 
                 //Alamai analytics
-                setupAkamai();
+//                setupAkamai();
 
                 showAds();
             }
@@ -1764,78 +1764,6 @@ public class PlaybackActivity extends Activity implements
                 showAds();
             }
         });
-
-//        /* Zype, Evgeny Cherkasov */
-//        // Before playing video load player data from Zype API and update content object with
-//        // player url and ad tags
-//        String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
-//        HashMap<String, String> params = new HashMap<>();
-//        if (!TextUtils.isEmpty(accessToken)) {
-//            params.put(ZypeApi.ACCESS_TOKEN, accessToken);
-//        }
-//        else {
-//            params.put(ZypeApi.APP_KEY, ZypeSettings.APP_KEY);
-//        }
-//        String uuid = AdMacrosHelper.getAdvertisingId(this);
-//        if (!TextUtils.isEmpty(uuid)) {
-//            params.put(ZypeApi.UUID, uuid);
-//        }
-//        ZypeApi.getInstance().getApi().getPlayer(IZypeApi.HEADER_USER_AGENT, mSelectedContent.getId(), params).enqueue(new Callback<PlayerResponse>() {
-//            @Override
-//            public void onResponse(Call<PlayerResponse> call, Response<PlayerResponse> response) {
-//                if (response.isSuccessful()) {
-//                    if (!response.body().playerData.body.files.isEmpty()) {
-//                        updateContentWithPlayerData(mSelectedContent, response.body().playerData);
-//                    }
-//                    else {
-//                        updateContentWithPlayerData(mSelectedContent, null);
-//                    }
-//                }
-//                else {
-//                    updateContentWithPlayerData(mSelectedContent, null);
-//                    if (response.code() == 403) {
-//                        String errorMessage = null;
-//                        ErrorBody errorBody = ErrorHelper.parseError(response);
-//                        if (errorBody != null) {
-//                            errorMessage = errorBody.message;
-//                        }
-//                        mErrorDialogFragment = ErrorDialogFragment.newInstance(PlaybackActivity.this,
-//                                ErrorUtils.ERROR_CATEGORY.ZYPE_CUSTOM, errorMessage, PlaybackActivity.this);
-//                        mErrorDialogFragment.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
-//                        return;
-//                    }
-//                }
-//                if (mSelectedContent.getAdCuePoints() != null) {
-//                    Log.d(TAG, "openSelectedContent(): Ad tags count = " + mSelectedContent.getAdCuePoints().size());
-//                }
-//                else {
-//                    Log.d(TAG, "openSelectedContent(): No ad tags");
-//                }
-//                // We need current playback position here to determine ad number to play
-//                loadContentPlaybackState();
-//                // Update ad parameters
-//                initAdsExtras();
-//                if (mAdsImplementation.getExtra().getInt(IAds.AD_NUMBER) == 0
-//                        && mSelectedContent.getAdCuePoints().get(0) == 0) {
-//                    mAdsImplementation.init(PlaybackActivity.this, mAdsView, mAdsImplementation.getExtra());
-//                    mAdsImplementation.showAds();
-//                }
-//                else {
-//                    // Show video View.
-//                    mAdsImplementation.showAds();
-////                    switchToVideoView();
-////                    openContentHelper(mSelectedContent);
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<PlayerResponse> call, Throwable t) {
-//                updateContentWithPlayerData(mSelectedContent, null);
-//                mAdsImplementation.showAds();
-//            }
-//        });
-//        // Show pre roll ad.
-//        mAdsImplementation.showPreRollAd();
     }
 
     private void releasePlayer() {
@@ -1873,12 +1801,12 @@ public class PlaybackActivity extends Activity implements
                     mSelectedContent, getCurrentPosition());
             /* Zype, Evgeny Cherkasov */
             // Akamai analytics
-            akamaiPlugin.handleBufferEnd();
+//            akamaiPlugin.handleBufferEnd();
         }
         /* Zype, Evgeny Cherkasov */
         // Akamai analytics
         if (mPrevState == PlayerState.SEEKING && mCurrentState != PlayerState.SEEKING) {
-            akamaiPlugin.handleSeekEnd(getCurrentPosition());
+//            akamaiPlugin.handleSeekEnd(getCurrentPosition());
         }
         switch (newState) {
             case IDLE:
@@ -1962,7 +1890,7 @@ public class PlaybackActivity extends Activity implements
                 }
                 /* Zype, Evgeny Cherkasov */
                 // Akamai analytics
-                akamaiPlugin.handlePause();
+//                akamaiPlugin.handlePause();
                 break;
             case PLAYING:
                 mPlaybackState = LeanbackPlaybackState.PLAYING;
@@ -2008,7 +1936,7 @@ public class PlaybackActivity extends Activity implements
                         mTotalSegments, currentSegment);
                 /* Zype, Evgeny Cherkasov */
                 // Akamai analytics
-                akamaiPlugin.handlePlay();
+//                akamaiPlugin.handlePlay();
                 break;
             case BUFFERING:
                 showProgress();
@@ -2021,13 +1949,13 @@ public class PlaybackActivity extends Activity implements
                         mSelectedContent, getCurrentPosition());
                 /* Zype, Evgeny Cherkasov */
                 // Akamai analytics
-                akamaiPlugin.handleBufferStart();
+//                akamaiPlugin.handleBufferStart();
                 break;
             case SEEKING:
                 showProgress();
                 /* Zype, Evgeny Cherkasov */
                 // Akamai analytics
-                akamaiPlugin.handleSeekStart(getCurrentPosition());
+//                akamaiPlugin.handleSeekStart(getCurrentPosition());
                 break;
             case ENDED:
                 hideProgress();
@@ -2045,7 +1973,7 @@ public class PlaybackActivity extends Activity implements
                 }
                 /* Zype, Evgeny Cherkasov */
                 // Akamai analytics
-                akamaiPlugin.handlePlayEnd(EndReasonCodes.Play_End_Detected.toString());
+//                akamaiPlugin.handlePlayEnd(EndReasonCodes.Play_End_Detected.toString());
                 break;
             case CLOSING:
                 if (mPlaybackOverlayFragment != null) {
@@ -2062,7 +1990,7 @@ public class PlaybackActivity extends Activity implements
                 Log.e(TAG, "Player encountered an error!");
                 /* Zype, Evgeny Cherkasov */
                 // Akamai analytics
-                akamaiPlugin.handleError("");
+//                akamaiPlugin.handleError("");
                 break;
             default:
                 Log.e(TAG, "Unknown state!!!!!");
@@ -2252,7 +2180,10 @@ public class PlaybackActivity extends Activity implements
     /* Zype, Evgeny Cherkasov */
     private Content updateContentWithPlayerData(Content content, PlayerData playerData) {
         if (playerData != null) {
+            // Url
             content.setUrl(playerData.body.files.get(0).url);
+            content.setExtraValue(Content.EXTRA_VIDEO_URL, content.getUrl());
+            // Ads
             if (playerData.body.advertising != null && playerData.body.advertising.schedule.size() > 0) {
                 content.setAdCuePoints(new ArrayList<>());
                 List<String> adTags = new ArrayList<>();
@@ -2266,9 +2197,13 @@ public class PlaybackActivity extends Activity implements
                 content.setAdCuePoints(null);
                 content.setExtraValue(Content.EXTRA_AD_TAGS, null);
             }
+            // Analytics
             if (playerData.body.analytics != null) {
                 content.setExtraValue(Content.EXTRA_ANALYTICS_BEACON, playerData.body.analytics.beacon);
                 if (playerData.body.analytics.dimensions != null) {
+                    if (ContentBrowser.getInstance(this).isUserLoggedIn()) {
+                        content.setExtraValue(Content.EXTRA_ANALYTICS_CONSUMER_ID,Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_ID));
+                    }
                     content.setExtraValue(Content.EXTRA_ANALYTICS_DEVICE, playerData.body.analytics.dimensions.device);
                     content.setExtraValue(Content.EXTRA_ANALYTICS_PLAYER_ID, playerData.body.analytics.dimensions.playerId);
                     content.setExtraValue(Content.EXTRA_ANALYTICS_SITE_ID, playerData.body.analytics.dimensions.siteId);
@@ -2278,9 +2213,11 @@ public class PlaybackActivity extends Activity implements
         }
         else {
             content.setUrl("null");
+            content.setExtraValue(Content.EXTRA_VIDEO_URL, "null");
             content.setAdCuePoints(null);
             content.setExtraValue(Content.EXTRA_AD_TAGS, null);
             content.setExtraValue(Content.EXTRA_ANALYTICS_BEACON, null);
+            content.setExtraValue(Content.EXTRA_ANALYTICS_CONSUMER_ID, null);
             content.setExtraValue(Content.EXTRA_ANALYTICS_DEVICE, null);
             content.setExtraValue(Content.EXTRA_ANALYTICS_PLAYER_ID, null);
             content.setExtraValue(Content.EXTRA_ANALYTICS_SITE_ID, null);
@@ -2289,71 +2226,71 @@ public class PlaybackActivity extends Activity implements
         return content;
     }
 
-    private void setupAkamai() {
-        akamaiPlugin = new AnalyticsPlugin(getApplicationContext(), getAkamaiConfigUrl());
-        if (ContentBrowser.getInstance(this).isUserLoggedIn()) {
-            AnalyticsPlugin.setViewerId(Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_ID));
-        }
-        akamaiPlugin.handleSessionInit(new PluginCallBacks() {
-            @Override
-            public float streamHeadPosition() {
-                return getCurrentPosition();
-            }
+//    private void setupAkamai() {
+//        akamaiPlugin = new AnalyticsPlugin(getApplicationContext(), getAkamaiConfigUrl());
+//        if (ContentBrowser.getInstance(this).isUserLoggedIn()) {
+//            AnalyticsPlugin.setViewerId(Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_ID));
+//        }
+//        akamaiPlugin.handleSessionInit(new PluginCallBacks() {
+//            @Override
+//            public float streamHeadPosition() {
+//                return getCurrentPosition();
+//            }
+//
+//            @Override
+//            public float streamLength() {
+//                return mPlayer.getDuration();
+//            }
+//
+//            @Override
+//            public float getFps() {
+//                return 0;
+//            }
+//
+//            @Override
+//            public String streamURL() {
+//                return mSelectedContent.getUrl();
+//            }
+//
+//            @Override
+//            public boolean isLive() {
+//                return isContentLive(mSelectedContent);
+//            }
+//
+//            @Override
+//            public String videoSize() {
+//                return mPlayer.getCurrentVideoWidth() + "x" + mPlayer.getCurrentVideoHeight();
+//            }
+//
+//            @Override
+//            public String viewSize() {
+//                return mVideoView.getWidth() + "x" + mVideoView.getHeight();
+//            }
+//
+//            @Override
+//            public long bytesLoaded() {
+//                return 0;
+//            }
+//
+//            @Override
+//            public int droppedFrames() {
+//                return 0;
+//            }
+//
+//            @Override
+//            public boolean isPlaying() {
+//                return PlaybackActivity.this.isPlaying();
+//            }
+//        }, false);
+//        akamaiPlugin.setData("device", mSelectedContent.getExtraValueAsString(Content.EXTRA_ANALYTICS_DEVICE));
+//        akamaiPlugin.setData("playerId", mSelectedContent.getExtraValueAsString(Content.EXTRA_ANALYTICS_PLAYER_ID));
+//        akamaiPlugin.setData("siteId", mSelectedContent.getExtraValueAsString(Content.EXTRA_ANALYTICS_SITE_ID));
+//        akamaiPlugin.setData("videoId", mSelectedContent.getExtraValueAsString(Content.EXTRA_ANALYTICS_VIDEO_ID));
+//    }
 
-            @Override
-            public float streamLength() {
-                return mPlayer.getDuration();
-            }
-
-            @Override
-            public float getFps() {
-                return 0;
-            }
-
-            @Override
-            public String streamURL() {
-                return mSelectedContent.getUrl();
-            }
-
-            @Override
-            public boolean isLive() {
-                return isContentLive(mSelectedContent);
-            }
-
-            @Override
-            public String videoSize() {
-                return mPlayer.getCurrentVideoWidth() + "x" + mPlayer.getCurrentVideoHeight();
-            }
-
-            @Override
-            public String viewSize() {
-                return mVideoView.getWidth() + "x" + mVideoView.getHeight();
-            }
-
-            @Override
-            public long bytesLoaded() {
-                return 0;
-            }
-
-            @Override
-            public int droppedFrames() {
-                return 0;
-            }
-
-            @Override
-            public boolean isPlaying() {
-                return PlaybackActivity.this.isPlaying();
-            }
-        }, false);
-        akamaiPlugin.setData("device", mSelectedContent.getExtraValueAsString(Content.EXTRA_ANALYTICS_DEVICE));
-        akamaiPlugin.setData("playerId", mSelectedContent.getExtraValueAsString(Content.EXTRA_ANALYTICS_PLAYER_ID));
-        akamaiPlugin.setData("siteId", mSelectedContent.getExtraValueAsString(Content.EXTRA_ANALYTICS_SITE_ID));
-        akamaiPlugin.setData("videoId", mSelectedContent.getExtraValueAsString(Content.EXTRA_ANALYTICS_VIDEO_ID));
-    }
-
-    private String getAkamaiConfigUrl() {
-        return mSelectedContent.getExtraValueAsString(Content.EXTRA_ANALYTICS_BEACON);
-    }
+//    private String getAkamaiConfigUrl() {
+//        return mSelectedContent.getExtraValueAsString(Content.EXTRA_ANALYTICS_BEACON);
+//    }
 
     private int getClosedCaptionsTrackIndex(String track) {
         int result = -1;
