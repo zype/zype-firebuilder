@@ -27,6 +27,7 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
@@ -71,6 +72,9 @@ public interface IZypeApi {
 
     @POST("/pin/acquire")
     Call<DevicePinResponse> createDevicePin(@QueryMap HashMap<String, String> queryParams);
+
+    @PUT("pin/unlink")
+    Call<ConsumerResponse> unlinkDevicePin(@QueryMap HashMap<String, String> queryParams);
 
     // Video entitlements
     @GET("/videos/{video_id}/entitled")

@@ -18,6 +18,7 @@ public class ZypeSettings {
     public static final String MY_LIBRARY_PLAYLIST_ID = "MyLibrary";
 
     // Template version
+    public static final boolean DEVICE_LINKING = Boolean.valueOf("<DEVICE_LINKING>");;
     public static final String TEMPLATE_VERSION = "1.5.0";
 
     // App features

@@ -38,6 +38,7 @@ public class ZypeApi {
     private static final String CLIENT_ID = "client_id";
     private static final String CLIENT_SECRET = "client_secret";
     public static final String CONSUMER_EMAIL = "consumer[email]";
+    public static final String CONSUMER_ID = "consumer_id";
     public static final String CONSUMER_PASSWORD = "consumer[password]";
     private static final String LINKED_DEVICE_ID = "linked_device_id";
     private static final String PAGE = "page";
@@ -221,6 +222,26 @@ public class ZypeApi {
             Response response = apiImpl.createDevicePin(params).execute();
             if (response.isSuccessful()) {
                 return (DevicePinResponse) response.body();
+            }
+            else {
+                return null;
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public ConsumerResponse unlinkDevicePin(String consumerId, String pin) {
+        try {
+            HashMap<String, String> params = new HashMap<>();
+            params.put(APP_KEY, ZypeSettings.APP_KEY);
+            params.put(CONSUMER_ID, consumerId);
+            params.put(PIN, pin);
+            Response response = apiImpl.unlinkDevicePin(params).execute();
+            if (response.isSuccessful()) {
+                return (ConsumerResponse) response.body();
             }
             else {
                 return null;

@@ -145,6 +145,7 @@ public class ZypeAuthentication implements IAuthentication {
         Preferences.setString(ZypeAuthentication.PREFERENCE_RESOURCE_OWNER_ID, "");
         Preferences.setLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT, 0);
         Preferences.setString(ZypeAuthentication.PREFERENCE_CONSUMER_ID, null);
+        Preferences.setBoolean(ZypeAuthentication.PREFERENCE_IS_DEVICE_LINKED, false);
         responseHandler.onSuccess(new Bundle());
     }
 
