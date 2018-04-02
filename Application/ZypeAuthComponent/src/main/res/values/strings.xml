@@ -2,6 +2,12 @@
     <string name="app_name">ZypeAuthComponent</string>
 
     <string name="zype_login_button">Sign in</string>
+    <string name="zype_login_button_device_linked">Continue</string>
+    <string name="zype_login_button_email">Sign in with Emaiil</string>
+    <string name="zype_login_button_link_device">Link Device</string>
+    <string name="zype_login_device_linking_url">From your computer or mobile device visit:</string>
+    <string name="zype_login_pin">Enter Pin:</string>
+    <string name="zype_login_select_method_header">Have an account?</string>
     <string name="zype_login_username">Email</string>
     <string name="zype_login_password">Password</string>
     <string name="login_description1">Enter your email and password to sign in. If you have any issues signing in please contact customer support.</string>

@@ -1489,9 +1489,6 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                             if (result) {
                                 setLastSelectedContentContainer(contentContainer);
                                 switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
-//                                if (!isFavoritesLoaded()) {
-//                                    loadFavoritesVideos(contentContainer);
-//                                }
                             }
                             else {
                                 // TODO: Switch to Favorites screen after successful login
@@ -1503,9 +1500,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             else {
                 setLastSelectedContentContainer(contentContainer);
                 switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
-//                if (!isFavoritesLoaded()) {
-                    loadLocalFavoritesVideos(contentContainer);
-//                }
+                loadLocalFavoritesVideos(contentContainer);
             }
         }
     }
@@ -2010,7 +2005,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             }
             else {
                 /* Zype, Evgeny Cherkasov */
-                // Never show login later alert
+                // Don't show login later alert
                 //boolean loginLater = Preferences.getBoolean(AuthHelper.LOGIN_LATER_PREFERENCES_KEY);
                 boolean loginLater = true;
                 if (!loginLater && mAuthHelper.getIAuthentication()

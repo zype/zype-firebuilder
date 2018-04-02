@@ -5,6 +5,7 @@ import com.zype.fire.api.Model.AccessTokenResponse;
 import com.zype.fire.api.Model.AppResponse;
 import com.zype.fire.api.Model.BifrostResponse;
 import com.zype.fire.api.Model.ConsumerResponse;
+import com.zype.fire.api.Model.DevicePinResponse;
 import com.zype.fire.api.Model.PlayerResponse;
 import com.zype.fire.api.Model.PlaylistsResponse;
 import com.zype.fire.api.Model.VideoData;
@@ -63,6 +64,13 @@ public interface IZypeApi {
     @POST("/consumers")
     Call<ConsumerResponse> createConsumer(@QueryMap HashMap<String, String> queryParams,
                                           @FieldMap HashMap<String, String> fieldParams);
+
+    // Device linking
+    @GET("/pin/status")
+    Call<DevicePinResponse> getDevicePin(@QueryMap HashMap<String, String> queryParams);
+
+    @POST("/pin/acquire")
+    Call<DevicePinResponse> createDevicePin(@QueryMap HashMap<String, String> queryParams);
 
     // Video entitlements
     @GET("/videos/{video_id}/entitled")

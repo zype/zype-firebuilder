@@ -13,6 +13,8 @@ import com.zype.fire.api.Model.AppData;
  */
 
 public class ZypeConfiguration {
+    private static final String PREFERENCE_DEVICE_LINKING = "ZypeDeviceLinking";
+    private static final String PREFERENCE_DEVICE_LINKING_URL = "ZypeDeviceLinkingUrl";
     private static final String PREFERENCE_FAVORITES_API = "ZypeFavoritesApi";
     private static final String PREFERENCE_NATIVE_SUBSCRIPTION = "ZypeNativeSubscription";
     private static final String PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION = "ZypeNativeToUniversalSubscription";
@@ -30,6 +32,12 @@ public class ZypeConfiguration {
 
         SharedPreferences prefs = getPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
+        if (!TextUtils.isEmpty(appData.deviceLinking)) {
+            editor.putBoolean(PREFERENCE_DEVICE_LINKING, Boolean.valueOf(appData.deviceLinking));
+        }
+        if (!TextUtils.isEmpty(appData.deviceLinkingUrl)) {
+            editor.putString(PREFERENCE_DEVICE_LINKING_URL, appData.deviceLinkingUrl);
+        }
         if (!TextUtils.isEmpty(appData.favoritesViaApi)) {
             editor.putBoolean(PREFERENCE_FAVORITES_API, Boolean.valueOf(appData.favoritesViaApi));
         }
@@ -57,6 +65,7 @@ public class ZypeConfiguration {
     public static void clear(Context context) {
         SharedPreferences prefs = getPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
+        editor.remove(PREFERENCE_DEVICE_LINKING);
         editor.remove(PREFERENCE_FAVORITES_API);
         editor.remove(PREFERENCE_NATIVE_SUBSCRIPTION);
         editor.remove(PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION);
@@ -91,9 +100,12 @@ public class ZypeConfiguration {
         return getStringPreference(PREFERENCE_ROOT_PLAYLIST_ID, ZypeSettings.ROOT_PLAYLIST_ID, context);
     }
 
+    public static boolean isDeviceLinkingEnabled(Context context) {
+        return getBooleanPreference(PREFERENCE_DEVICE_LINKING, ZypeSettings.DEVICE_LINKING, context);
+    }
+
     public static boolean isFavoritesViaApiEnabled(Context context) {
-        return false;
-//        return getBooleanPreference(PREFERENCE_FAVORITES_API, ZypeSettings.FAVORITES_VIA_API, context);
+        return getBooleanPreference(PREFERENCE_FAVORITES_API, ZypeSettings.FAVORITES_VIA_API, context);
     }
 
     public static boolean isNativeSubscriptionEnabled(Context context) {

@@ -34,10 +34,12 @@ public class ZypeAuthentication implements IAuthentication {
     public static final String PREFERENCE_CONSUMER_EMAIL = "ZypeConsumerEmail";
     public static final String PREFERENCE_CONSUMER_ID = "ZypeConsumerId";
     public static final String PREFERENCE_CONSUMER_PASSWORD = "ZypeConsumerPassword";
+    public static final String PREFERENCE_IS_DEVICE_LINKED = "ZypeIsDeviceLinked";
 
     private static final String RESPONSE_ACCESS_TOKEN = "ResponseAccessToken";
     private static final String RESPONSE_ACCESS_TOKEN_INFO = "ResponseAccessTokenInfo";
     private static final String RESPONSE_CONSUMER = "ResponseConsumer";
+    private static final String RESPONSE_IS_DEVICE_LINKED = "ResponseIsDeviceLinked";
 
     /**
      * The access token is used to see if the user is authenticated or not.
@@ -175,6 +177,28 @@ public class ZypeAuthentication implements IAuthentication {
         result.put(RESPONSE_ACCESS_TOKEN, responseAccessToken);
         result.put(RESPONSE_ACCESS_TOKEN_INFO, responseAccessTokenInfo);
         result.put(RESPONSE_CONSUMER, responseConsumer);
+        result.put(RESPONSE_IS_DEVICE_LINKED, false);
+        return result;
+    }
+
+    public static Map<String, Object> getAccessTokenWithPin(String deviceId, String pin) {
+        AccessTokenResponse responseAccessToken = ZypeApi.getInstance().retrieveAccessTokenWithPin(deviceId, pin);
+        AccessTokenInfoResponse responseAccessTokenInfo = null;
+        ConsumerResponse responseConsumer = null;
+        if (responseAccessToken != null) {
+            responseAccessTokenInfo = ZypeApi.getInstance().getAccessTokenInfo(responseAccessToken.getAccessToken());
+            if (responseAccessTokenInfo != null) {
+                responseConsumer = ZypeApi.getInstance().getConsumer(responseAccessTokenInfo.resourceOwnerId, responseAccessToken.getAccessToken());
+            }
+        }
+        else {
+            return null;
+        }
+        Map<String, Object> result = new HashMap<>();
+        result.put(RESPONSE_ACCESS_TOKEN, responseAccessToken);
+        result.put(RESPONSE_ACCESS_TOKEN_INFO, responseAccessTokenInfo);
+        result.put(RESPONSE_CONSUMER, responseConsumer);
+        result.put(RESPONSE_IS_DEVICE_LINKED, true);
         return result;
     }
 
@@ -217,6 +241,7 @@ public class ZypeAuthentication implements IAuthentication {
         result.put(RESPONSE_ACCESS_TOKEN, responseAccessToken);
         result.put(RESPONSE_ACCESS_TOKEN_INFO, responseAccessTokenInfo);
         result.put(RESPONSE_CONSUMER, responseConsumer);
+        result.put(RESPONSE_IS_DEVICE_LINKED, Preferences.getBoolean(PREFERENCE_IS_DEVICE_LINKED));
         return result;
     }
 
@@ -232,13 +257,10 @@ public class ZypeAuthentication implements IAuthentication {
             resourceOwnerId = ((AccessTokenInfoResponse) data.get(RESPONSE_ACCESS_TOKEN_INFO)).resourceOwnerId;
         }
         ConsumerData consumer = null;
-//        int subscriptionCount = 0;
-//        String email = "";
         if (data.get(RESPONSE_CONSUMER) != null) {
             consumer = ((ConsumerResponse) data.get(RESPONSE_CONSUMER)).consumerData;
-//            subscriptionCount = ((ConsumerResponse) data.get(RESPONSE_CONSUMER)).consumerData.subscriptionCount;
-//            email = ((ConsumerResponse) data.get(RESPONSE_CONSUMER)).consumerData.email;
         }
+        boolean isDeviceLinked = (Boolean) data.get(RESPONSE_IS_DEVICE_LINKED);
 
         if (com.amazon.android.module.BuildConfig.DEBUG) {
             Log.d(TAG, "Storing access token: " + accessToken);
@@ -251,5 +273,6 @@ public class ZypeAuthentication implements IAuthentication {
         Preferences.setLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT, consumer.subscriptionCount);
         Preferences.setString(ZypeAuthentication.PREFERENCE_CONSUMER_EMAIL, consumer.email);
         Preferences.setString(ZypeAuthentication.PREFERENCE_CONSUMER_ID, consumer.id);
+        Preferences.setBoolean(ZypeAuthentication.PREFERENCE_IS_DEVICE_LINKED, isDeviceLinked);
     }
 }

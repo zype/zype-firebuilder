@@ -9,6 +9,14 @@ import com.google.gson.annotations.SerializedName;
 
 public class AppData {
 
+//    @SerializedName("device_linking")
+//    @Expose
+    public String deviceLinking;
+
+//    @SerializedName("device_link_url")
+//    @Expose
+    public String deviceLinkingUrl;
+
     @SerializedName("favorites_via_api")
     @Expose
     public String favoritesViaApi;

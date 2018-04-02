@@ -4,11 +4,14 @@ import com.zype.fire.api.Model.AccessTokenInfoResponse;
 import com.zype.fire.api.Model.AccessTokenResponse;
 import com.zype.fire.api.Model.AppResponse;
 import com.zype.fire.api.Model.ConsumerResponse;
+import com.zype.fire.api.Model.DevicePinData;
+import com.zype.fire.api.Model.DevicePinResponse;
 import com.zype.fire.api.Model.PlaylistsResponse;
 import com.zype.fire.api.Model.VideoEntitlementsResponse;
 import com.zype.fire.api.Model.VideoFavoritesResponse;
 import com.zype.fire.api.Model.VideoResponse;
 import com.zype.fire.api.Model.VideosResponse;
+import com.zype.fire.api.Util.AdMacrosHelper;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -36,9 +39,11 @@ public class ZypeApi {
     private static final String CLIENT_SECRET = "client_secret";
     public static final String CONSUMER_EMAIL = "consumer[email]";
     public static final String CONSUMER_PASSWORD = "consumer[password]";
+    private static final String LINKED_DEVICE_ID = "linked_device_id";
     private static final String PAGE = "page";
-    public static final String PER_PAGE = "per_page";
     private static final String PASSWORD = "password";
+    public static final String PER_PAGE = "per_page";
+    private static final String PIN = "pin";
     public static final String QUERY = "q";
     private static final String REFRESH_TOKEN = "refresh_token";
 
@@ -87,10 +92,35 @@ public class ZypeApi {
         return apiImpl;
     }
 
+    /*
+     * OAuth
+     */
     public AccessTokenResponse retrieveAccessToken(String username, String password) {
         Map<String, String> params = new HashMap<>();
         params.put(USERNAME, username);
         params.put(PASSWORD, password);
+        params.put(CLIENT_ID, ZypeSettings.CLIENT_ID);
+        params.put(CLIENT_SECRET, ZypeSettings.CLIENT_SECRET);
+        params.put(CLIENT_GRANT_TYPE, "password");
+        try {
+            Response response = apiImpl.retrieveAccessToken(params).execute();
+            if (response.isSuccessful()) {
+                return (AccessTokenResponse) response.body();
+            }
+            else {
+                return null;
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public AccessTokenResponse retrieveAccessTokenWithPin(String deviceId, String pin) {
+        Map<String, String> params = new HashMap<>();
+        params.put(LINKED_DEVICE_ID, deviceId);
+        params.put(PIN, pin);
         params.put(CLIENT_ID, ZypeSettings.CLIENT_ID);
         params.put(CLIENT_SECRET, ZypeSettings.CLIENT_SECRET);
         params.put(CLIENT_GRANT_TYPE, "password");
@@ -153,6 +183,44 @@ public class ZypeApi {
             Response response = apiImpl.getApp(params).execute();
             if (response.isSuccessful()) {
                 return (AppResponse) response.body();
+            }
+            else {
+                return null;
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public DevicePinResponse getDevicePin(String deviceId) {
+        try {
+            HashMap<String, String> params = new HashMap<>();
+            params.put(APP_KEY, ZypeSettings.APP_KEY);
+            params.put(LINKED_DEVICE_ID, deviceId);
+            Response response = apiImpl.getDevicePin(params).execute();
+            if (response.isSuccessful()) {
+                return (DevicePinResponse) response.body();
+            }
+            else {
+                return null;
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public DevicePinResponse createDevicePin(String deviceId) {
+        try {
+            HashMap<String, String> params = new HashMap<>();
+            params.put(APP_KEY, ZypeSettings.APP_KEY);
+            params.put(LINKED_DEVICE_ID, deviceId);
+            Response response = apiImpl.createDevicePin(params).execute();
+            if (response.isSuccessful()) {
+                return (DevicePinResponse) response.body();
             }
             else {
                 return null;
