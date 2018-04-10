@@ -24,6 +24,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        defaultPublishConfig "templateRelease"
     }
     buildTypes {
         release {
@@ -32,6 +33,12 @@ android {
         }
         debug {
             testCoverageEnabled true
+        }
+    }
+    productFlavors {
+        zype {
+        }
+        template {
         }
     }
     // This is for excluding duplicate jackson dependencies.

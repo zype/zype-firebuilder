@@ -1626,41 +1626,38 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
                 // Add "Resume" button if content playback is not complete.
                 if (record != null && !record.isPlaybackComplete()) {
-                    contentActionList.add(new Action().setId(CONTENT_ACTION_RESUME)
-                            .setLabel1(mAppContext.getResources().getString(R.string.resume_1))
-                            .setLabel2(mAppContext.getResources().getString(R.string.resume_2)));
+                    contentActionList.add(createActionButton(CONTENT_ACTION_RESUME,
+                            R.string.resume_1, R.string.resume_2));
+                    // Add "Watch From Beginning" button to start content over.
+                    contentActionList.add(createActionButton(CONTENT_ACTION_WATCH_FROM_BEGINNING,
+                            R.string.watch_from_beginning_1, R.string.watch_from_beginning_2));
                 }
-                // Add "Watch From Beginning" button to start content over.
-                contentActionList.add(new Action().setId(CONTENT_ACTION_WATCH_FROM_BEGINNING)
-                        .setLabel1(mAppContext.getResources().getString(R.string.watch_from_beginning_1))
-                        .setLabel2(mAppContext.getResources().getString(R.string.watch_from_beginning_2)));
+                // If the content has not been played yet, add the "Watch Now" button.
+                else {
+                    contentActionList.add(createActionButton(CONTENT_ACTION_WATCH_NOW,
+                            R.string.watch_now_1, R.string.watch_now_2));
+                }
                 if (isWatchlistRowEnabled()) {
                     addWatchlistAction(contentActionList, content.getId());
                 }
             }
             else {
-                contentActionList.add(new Action().setId(CONTENT_ACTION_WATCH_NOW)
-                        .setLabel1(mAppContext.getResources().getString(R.string.watch_now_1))
-                        .setLabel2(mAppContext.getResources().getString(R.string.watch_now_2)));
+                contentActionList.add(createActionButton(CONTENT_ACTION_WATCH_NOW,
+                        R.string.watch_now_1, R.string.watch_now_2));
             }
         }
         if (showSubscribe) {
-            contentActionList.add(new Action()
-                    .setId(CONTENT_ACTION_CHOOSE_PLAN)
-                    .setLabel1(mAppContext.getResources().getString(R.string.action_subscription_1))
-                    .setLabel2(mAppContext.getResources().getString(R.string.action_subscription_2)));
+            contentActionList.add(createActionButton(CONTENT_ACTION_CHOOSE_PLAN,
+                    R.string.action_subscription_1, R.string.action_subscription_2));
         }
         if (showPurchase) {
             // TODO: Display button to purchase video
-            contentActionList.add(new Action()
-                    .setId(CONTENT_ACTION_CHOOSE_PLAN)
-                    .setLabel1(mAppContext.getResources().getString(R.string.action_subscription_1))
-                    .setLabel2(mAppContext.getResources().getString(R.string.action_subscription_2)));
+            contentActionList.add(createActionButton(CONTENT_ACTION_CHOOSE_PLAN,
+                    R.string.action_subscription_1, R.string.action_subscription_2));
         }
         if (showAdFree) {
-            contentActionList.add(new Action().setId(CONTENT_ACTION_SWAF)
-                    .setLabel1(mAppContext.getResources().getString(R.string.action_swaf_1))
-                    .setLabel2(mAppContext.getResources().getString(R.string.action_swaf_2)));
+            contentActionList.add(createActionButton(CONTENT_ACTION_SWAF,
+                    R.string.action_swaf_1, R.string.action_swaf_2));
         }
         if (showFavorites) {
             ContentContainer favoritesContainer = getRootContentContainer()
@@ -1668,14 +1665,12 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             if (favoritesContainer != null) {
                 if (isFavoritesLoaded()) {
                     if (!VideoFavoritesHelper.getInstance().recordExists(mAppContext, content.getId())) {
-                        contentActionList.add(new Action().setId(CONTENT_ACTION_FAVORITES_ADD)
-                                .setLabel1(mAppContext.getResources().getString(R.string.action_favorites_add_1))
-                                .setLabel2(mAppContext.getResources().getString(R.string.action_favorites_add_2)));
+                        contentActionList.add(createActionButton(CONTENT_ACTION_FAVORITES_ADD,
+                                R.string.action_favorites_add_1, R.string.action_favorites_add_2));
                     }
                     else {
-                        contentActionList.add(new Action().setId(CONTENT_ACTION_FAVORITES_REMOVE)
-                                .setLabel1(mAppContext.getResources().getString(R.string.action_favorites_remove_1))
-                                .setLabel2(mAppContext.getResources().getString(R.string.action_favorites_remove_2)));
+                        contentActionList.add(createActionButton(CONTENT_ACTION_FAVORITES_REMOVE,
+                                R.string.action_favorites_remove_1, R.string.action_favorites_remove_2));
                     }
                 }
                 else {

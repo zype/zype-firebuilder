@@ -44,11 +44,11 @@ public class ZypeLoginActivity extends Activity {
     private LinearLayout layoutMethod;
     private Button buttonLinkDevice;
     private Button buttonEmail;
-    private Button buttonDeviceLinked;
 
     private LinearLayout layoutPin;
     private TextView textDeviceLinkingUrl;
     private TextView textPin;
+    private Button buttonDeviceLinked;
 
     private LinearLayout layoutEmail;
     private TextView textMessage;

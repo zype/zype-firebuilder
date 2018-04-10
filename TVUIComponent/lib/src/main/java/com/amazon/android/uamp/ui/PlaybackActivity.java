@@ -30,9 +30,6 @@
 
 package com.amazon.android.uamp.ui;
 
-import com.akamai.android.analytics.AnalyticsPlugin;
-import com.akamai.android.analytics.EndReasonCodes;
-import com.akamai.android.analytics.PluginCallBacks;
 import com.amazon.mediaplayer.tracks.MediaFormat;
 import com.google.android.exoplayer.text.CaptionStyleCompat;
 import com.google.android.exoplayer.text.SubtitleLayout;

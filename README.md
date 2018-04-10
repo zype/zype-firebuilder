@@ -22,12 +22,16 @@ Full Documentation for Fire App Builder is located [here](https://developer.amaz
 
 2. Open Application folder as existing project in Android Studio
 
-3. This SDK has two app versions - Zype demo app and template app
-   - To build Zype demo app select `zypeDebug` build variant for `app` and `ZypeAPI` modules
+3. This SDK has two app variants - Zype demo app and template app. To build Zype demo app:
+
+   - Select `zypeDebug` build variant for `app`, `PurchaseInterface` and `ZypeAPI` modules
 
      <a href="https://drive.google.com/uc?export=view&id=1wz_eFKHcljpUFYuwfIKSCSCVhcKFGDPG"><img src="https://drive.google.com/uc?export=view&id=1wz_eFKHcljpUFYuwfIKSCSCVhcKFGDPG" style="width: auto; height: auto" title="Click for the larger version." /></a>
 
-   - To build custom app based on the template version follow instructions in the [RECIPE.md](./RECIPE.md)
+   - Set `zypeDebug` value to `defaultPublishConfig` parameters in `PurchaseInterface/build.gradle` and `Application/ZypeAPI/build.gradle` files.
+
+***Note:*** To build custom app based on the template see [this section](#template).
+
 4. Wait for Gradle to finish building. It may take up to 30 minutes.
 
 5. Run the app on a connected Fire TV device or in TV emulator
@@ -40,17 +44,18 @@ Full Documentation for Fire App Builder is located [here](https://developer.amaz
 - Resume watch functionality
 - Pre-roll ads
 - Midroll ads
+- Video Favorites
+- Closed Caption Support
 
 ## Unsupported Features
 
-- Video Favorites 
 - Dynamic theme colors
-- Closed Caption Support
 
 ## Monetizations Supported
 
 - Native SVOD via In App Purchases
 - Universal SVOD via login
+- Universal TVOD
 
 ## Supported Devices
 
@@ -65,106 +70,57 @@ Please only select the following devices when submitting your app to Amazon.
 
 Non-Amazon Android devices and Amazon Fire phones and tablets are not supported and should be deselected. 
 
-## Creating new Fire TV app based of Zype Template
+## Creating Custom App Based on the Template<a name="template"></a>
 
-### Customizing UI resources
+1. Select `templateDebug` (or `templateRelease`) build variant for `app` and `ZypeAPI` modules
 
-**App name**
+2. Set `templateRelease` value to `defaultPublishConfig` parameters in `PurchaseInterface/build.gradle` and `Application/ZypeAPI/build.gradle` files.
 
-In the ```app\res\values\strings.xml``` file update following string resources:
+3. Replace following placeholders with actual values:
 
-- ```app_name```
-- ```app_name_short```
+  **Application/ZypeAPI/src/template/java/com/zype/fire/api/ZypeSettings.java**
+  - ```<APP_KEY>```
+  - ```<CLIENT_ID>```
+  - ```<CLIENT_SECRET>```
+  - ```<ROOT_PLAYLIST_ID>```
+
+Also replace features and monetization options placeholders with `true` or `false` values.
+
+**Application/app/build.gradle**
+- ```<APPLICATION_ID>``` - used to identify your app on the device and in the marketplace. Must be unique and usually is following `com.yourdomain.aftv` pattern.
+
+**Application/app/src/template/res/values/strings.xml**
+- ```<APP_NAME>```
+- ```<APP_NAME_SHORT>```
+
+**Application/app/src/template/res/values-en/strings.xml**
+- ```<APP_NAME>```
+
+**Application/app/src/template/res/values/custom.xml**
+- ```<BRAND_COLOR>``` - used for highlighting buttons and widgets
+
+4. Update following resources:
 
 **Company logo**
 
+*Application/app/src/template/res/drawable/logo_company.png*
+
 Image dimensions should be approximately 356 x 108 px and have a transparent background.
-Put your logo file to ```app\res\drawable``` folder.
-
-In the ```app\res\values\custom.xml``` file update following elements with your logo drawable resource id:
-
-- ```splash_logo```
-- ```company_logo```
 
 **App icon**
 
-In ```app\res\mipmap``` folders (```-mdpi```, ```-hdpi```, ```-xhdpi```, ```-xxhdpi```) update ```ic_launcher``` file.
+*Application/app/src/template/res/mipmap-mdpi/ic_launcher.png*
+*Application/app/src/template/res/mipmap-hdpi/ic_launcher.png*
+*Application/app/src/template/res/mipmap-xhdpi/ic_launcher.png*
+*Application/app/src/template/res/mipmap-xxhdpi/ic_launcher.png*
 
-You can use icon generatir in Android Studio to produce icons with required dimensions from 512x512 source icon image.   
+You can use icon generator in Android Studio to produce icons with required dimensions from 512x512 source icon image.
 
-**Action buttons and other widgets**
-
-To use your brand color for highlighting buttons and widgets update ```accent``` color resource in the ```app\res\values\custom.xml``` file.  
-
-### Building app with the template variant
-
-Note: 
-- Build `app` and `ZypeApi` as `templateDebug` or `templateRelease` in the Build Variants section
-- Update `ZypeApi/build.gradle` to use `templateDebug` as defaultConfig instead of `demoDebug`
-
-Update the following resources in each file:
-
-In ```Application/ZypeAPI/src/template/java/com/zype/fire/api/ZypeSettings.java```
-- ```<APP_KEY>```
-- ```<CLIENT_ID>```
-- ```<CLIENT_SECRET>```
-- ```<ROOT_PLAYLIST_ID>```
-
-Also, set subscription details to `true/false` as you see fit.
-
-In ```Application/app/build.gradle```
-- ```<APPLICATION_ID>```
-
-In ```Application/app/src/template/res/values/custom.xml```
-- ```<BRAND_COLOR>```
-
-In ```Application/app/src/template/res/values-en/strings.xml```
-- ```<APP_NAME>```
-
-In ```Application/app/src/template/res/values/strings.xml```
-- ```<APP_NAME>```
-- ```<APP_NAME_SHORT>```
+5. Rebuild the project
 
 ## Built With
 
 * [Zype API](http://dev.zype.com/api_docs/intro/) - Zype API docs
-
-## App Architecture
-
-Modules customized to work with Zype Platform:
-
-- **DataLoader**
-
-New custom data loader ```ZypeDataDownloader``` is added. It is loading playlist and video data using Zype API and put this data into feed, which is processed further by Fire App Builder. See "App Configuration" section for how ZypeDatadownloader is connected to Fire App Builder.
-
-- **ContentBrowser**
-
-This core module is modified to support Zype enchanced playlists and custom data feed.
-
-- **ContentModel**
-
-New custom feed translators ```ZypeContentTranslator``` and ```ZypeContentContainerTranslator``` are added to map specific Zype 
-video and playlist objects to Fire App Builder content model.
-
-- **TVUIComponent**
-
-```CardPresenter``` is modified to support thumbnail images for categories (playlists).
-
-```ContentBrowseFragment``` is modified to support navigation from home screen to nested playlists.
-
-```ZypePlaylistContentBrowseActivity``` 
-```ZypePlaylistContentBrowseFragment``` are added to display content of nested playlistsis.
-
-- **App Configuration**
-
-```DataLoadManagerConfig.json``` is modified to support custom Zype data downloader
-
-```ZypeDownloaderConfig.json``` is added for using with ZypeDataDownloader
-
-```ZypeCategoriesRecipe.json```
-```ZypeContentsRecipe.json``` is added to configure parsing data from custom Zype feed
-
-```Navigator.json``` is modified to support Zype customizations
 
 ## Contributing
 
