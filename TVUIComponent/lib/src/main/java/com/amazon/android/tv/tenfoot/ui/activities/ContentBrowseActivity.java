@@ -34,6 +34,7 @@ import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.model.Action;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
+import com.amazon.android.tv.tenfoot.ui.fragments.MenuFragment;
 import com.amazon.android.tv.tenfoot.utils.BrowseHelper;
 import com.amazon.android.ui.constants.ConfigurationConstants;
 import com.amazon.android.ui.fragments.LogoutSettingsFragment;
@@ -52,7 +53,9 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -84,6 +87,9 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
     // View that contains the background
     private View mMainFrame;
     private Drawable mBackgroundWithPreview;
+
+    /* Zype, Evgeny Cherkasov */
+    private boolean isMenuOpened = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -127,6 +133,9 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         // Set the background
         mMainFrame = findViewById(R.id.main_frame);
         mMainFrame.setBackground(mBackgroundWithPreview);
+
+        /*Zype, Evgeny Cherkasov */
+        hideMenu();
     }
 
     /**
@@ -148,8 +157,8 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         else if (item instanceof ContentContainer) {
             ContentContainer contentContainer = (ContentContainer) item;
             callImageLoadSubscription(contentContainer.getName(),
-                    (String) contentContainer.getExtraStringValue("description"),
-                    (String) contentContainer.getExtraStringValue(Content.BACKGROUND_IMAGE_URL_FIELD_NAME));
+                    contentContainer.getExtraStringValue("description"),
+                    contentContainer.getExtraStringValue(Content.BACKGROUND_IMAGE_URL_FIELD_NAME));
         }
         else if (item instanceof Action) {
             Action settingsAction = (Action) item;
@@ -235,5 +244,59 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
     public void setRestoreActivityValues() {
 
         BrowseHelper.saveBrowseActivityState(this);
+    }
+
+    /* Zype, Evgeny Cherkasov */
+    private void showMenu() {
+        MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+        if (fragment != null) {
+            isMenuOpened = true;
+            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.lb_error_background_color_translucent));
+            getFragmentManager().beginTransaction()
+                    .show(fragment)
+                    .commit();
+            fragment.getView().requestFocus();
+        }
+    }
+
+    private void hideMenu() {
+        MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+        if (fragment != null) {
+            isMenuOpened = false;
+            getFragmentManager().beginTransaction()
+                    .hide(fragment)
+                    .commit();
+        }
+    }
+
+    /**
+     * Called to process key events.  You can override this to intercept all
+     * key events before they are dispatched to the window.  Be sure to call
+     * this implementation for key events that should be handled normally.
+     *
+     * @param event The key event.
+     * @return boolean Return true if this event was consumed.
+     */
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        Log.d(TAG, "event=" + event.toString());
+        if (event.getAction() == KeyEvent.ACTION_UP) {
+            switch (event.getKeyCode()) {
+                case KeyEvent.KEYCODE_MENU:
+                    Log.d(TAG, "Menu button pressed");
+                    if (!isMenuOpened) {
+                        showMenu();
+                    }
+                    return true;
+                case KeyEvent.KEYCODE_BACK:
+                    Log.d(TAG, "Back button pressed");
+                    if (isMenuOpened) {
+                        hideMenu();
+                        return true;
+                    }
+                    break;
+            }
+        }
+        return super.dispatchKeyEvent(event);
     }
 }
