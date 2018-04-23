@@ -38,13 +38,14 @@ import com.amazon.android.tv.tenfoot.utils.ContentHelper;
 import com.amazon.android.utils.GlideHelper;
 import com.amazon.android.utils.Helpers;
 import com.amazon.android.tv.tenfoot.R;
-import com.amazon.android.utils.Preferences;
-import com.bumptech.glide.Glide;
-import com.zype.fire.auth.ZypeAuthentication;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.zype.fire.api.ZypeConfiguration;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.v17.leanback.widget.BaseCardView;
 import android.support.v17.leanback.widget.ImageCardView;
@@ -75,6 +76,7 @@ public class CardPresenter extends Presenter {
     /* Zype, Evgeny Cherkasov */
     private Drawable imageLocked;
     private Drawable imageUnlocked;
+    private static Drawable infoFieldWithProgressBarBackground;
     private ContentBrowser contentBrowser;
 
     @Override
@@ -87,6 +89,7 @@ public class CardPresenter extends Presenter {
             mDefaultCardImage = ContextCompat.getDrawable(mContext, R.drawable.movie);
             sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused);
             /* Zype, Evgeny Cherkasov */
+            infoFieldWithProgressBarBackground = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_progress_bar);
             imageLocked = ContextCompat.getDrawable(mContext, R.drawable.locked);
             imageUnlocked = ContextCompat.getDrawable(mContext, R.drawable.unlocked);
         }
@@ -100,9 +103,9 @@ public class CardPresenter extends Presenter {
             public void setSelected(boolean selected) {
 
                 super.setSelected(selected);
-                if (mInfoField != null) {
-                    mInfoField.setBackground(sFocusedFadeMask);
-                }
+//                if (mInfoField != null) {
+//                    mInfoField.setBackground(sFocusedFadeMask);
+//                }
             }
         };
         cardView.setFocusable(true);
@@ -153,11 +156,34 @@ public class CardPresenter extends Presenter {
 
                 cardView.setContentText(content.getTitle());
                 cardView.setMainImageDimensions(mCardWidthDp, mCardHeightDp);
-                GlideHelper.loadImageIntoView(cardView.getMainImageView(),
-                                              viewHolder.view.getContext(),
-                                              content.getCardImageUrl(),
-                                              new GlideHelper.LoggingListener<>(),
-                                              R.drawable.movie);
+                /* Zype, Evgeny Cherkasov */
+                double playbackPercentage = content.getExtraValueAsDouble(Content.EXTRA_PLAYBACK_POSITION_PERCENTAGE);
+                if (ZypeConfiguration.displayDurationWatchedIndicatorOnVideoThumbnails()
+                        && playbackPercentage > 0) {
+                    SimpleTarget<Bitmap> bitmapTarget = new SimpleTarget<Bitmap>(mCardWidthDp, mCardHeightDp) {
+                        @Override
+                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            cardView.setInfoAreaBackground(infoFieldWithProgressBarBackground);
+                            Bitmap bitmap = Helpers.addProgressToThumbnail((Activity) mContext, resource, playbackPercentage, 0);
+                            cardView.getMainImageView().setImageBitmap(bitmap);
+                        }
+                    };
+                    GlideHelper.loadImageIntoSimpleTargetBitmap(
+                            viewHolder.view.getContext(),
+                            content.getCardImageUrl(),
+                            new GlideHelper.LoggingListener<>(),
+                            R.drawable.movie,
+                            bitmapTarget);
+                }
+                else {
+                    GlideHelper.loadImageIntoView(
+                            cardView.getMainImageView(),
+                            viewHolder.view.getContext(),
+                            content.getCardImageUrl(),
+                            new GlideHelper.LoggingListener<>(),
+                            R.drawable.movie);
+                    cardView.setInfoAreaBackground(sFocusedFadeMask);
+                }
 
                 /* Zype, Evgeny Cherkasov */
                 // Display lock icon for subscription video
