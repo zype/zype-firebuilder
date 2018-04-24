@@ -230,86 +230,6 @@ public class ContentBrowseFragment extends RowsFragment {
         }
     }
 
-//    private void loadRootContentContainer(ArrayObjectAdapter rowsAdapter) {
-//
-//        ContentContainer rootContentContainer = ContentBrowser.getInstance(getActivity())
-//                                                              .getRootContentContainer();
-//
-//        CardPresenter cardPresenter = new CardPresenter();
-//        PosterCardPresenter posterCardPresenter = new PosterCardPresenter();
-//
-//        for (ContentContainer contentContainer : rootContentContainer.getContentContainers()) {
-//
-//            /* Zype, Evgeny Cherkasob */
-//            // Don't show My Library content container
-//            if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)) {
-//                continue;
-//            }
-//
-//            HeaderItem header = new HeaderItem(0, contentContainer.getName());
-//            ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
-//            /* Zype, Evgeny Cherkasov */
-//            if (contentContainer.getExtraStringValue(ContentContainer.EXTRA_THUMBNAIL_LAYOUT).equals("poster")) {
-//                listRowAdapter = new ArrayObjectAdapter(posterCardPresenter);
-//            }
-//
-//            for (ContentContainer innerContentContainer : contentContainer.getContentContainers()) {
-//                listRowAdapter.add(innerContentContainer);
-//            }
-//
-//            for (Content content : contentContainer.getContents()) {
-//                listRowAdapter.add(content);
-//            }
-//
-//            /* Zype, Evgeny Cherkasov */
-//            // Update NextPage parameter because the first page of playlist videos was loaded
-//            // while running global recipes chain
-//            // TODO: Probably it would better to move updating NextPage to the getContentsObservable()
-//            if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) == 1) {
-//                if (contentContainer.getExtraValueAsInt(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT) > ZypeApi.PER_PAGE_DEFAULT) {
-//                    contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, 2);
-//                }
-//                else {
-//                    contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, -1);
-//                }
-//            }
-//            if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
-//                PlaylistAction action = new PlaylistAction();
-//                action.setAction(ContentBrowser.NEXT_PAGE)
-//                        .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
-//                        .setLabel1(getString(R.string.action_load_more));
-//                action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
-//                listRowAdapter.add(action);
-//            }
-//
-//            rowsAdapter.add(new ListRow(header, listRowAdapter));
-//        }
-//    }
-//
-//    private void addSettingsActionsToRowAdapter(ArrayObjectAdapter arrayObjectAdapter) {
-//
-//        List<Action> settings = ContentBrowser.getInstance(getActivity()).getSettingsActions();
-//
-//        if (settings != null && !settings.isEmpty()) {
-//
-//            SettingsCardPresenter cardPresenter = new SettingsCardPresenter();
-//            settingsAdapter = new ArrayObjectAdapter(cardPresenter);
-//
-//            for (Action item : settings) {
-//                settingsAdapter.add(item);
-//            }
-//        }
-//        else {
-//            Log.d(TAG, "No settings were found");
-//        }
-//
-//        if (settingsAdapter != null) {
-//            // Create settings header and row
-//            HeaderItem header = new HeaderItem(0, getString(R.string.settings_title));
-//            arrayObjectAdapter.add(new ListRow(header, settingsAdapter));
-//        }
-//    }
-
     private final class ItemViewClickedListener implements OnItemViewClickedListener {
 
         @Override
@@ -325,7 +245,7 @@ public class ContentBrowseFragment extends RowsFragment {
                     item = contentContainer.getContents().get(0);
                 }
                 else {
-                    if (Integer.valueOf(contentContainer.getExtraStringValue("playlistItemCount")) > 0) {
+                    if (Integer.valueOf(contentContainer.getExtraStringValue(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT)) > 0) {
                         // Playlist has  videos, but they is not loaded yet.
                         // Load videos and then open video detail screen of the first video in the playlist
                         ContentLoader.ILoadContentForContentContainer listener = new ContentLoader.ILoadContentForContentContainer() {

@@ -97,7 +97,7 @@ public class ZypeDataDownloaderHelper {
                     result.videos = new ArrayList<>();
                 }
 
-                if (response.pagination.current == response.pagination.pages) {
+                if (response.pagination.current >= response.pagination.pages) {
                     result.nextPage = -1;
                 }
                 else {

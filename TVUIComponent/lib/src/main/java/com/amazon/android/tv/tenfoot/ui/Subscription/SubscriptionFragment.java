@@ -11,14 +11,12 @@ import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v17.leanback.widget.VerticalGridView;
-import android.util.Log;
 
-import com.amazon.android.contentbrowser.BuildConfig;
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.helper.PurchaseHelper;
 import com.amazon.android.model.event.SubscriptionProductsUpdateEvent;
-import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
+import com.amazon.android.tv.tenfoot.presenter.SubscriptionCardPresenter;
 import com.amazon.android.tv.tenfoot.ui.Subscription.Model.SubscriptionItem;
 
 import org.greenrobot.eventbus.EventBus;
