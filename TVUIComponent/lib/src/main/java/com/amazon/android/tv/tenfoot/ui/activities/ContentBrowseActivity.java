@@ -52,6 +52,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Display;
@@ -280,22 +281,38 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         Log.d(TAG, "event=" + event.toString());
-        if (event.getAction() == KeyEvent.ACTION_UP) {
-            switch (event.getKeyCode()) {
-                case KeyEvent.KEYCODE_MENU:
+        switch (event.getKeyCode()) {
+            case KeyEvent.KEYCODE_MENU:
+                if (event.getAction() == KeyEvent.ACTION_UP) {
                     Log.d(TAG, "Menu button pressed");
                     if (!isMenuOpened) {
                         showMenu();
                     }
                     return true;
-                case KeyEvent.KEYCODE_BACK:
+                }
+            case KeyEvent.KEYCODE_BACK:
+                if (event.getAction() == KeyEvent.ACTION_UP) {
                     Log.d(TAG, "Back button pressed");
                     if (isMenuOpened) {
                         hideMenu();
                         return true;
                     }
                     break;
-            }
+                }
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+                Log.d(TAG, "Down button pressed");
+                if (isMenuOpened) {
+                    MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+                    if (fragment != null) {
+                        ArrayObjectAdapter menuAdapter = (ArrayObjectAdapter) fragment.getAdapter();
+                        if (fragment.getSelectedMenuItemIndex() + 1 >= menuAdapter.size()) {
+                            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                break;
         }
         return super.dispatchKeyEvent(event);
     }

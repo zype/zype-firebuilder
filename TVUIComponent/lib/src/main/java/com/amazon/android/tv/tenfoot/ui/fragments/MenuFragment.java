@@ -29,6 +29,7 @@ public class MenuFragment extends RowsFragment {
     private static final String TAG = MenuFragment.class.getSimpleName();
 
     private ArrayObjectAdapter adapter;
+    private int selectedMenuItemIndex;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,7 +41,8 @@ public class MenuFragment extends RowsFragment {
             @Override
             public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
                                        RowPresenter.ViewHolder rowViewHolder, Row row) {
-                Log.i(TAG, "onItemSelected: " + item + " row " + row);
+                selectedMenuItemIndex = adapter.indexOf(row);
+                Log.i(TAG, "onItemSelected(): item=" + item + ", row=" + row + ", index=" + selectedMenuItemIndex);
             }
         });
 
@@ -85,5 +87,9 @@ public class MenuFragment extends RowsFragment {
             }
 
         }
+    }
+
+    public int getSelectedMenuItemIndex() {
+        return selectedMenuItemIndex;
     }
 }
