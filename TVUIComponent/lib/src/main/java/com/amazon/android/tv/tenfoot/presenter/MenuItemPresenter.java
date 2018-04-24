@@ -22,13 +22,17 @@ import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.amazon.android.model.Action;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.TenFootApp;
+import com.amazon.android.tv.tenfoot.ui.Subscription.Model.SubscriptionItem;
+import com.amazon.android.tv.tenfoot.ui.Subscription.SubscriptionCardPresenter;
 import com.amazon.android.utils.Helpers;
 
 /**
@@ -39,89 +43,46 @@ import com.amazon.android.utils.Helpers;
 public class MenuItemPresenter extends Presenter {
     private static final String TAG = MenuItemPresenter.class.getSimpleName();
 
-    private int mCardWidthDp;
-    private int mCardHeightDp;
-    private static Drawable sFocusedFadeMask;
-    private View mInfoField;
-
     /**
      * {@inheritDoc}
      */
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
-
-        Context context = parent.getContext();
-        try {
-            sFocusedFadeMask = ContextCompat.getDrawable(context, R.drawable.content_fade_focused);
-        }
-        catch (Resources.NotFoundException e) {
-            Log.e(TAG, "Resource not found", e);
-            throw e;
-        }
-
-        ImageCardView cardView = new ImageCardView(context) {
-            @Override
-            public void setSelected(boolean selected) {
-
-                super.setSelected(selected);
-                if (mInfoField != null) {
-                    mInfoField.setBackground(sFocusedFadeMask);
-                }
-            }
-        };
-        cardView.setFocusable(true);
-        cardView.setFocusableInTouchMode(true);
-
-        // Set the type and visibility of the info area.
-        cardView.setCardType(BaseCardView.CARD_TYPE_INFO_OVER);
-        cardView.setInfoVisibility(BaseCardView.CARD_REGION_VISIBLE_ALWAYS);
-
-        int CARD_WIDTH_PX = 240;
-        mCardWidthDp = Helpers.convertPixelToDp(context, CARD_WIDTH_PX);
-        int CARD_HEIGHT_PX = 40;
-        mCardHeightDp = Helpers.convertPixelToDp(context, CARD_HEIGHT_PX);
-
-        mInfoField = cardView.findViewById(R.id.info_field);
-        if (mInfoField != null) {
-            mInfoField.setBackground(sFocusedFadeMask);
-        }
-
-        return new ViewHolder(cardView);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.menu_list_item, parent, false);
+        view.setFocusable(true);
+        view.setFocusableInTouchMode(true);
+        return new MenuItemPresenter.ViewHolder(view);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, Object item) {
+    public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
 
-        Action menuItem = (Action) item;
-        ImageCardView cardView = (ImageCardView) viewHolder.view;
-
-        cardView.setContentText(menuItem.getLabel1());
-        cardView.setMainImageScaleType(ImageView.ScaleType.CENTER);
-        cardView.setMainImageDimensions(mCardWidthDp, mCardHeightDp);
-//        try {
-//            cardView.setMainImage(ContextCompat.getDrawable(TenFootApp.getInstance()
-//                                                                      .getApplicationContext(),
-//                                                            menuItem.getIconResourceId()));
-//        }
-//        catch (Resources.NotFoundException e) {
-//            Log.e(TAG, "Resource not found", e);
-//            throw e;
-//        }
+        ViewHolder holder = (ViewHolder) viewHolder;
+        holder.item = (Action) item;
+        holder.textTitle.setText(holder.item.getLabel1());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void onUnbindViewHolder(ViewHolder viewHolder) {
-
-//        ImageCardView cardView = (ImageCardView) viewHolder.view;
-//        // Remove references to images so that the garbage collector can free up memory.
-//        cardView.setBadgeImage(null);
-//        cardView.setMainImage(null);
+    public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {
     }
+
+    public class ViewHolder extends Presenter.ViewHolder {
+        public final View view;
+        public Action item;
+        public TextView textTitle;
+
+        public ViewHolder(View view) {
+            super(view);
+            this.view = view;
+            textTitle = (TextView) view.findViewById(R.id.textTitle);
+        }
+    }
+
 }
 

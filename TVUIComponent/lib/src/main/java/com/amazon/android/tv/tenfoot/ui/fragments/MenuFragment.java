@@ -19,6 +19,8 @@ import com.amazon.android.tv.tenfoot.presenter.MenuItemPresenter;
 
 import java.util.List;
 
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+
 /**
  * Created by Evgeny Cherkasov on 18.04.2018.
  */
@@ -57,6 +59,7 @@ public class MenuFragment extends RowsFragment {
         }
 
         ListRowPresenter presenter = new ListRowPresenter();
+        presenter.setRowHeight(80);
         adapter = new ArrayObjectAdapter(presenter);
 
         final MenuItemPresenter menuItemPresenter = new MenuItemPresenter();
