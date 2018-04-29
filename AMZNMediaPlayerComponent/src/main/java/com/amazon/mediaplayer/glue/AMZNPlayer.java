@@ -18,7 +18,9 @@ package com.amazon.mediaplayer.glue;
 import android.content.Context;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -601,5 +603,22 @@ public class AMZNPlayer implements UAMP, SurfaceHolder.Callback {
                                       RendererTrackMetric rendererTrackMetric) {
 
         return mPlayer.getRendererTrackMetric(trackType, rendererTrackMetric);
+    }
+
+    /* Zype, Evgeny Cherkasov */
+    @Override
+    public void updateSurfaceView() {
+        int videoWidth = getCurrentVideoWidth();
+        int videoHeight = getCurrentVideoHeight();
+
+        DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
+        int screenWidth = displayMetrics.widthPixels;
+        int screenHeight = displayMetrics.heightPixels;
+
+        if (videoHeight < screenHeight && videoWidth < screenWidth) {
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(videoWidth, videoHeight, Gravity.CENTER);
+            mSurfaceView.setLayoutParams(params);
+            mSurfaceView.getHolder().setFixedSize(videoWidth, videoHeight);
+        }
     }
 }

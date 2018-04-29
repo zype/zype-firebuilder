@@ -64,4 +64,7 @@ public interface UAMP extends AMZNMediaPlayer {
      * Detach SurfaceView from provided FrameLayout.
      */
     void detachSurfaceView();
+
+    /* Zype, Evgeny Cherkasov */
+    void updateSurfaceView();
 }

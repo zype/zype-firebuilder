@@ -1839,6 +1839,10 @@ public class PlaybackActivity extends Activity implements
                     mPlaybackOverlayFragment.togglePlaybackUI(false);
                 }
                 hideProgress();
+
+                /* Zype, Evgeny Cherkasov */
+                mPlayer.updateSurfaceView();
+
                 mWindow.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 if (mPrevState == PlayerState.PREPARING) {
                     if (mPlaybackOverlayFragment != null) {
