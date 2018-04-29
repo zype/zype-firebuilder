@@ -158,8 +158,7 @@ public class CardPresenter extends Presenter {
                 cardView.setMainImageDimensions(mCardWidthDp, mCardHeightDp);
                 /* Zype, Evgeny Cherkasov */
                 double playbackPercentage = content.getExtraValueAsDouble(Content.EXTRA_PLAYBACK_POSITION_PERCENTAGE);
-                if (ZypeConfiguration.displayDurationWatchedIndicatorOnVideoThumbnails()
-                        && playbackPercentage > 0) {
+                if (ZypeConfiguration.displayWatchedBarOnVideoThumbnails() && playbackPercentage > 0) {
                     SimpleTarget<Bitmap> bitmapTarget = new SimpleTarget<Bitmap>(mCardWidthDp, mCardHeightDp) {
                         @Override
                         public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {

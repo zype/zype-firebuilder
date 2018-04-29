@@ -129,7 +129,7 @@ public class ZypeConfiguration {
     }
 
     // UI
-    public static boolean displayDurationWatchedIndicatorOnVideoThumbnails() {
+    public static boolean displayWatchedBarOnVideoThumbnails() {
         return true;
     }
 

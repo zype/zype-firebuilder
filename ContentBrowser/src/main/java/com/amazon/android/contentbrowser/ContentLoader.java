@@ -379,7 +379,7 @@ public class ContentLoader {
                                 .getExtraStringValue(Recipe.CONTENT_TYPE_TAG));
                     }
                     /* Zype, Evgeny Cherkasov */
-                    if (ZypeConfiguration.displayDurationWatchedIndicatorOnVideoThumbnails()) {
+                    if (ZypeConfiguration.displayWatchedBarOnVideoThumbnails()) {
                         content.setExtraValue(Content.EXTRA_PLAYBACK_POSITION_PERCENTAGE,
                                 getContentPlaybackPositionPercentage(content));
                     }
