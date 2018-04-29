@@ -14,10 +14,9 @@
  */
 package com.amazon.android.contentbrowser;
 
-import com.amazon.android.contentbrowser.Favorites.FavoritesManager;
+import com.amazon.android.contentbrowser.database.helpers.RecentDatabaseHelper;
 import com.amazon.android.contentbrowser.database.helpers.VideoFavoritesHelper;
-import com.amazon.android.contentbrowser.helper.ErrorHelper;
-import com.amazon.android.interfaces.ICancellableLoad;
+import com.amazon.android.contentbrowser.database.records.RecentRecord;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.model.content.constants.ExtraKeys;
@@ -29,7 +28,6 @@ import com.amazon.android.navigator.Navigator;
 import com.amazon.android.navigator.NavigatorModel;
 import com.amazon.android.navigator.NavigatorModelParser;
 import com.amazon.android.recipe.Recipe;
-import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.Preferences;
 import com.amazon.dataloader.datadownloader.ZypeDataDownloaderHelper;
 import com.amazon.dataloader.dataloadmanager.DataLoadManager;
@@ -41,7 +39,6 @@ import com.zype.fire.api.Model.VideoData;
 import com.zype.fire.api.Model.VideoEntitlementData;
 import com.zype.fire.api.Model.VideoEntitlementsResponse;
 import com.zype.fire.api.Model.VideoFavoriteResponse;
-import com.zype.fire.api.Model.VideoFavoritesResponse;
 import com.zype.fire.api.Model.VideoResponse;
 import com.zype.fire.api.Model.VideosResponse;
 import com.zype.fire.api.ZypeApi;
@@ -49,10 +46,7 @@ import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
@@ -61,7 +55,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
-import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -384,6 +377,11 @@ public class ContentLoader {
                     if (contentContainer.getExtraStringValue(Recipe.CONTENT_TYPE_TAG) != null) {
                         content.setExtraValue(Recipe.CONTENT_TYPE_TAG, contentContainer
                                 .getExtraStringValue(Recipe.CONTENT_TYPE_TAG));
+                    }
+                    /* Zype, Evgeny Cherkasov */
+                    if (ZypeConfiguration.displayDurationWatchedIndicatorOnVideoThumbnails()) {
+                        content.setExtraValue(Content.EXTRA_PLAYBACK_POSITION_PERCENTAGE,
+                                getContentPlaybackPositionPercentage(content));
                     }
                     contentContainer.addContent(content);
                 }
@@ -1134,4 +1132,54 @@ public class ContentLoader {
                             return content;
                         }));
     }
+
+
+    /**
+     * Get content playback position percentage for progress bar.
+     *
+     * @param content Content.
+     * @return Percentage playback complete.
+     */
+    public double getContentPlaybackPositionPercentage(Content content) {
+
+        RecentRecord record = getRecentRecord(content);
+        // Calculate the playback position percentage as the current playback position
+        // over the entire video duration
+        if (record != null && !record.isPlaybackComplete()) {
+
+            // Calculate time remaining as duration minus playback location
+            long duration = record.getDuration();
+            long currentPlaybackPosition = record.getPlaybackLocation();
+
+            if ((duration > 0) && (currentPlaybackPosition > 0)
+                    && (duration > currentPlaybackPosition)) {
+                return (((double) currentPlaybackPosition) / duration);
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     * Get Recent Record from database based on content id
+     *
+     * @param content Content.
+     * @return Recent Record.
+     */
+    public RecentRecord getRecentRecord(Content content) {
+
+        RecentRecord record = null;
+        RecentDatabaseHelper databaseHelper = RecentDatabaseHelper.getInstance();
+        if (databaseHelper != null) {
+            if (databaseHelper.recordExists(mContext, content.getId())) {
+                record = databaseHelper.getRecord(mContext, content.getId());
+            }
+        }
+        else {
+            Log.e(TAG, "Unable to load content because database is null");
+        }
+
+        return record;
+    }
+
 }

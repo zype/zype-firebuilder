@@ -287,6 +287,40 @@ public class Helpers {
     }
 
     /**
+     * Add progress bar to image.
+     *
+     * @param activity The activity.
+     * @param raw      The raw bitmap image to round.
+     * @param playbackPercentage The playback percentage
+     * @return The progress bar image.
+     */
+    public static Bitmap addProgressToThumbnail(Activity activity, Bitmap raw, double playbackPercentage, int colorRes) {
+
+        int width = raw.getWidth();
+        int height = raw.getHeight();
+        Canvas canvas = new Canvas(raw);
+
+        final Paint paint = new Paint();
+        paint.setAntiAlias(true);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+
+        final Rect bar = new Rect(0, height - 10, width, height);
+        paint.setColor(ContextCompat.getColor(activity, android.R.color.darker_gray));
+        canvas.drawRect(bar, paint);
+
+        final Rect progress = new Rect(0, height - 10, (int) (width * playbackPercentage), height);
+        if (colorRes > 0) {
+            paint.setColor(ContextCompat.getColor(activity, colorRes));
+        }
+        else {
+            paint.setColor(ContextCompat.getColor(activity, R.color.accent));
+        }
+        canvas.drawRect(progress, paint);
+        return raw;
+    }
+
+    /**
      * Add time remaining to image.
      *
      * @param activity The activity;

@@ -32,6 +32,7 @@ package com.amazon.android.tv.tenfoot.presenter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.v17.leanback.widget.BaseCardView;
 import android.support.v17.leanback.widget.ImageCardView;
@@ -53,6 +54,9 @@ import com.amazon.android.tv.tenfoot.base.TenFootApp;
 import com.amazon.android.tv.tenfoot.utils.ContentHelper;
 import com.amazon.android.utils.GlideHelper;
 import com.amazon.android.utils.Helpers;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.zype.fire.api.ZypeConfiguration;
 
 /**
  * Zype, Evgeny Cherkasov
@@ -73,6 +77,7 @@ public class PosterCardPresenter extends Presenter {
     private Context mContext;
     private Drawable imageLocked;
     private Drawable imageUnlocked;
+    private static Drawable infoFieldWithProgressBarBackground;
     private ContentBrowser contentBrowser;
 
     @Override
@@ -83,6 +88,7 @@ public class PosterCardPresenter extends Presenter {
         try {
             mDefaultCardImage = ContextCompat.getDrawable(mContext, R.drawable.movie);
             sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused);
+            infoFieldWithProgressBarBackground = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_progress_bar);
             imageLocked = ContextCompat.getDrawable(mContext, R.drawable.locked);
             imageUnlocked = ContextCompat.getDrawable(mContext, R.drawable.unlocked);
         }
@@ -96,9 +102,9 @@ public class PosterCardPresenter extends Presenter {
             public void setSelected(boolean selected) {
 
                 super.setSelected(selected);
-                if (mInfoField != null) {
-                    mInfoField.setBackground(sFocusedFadeMask);
-                }
+//                if (mInfoField != null) {
+//                    mInfoField.setBackground(sFocusedFadeMask);
+//                }
             }
         };
         cardView.setFocusable(true);
@@ -151,11 +157,33 @@ public class PosterCardPresenter extends Presenter {
                 if (TextUtils.isEmpty(url) || url.equals("null")) {
                     url = content.getExtraValueAsString(Content.EXTRA_THUMBNAIL_POSTER_URL);
                 }
-                GlideHelper.loadImageIntoView(cardView.getMainImageView(),
-                                              viewHolder.view.getContext(),
-                                              url,
-                                              new GlideHelper.LoggingListener<>(),
-                                              R.drawable.movie);
+                double playbackPercentage = content.getExtraValueAsDouble(Content.EXTRA_PLAYBACK_POSITION_PERCENTAGE);
+                if (ZypeConfiguration.displayDurationWatchedIndicatorOnVideoThumbnails()
+                        && playbackPercentage > 0) {
+                    SimpleTarget<Bitmap> bitmapTarget = new SimpleTarget<Bitmap>(mCardWidthDp, mCardHeightDp) {
+                        @Override
+                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            cardView.setInfoAreaBackground(infoFieldWithProgressBarBackground);
+                            Bitmap bitmap = Helpers.addProgressToThumbnail((Activity) mContext, resource, playbackPercentage, 0);
+                            cardView.getMainImageView().setImageBitmap(bitmap);
+                        }
+                    };
+                    GlideHelper.loadImageIntoSimpleTargetBitmap(
+                            viewHolder.view.getContext(),
+                            url,
+                            new GlideHelper.LoggingListener<>(),
+                            R.drawable.movie,
+                            bitmapTarget);
+                }
+                else {
+                    GlideHelper.loadImageIntoView(
+                            cardView.getMainImageView(),
+                            viewHolder.view.getContext(),
+                            url,
+                            new GlideHelper.LoggingListener<>(),
+                            R.drawable.movie);
+                    cardView.setInfoAreaBackground(sFocusedFadeMask);
+                }
 
                 // Display lock icon for subscription video
                 if (content.isSubscriptionRequired()) {

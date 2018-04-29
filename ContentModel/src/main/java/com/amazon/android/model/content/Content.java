@@ -322,6 +322,8 @@ public class Content implements Serializable {
     // Pass required flag
     public static final String EXTRA_PASS_REQUIRED = "PassRequired";
     // Playlist id
+    public static final String EXTRA_PLAYBACK_POSITION_PERCENTAGE = "PlaybackPositionPercentage";
+    // Playlist id
     public static final String EXTRA_PLAYLIST_ID = "playlistId";
     // Purchase required flag
     public static final String EXTRA_PURCHASE_REQUIRED = "PurchaseRequired";
@@ -851,6 +853,21 @@ public class Content implements Serializable {
             return null;
         }
         return mExtras.get(key).toString();
+    }
+
+    /**
+     * Get a value from the extras map as a double. Warning: This method expects that the value that
+     * the key maps to is a double. If its not, errors may occur.
+     *
+     * @param key The key to the value.
+     * @return A double value; 0 if the value doesn't exist in the extras.
+     */
+    public double getExtraValueAsDouble(String key) {
+
+        if (mExtras == null || mExtras.get(key) == null) {
+            return 0;
+        }
+        return (Double) mExtras.get(key);
     }
 
 

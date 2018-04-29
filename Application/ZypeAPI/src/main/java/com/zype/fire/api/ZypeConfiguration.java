@@ -127,4 +127,10 @@ public class ZypeConfiguration {
     public static boolean isUniversalTVODEnabled(Context context) {
         return getBooleanPreference(PREFERENCE_UNIVERSAL_TVOD, ZypeSettings.UNIVERSAL_TVOD, context);
     }
+
+    // UI
+    public static boolean displayDurationWatchedIndicatorOnVideoThumbnails() {
+        return true;
+    }
+
 }
