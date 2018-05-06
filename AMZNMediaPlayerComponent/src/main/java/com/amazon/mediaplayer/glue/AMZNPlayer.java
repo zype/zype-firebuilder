@@ -616,9 +616,12 @@ public class AMZNPlayer implements UAMP, SurfaceHolder.Callback {
         int screenHeight = displayMetrics.heightPixels;
 
         if (videoHeight < screenHeight && videoWidth < screenWidth) {
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(videoWidth, videoHeight, Gravity.CENTER);
+            float ratio = Math.min((float) screenHeight / videoHeight, (float) screenWidth / videoWidth);
+            int newWidth = (int) (1.0 * videoWidth * ratio);
+            int newHeight = (int) (1.0 * videoHeight * ratio);
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(newWidth, newHeight, Gravity.CENTER);
             mSurfaceView.setLayoutParams(params);
-            mSurfaceView.getHolder().setFixedSize(videoWidth, videoHeight);
+            mSurfaceView.getHolder().setFixedSize(newWidth, newHeight);
         }
     }
 }
