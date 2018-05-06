@@ -133,4 +133,8 @@ public class ZypeConfiguration {
         return true;
     }
 
+    public static boolean showLeftMenu() {
+        // Return `true` to enable the left menu
+        return false;
+    }
 }

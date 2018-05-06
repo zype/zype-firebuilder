@@ -99,6 +99,13 @@ permissions and limitations under the License.
                 android:layout_height="match_parent"
                 android:layout_below="@id/content_details"
                 tools:layout="@layout/action_widget_container"/>
+        <fragment
+            android:layout_width="380dp"
+            android:layout_height="match_parent"
+            android:name="com.amazon.android.tv.tenfoot.ui.fragments.MenuFragment"
+            android:id="@+id/fragmentMenu"
+            tools:layout="@layout/action_widget_container"
+            />
     </RelativeLayout>
 
     <include layout="@layout/action_widget_container"/>
