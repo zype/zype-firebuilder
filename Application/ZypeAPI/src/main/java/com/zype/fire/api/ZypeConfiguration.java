@@ -127,4 +127,9 @@ public class ZypeConfiguration {
     public static boolean isUniversalTVODEnabled(Context context) {
         return getBooleanPreference(PREFERENCE_UNIVERSAL_TVOD, ZypeSettings.UNIVERSAL_TVOD, context);
     }
+
+    public static boolean showLeftMenu() {
+        // Return `true` to enable the left menu
+        return false;
+    }
 }

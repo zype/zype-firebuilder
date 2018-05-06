@@ -44,6 +44,7 @@ import com.amazon.android.utils.Helpers;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment;
+import com.zype.fire.api.ZypeConfiguration;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -281,14 +282,17 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         Log.d(TAG, "event=" + event.toString());
+
         switch (event.getKeyCode()) {
             case KeyEvent.KEYCODE_MENU:
                 if (event.getAction() == KeyEvent.ACTION_UP) {
-                    Log.d(TAG, "Menu button pressed");
-                    if (!isMenuOpened) {
-                        showMenu();
+                    if (ZypeConfiguration.showLeftMenu()) {
+                        Log.d(TAG, "Menu button pressed");
+                        if (!isMenuOpened) {
+                            showMenu();
+                        }
+                        return true;
                     }
-                    return true;
                 }
             case KeyEvent.KEYCODE_BACK:
                 if (event.getAction() == KeyEvent.ACTION_UP) {
