@@ -286,7 +286,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         switch (event.getKeyCode()) {
             case KeyEvent.KEYCODE_MENU:
                 if (event.getAction() == KeyEvent.ACTION_UP) {
-                    if (ZypeConfiguration.showLeftMenu()) {
+                    if (ZypeConfiguration.displayLeftMenu()) {
                         Log.d(TAG, "Menu button pressed");
                         if (!isMenuOpened) {
                             showMenu();
