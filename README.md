@@ -116,7 +116,19 @@ Image dimensions should be approximately 356 x 108 px and have a transparent bac
 
 You can use icon generator in Android Studio to produce icons with required dimensions from 512x512 source icon image.
 
-5. Rebuild the project
+5. Setup UI options
+
+**Left menu**
+
+Left menu will appear when the user press `Menu` button on the device retomte control. It contains the same actions like Settings row at the bottom of the main screen.
+This option is turned off by default. To turn it on make the method `displayLeftMenu()` in the `ZypeConfiguration.java` return `true` value.
+
+**Watched bar**
+
+The watched bar is displayed on the video thumbnail and shows the time that user watched this video.
+This option is turned on by default. To turn it off make the method `displayWatchedBarOnVideoThumbnails()` in the `ZypeConfiguration.java` return `false` value.
+
+6. Rebuild the project
 
 ## Built With
 
