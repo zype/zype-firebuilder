@@ -43,6 +43,5 @@ public class ZypeSettings {
      * Amazon shared key is required for native subscription feature. It is used in request to Zype Bifrost
      * service for verifying subscription.
      */
-    public static final String AMAZON_SHARED_KEY = "2:QwDSMRWE6-QskpjXS0LDjFOqu9jWadiFvygv15Onw2Xt917Bm-9vHXUfwWmTFyKo:Lntf8F3vQfgCgGjTIh7kVw==";
+    public static final String AMAZON_SHARED_KEY = "";
 }
-
