@@ -674,7 +674,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             }
         });
         /* Zype, Evgeny Cherkasov */
-        setCustomSearchHandler(new ZypeSearchManager(Recipe.newInstance(mAppContext, "recipes/ZypeSearchContentsRecipe.json")));
+        setCustomSearchHandler(new ZypeSearchManager(Recipe.newInstance(mAppContext, "recipes/ZypeSearchContentsRecipe.json"),
+                mAppContext));
 
         mNavigator.setINavigationListener(new Navigator.INavigationListener() {
 

@@ -21,7 +21,7 @@ public class ZypeSettings {
     public static final String ROOT_MY_LIBRARY_PLAYLIST_ID = "RootMyLibrary";
 
     // Template version
-    public static final String TEMPLATE_VERSION = "1.5.0";
+    public static final String TEMPLATE_VERSION = "1.5.1";
 
     // Features
     public static final boolean DEVICE_LINKING = Boolean.valueOf("<DEVICE_LINKING>");

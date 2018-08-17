@@ -45,6 +45,7 @@ public class ZypeApi {
     private static final String PASSWORD = "password";
     public static final String PER_PAGE = "per_page";
     private static final String PIN = "pin";
+    public static final String PLAYLIST_ID_INCLUSIVE = "playlist_id.inclusive";
     public static final String QUERY = "q";
     private static final String REFRESH_TOKEN = "refresh_token";
 

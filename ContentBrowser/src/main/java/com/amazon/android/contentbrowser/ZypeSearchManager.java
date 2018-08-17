@@ -1,29 +1,20 @@
 package com.amazon.android.contentbrowser;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.Pair;
 
-import com.amazon.android.contentbrowser.helper.ErrorHelper;
-import com.amazon.android.contentbrowser.helper.LauncherIntegrationManager;
 import com.amazon.android.model.content.Content;
-import com.amazon.android.model.translators.ContentTranslator;
 import com.amazon.android.model.translators.ZypeContentTranslator;
-import com.amazon.android.navigator.NavigatorModel;
 import com.amazon.android.recipe.Recipe;
 import com.amazon.android.search.ISearchResult;
-import com.amazon.android.ui.fragments.AlertDialogFragment;
-import com.amazon.android.utils.ErrorUtils;
 import com.amazon.dynamicparser.DynamicParser;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.zype.fire.api.IZypeApi;
-import com.zype.fire.api.Model.PlayerResponse;
 import com.zype.fire.api.Model.VideoData;
 import com.zype.fire.api.Model.VideosResponse;
 import com.zype.fire.api.ZypeApi;
+import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 
 import java.util.HashMap;
@@ -43,10 +34,13 @@ import rx.schedulers.Schedulers;
 public class ZypeSearchManager implements ContentBrowser.ICustomSearchHandler {
     private static final String TAG = ZypeSearchManager.class.getSimpleName();
 
-    Recipe recipeSearchContents;
+    private Context context;
+    private Recipe recipeSearchContents;
 
-    public ZypeSearchManager(Recipe recipeSearchContents) {
+
+    public ZypeSearchManager(Recipe recipeSearchContents, Context context) {
         this.recipeSearchContents = recipeSearchContents;
+        this.context = context;
     }
 
     @Override
@@ -54,6 +48,7 @@ public class ZypeSearchManager implements ContentBrowser.ICustomSearchHandler {
         HashMap<String, String> params = new HashMap<>();
         params.put(ZypeApi.APP_KEY, ZypeSettings.APP_KEY);
         params.put(ZypeApi.PER_PAGE, String.valueOf(ZypeApi.PER_PAGE_DEFAULT));
+        params.put(ZypeApi.PLAYLIST_ID_INCLUSIVE, ZypeConfiguration.getRootPlaylistId(context));
         params.put(ZypeApi.QUERY, query);
 
         ZypeApi.getInstance().getApi().getVideos(1, params).enqueue(new Callback<VideosResponse>() {

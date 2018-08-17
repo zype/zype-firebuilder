@@ -7,18 +7,21 @@ import android.content.Context;
  */
 
 public class ZypeSettings {
-//    // Zype app key
-//    public static final String APP_KEY = "vTlJuVm2hLnXui5eagy9cxOqWoZNijfGrBmdY9q-64vQEoYufrFBpQeu80vVzBR8";
-//    // OAuth credentials
-//    public static final String CLIENT_ID = "a5e203a720af81c0cf0d5e22cfc9fb1b490b2cfe0d71d51e46995751e3f4cc6f";
-//    public static final String CLIENT_SECRET = "31e6f8cbb887ba5dd6b6cf9dfb3bb89e81ae298b58455663a9f50c4609c2466d ";
     // Zype app key
-    public static final String APP_KEY = "iBjj-jnjT12tQGmyeOR9op8_RjsGmT1Nq5OEETkbxOXnNmDE1m9MrB0wpti0__9l";
+    public static final String APP_KEY = "L2fycHRmrKK2uJRdzy6qeoTOoQj5RmN0AphcLMkiOHa5RYJmqHk2QZQlU9xZAbMX";
     // OAuth credentials
-    public static final String CLIENT_ID = "62f1d247b4c5e77b6111d9a9ed8b3b64bab6be66cc8b7513a928198083cd1c72";
-    public static final String CLIENT_SECRET = "06f45687da00bbe3cf51dddc7dbd7a288d1c852cf0b9a6e76e25bb115dcf872c";
+    public static final String CLIENT_ID = "12737780da12068cfd0232dad0430ad2871a4d22d3f01a873849f5923b66e76b";
+    public static final String CLIENT_SECRET = "114d65f693ba29c4fa095f754d1a593d22d5affde3a4074654bf0a495b7ad0c8";
     // Playlist
-    public static final String ROOT_PLAYLIST_ID = "577e65c85577de0d1000c1ee";
+    public static final String ROOT_PLAYLIST_ID = "5807ccdc849e2d0d11000146";
+
+//    // Zype app key
+//    public static final String APP_KEY = "iBjj-jnjT12tQGmyeOR9op8_RjsGmT1Nq5OEETkbxOXnNmDE1m9MrB0wpti0__9l";
+//    // OAuth credentials
+//    public static final String CLIENT_ID = "62f1d247b4c5e77b6111d9a9ed8b3b64bab6be66cc8b7513a928198083cd1c72";
+//    public static final String CLIENT_SECRET = "06f45687da00bbe3cf51dddc7dbd7a288d1c852cf0b9a6e76e25bb115dcf872c";
+//    // Playlist
+//    public static final String ROOT_PLAYLIST_ID = "577e65c85577de0d1000c1ee";
 
     public static final String FAVORITES_PLAYLIST_ID = "Favorites";
     public static final String MY_LIBRARY_PLAYLIST_ID = "MyLibrary";
@@ -26,7 +29,7 @@ public class ZypeSettings {
     public static final String ROOT_MY_LIBRARY_PLAYLIST_ID = "RootMyLibrary";
 
     // Template version
-    public static final String TEMPLATE_VERSION = "1.5.0";
+    public static final String TEMPLATE_VERSION = "1.5.1";
 
     // Features
     public static final boolean DEVICE_LINKING = true;
