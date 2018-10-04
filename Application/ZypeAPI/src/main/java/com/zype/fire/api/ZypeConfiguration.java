@@ -18,6 +18,7 @@ public class ZypeConfiguration {
     private static final String PREFERENCE_FAVORITES_API = "ZypeFavoritesApi";
     private static final String PREFERENCE_NATIVE_SUBSCRIPTION = "ZypeNativeSubscription";
     private static final String PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION = "ZypeNativeToUniversalSubscription";
+    private static final String PREFERENCE_NATIVE_TVOD = "ZypeNativeTVOD";
     private static final String PREFERENCE_ROOT_PLAYLIST_ID = "ZypeRootPlaylistId";
     private static final String PREFERENCE_SUBSCRIBE_TO_WATCH_AD_FREE = "ZypeSubscribeToWatchAdFree";
     private static final String PREFERENCE_UNIVERSAL_SUBSCRIPTION = "ZypeUniversalSubscription";
@@ -47,6 +48,9 @@ public class ZypeConfiguration {
         if (!TextUtils.isEmpty(appData.nativeToUniversalSubscription)) {
             editor.putBoolean(PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION, Boolean.valueOf(appData.nativeToUniversalSubscription));
         }
+        if (!TextUtils.isEmpty(appData.nativeTVOD)) {
+            editor.putBoolean(PREFERENCE_NATIVE_TVOD, Boolean.valueOf(appData.nativeTVOD));
+        }
         if (!TextUtils.isEmpty(appData.featuredPlaylistId)) {
             editor.putString(PREFERENCE_ROOT_PLAYLIST_ID, appData.featuredPlaylistId);
         }
@@ -69,6 +73,7 @@ public class ZypeConfiguration {
         editor.remove(PREFERENCE_FAVORITES_API);
         editor.remove(PREFERENCE_NATIVE_SUBSCRIPTION);
         editor.remove(PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION);
+        editor.remove(PREFERENCE_NATIVE_TVOD);
         editor.remove(PREFERENCE_ROOT_PLAYLIST_ID);
         editor.remove(PREFERENCE_SUBSCRIBE_TO_WATCH_AD_FREE);
         editor.remove(PREFERENCE_UNIVERSAL_SUBSCRIPTION);
@@ -114,6 +119,10 @@ public class ZypeConfiguration {
 
     public static boolean isNativeToUniversalSubscriptionEnabled(Context context) {
         return getBooleanPreference(PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION, ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED, context);
+    }
+
+    public static boolean isNativeTVODEnabled(Context context) {
+        return getBooleanPreference(PREFERENCE_NATIVE_TVOD, ZypeSettings.NATIVE_TVOD, context);
     }
 
     public static boolean isSubscribeToWatchAdFreeEnabled(Context context) {

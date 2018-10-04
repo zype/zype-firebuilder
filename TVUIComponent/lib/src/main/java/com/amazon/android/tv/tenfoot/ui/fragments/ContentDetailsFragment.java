@@ -42,9 +42,13 @@ import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.DetailsDescriptionPresenter;
 import com.amazon.android.tv.tenfoot.ui.activities.ContentDetailsActivity;
 import com.amazon.android.utils.LeanbackHelpers;
+import com.amazon.android.utils.Preferences;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.zype.fire.api.ZypeApi;
+import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
+import com.zype.fire.auth.ZypeAuthentication;
 
 import android.app.Activity;
 import android.app.NotificationManager;
@@ -88,7 +92,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import java.util.HashMap;
 import java.util.List;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 /**
@@ -527,6 +537,7 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
         if (receiver != null) {
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, new IntentFilter("DataUpdated"));
         }
+        checkVideoEntitlement();
     }
 
     /**
@@ -610,5 +621,34 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
             action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
             listRowAdapter.add(action);
         }
+    }
+
+    private void checkVideoEntitlement() {
+        if (ZypeConfiguration.isUniversalTVODEnabled(getActivity())) {
+            if (mSelectedContent.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED)) {
+                String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
+                HashMap<String, String> params = new HashMap<>();
+                params.put(ZypeApi.ACCESS_TOKEN, accessToken);
+                ZypeApi.getInstance().getApi().checkVideoEntitlement(mSelectedContent.getId(), params).enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        Log.e(TAG, "checkVideoEntitlement(): code=" + response.code());
+                        if (response.isSuccessful()) {
+                            mSelectedContent.setExtraValue(Content.EXTRA_ENTITLED, true);
+                        }
+                        else {
+                            mSelectedContent.setExtraValue(Content.EXTRA_ENTITLED, false);
+                        }
+                        updateActions();
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Log.e(TAG, "checkVideoEntitlement(): failed");
+                    }
+                });
+            }
+        }
+
     }
 }

@@ -81,6 +81,9 @@ permissions and limitations under the License.
         <activity android:name="com.amazon.android.uamp.ui.PlaybackActivity"/>
         <!-- Zype, Evgeny Cherkasov -->
         <activity
+            android:name="com.amazon.android.tv.tenfoot.ui.Subscription.BuyVideoActivity"
+            android:label="@string/buy_video_confirm" />
+        <activity
             android:name="com.amazon.android.tv.tenfoot.ui.Subscription.CreateLoginActivity"
             android:label="@string/create_login_title" />
         <activity

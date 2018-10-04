@@ -37,6 +37,10 @@ public class AppData {
     @Expose
     public String nativeToUniversalSubscription;
 
+    @SerializedName("native_tvod")
+    @Expose
+    public String nativeTVOD;
+
     @SerializedName("per_page")
     @Expose
     public String perPage;

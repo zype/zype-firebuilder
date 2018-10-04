@@ -268,9 +268,10 @@ public class ContentBrowseFragment extends RowsFragment {
                 Log.d(TAG, "Content with title " + content.getTitle() + " was clicked");
 
                 /* Zype, Evgeny Cherkasov */
-                // Get video entitlement
+                // Get video entitlement for purchase required videos
                 if (ZypeConfiguration.isUniversalTVODEnabled(getActivity())) {
-                    if (!content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
+                    if (content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED)
+                            && !content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
                         String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
                         HashMap<String, String> params = new HashMap<>();
                         params.put(ZypeApi.ACCESS_TOKEN, accessToken);

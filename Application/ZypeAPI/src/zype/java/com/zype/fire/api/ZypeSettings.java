@@ -12,14 +12,6 @@ public class ZypeSettings {
 //    // OAuth credentials
 //    public static final String CLIENT_ID = "a5e203a720af81c0cf0d5e22cfc9fb1b490b2cfe0d71d51e46995751e3f4cc6f";
 //    public static final String CLIENT_SECRET = "31e6f8cbb887ba5dd6b6cf9dfb3bb89e81ae298b58455663a9f50c4609c2466d ";
-//    // Zype app key
-//    public static final String APP_KEY = "L2fycHRmrKK2uJRdzy6qeoTOoQj5RmN0AphcLMkiOHa5RYJmqHk2QZQlU9xZAbMX";
-//    // OAuth credentials
-//    public static final String CLIENT_ID = "12737780da12068cfd0232dad0430ad2871a4d22d3f01a873849f5923b66e76b";
-//    public static final String CLIENT_SECRET = "114d65f693ba29c4fa095f754d1a593d22d5affde3a4074654bf0a495b7ad0c8";
-//    // Playlist
-//    public static final String ROOT_PLAYLIST_ID = "5807ccdc849e2d0d11000146";
-
     // Zype app key
     public static final String APP_KEY = "iBjj-jnjT12tQGmyeOR9op8_RjsGmT1Nq5OEETkbxOXnNmDE1m9MrB0wpti0__9l";
     // OAuth credentials
@@ -34,23 +26,24 @@ public class ZypeSettings {
     public static final String ROOT_MY_LIBRARY_PLAYLIST_ID = "RootMyLibrary";
 
     // Template version
-    public static final String TEMPLATE_VERSION = "1.6.0";
+    public static final String TEMPLATE_VERSION = "1.8.0";
 
     // Features
+    public static final boolean ACCOUNT_CREATION_TOS = false;
     public static final boolean DEVICE_LINKING = true;
     public static final boolean FAVORITES_VIA_API = true;
-    public static final boolean ACCOUNT_CREATION_TOS = false;
 
     // Monetization
     public static final boolean NATIVE_SUBSCRIPTION_ENABLED = false;
-    public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = true;
+    public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = false;
+    public static final boolean NATIVE_TVOD = true;
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = false;
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = false;
-    public static final boolean UNIVERSAL_TVOD = false;
+    public static final boolean UNIVERSAL_TVOD = true;
 
     /**
      * Amazon shared key is required for native subscription feature. It is used in request to Zype Bifrost
      * service for verifying subscription.
      */
-    public static final String AMAZON_SHARED_KEY = "";
+    public static final String AMAZON_SHARED_KEY = "2:QwDSMRWE6-QskpjXS0LDjFOqu9jWadiFvygv15Onw2Xt917Bm-9vHXUfwWmTFyKo:Lntf8F3vQfgCgGjTIh7kVw==";
 }

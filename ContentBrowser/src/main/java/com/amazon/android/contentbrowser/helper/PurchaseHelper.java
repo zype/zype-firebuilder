@@ -18,8 +18,8 @@ import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.R;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.event.ProgressOverlayDismissEvent;
-import com.amazon.android.model.event.SubscriptionProductsUpdateEvent;
-import com.amazon.android.model.event.SubscriptionPurchaseEvent;
+import com.amazon.android.model.event.ProductsUpdateEvent;
+import com.amazon.android.model.event.PurchaseEvent;
 import com.amazon.android.module.ModuleManager;
 import com.amazon.android.recipe.Recipe;
 import com.amazon.android.ui.fragments.ProgressDialogFragment;
@@ -36,13 +36,11 @@ import org.greenrobot.eventbus.EventBus;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -105,6 +103,10 @@ public class PurchaseHelper {
     private final Map<String, String> mActionsMap;
     private String mDailyPassSKU;
     private String mSubscriptionSKU;
+
+    /* Zype, Evgeny Cherkasov */
+    private String mBuyVideoSKU;
+
     /**
      * Event bus reference.
      */
@@ -416,7 +418,7 @@ public class PurchaseHelper {
                     Log.e(TAG, "isPurchaseValid subscribe called");
                     /* Zype, Evgeny Cherkasov */
 //                    mContentBrowser.updateContentActions();
-                    EventBus.getDefault().post(new SubscriptionPurchaseEvent(resultBundle));
+                    EventBus.getDefault().post(new PurchaseEvent(resultBundle));
 
                     EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
                 }, throwable -> {
@@ -447,10 +449,15 @@ public class PurchaseHelper {
             handlePurchaseChain(activity, mSubscriptionSKU);
         }
         /* Zype, Evgeny Cherkasov */
+        else if (actionId == ContentBrowser.CONTENT_ACTION_BUY) {
+            handlePurchaseChain(activity, mBuyVideoSKU);
+        }
         else if (actionId == ContentBrowser.CONTENT_ACTION_CHOOSE_PLAN) {
             mContentBrowser.switchToSubscriptionScreen(new Bundle());
         }
-
+        else if (actionId == ContentBrowser.CONTENT_ACTION_CONFIRM_PURCHASE) {
+            mContentBrowser.switchToBuyVideoScreen(new Bundle());
+        }
     }
 
     /**
@@ -477,22 +484,27 @@ public class PurchaseHelper {
                         errorDialogFragment.dismiss();
                     });
         }
+        handleProductsChain(activity, skuSet);
+    }
+
+    public void handleProductsChain(Activity activity, Set<String> skuSet) {
+        triggerProgress(activity);
         productsObservable(skuSet)
                 .subscribeOn(Schedulers.newThread()) //this needs to be first make sure
                 .observeOn(AndroidSchedulers.mainThread()) //this needs to be last to
                 // make sure rest is running on separate thread.
                 .subscribe(resultBundle -> {
-                    EventBus.getDefault().post(new SubscriptionProductsUpdateEvent(resultBundle));
-                    EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
-                    },
-                    throwable -> {
-                        EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
+                            EventBus.getDefault().post(new ProductsUpdateEvent(resultBundle));
+                            EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
+                        },
+                        throwable -> {
+                            EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
 
-                        ErrorHelper.injectErrorFragment(activity, ErrorUtils.ERROR_CATEGORY.NETWORK_ERROR,
-                                (errorDialogFragment, errorButtonType, errorCategory) -> {
-                            errorDialogFragment.dismiss();
+                            ErrorHelper.injectErrorFragment(activity, ErrorUtils.ERROR_CATEGORY.NETWORK_ERROR,
+                                    (errorDialogFragment, errorButtonType, errorCategory) -> {
+                                        errorDialogFragment.dismiss();
+                                    });
                         });
-                    });
     }
 
     public Observable<Bundle> productsObservable(Set<String> skuSet) {
@@ -556,4 +568,10 @@ public class PurchaseHelper {
         }
         return null;
     }
+
+    /* Zype, Evgeny Cherkasov */
+    public void setBuyVideoSKU(String sku) {
+        mBuyVideoSKU = sku;
+    }
+
 }
