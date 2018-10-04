@@ -76,6 +76,13 @@ permissions and limitations under the License.
     <!--
         Zype, Evgeny Cherkasov
     -->
+    <!-- Buy video -->
+    <string name="buy_video_button_confirm">Buy Video</string>
+    <string name="buy_video_button_confirm_price">Buy Video - %1$s</string>
+    <string name="buy_video_button_cancel">Cancel</string>
+    <string name="buy_video_button_restore">Restore purchase</string>
+    <string name="buy_video_confirm">Confirm purchase</string>
+
     <!-- Content details -->
     <string name="content_details_recommended_header_favorites">Favorites</string>
 
@@ -89,7 +96,7 @@ permissions and limitations under the License.
     <string name="create_login_description">You will be able to enjoy watching from any device</string>
     <string name="create_login_title">Create a login</string>
 
-    <!-- Login -->>
+    <!-- Login -->
     <string name="login_message">Please sign in to watch</string>
 
     <!-- Subscription -->

@@ -20,6 +20,14 @@ public class ZypeSettings {
     // Playlist
     public static final String ROOT_PLAYLIST_ID = "577e65c85577de0d1000c1ee";
 
+//    // Zype app key
+//    public static final String APP_KEY = "le8lKSJFRpcCUtU7FVf0R9WnJjyzYo4RgHzMTCXOJI-9yDqs0ICu4y0hn-9nvf8c";
+//    // OAuth credentials
+//    public static final String CLIENT_ID = "a5d53665ab51b3ab209f31c1b708b5d096538f4ffb73558b5ca9dbff6f201f59";
+//    public static final String CLIENT_SECRET = "982666422b621be6b9e58c4de8306fdc34473e961f2afe0e3f807664d61cd806";
+//    // Playlist
+//    public static final String ROOT_PLAYLIST_ID = "577e65c85577de0d1000c1ee";
+
     public static final String FAVORITES_PLAYLIST_ID = "Favorites";
     public static final String MY_LIBRARY_PLAYLIST_ID = "MyLibrary";
     public static final String ROOT_FAVORITES_PLAYLIST_ID = "RootFavorites";
@@ -35,8 +43,9 @@ public class ZypeSettings {
     // Monetization
     public static final boolean NATIVE_SUBSCRIPTION_ENABLED = false;
     public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = false;
+    public static final boolean NATIVE_TVOD = true;
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = false;
-    public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = true;
+    public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = false;
     public static final boolean UNIVERSAL_TVOD = true;
 
     /**

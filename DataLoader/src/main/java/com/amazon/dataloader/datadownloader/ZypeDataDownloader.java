@@ -176,6 +176,9 @@ public class ZypeDataDownloader extends ADataDownloader {
             result = appResponse.data;
         }
 
+        // TODO: Delete this for release build
+        result.universalTVOD = null;
+
         return result;
     }
 

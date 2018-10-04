@@ -3,12 +3,12 @@ package com.amazon.android.model.event;
 import android.os.Bundle;
 
 /**
- * Created by Evgeny Cherkasov on 29.08.2017.
+ * Created by Evgeny Cherkasov on 25.08.2017.
  *
- * Subscription purchase event class for event broadcasting.
+ * Subscription products update event class for event broadcasting.
  */
 
-public class SubscriptionPurchaseEvent {
+public class ProductsUpdateEvent {
     /**
      * Dismiss flag.
      */
@@ -19,7 +19,7 @@ public class SubscriptionPurchaseEvent {
      *
      * @param extras Bundle with products data.
      */
-    public SubscriptionPurchaseEvent(Bundle extras) {
+    public ProductsUpdateEvent(Bundle extras) {
         this.extras = extras;
     }
 

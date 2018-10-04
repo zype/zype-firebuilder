@@ -57,6 +57,9 @@ permissions and limitations under the License.
     <!--
         Zype, Evgeny Cherkasov
     -->
+    <!-- Buy video -->
+    <string name="buy_video_error_product">Error retrieving product info</string>
+    <string name="buy_video_error_verify">Error verifying video purchase.</string>
     <!-- Create login -->
     <string name="create_consumer_error">Error creating login. Please retry.</string>
     <!-- Favorites -->

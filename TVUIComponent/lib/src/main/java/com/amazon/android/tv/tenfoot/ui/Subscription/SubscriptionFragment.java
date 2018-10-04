@@ -14,7 +14,7 @@ import android.support.v17.leanback.widget.VerticalGridView;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.helper.PurchaseHelper;
-import com.amazon.android.model.event.SubscriptionProductsUpdateEvent;
+import com.amazon.android.model.event.ProductsUpdateEvent;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
 import com.amazon.android.tv.tenfoot.presenter.SubscriptionCardPresenter;
 import com.amazon.android.tv.tenfoot.ui.Subscription.Model.SubscriptionItem;
@@ -120,7 +120,7 @@ public class SubscriptionFragment extends RowsFragment {
      * @param event Broadcast event for progress overlay dismiss.
      */
     @Subscribe
-    public void onProductsUpdateEvent(SubscriptionProductsUpdateEvent event) {
+    public void onProductsUpdateEvent(ProductsUpdateEvent event) {
         ArrayList<HashMap<String, String>> products = (ArrayList<HashMap<String, String>>) event.getExtras().getSerializable(PurchaseHelper.RESULT_PRODUCTS);
         updateSubscriptionOptions(rowsAdapter, products);
     }

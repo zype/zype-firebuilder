@@ -43,6 +43,8 @@ public class ErrorUtils {
         PLAYER_ERROR,
         AUTHENTICATION_SYSTEM_ERROR,
         /* Zype, Evgeny Cherkasov */
+        ZYPE_BUY_VIDEO_ERROR_PRODUCT,
+        ZYPE_BUY_VIDEO_ERROR_VERIFY,
         ZYPE_CREATE_CONSUMER_ERROR,
         ZYPE_CUSTOM,
         ZYPE_FAVORITES_ERROR_EMPTY,
@@ -96,6 +98,12 @@ public class ErrorUtils {
                 errorMessage = context.getResources().getString(R.string.playback_error_message);
                 break;
             /* Zype, Evgeny Cherkasov */
+            case ZYPE_BUY_VIDEO_ERROR_PRODUCT:
+                errorMessage = context.getResources().getString(R.string.buy_video_error_product);
+                break;
+            case ZYPE_BUY_VIDEO_ERROR_VERIFY:
+                errorMessage = context.getResources().getString(R.string.buy_video_error_verify);
+                break;
             case ZYPE_CREATE_CONSUMER_ERROR:
                 errorMessage = context.getResources().getString(R.string.create_consumer_error);
                 break;
@@ -152,6 +160,8 @@ public class ErrorUtils {
                 buttonLabelsList.add(context.getResources().getString(R.string.dismiss_label));
                 break;
             /* Zype, Evgeny Cherkasov */
+            case ZYPE_BUY_VIDEO_ERROR_PRODUCT:
+            case ZYPE_BUY_VIDEO_ERROR_VERIFY:
             case ZYPE_CREATE_CONSUMER_ERROR:
                 buttonLabelsList.add(context.getResources().getString(R.string.dismiss_label));
                 break;

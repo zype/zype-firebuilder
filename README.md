@@ -54,8 +54,9 @@ Full Documentation for Fire App Builder is located [here](https://developer.amaz
 ## Monetizations Supported
 
 - Native SVOD via In App Purchases
-- Universal SVOD via login
-- Universal TVOD
+- Universal SVOD via login and device linking
+- Native TVOD via In App Purchases
+- Universal TVOD via login and device linking
 
 ## Supported Devices
 
@@ -81,7 +82,6 @@ Non-Amazon Android devices and Amazon Fire phones and tablets are not supported 
   **Application/ZypeAPI/src/template/java/com/zype/fire/api/ZypeSettings.java**
   - ```<APP_KEY>```
   - ```<CLIENT_ID>```
-  - ```<CLIENT_SECRET>```
   - ```<ROOT_PLAYLIST_ID>```
 
 Also replace features and monetization options placeholders with `true` or `false` values.

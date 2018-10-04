@@ -71,6 +71,11 @@ public class ZypeReceiptVerificationService extends AReceiptVerifier {
                 return requestId;
             }
         }
+        else if (ZypeConfiguration.isUniversalTVODEnabled(context)) {
+            Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
+            listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
+            return requestId;
+        }
         else {
             Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
             listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);

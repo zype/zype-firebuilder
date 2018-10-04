@@ -165,6 +165,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final String CONTENT_SLIDESHOW_SCREEN = "CONTENT_SLIDESHOW_SCREEN";
 
     /* Zype, Evgeny Cherkasov */
+    public static final String BUY_VIDEO_SCREEN = "BUY_VIDEO_SCREEN";
     public static final String SUBSCRIPTION_SCREEN = "SUBSCRIPTION_SCREEN";
 
     /**
@@ -284,10 +285,11 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
     /* Zype, Evgeny Cherkasov */
     // Choose plan action
-    public static final int CONTENT_ACTION_CHOOSE_PLAN = 50;
+    public static final int CONTENT_ACTION_CHOOSE_PLAN = 51;
+    public static final int CONTENT_ACTION_CONFIRM_PURCHASE = 52;
     // Favorites actions
-    public static final int CONTENT_ACTION_FAVORITES_ADD = 51;
-    public static final int CONTENT_ACTION_FAVORITES_REMOVE = 52;
+    public static final int CONTENT_ACTION_FAVORITES_ADD = 53;
+    public static final int CONTENT_ACTION_FAVORITES_REMOVE = 54;
     // Watch ad free action
     public static final int CONTENT_ACTION_SWAF = 55;
 
@@ -644,7 +646,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         mIAPDisabled = mAppContext.getResources().getBoolean(R.bool.is_iap_disabled);
         /* Zype, Evgeny Cherkasov */
         if (!ZypeConfiguration.isNativeSubscriptionEnabled(mAppContext)
-                && !ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(mAppContext)) {
+                && !ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(mAppContext)
+                && !ZypeConfiguration.isNativeTVODEnabled(mAppContext)) {
             mIAPDisabled = true;
         }
 
@@ -1561,6 +1564,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         boolean showAdFree = false;
         boolean showFavorites = false;
 
+        boolean subscriptionRequired = content.isSubscriptionRequired();
         boolean purchaseRequired = false;
         boolean entitled = false;
         if (ZypeConfiguration.isUniversalTVODEnabled(mAppContext)) {
@@ -1573,7 +1577,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         if (isSubscriptionNotRequired && !purchaseRequired || mIAPDisabled) {
             showWatch = true;
         }
-        else if (!isSubscriptionNotRequired && purchaseRequired) {
+        else if (subscriptionRequired && purchaseRequired) {
             if (!isUserSubscribed() && !entitled) {
                 showSubscribe = true;
                 showPurchase = true;
@@ -1583,7 +1587,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             }
         }
         else {
-            if (!isSubscriptionNotRequired) {
+            if (subscriptionRequired) {
                 if (isUserSubscribed()) {
                     showWatch = true;
                 }
@@ -1602,7 +1606,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     showWatch = true;
                 }
                 else {
-                    showPurchase = true;
+                    if (ZypeConfiguration.isNativeTVODEnabled(mAppContext)) {
+                        showPurchase = true;
+                    }
                 }
             }
         }
@@ -1651,9 +1657,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     R.string.action_subscription_1, R.string.action_subscription_2));
         }
         if (showPurchase) {
-            // TODO: Display button to purchase video
-            contentActionList.add(createActionButton(CONTENT_ACTION_CHOOSE_PLAN,
-                    R.string.action_subscription_1, R.string.action_subscription_2));
+            contentActionList.add(createActionButton(CONTENT_ACTION_CONFIRM_PURCHASE,
+                    R.string.action_buy_video_1, R.string.action_buy_video_2));
         }
         if (showAdFree) {
             contentActionList.add(createActionButton(CONTENT_ACTION_SWAF,
@@ -2345,7 +2350,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 mPurchaseHelper.handleAction(activity, content, actionId);
                 break;
             /* Zype, Evgeny Cherkasov */
+            case CONTENT_ACTION_BUY:
             case CONTENT_ACTION_CHOOSE_PLAN:
+            case CONTENT_ACTION_CONFIRM_PURCHASE:
                 mPurchaseHelper.handleAction(activity, content, actionId);
                 break;
             case CONTENT_ACTION_FAVORITES_ADD:
@@ -3122,6 +3129,12 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
     public void updateSubscriptionSku(String sku) {
         mPurchaseHelper.setSubscriptionSKU(sku);
+    }
+
+    public void switchToBuyVideoScreen(Bundle extras) {
+        switchToScreen(BUY_VIDEO_SCREEN, intent -> {
+            intent.putExtras(extras);
+        });
     }
 
     public void switchToSubscriptionScreen(Bundle extras) {
