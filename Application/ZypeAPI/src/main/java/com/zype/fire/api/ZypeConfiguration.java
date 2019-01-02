@@ -137,4 +137,8 @@ public class ZypeConfiguration {
         // Return `true` to enable the left menu
         return false;
     }
+
+    public static boolean isCreateAccountTermsOfServiceRequired() {
+        return ZypeSettings.ACCOUNT_CREATION_TOS;
+    }
 }
