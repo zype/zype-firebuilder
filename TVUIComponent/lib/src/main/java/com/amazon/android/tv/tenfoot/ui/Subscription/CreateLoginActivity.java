@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
@@ -44,6 +45,7 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
 
     public static final String PARAMETERS_SKU = "SKU";
 
+    private CheckBox checkboxTermsOfService;
     private EditText editEmail;
     private EditText editPassword;
     private Button buttonSignUp;
@@ -62,6 +64,8 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
         editEmail = (EditText) findViewById(R.id.editEmail);
         editPassword = (EditText) findViewById(R.id.editPassword);
 
+        checkboxTermsOfService = (CheckBox) findViewById(R.id.checkboxTermsOfService);
+
         buttonSignUp = (Button) findViewById(R.id.buttonSignUp);
         buttonSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,12 +80,23 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
                 onLogin();
             }
         });
+
+        updateViews();
     }
 
     // //////////
     // UI
     //
     private void bindViews() {
+    }
+
+    private void updateViews() {
+        if (contentBrowser.isCreateAccountTermsOfServiceRequired()) {
+            checkboxTermsOfService.setVisibility(View.VISIBLE);
+        }
+        else {
+            checkboxTermsOfService.setVisibility(View.GONE);
+        }
     }
 
     //
@@ -119,6 +134,15 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
     }
 
     private void createConsumer() {
+        if (contentBrowser.isCreateAccountTermsOfServiceRequired()) {
+            if (!checkboxTermsOfService.isChecked()) {
+                dialogError = ErrorDialogFragment.newInstance(CreateLoginActivity.this,
+                        ErrorUtils.ERROR_CATEGORY.ZYPE_CUSTOM, getString(R.string.create_login_error_tos),
+                        CreateLoginActivity.this);
+                dialogError.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
+                return;
+            }
+        }
         Consumer consumer = getViewModel();
         if (validate(consumer)) {
             requestCreateConsumer(consumer);
@@ -164,8 +188,8 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
      */
     @Override
     public void doButtonClick(ErrorDialogFragment errorDialogFragment, ErrorUtils.ERROR_BUTTON_TYPE errorButtonType, ErrorUtils.ERROR_CATEGORY errorCategory) {
-        if (dialogError  != null) {
-            dialogError .dismiss();
+        if (dialogError != null) {
+            dialogError.dismiss();
         }
     }
 

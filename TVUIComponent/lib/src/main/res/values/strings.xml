@@ -83,8 +83,10 @@ permissions and limitations under the License.
     <string name="create_login_email">Email</string>
     <string name="create_login_email_error_empty">Email is required</string>
     <string name="create_login_email_error_invalid">Enter valid email</string>
+    <string name="create_login_error_tos">You must agree with the terms of service in order to proceed.</string>
     <string name="create_login_password">Password</string>
     <string name="create_login_password_error_empty">Enter password</string>
+    <string name="create_login_terms_of_service">I agree to the terms of service</string>
     <string name="create_login_button_sign_up">Sign Up</string>
     <string name="create_login_description">You will be able to enjoy watching from any device</string>
     <string name="create_login_title">Create a login</string>

@@ -3134,4 +3134,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public PurchaseHelper getPurchaseHelper() {
         return mPurchaseHelper;
     }
+
+    public boolean isCreateAccountTermsOfServiceRequired() {
+        return ZypeConfiguration.isCreateAccountTermsOfServiceRequired();
+    }
 }

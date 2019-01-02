@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="48dp"
+    android:padding="24dp"
     >
     <ImageView
         android:layout_width="116dp"
@@ -62,6 +62,15 @@
         android:minWidth="200dp"
         android:minHeight="48dp"
         android:text="@string/create_login_button_sign_up"
+        />
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/checkboxTermsOfService"
+        android:text="@string/create_login_terms_of_service"
+        android:checked="true"
         />
     <LinearLayout
         android:layout_width="match_parent"
