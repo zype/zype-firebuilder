@@ -2188,9 +2188,11 @@ public class PlaybackActivity extends Activity implements
             if (playerData.body.advertising != null && playerData.body.advertising.schedule.size() > 0) {
                 content.setAdCuePoints(new ArrayList<>());
                 List<String> adTags = new ArrayList<>();
+                String adTag;
                 for (AdvertisingSchedule item : playerData.body.advertising.schedule) {
                     content.getAdCuePoints().add(item.offset);
-                    adTags.add(item.tag);
+                    adTag = AdMacrosHelper.updateAdTagParameters(this, item.tag);
+                    adTags.add(adTag);
                 }
                 content.setExtraValue(Content.EXTRA_AD_TAGS, adTags);
             }
