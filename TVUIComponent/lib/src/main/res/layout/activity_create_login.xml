@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="24dp"
+    android:padding="16dp"
     >
     <ImageView
         android:layout_width="116dp"
@@ -23,14 +23,16 @@
         android:textStyle="bold"
         android:textColor="@color/login_code_color"
         />
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:text="@string/create_login_description"
-        android:textSize="16sp"
-        android:textColor="@color/login_instructions_color"
-        />
+    <!--
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/create_login_description"
+            android:textSize="16sp"
+            android:textColor="@color/login_instructions_color"
+            />
+    -->
     <EditText
         android:layout_width="480dp"
         android:layout_height="wrap_content"
@@ -40,16 +42,18 @@
         android:inputType="textEmailAddress"
         android:textSize="20sp"
         android:hint="@string/create_login_email"
+        android:backgroundTint="@color/background_tint_color_selector"
         />
     <EditText
         android:layout_width="480dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:layout_gravity="center_horizontal"
         android:id="@+id/editPassword"
         android:inputType="textPassword"
         android:textSize="20sp"
         android:hint="@string/create_login_password"
+        android:backgroundTint="@color/background_tint_color_selector"
         />
     <Button
         android:layout_width="wrap_content"
@@ -57,7 +61,7 @@
         android:layout_marginTop="24dp"
         android:layout_gravity="center_horizontal"
         android:id="@+id/buttonSignUp"
-        android:background="@drawable/action_button_background"
+        android:background="@drawable/highlighted_button_background"
         android:textColor="@drawable/action_button_text_color_selector"
         android:minWidth="200dp"
         android:minHeight="48dp"
@@ -66,11 +70,14 @@
     <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="20dp"
         android:layout_gravity="center_horizontal"
         android:id="@+id/checkboxTermsOfService"
         android:text="@string/create_login_terms_of_service"
         android:checked="true"
+        android:drawableStart="@android:color/transparent"
+        android:drawablePadding="16dp"
+        android:buttonTint="@color/accent"
         />
     <LinearLayout
         android:layout_width="match_parent"
@@ -90,7 +97,7 @@
             />
         <Button
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="36dp"
             android:layout_marginRight="20dp"
             android:id="@+id/buttonLogin"
             android:background="@drawable/action_button_background"

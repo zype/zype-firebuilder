@@ -119,14 +119,16 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
                         contentBrowser.getAuthHelper()
                                 .authenticateWithActivity()
                                 .subscribe(resultBundle -> {
-                                    if (resultBundle != null && !resultBundle.getBoolean(AuthHelper.RESULT)) {
-                                        contentBrowser.getNavigator().runOnUpcomingActivity(() -> contentBrowser.getAuthHelper()
-                                                .handleErrorBundle(resultBundle));
-                                    }
-                                    else {
-                                        contentBrowser.onAuthenticationStatusUpdateEvent(new AuthHelper.AuthenticationStatusUpdateEvent(true));
-                                        EventBus.getDefault().post(new AuthHelper.AuthenticationStatusUpdateEvent(true));
-                                        finish();
+                                    if (resultBundle != null) {
+                                        if (!resultBundle.getBoolean(AuthHelper.RESULT)) {
+                                            contentBrowser.getNavigator().runOnUpcomingActivity(() -> contentBrowser.getAuthHelper()
+                                                    .handleErrorBundle(resultBundle));
+                                        } else {
+                                            contentBrowser.onAuthenticationStatusUpdateEvent(new AuthHelper.AuthenticationStatusUpdateEvent(true));
+                                            EventBus.getDefault().post(new AuthHelper.AuthenticationStatusUpdateEvent(true));
+                                            setResult(RESULT_OK);
+                                            finish();
+                                        }
                                     }
                                 });
                     }
