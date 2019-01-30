@@ -29,7 +29,7 @@ public class ZypeSettings {
     public static final String TEMPLATE_VERSION = "1.8.0";
 
     // Features
-    public static final boolean ACCOUNT_CREATION_TOS = false;
+    public static final boolean ACCOUNT_CREATION_TOS = true;
     public static final boolean DEVICE_LINKING = true;
     public static final boolean FAVORITES_VIA_API = true;
 

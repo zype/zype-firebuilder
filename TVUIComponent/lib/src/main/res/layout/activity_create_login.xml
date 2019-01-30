@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:padding="24dp"
     >
     <ImageView
         android:layout_width="116dp"
@@ -23,16 +23,14 @@
         android:textStyle="bold"
         android:textColor="@color/login_code_color"
         />
-    <!--
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:text="@string/create_login_description"
-            android:textSize="16sp"
-            android:textColor="@color/login_instructions_color"
-            />
-    -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/create_login_description"
+        android:textSize="16sp"
+        android:textColor="@color/login_instructions_color"
+        />
     <EditText
         android:layout_width="480dp"
         android:layout_height="wrap_content"

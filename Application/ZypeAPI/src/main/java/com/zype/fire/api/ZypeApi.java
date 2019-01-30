@@ -36,7 +36,7 @@ public class ZypeApi {
     public static final String APP_KEY = "app_key";
     private static final String CLIENT_GRANT_TYPE = "grant_type";
     private static final String CLIENT_ID = "client_id";
-    private static final String CLIENT_SECRET = "client_secret";
+//    private static final String CLIENT_SECRET = "client_secret";
     public static final String CONSUMER_EMAIL = "consumer[email]";
     public static final String CONSUMER_ID = "consumer_id";
     public static final String CONSUMER_PASSWORD = "consumer[password]";
@@ -102,7 +102,6 @@ public class ZypeApi {
         params.put(USERNAME, username);
         params.put(PASSWORD, password);
         params.put(CLIENT_ID, ZypeSettings.CLIENT_ID);
-//        params.put(CLIENT_SECRET, ZypeSettings.CLIENT_SECRET);
         params.put(CLIENT_GRANT_TYPE, "password");
         try {
             Response response = apiImpl.retrieveAccessToken(params).execute();
@@ -124,7 +123,6 @@ public class ZypeApi {
         params.put(LINKED_DEVICE_ID, deviceId);
         params.put(PIN, pin);
         params.put(CLIENT_ID, ZypeSettings.CLIENT_ID);
-//        params.put(CLIENT_SECRET, ZypeSettings.CLIENT_SECRET);
         params.put(CLIENT_GRANT_TYPE, "password");
         try {
             Response response = apiImpl.retrieveAccessToken(params).execute();
@@ -145,7 +143,6 @@ public class ZypeApi {
         Map<String, String> params = new HashMap<>();
         params.put(REFRESH_TOKEN, refreshToken);
         params.put(CLIENT_ID, ZypeSettings.CLIENT_ID);
-//        params.put(CLIENT_SECRET, ZypeSettings.CLIENT_SECRET);
         params.put(CLIENT_GRANT_TYPE, "refresh_token");
         try {
             Response response = apiImpl.retrieveAccessToken(params).execute();

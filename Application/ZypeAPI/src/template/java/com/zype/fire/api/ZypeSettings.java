@@ -24,6 +24,7 @@ public class ZypeSettings {
     public static final String TEMPLATE_VERSION = "1.6.0";
 
     // Features
+    public static final boolean ACCOUNT_CREATION_TOS = true;
     public static final boolean DEVICE_LINKING = Boolean.valueOf("<DEVICE_LINKING>");
     public static final boolean FAVORITES_VIA_API = Boolean.valueOf("<FAVORITES_VIA_API>");
     public static final boolean ACCOUNT_CREATION_TOS = false;
