@@ -90,6 +90,7 @@ permissions and limitations under the License.
     <string name="create_login_email">Email</string>
     <string name="create_login_email_error_empty">Email is required</string>
     <string name="create_login_email_error_invalid">Enter valid email</string>
+    <string name="create_login_error_credentials">Please enter valid credentials.</string>
     <string name="create_login_error_tos">You must agree with the terms of service in order to proceed.</string>
     <string name="create_login_password">Password</string>
     <string name="create_login_password_error_empty">Enter password</string>

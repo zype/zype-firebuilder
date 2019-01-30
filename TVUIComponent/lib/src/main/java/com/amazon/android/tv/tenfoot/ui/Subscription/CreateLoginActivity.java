@@ -150,7 +150,10 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
             requestCreateConsumer(consumer);
         }
         else {
-            // TODO: Hide progress
+            dialogError = ErrorDialogFragment.newInstance(CreateLoginActivity.this,
+                    ErrorUtils.ERROR_CATEGORY.ZYPE_CUSTOM, getString(R.string.create_login_error_credentials),
+                    CreateLoginActivity.this);
+            dialogError.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
         }
     }
 
