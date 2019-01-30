@@ -6,6 +6,8 @@ import com.zype.fire.api.Model.AppResponse;
 import com.zype.fire.api.Model.BifrostResponse;
 import com.zype.fire.api.Model.ConsumerResponse;
 import com.zype.fire.api.Model.DevicePinResponse;
+import com.zype.fire.api.Model.MarketplaceConnectBody;
+import com.zype.fire.api.Model.MarketplaceConnectResponse;
 import com.zype.fire.api.Model.PlayerResponse;
 import com.zype.fire.api.Model.PlaylistsResponse;
 import com.zype.fire.api.Model.VideoData;
@@ -21,6 +23,7 @@ import java.util.Map;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
+import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
@@ -98,8 +101,13 @@ public interface IZypeApi {
 
     @DELETE("/consumers/{consumer_id}/video_favorites/{video_favorite_id}")
     Call<ResponseBody> removeVideoFavorite(@Path("consumer_id") String consumerId,
-                                       @Path("video_favorite_id") String videoFavoriteId,
-                                       @QueryMap HashMap<String, String> queryParams);
+                                           @Path("video_favorite_id") String videoFavoriteId,
+                                           @QueryMap HashMap<String, String> queryParams);
+
+    // Marketplace connect
+    @POST("https://mkt.zype.com/v1/amazon/transactions")
+    Call<MarketplaceConnectResponse> verifyPurchaseAmazon(@Body MarketplaceConnectBody body);
+
     // Playlist
     @GET("/playlists")
     Call<PlaylistsResponse> getPlaylists(@Query(PARAM_PAGE) int page, @QueryMap HashMap<String, String> params);

@@ -13,6 +13,7 @@ import com.zype.fire.api.Model.AppData;
  */
 
 public class ZypeConfiguration {
+    private static final String PREFERENCE_APP_ID = "ZypeAppId";
     private static final String PREFERENCE_DEVICE_LINKING = "ZypeDeviceLinking";
     private static final String PREFERENCE_DEVICE_LINKING_URL = "ZypeDeviceLinkingUrl";
     private static final String PREFERENCE_FAVORITES_API = "ZypeFavoritesApi";
@@ -20,6 +21,7 @@ public class ZypeConfiguration {
     private static final String PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION = "ZypeNativeToUniversalSubscription";
     private static final String PREFERENCE_NATIVE_TVOD = "ZypeNativeTVOD";
     private static final String PREFERENCE_ROOT_PLAYLIST_ID = "ZypeRootPlaylistId";
+    private static final String PREFERENCE_SITE_ID = "ZypeSiteId";
     private static final String PREFERENCE_SUBSCRIBE_TO_WATCH_AD_FREE = "ZypeSubscribeToWatchAdFree";
     private static final String PREFERENCE_UNIVERSAL_SUBSCRIPTION = "ZypeUniversalSubscription";
     private static final String PREFERENCE_UNIVERSAL_TVOD = "ZypeUniversalTVOD";
@@ -33,6 +35,9 @@ public class ZypeConfiguration {
 
         SharedPreferences prefs = getPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
+        if (!TextUtils.isEmpty(appData.Id)) {
+            editor.putString(PREFERENCE_APP_ID, appData.Id);
+        }
         if (!TextUtils.isEmpty(appData.deviceLinking)) {
             editor.putBoolean(PREFERENCE_DEVICE_LINKING, Boolean.valueOf(appData.deviceLinking));
         }
@@ -54,6 +59,9 @@ public class ZypeConfiguration {
         if (!TextUtils.isEmpty(appData.featuredPlaylistId)) {
             editor.putString(PREFERENCE_ROOT_PLAYLIST_ID, appData.featuredPlaylistId);
         }
+        if (!TextUtils.isEmpty(appData.siteId)) {
+            editor.putString(PREFERENCE_SITE_ID, appData.siteId);
+        }
         if (!TextUtils.isEmpty(appData.subscribeToWatchAdFree)) {
             editor.putBoolean(PREFERENCE_SUBSCRIBE_TO_WATCH_AD_FREE, Boolean.valueOf(appData.subscribeToWatchAdFree));
         }
@@ -69,12 +77,14 @@ public class ZypeConfiguration {
     public static void clear(Context context) {
         SharedPreferences prefs = getPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
+        editor.remove(PREFERENCE_APP_ID);
         editor.remove(PREFERENCE_DEVICE_LINKING);
         editor.remove(PREFERENCE_FAVORITES_API);
         editor.remove(PREFERENCE_NATIVE_SUBSCRIPTION);
         editor.remove(PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION);
         editor.remove(PREFERENCE_NATIVE_TVOD);
         editor.remove(PREFERENCE_ROOT_PLAYLIST_ID);
+        editor.remove(PREFERENCE_SITE_ID);
         editor.remove(PREFERENCE_SUBSCRIBE_TO_WATCH_AD_FREE);
         editor.remove(PREFERENCE_UNIVERSAL_SUBSCRIPTION);
         editor.remove(PREFERENCE_UNIVERSAL_TVOD);
@@ -101,8 +111,16 @@ public class ZypeConfiguration {
         }
     }
 
+    public static String getAppId(Context context) {
+        return getStringPreference(PREFERENCE_APP_ID, "", context);
+    }
+
     public static String getRootPlaylistId(Context context) {
         return getStringPreference(PREFERENCE_ROOT_PLAYLIST_ID, ZypeSettings.ROOT_PLAYLIST_ID, context);
+    }
+
+    public static String getSiteId(Context context) {
+        return getStringPreference(PREFERENCE_SITE_ID, "", context);
     }
 
     public static boolean isDeviceLinkingEnabled(Context context) {

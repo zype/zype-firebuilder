@@ -8,6 +8,9 @@ import com.amazon.purchase.model.Receipt;
 import com.amazon.purchase.model.Response;
 import com.amazon.purchase.model.UserData;
 import com.zype.fire.api.Model.BifrostResponse;
+import com.zype.fire.api.Model.MarketplaceConnectBody;
+import com.zype.fire.api.Model.MarketplaceConnectBodyData;
+import com.zype.fire.api.Model.MarketplaceConnectResponse;
 import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
@@ -72,9 +75,35 @@ public class ZypeReceiptVerificationService extends AReceiptVerifier {
             }
         }
         else if (ZypeConfiguration.isUniversalTVODEnabled(context)) {
-            Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
-            listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
-            return requestId;
+            MarketplaceConnectBody body = new MarketplaceConnectBody();
+            body.amount = String.valueOf("");
+            body.appId = ZypeConfiguration.getAppId(context);
+            body.consumerId = Preferences.getString("ZypeConsumerId");
+            body.siteId = ZypeConfiguration.getSiteId(context);
+            body.transactionType = "purchase";
+            MarketplaceConnectBodyData bodyData = new MarketplaceConnectBodyData();
+            bodyData.receiptId = receipt.getReceiptId();
+            bodyData.userId = userData.getUserId();
+            body.data = bodyData;
+
+            try {
+                retrofit2.Response response = ZypeApi.getInstance().getApi().verifyPurchaseAmazon(body).execute();
+                if (response.isSuccessful()) {
+                    Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
+                    listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
+                    return requestId;
+                }
+                else {
+                    Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
+                    listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
+                    return requestId;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
+                listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
+                return requestId;
+            }
         }
         else {
             Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);

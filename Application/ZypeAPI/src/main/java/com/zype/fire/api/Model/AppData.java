@@ -49,6 +49,10 @@ public class AppData {
     @Expose
     public String subscribeToWatchAdFree;
 
+    @SerializedName("site_id")
+    @Expose
+    public String siteId;
+
     @Expose
     public String theme;
 
