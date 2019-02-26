@@ -117,13 +117,19 @@ public class VastResponse {
             }
 
             if (adElementObject instanceof List) {
-                for (Map<String, Map> map : (List<Map<String, Map>>) adElementObject) {
-                    vastResponse.getAdElements().add(AdElement.createInstance(map));
-                }
+                /* Zype, Evgeny Cherkasov */
+//                for (Map<String, Map> map : (List<Map<String, Map>>) adElementObject) {
+//                    vastResponse.getAdElements().add(AdElement.createInstance(map));
+//                }
+                vastResponse.getAdElements().addAll(AdElement.createInstanceList((List<Map<String, Map>>) adElementObject));
             }
             else {
-                vastResponse.getAdElements().add(AdElement.createInstance((Map<String, Map>)
-                                                                                  adElementObject));
+                /* Zype, Evgeny Cherkasov */
+//                vastResponse.getAdElements().add(AdElement.createInstance((Map<String, Map>)
+//                                                                                  adElementObject));
+                List<Map<String, Map>> xmlMapList = new ArrayList<>(1);
+                xmlMapList.add((Map<String, Map>) adElementObject);
+                vastResponse.getAdElements().addAll(AdElement.createInstanceList(xmlMapList));
             }
         }
         return vastResponse;

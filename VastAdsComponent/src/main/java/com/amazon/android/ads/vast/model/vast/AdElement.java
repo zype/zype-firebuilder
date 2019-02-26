@@ -25,6 +25,7 @@ import com.amazon.dynamicparser.impl.XmlParser;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -89,14 +90,14 @@ public class AdElement implements Comparable<AdElement> {
             if (attributes.containsKey(VmapHelper.SEQUENCE_KEY)) {
                 adElement.setAdSequence(Integer.valueOf(attributes.get(VmapHelper.SEQUENCE_KEY)));
             }
-
+        }
             if (xmlMap.containsKey(WRAPPER_ELEMENT_KEY)) {
                 processWrapper(xmlMap.get(WRAPPER_ELEMENT_KEY), adElement);
             }
             else {
                 adElement.setInlineAd(new Inline(xmlMap));
             }
-        }
+//        }
 
         return adElement;
     }
@@ -169,7 +170,12 @@ public class AdElement implements Comparable<AdElement> {
 
             if (xmlMap != null && xmlMap.containsKey(VastResponse.AD_KEY)) {
                 Log.d(TAG, "Wrapping VAST response with VMAP");
-                return AdElement.createInstance(xmlMap.get(VastResponse.AD_KEY));
+                if (xmlMap.get(VastResponse.AD_KEY) instanceof List) {
+                    return AdElement.createInstance((Map<String, Map>) ((List) xmlMap.get(VastResponse.AD_KEY)).get(0));
+                }
+                else {
+                    return AdElement.createInstance(xmlMap.get(VastResponse.AD_KEY));
+                }
             }
         }
         catch (IParser.InvalidDataException e) {
@@ -283,4 +289,145 @@ public class AdElement implements Comparable<AdElement> {
                 ", mSelectedMediaFileUrl='" + mSelectedMediaFileUrl + '\'' +
                 '}';
     }
+
+    /* Zype, Evgeny Cherkasov */
+
+    /**
+     * Creates a list of instances of a Ad Element given the parsed xml data.
+     *
+     * @param xmlMapList A list of maps representing the parsed xml response.
+     * @return A list of Ad Element instances.
+     */
+    public static List<AdElement> createInstanceList(List<Map<String, Map>> xmlMapList) {
+
+        List<AdElement> result = new ArrayList<>();
+        for (Map<String, Map> map : xmlMapList) {
+            result.addAll(createInstanceList(map));
+        }
+
+        return result;
+    }
+
+    /**
+     * Creates a instance of a Ad Element given the parsed xml data.
+     *
+     * @param xmlMap A map representing the parsed xml response.
+     * @return An Ad Element instance.
+     */
+    public static List<AdElement> createInstanceList(Map<String, Map> xmlMap) {
+
+        List<AdElement> result = new ArrayList<>();
+
+        AdElement adElement = new AdElement();
+        Log.d(TAG, "Creating VAST response from xml map");
+
+        Map<String, String> attributes = xmlMap.get(XmlParser.ATTRIBUTES_TAG);
+
+        if (attributes != null) {
+            adElement.setId(attributes.get(VmapHelper.ID_KEY));
+            if (attributes.containsKey(VmapHelper.SEQUENCE_KEY)) {
+                adElement.setAdSequence(Integer.valueOf(attributes.get(VmapHelper.SEQUENCE_KEY)));
+            }
+        }
+        if (xmlMap.containsKey(WRAPPER_ELEMENT_KEY)) {
+            processWrapper(xmlMap.get(WRAPPER_ELEMENT_KEY), result);
+        }
+        else {
+            adElement.setInlineAd(new Inline(xmlMap));
+            result.add(adElement);
+        }
+
+        return result;
+    }
+
+    /**
+     * Process the wrapper element. Creates a VastResponse from the VASTAdTagURI element and then
+     * ads the wrapper's impression URL, error URL, and linear tracking events to the Inline ads of
+     * the VastResponse.
+     *
+     * @param wrapperMap The map containing the wrapper data.
+     * @param adElements  The original list of Ad element objects.
+     */
+    private static void processWrapper(Map<String, Map> wrapperMap, List<AdElement> adElements) {
+
+        // Process the VastAdTagURI to get wrapped VAST response.
+        String vastAdTagUri = VmapHelper.getTextValueFromMap(wrapperMap.get
+                (VASTADTAGURI_ELEMENT_KEY));
+        List<AdElement> wrappedAdElements = createInstanceList(vastAdTagUri);
+        if (wrappedAdElements == null) {
+            Log.e(TAG, "processWrapper(): Invalid wrapper response");
+            return;
+        }
+
+        // Add the creative's tracking events from the wrapper to the inline ad.
+        Map<String, Map> trackingEventsMap =
+                PathHelper.getMapByPath((Map) wrapperMap, TRACKING_EVENTS_PATH);
+
+        for (AdElement adElement : wrappedAdElements) {
+            // Add the impression, error url, and tracking events to each creative of each inline add.
+            for (Map trackingMap : (List<Map>) trackingEventsMap.get(VmapHelper.TRACKING_KEY)) {
+                for (Creative creative : adElement.getInlineAd().getCreatives()) {
+                    creative.getVastAd().addTrackingEvent(new Tracking(trackingMap));
+                }
+            }
+            // Add the impression to the inline
+            if (wrapperMap.containsKey(VmapHelper.IMPRESSION_KEY)) {
+                adElement.getInlineAd().getImpressions().addAll(
+                        VmapHelper.getStringListFromMap(wrapperMap, VmapHelper.IMPRESSION_KEY));
+            }
+            // Add the error url to the inline
+            if (wrapperMap.containsKey(VmapHelper.ERROR_ELEMENT_KEY)) {
+                adElement.getInlineAd().getErrorUrls().addAll(
+                        VmapHelper.getStringListFromMap(wrapperMap, VmapHelper.ERROR_ELEMENT_KEY));
+            }
+        }
+        adElements.addAll(wrappedAdElements);
+    }
+
+    /**
+     * Create a list of instances given an ad tag URL. Downloads the data from the URL, parses it, and
+     * creates the list of Ad Element objects based on the parsed data.
+     *
+     * Note: This method should be called off the UI thread.
+     *
+     * @param adTag The URL to get the VAST response from.
+     * @return A list of Ad Element instances.
+     */
+    public static List<AdElement> createInstanceList(String adTag) {
+
+        Log.d(TAG, "Processing ad url string for vast model");
+        String xmlData;
+        try {
+            adTag = NetworkUtils.addParameterToUrl(adTag, IAds.CORRELATOR_PARAMETER,
+                    "" + System.currentTimeMillis());
+            xmlData = NetworkUtils.getDataLocatedAtUrl(adTag);
+        }
+        catch (IOException e) {
+            Log.e(TAG, "Could not get data from url " + adTag, e);
+            return null;
+        }
+
+        XmlParser parser = new XmlParser();
+        try {
+            Map<String, Map> xmlMap = (Map<String, Map>) parser.parse(xmlData);
+
+            if (xmlMap != null && xmlMap.containsKey(VastResponse.AD_KEY)) {
+                Log.d(TAG, "Wrapping VAST response with VMAP");
+                if (xmlMap.get(VastResponse.AD_KEY) instanceof List) {
+                    return AdElement.createInstanceList((Map<String, Map>) ((List) xmlMap.get(VastResponse.AD_KEY)).get(0));
+                }
+                else {
+                    List<Map<String, Map>> xmlMapList = new ArrayList<>(1);
+                    xmlMapList.add(xmlMap.get(VastResponse.AD_KEY));
+                    return AdElement.createInstanceList(xmlMapList);
+                }
+            }
+        }
+        catch (IParser.InvalidDataException e) {
+            Log.e(TAG, "Data could not be parsed. ", e);
+        }
+        Log.e(TAG, "Error creating vast model from ad tag.");
+        return null;
+    }
+
 }
