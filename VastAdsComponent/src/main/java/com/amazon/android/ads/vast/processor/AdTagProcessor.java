@@ -21,6 +21,7 @@ import com.amazon.android.utils.NetworkUtils;
 import com.amazon.dynamicparser.IParser;
 import com.amazon.dynamicparser.impl.XmlParser;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.IOException;
@@ -146,18 +147,41 @@ public class AdTagProcessor {
         return AdTagType.error;
     }
 
-    /* Zype, Evgeny Cherkasov */
+    /* Zype, Evgeny Cherkasov
+    * begin */
     public AdTagType processList(ArrayList<String> adTags, int[] timeOffsets) {
         AdTagType result = null;
 
         for (int i = 0; i < timeOffsets.length; i++) {
             int offset = timeOffsets[i];
             String adTag = adTags.get(i);
-            result = process(adTag, offset);
+            if (i == 0) {
+                result = process(adTag, offset);
+            }
+            else {
+                new ProcessAsync(adTag, offset).execute();
+            }
         }
 
         return result;
     }
+
+    private class ProcessAsync extends AsyncTask<Void, Void, AdTagType> {
+        private String adTag;
+        private int offset;
+
+        public ProcessAsync(String adTag, int offset) {
+            this.adTag = adTag;
+            this.offset = offset;
+        }
+
+        @Override
+        protected AdTagType doInBackground(Void... params) {
+            return process(adTag, offset);
+        }
+    }
+    /* Zype
+    * end */
 
     /**
      * Get the ad response.
