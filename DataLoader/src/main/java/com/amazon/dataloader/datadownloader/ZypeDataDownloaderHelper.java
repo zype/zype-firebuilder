@@ -10,6 +10,8 @@ import com.zype.fire.api.Model.VideoFavoriteData;
 import com.zype.fire.api.Model.VideoFavoritesResponse;
 import com.zype.fire.api.Model.VideoResponse;
 import com.zype.fire.api.Model.VideosResponse;
+import com.zype.fire.api.Model.ZobjectContentData;
+import com.zype.fire.api.Model.ZobjectContentResponse;
 import com.zype.fire.api.ZypeApi;
 
 import java.util.ArrayList;

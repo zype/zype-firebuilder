@@ -10,19 +10,18 @@ import com.zype.fire.api.Model.MarketplaceConnectBody;
 import com.zype.fire.api.Model.MarketplaceConnectResponse;
 import com.zype.fire.api.Model.PlayerResponse;
 import com.zype.fire.api.Model.PlaylistsResponse;
-import com.zype.fire.api.Model.VideoData;
 import com.zype.fire.api.Model.VideoEntitlementsResponse;
 import com.zype.fire.api.Model.VideoFavoriteResponse;
 import com.zype.fire.api.Model.VideoFavoritesResponse;
 import com.zype.fire.api.Model.VideoResponse;
 import com.zype.fire.api.Model.VideosResponse;
+import com.zype.fire.api.Model.ZobjectContentResponse;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
-import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.FieldMap;
@@ -125,4 +124,7 @@ public interface IZypeApi {
     @GET("https://player.zype.com/embed/{video_id}.json")
     Call<PlayerResponse> getPlayer(@Header("User-Agent") String userAgent, @Path("video_id") String videoId, @QueryMap HashMap<String, String> params);
 
+    // ZObjects
+    @GET("/zobjects/?zobject_type=content")
+    Call<ZobjectContentResponse> getZobjectContent(@QueryMap HashMap<String, String> params);
 }

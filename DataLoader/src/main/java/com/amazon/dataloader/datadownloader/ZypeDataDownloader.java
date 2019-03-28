@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.amazon.android.recipe.Recipe;
+import com.amazon.android.utils.Preferences;
 import com.amazon.dataloader.R;
 import com.amazon.utils.model.Data;
 import com.google.gson.Gson;
@@ -15,6 +16,8 @@ import com.zype.fire.api.Model.PlaylistData;
 import com.zype.fire.api.Model.PlaylistsResponse;
 import com.zype.fire.api.Model.VideoData;
 import com.zype.fire.api.Model.VideosResponse;
+import com.zype.fire.api.Model.ZobjectContentData;
+import com.zype.fire.api.Model.ZobjectContentResponse;
 import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
@@ -37,6 +40,8 @@ public class ZypeDataDownloader extends ADataDownloader {
     protected static final String URL_GENERATOR_IMPL = "url_generator_impl";
     // Key to locate the URL generator.
     protected static final String URL_GENERATOR_RECIPE = "url_generator";
+
+    private static final String PREFERENCE_TERMS = "ZypeTerms";
 
     /**
      * {@link AUrlGenerator} instance.
@@ -105,6 +110,8 @@ public class ZypeDataDownloader extends ADataDownloader {
         AppData appData = loadAppConfiguration();
         Log.d(TAG, "fetchData(): App configuration loaded");
         ZypeConfiguration.update(appData, mContext);
+
+        loadZobjectContents();
 
         List<PlaylistData> playlists = loadPlaylists();
         Log.d(TAG, "fetchData(): Playlists loaded");
@@ -180,6 +187,24 @@ public class ZypeDataDownloader extends ADataDownloader {
         result.universalTVOD = null;
 
         return result;
+    }
+
+    private void loadZobjectContents() {
+        ZobjectContentResponse response = ZypeApi.getInstance().getZobjectContents();
+        if (response != null) {
+            Log.d(TAG, "loadZobjectContents(): size=" + response.zobjectContents.size());
+            for (ZobjectContentData item : response.zobjectContents) {
+                if (item.friendlyTitle.equals("privacy_policy")) {
+                    Preferences.setString(PREFERENCE_TERMS, item.description);
+                    return;
+                }
+            }
+            Preferences.setString(PREFERENCE_TERMS, null);
+        }
+        else {
+            Log.e(TAG, "loadZobjectContents(): failed");
+            Preferences.setString(PREFERENCE_TERMS, null);
+        }
     }
 
     private List<PlaylistData> loadPlaylists() {

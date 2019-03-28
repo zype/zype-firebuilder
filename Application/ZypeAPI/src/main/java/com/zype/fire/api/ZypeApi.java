@@ -4,19 +4,17 @@ import com.zype.fire.api.Model.AccessTokenInfoResponse;
 import com.zype.fire.api.Model.AccessTokenResponse;
 import com.zype.fire.api.Model.AppResponse;
 import com.zype.fire.api.Model.ConsumerResponse;
-import com.zype.fire.api.Model.DevicePinData;
 import com.zype.fire.api.Model.DevicePinResponse;
 import com.zype.fire.api.Model.PlaylistsResponse;
 import com.zype.fire.api.Model.VideoEntitlementsResponse;
 import com.zype.fire.api.Model.VideoFavoritesResponse;
 import com.zype.fire.api.Model.VideoResponse;
 import com.zype.fire.api.Model.VideosResponse;
-import com.zype.fire.api.Util.AdMacrosHelper;
+import com.zype.fire.api.Model.ZobjectContentResponse;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.prefs.Preferences;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -388,4 +386,22 @@ public class ZypeApi {
         }
     }
 
+    public ZobjectContentResponse getZobjectContents() {
+        try {
+            HashMap<String, String> params = new HashMap<>();
+            params.put(APP_KEY, ZypeSettings.APP_KEY);
+            params.put(PER_PAGE, String.valueOf(PER_PAGE_DEFAULT));
+            Response response = apiImpl.getZobjectContent(params).execute();
+            if (response.isSuccessful()) {
+                return (ZobjectContentResponse) response.body();
+            }
+            else {
+                return null;
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

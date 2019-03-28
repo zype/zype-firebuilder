@@ -18,6 +18,7 @@ import com.amazon.android.model.Action;
 import com.amazon.android.ui.interfaces.ASettingsFragment;
 import com.amazon.android.ui.interfaces.SingleViewProvider;
 import com.amazon.android.utils.Helpers;
+import com.amazon.android.utils.Preferences;
 import com.amazon.utils.R;
 //import com.zype.fire.api.ZypeSettings;
 
@@ -84,14 +85,21 @@ public class NoticeSettingsFragment extends ASettingsFragment {
      */
     private SingleViewProvider getSingleViewProvider(Context context) {
 
-        String content = "";
-        try {
-            content = Helpers.getContentFromFile(context,
-                                                 context.getString(R.string.terms_of_use_file));
-        }
-        catch (Exception e) {
-            Log.e(TAG, "could not read terms of use file", e);
-        }
+        /* Zype, Evgeny Cherkasov
+        * begin */
+//        String content = "";
+//        try {
+//            content = Helpers.getContentFromFile(context,
+//                                                 context.getString(R.string.terms_of_use_file));
+//        }
+//        catch (Exception e) {
+//            Log.e(TAG, "could not read terms of use file", e);
+//        }
+        // Terms of services are loading when the app is starting
+        // from Zobject Content with the 'privacy_policy' id
+        String content = Preferences.getString("ZypeTerms");
+        /* Zype
+        * end */
         /* Zype, Evgeny Cherkasov */
         // TODO: Add import for ZypeSettings
 //        content += "<p>Zype Template version: " + ZypeSettings.TEMPLATE_VERSION + "</p>";
