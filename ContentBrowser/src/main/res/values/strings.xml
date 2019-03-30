@@ -76,4 +76,12 @@ permissions and limitations under the License.
     <string name="my_library_label">My Library</string>
     <string name="subscription_alert_title">Subscription</string>
     <string name="subscription_alert_message">You must have a subscription to play this video</string>
+
+    <string name="action_signup_to_watch1">Sign Up</string>
+    <string name="action_signup_to_watch2">to Watch</string>
+    <string name="action_registration_complete_title">Thank you for providing details</string>
+    <string name="action_registration_complete_message">Your account has been successfully logged in</string>
+    <string name="action_registration_complete_btn">Dismiss</string>
+
+
 </resources>

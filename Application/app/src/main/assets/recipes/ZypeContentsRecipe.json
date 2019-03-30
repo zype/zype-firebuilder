@@ -19,6 +19,7 @@
     "subscription_required@mSubscriptionRequired",
     "thumbnails@mCardImageUrl",
     "thumbnails@mBackgroundImageUrl",
-    "videoFavoriteId@VideoFavoriteId"
+    "videoFavoriteId@VideoFavoriteId",
+    "registration_required@RegistrationRequired"
   ]
 }

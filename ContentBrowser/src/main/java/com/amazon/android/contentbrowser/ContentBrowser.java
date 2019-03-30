@@ -62,6 +62,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -167,6 +168,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     /* Zype, Evgeny Cherkasov */
     public static final String BUY_VIDEO_SCREEN = "BUY_VIDEO_SCREEN";
     public static final String SUBSCRIPTION_SCREEN = "SUBSCRIPTION_SCREEN";
+
+    public static final String USER_SIGN_UP = "USER_SIGN_UP";
 
     /**
      * Free content constant.
@@ -292,6 +295,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final int CONTENT_ACTION_FAVORITES_REMOVE = 54;
     // Watch ad free action
     public static final int CONTENT_ACTION_SWAF = 55;
+
+    public static final int CONTENT_REGISTRATION_REQUIRED = 56;
+
 
     /**
      * Search algorithm name.
@@ -814,7 +820,16 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         updateUserSubscribed();
 
         updateLoginAction();
+
+        if(authenticationStatusUpdateEvent.isRegistration()) {
+          getNavigator().runOnUpcomingActivity(()-> {
+            showRegistrationCompleteDialog();
+          });
+
+          updateContentActions();
+        }
     }
+
 
     /**
      * Get instance, singleton method.
@@ -1568,6 +1583,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         boolean subscriptionRequired = content.isSubscriptionRequired();
         boolean purchaseRequired = false;
         boolean entitled = false;
+
         if (ZypeConfiguration.isUniversalTVODEnabled(mAppContext)) {
             purchaseRequired = content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED);
             if (purchaseRequired && content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
@@ -1621,6 +1637,21 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         }
         showFavorites = true;
 
+        boolean registrationRequired = content.getExtraValueAsBoolean(Content.EXTRA_REGISTRATION_REQUIRED);
+
+        if(registrationRequired) {
+            //check here if the user is already logged in
+            String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
+
+            if(TextUtils.isEmpty(accessToken)) {
+                showWatch = false;
+            }
+            else {
+                registrationRequired = false;
+            }
+        }
+
+
         if (showWatch) {
             // Check if the content is meant for live watching. Live content requires only a
             // watch now button.
@@ -1653,6 +1684,13 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                         R.string.watch_now_1, R.string.watch_now_2));
             }
         }
+
+        if(registrationRequired) {
+            contentActionList.add(createActionButton(CONTENT_REGISTRATION_REQUIRED,
+                R.string.action_signup_to_watch1, R.string.action_signup_to_watch2));
+            return contentActionList;
+        }
+
         if (showSubscribe) {
             contentActionList.add(createActionButton(CONTENT_ACTION_CHOOSE_PLAN,
                     R.string.action_subscription_1, R.string.action_subscription_2));
@@ -1925,6 +1963,24 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 mAuthHelper.handleOnActivityResult(requestCode, resultCode, data);
                 break;
         }
+    }
+
+    private void showRegistrationCompleteDialog() {
+        AlertDialogFragment.createAndShowAlertDialogFragment(mNavigator.getActiveActivity(),
+            mAppContext.getString(R.string.action_registration_complete_title),
+            mAppContext.getString(R.string.action_registration_complete_message),
+            mAppContext.getString(R.string.action_registration_complete_btn),
+            null, new AlertDialogFragment.IAlertDialogListener() {
+                @Override
+                public void onDialogPositiveButton(AlertDialogFragment alertDialogFragment) {
+
+                }
+
+                @Override
+                public void onDialogNegativeButton(AlertDialogFragment alertDialogFragment) {
+
+                }
+            });
     }
 
     /**
@@ -2341,6 +2397,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         AnalyticsHelper.trackContentDetailsAction(content, actionId);
         switch (actionId) {
+            case CONTENT_REGISTRATION_REQUIRED: {
+                switchToLoginScreen();
+            }
+            break;
             case CONTENT_ACTION_WATCH_NOW:
             case CONTENT_ACTION_WATCH_FROM_BEGINNING:
             case CONTENT_ACTION_RESUME:
@@ -3135,6 +3195,12 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public void switchToBuyVideoScreen(Bundle extras) {
         switchToScreen(BUY_VIDEO_SCREEN, intent -> {
             intent.putExtras(extras);
+        });
+    }
+
+    public void switchToLoginScreen() {
+        switchToScreen(USER_SIGN_UP, intent -> {
+            intent.putExtra("registration", true);
         });
     }
 

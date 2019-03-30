@@ -336,6 +336,8 @@ public class Content implements Serializable {
     // Video player url
     public static final String EXTRA_VIDEO_URL = "VideoFavoriteId";
 
+    public static final String EXTRA_REGISTRATION_REQUIRED = "RegistrationRequired";
+
     /**
      * Creates a {@link Content} with empty values.
      */

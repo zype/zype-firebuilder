@@ -157,6 +157,10 @@ public class VideoData {
     @Expose
     public boolean matureContent;
 
+    @SerializedName("registration_required")
+    @Expose
+    public boolean registrationRequired;
+
     public String playlistId;
     public String playerUrl;
     public String videoFavoriteId;

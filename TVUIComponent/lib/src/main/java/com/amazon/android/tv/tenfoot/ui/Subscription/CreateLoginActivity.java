@@ -53,6 +53,7 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
 
     private ContentBrowser contentBrowser;
     private ErrorDialogFragment dialogError = null;
+    private boolean registration;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -80,6 +81,8 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
                 onLogin();
             }
         });
+
+        registration = getIntent().getBooleanExtra("registration", false);
 
         updateViews();
     }
@@ -124,7 +127,7 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
                                             contentBrowser.getNavigator().runOnUpcomingActivity(() -> contentBrowser.getAuthHelper()
                                                     .handleErrorBundle(resultBundle));
                                         } else {
-                                            contentBrowser.onAuthenticationStatusUpdateEvent(new AuthHelper.AuthenticationStatusUpdateEvent(true));
+                                            contentBrowser.onAuthenticationStatusUpdateEvent(new AuthHelper.AuthenticationStatusUpdateEvent(true, registration));
                                             EventBus.getDefault().post(new AuthHelper.AuthenticationStatusUpdateEvent(true));
                                             setResult(RESULT_OK);
                                             finish();
@@ -285,9 +288,8 @@ public class CreateLoginActivity extends Activity implements ErrorDialogFragment
                         // Successful login.
                         ZypeAuthentication.saveAccessToken(response);
 
-                        contentBrowser.onAuthenticationStatusUpdateEvent(new AuthHelper.AuthenticationStatusUpdateEvent(true));
+                        contentBrowser.onAuthenticationStatusUpdateEvent(new AuthHelper.AuthenticationStatusUpdateEvent(true, registration));
                         EventBus.getDefault().post(new AuthHelper.AuthenticationStatusUpdateEvent(true));
-
                         setResult(RESULT_OK);
                         buttonLogin.setEnabled(true);
                         finish();
