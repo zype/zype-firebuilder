@@ -666,7 +666,12 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         addWidgetsAction(createSearchAction());
         //addWidgetsAction(createSlideShowAction());
-        addSettingsAction(createTermsOfUseSettingsAction());
+        /* Zype, Evgeny Cherkasov
+        * begin*/
+        if (!TextUtils.isEmpty(Preferences.getString("ZypeTerms")))
+            addSettingsAction(createTermsOfUseSettingsAction());
+        /* Zype
+        * end */
         //addSettingsAction(createSlideShowSettingAction());
         setupLogoutAction();
         setupFavoritesAction();
