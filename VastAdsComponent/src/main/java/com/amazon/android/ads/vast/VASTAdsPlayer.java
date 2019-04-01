@@ -592,7 +592,7 @@ public class VASTAdsPlayer implements IAds,
                         mAdType = adTagProcessor.processList(videoExtras.getStringArrayList("AdTags"), videoExtras.getIntArray("mAdCuePoints"));
                     }
                     else {
-                        mAdType = AdTagProcessor.AdTagType.no_ad_break_found;
+                        mAdType = adTagProcessor.process("", 0);
                     }
 
                     if (mAdType == AdTagProcessor.AdTagType.no_ad_break_found) {
