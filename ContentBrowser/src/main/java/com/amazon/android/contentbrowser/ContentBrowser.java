@@ -169,7 +169,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final String BUY_VIDEO_SCREEN = "BUY_VIDEO_SCREEN";
     public static final String SUBSCRIPTION_SCREEN = "SUBSCRIPTION_SCREEN";
 
-    public static final String USER_SIGN_UP = "USER_SIGN_UP";
+    public static final String USER_SIGN_UP_SCREEN = "USER_SIGN_UP_SCREEN";
 
     /**
      * Free content constant.
@@ -1641,9 +1641,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         if(registrationRequired) {
             //check here if the user is already logged in
-            String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
 
-            if(TextUtils.isEmpty(accessToken)) {
+            if(!isUserLoggedIn()) {
                 showWatch = false;
             }
             else {
@@ -3199,7 +3198,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     public void switchToLoginScreen() {
-        switchToScreen(USER_SIGN_UP, intent -> {
+        switchToScreen(USER_SIGN_UP_SCREEN, intent -> {
             intent.putExtra("registration", true);
         });
     }
