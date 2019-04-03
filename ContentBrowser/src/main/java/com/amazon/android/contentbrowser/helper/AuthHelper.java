@@ -68,6 +68,8 @@ public class AuthHelper {
          */
         private boolean mUserAuthenticated = false;
 
+        private boolean mRegistration = false;
+
         /**
          * Constructor
          *
@@ -78,6 +80,12 @@ public class AuthHelper {
             mUserAuthenticated = flag;
         }
 
+        public AuthenticationStatusUpdateEvent(boolean flag, boolean registration) {
+
+            mUserAuthenticated = flag;
+            mRegistration = registration;
+        }
+
         /**
          * Returns true if the user is authentication after this event happened, false otherwise
          *
@@ -86,6 +94,16 @@ public class AuthHelper {
         public boolean isUserAuthenticated() {
 
             return mUserAuthenticated;
+        }
+
+        /**
+         * Returns true if the user is authentication after this event happened, false otherwise
+         *
+         * @return true if the user is authentication after this event happened, false otherwise
+         */
+        public boolean isRegistration() {
+
+            return mRegistration;
         }
     }
 
