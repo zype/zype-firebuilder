@@ -1103,7 +1103,13 @@ public class VASTAdsPlayer implements IAds,
         ((Activity) mContext).runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                if (!mSurfaceCreated) {
+                    FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                            FrameLayout.LayoutParams.MATCH_PARENT,
+                            FrameLayout.LayoutParams.MATCH_PARENT);
 
+                    createSurface(params);
+                }
                 mFrameLayout.addView(mSurfaceView);
             }
         });
