@@ -2417,6 +2417,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 switchToLoginScreen();
             }
             break;
+            case CONTENT_PLAY_TRAILER : {
+
+            }
+            break;
             case CONTENT_ACTION_WATCH_NOW:
             case CONTENT_ACTION_WATCH_FROM_BEGINNING:
             case CONTENT_ACTION_RESUME:

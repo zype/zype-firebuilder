@@ -70,7 +70,7 @@
     "com.amazon.android.tv.tenfoot.ui.Subscription.CreateLoginActivity": {
       "verifyScreenAccess": false,
       "verifyNetworkConnection": true,
-      "onAction": "USER_SIGN_UP"
+      "onAction": "USER_SIGN_UP_SCREEN"
     }
   }
 }
