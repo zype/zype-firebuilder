@@ -20,6 +20,8 @@
     "thumbnails@mCardImageUrl",
     "thumbnails@mBackgroundImageUrl",
     "videoFavoriteId@VideoFavoriteId",
-    "registration_required@RegistrationRequired"
+    "registration_required@RegistrationRequired",
+    "preview_ids@previewIds"
+
   ]
 }

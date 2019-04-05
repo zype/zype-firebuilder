@@ -338,6 +338,9 @@ public class Content implements Serializable {
 
     public static final String EXTRA_REGISTRATION_REQUIRED = "RegistrationRequired";
 
+    public static final String EXTRA_PREVIEW_IDS = "previewIds";
+
+
     /**
      * Creates a {@link Content} with empty values.
      */
@@ -731,6 +734,12 @@ public class Content implements Serializable {
             return null;
         }
         return mExtras.get(key);
+    }
+
+    public boolean hasTrailer() {
+        List previewIds = getExtraValueAsList(EXTRA_PREVIEW_IDS);
+
+        return previewIds != null && previewIds.size() > 0;
     }
 
     /**

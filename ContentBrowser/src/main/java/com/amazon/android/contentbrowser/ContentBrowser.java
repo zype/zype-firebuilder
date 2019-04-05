@@ -297,6 +297,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final int CONTENT_ACTION_SWAF = 55;
 
     public static final int CONTENT_REGISTRATION_REQUIRED = 56;
+    public static final int CONTENT_PLAY_TRAILER = 57;
 
 
     /**
@@ -1692,6 +1693,12 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         if(registrationRequired) {
             contentActionList.add(createActionButton(CONTENT_REGISTRATION_REQUIRED,
                 R.string.action_signup_to_watch1, R.string.action_signup_to_watch2));
+
+            if(content.hasTrailer()) {
+                contentActionList.add(createActionButton(CONTENT_PLAY_TRAILER,
+                    R.string.action_play_trailer_1, R.string.action_play_trailer_2));
+            }
+
             return contentActionList;
         }
 
@@ -1748,6 +1755,11 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 //                                                                .getString(R.string.daily_pass_2)));
 
         contentActionList.addAll(mGlobalContentActionList);
+
+      if(content.hasTrailer()) {
+        contentActionList.add(createActionButton(CONTENT_PLAY_TRAILER,
+            R.string.action_play_trailer_1, R.string.action_play_trailer_2));
+      }
 
         return contentActionList;
     }

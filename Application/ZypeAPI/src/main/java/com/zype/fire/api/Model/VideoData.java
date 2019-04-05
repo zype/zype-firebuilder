@@ -164,4 +164,8 @@ public class VideoData {
     public String playlistId;
     public String playerUrl;
     public String videoFavoriteId;
+
+    @SerializedName("preview_ids")
+    @Expose
+    public List<String> previewIds = new ArrayList<>();
 }
