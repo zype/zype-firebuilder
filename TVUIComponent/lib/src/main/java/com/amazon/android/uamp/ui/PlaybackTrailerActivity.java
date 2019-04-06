@@ -390,11 +390,11 @@ public class PlaybackTrailerActivity extends Activity implements
                 (Content) getIntent().getSerializableExtra("play_trailer");
 
 
-        if (mSelectedContent == null || TextUtils.isEmpty(mSelectedContent.getUrl())) {
+       /* if (mSelectedContent == null || TextUtils.isEmpty(mSelectedContent.getUrl())) {
             AnalyticsHelper.trackError(TAG, "Received an Intent to play content without a " +
                     "content object or content URL");
             finish();
-        }
+        }*/
 
         loadViews();
         createPlayerAndInitializeListeners();
@@ -1715,7 +1715,6 @@ public class PlaybackTrailerActivity extends Activity implements
                 }
                 break;
             case PREPARING:
-
                 break;
             case READY:
                 mPlaybackState = LeanbackPlaybackState.PAUSED;
@@ -1864,7 +1863,7 @@ public class PlaybackTrailerActivity extends Activity implements
      * Private helper method to do some cleanup when playback has finished.
      */
     private void playbackFinished() {
-
+        finish();
         mWindow.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
