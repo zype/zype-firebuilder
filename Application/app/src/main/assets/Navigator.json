@@ -71,6 +71,11 @@
       "verifyScreenAccess": false,
       "verifyNetworkConnection": true,
       "onAction": "USER_SIGN_UP_SCREEN"
+    },
+    "com.amazon.android.uamp.ui.PlaybackTrailerActivity": {
+      "verifyScreenAccess": true,
+      "verifyNetworkConnection": true,
+      "onAction": "PLAY_TRAILER_SCREEN"
     }
   }
 }

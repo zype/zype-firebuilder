@@ -1,12 +1,12 @@
 /**
  * Copyright 2015-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * A copy of the License is located at
- *
- *     http://aws.amazon.com/apache2.0/
- *
+ * <p>
+ * http://aws.amazon.com/apache2.0/
+ * <p>
  * or in the "license" file accompanying this file. This file is distributed
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
@@ -14,6 +14,16 @@
  */
 package com.amazon.android.contentbrowser;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
+import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
+import android.util.Log;
+
+import com.amazon.android.contentbrowser.Favorites.FavoritesManager;
 import com.amazon.android.contentbrowser.database.helpers.RecentDatabaseHelper;
 import com.amazon.android.contentbrowser.database.helpers.VideoFavoritesHelper;
 import com.amazon.android.contentbrowser.database.helpers.WatchlistDatabaseHelper;
@@ -23,7 +33,6 @@ import com.amazon.android.contentbrowser.helper.AnalyticsHelper;
 import com.amazon.android.contentbrowser.helper.AuthHelper;
 import com.amazon.android.contentbrowser.helper.ErrorHelper;
 import com.amazon.android.contentbrowser.helper.FontManager;
-import com.amazon.android.contentbrowser.Favorites.FavoritesManager;
 import com.amazon.android.contentbrowser.helper.LauncherIntegrationManager;
 import com.amazon.android.contentbrowser.helper.PurchaseHelper;
 import com.amazon.android.contentbrowser.recommendations.RecommendationManager;
@@ -35,8 +44,8 @@ import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.model.content.constants.ExtraKeys;
 import com.amazon.android.model.content.constants.PreferencesConstants;
 import com.amazon.android.model.event.ActionUpdateEvent;
-import com.amazon.android.module.ModularApplication;
 import com.amazon.android.model.event.FavoritesLoadEvent;
+import com.amazon.android.module.ModularApplication;
 import com.amazon.android.navigator.Navigator;
 import com.amazon.android.navigator.NavigatorModel;
 import com.amazon.android.navigator.UINode;
@@ -53,17 +62,11 @@ import com.amazon.android.utils.LeanbackHelpers;
 import com.amazon.android.utils.Preferences;
 import com.amazon.utils.DateAndTimeHelper;
 import com.amazon.utils.StringManipulation;
+import com.zype.fire.api.ZypeConfiguration;
+import com.zype.fire.api.ZypeSettings;
+import com.zype.fire.auth.ZypeAuthentication;
 
 import org.greenrobot.eventbus.EventBus;
-
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
-import android.text.TextUtils;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,13 +80,9 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-import static com.amazon.android.contentbrowser.helper.LauncherIntegrationManager
-        .getSourceOfContentPlayRequest;
+import static com.amazon.android.contentbrowser.helper.LauncherIntegrationManager.getSourceOfContentPlayRequest;
 
 /* Zype */
-import com.zype.fire.api.ZypeConfiguration;
-import com.zype.fire.api.ZypeSettings;
-import com.zype.fire.auth.ZypeAuthentication;
 
 /**
  * This class is the controller of the content browsing solution.
@@ -91,201 +90,146 @@ import com.zype.fire.auth.ZypeAuthentication;
 public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
     /**
-     * Debug TAG.
-     */
-    private static final String TAG = ContentBrowser.class.getSimpleName();
-
-    /**
-     * Debug recipe chain flag.
-     */
-    private static final boolean DEBUG_RECIPE_CHAIN = false;
-
-    /**
-     * Cause a feed error flag for debugging.
-     */
-    private static final boolean CAUSE_A_FEED_ERROR_FOR_DEBUGGING = false;
-
-    /**
-     * Request from launcher boolean key
-     */
-    private static final String REQUEST_FROM_LAUNCHER = "REQUEST_FROM_LAUNCHER";
-
-    /**
      * Content will update key.
      */
     public static final String CONTENT_WILL_UPDATE = "CONTENT_WILL_UPDATE";
-
     /**
      * The splash screen name.
      */
     public static final String CONTENT_SPLASH_SCREEN = "CONTENT_SPLASH_SCREEN";
-
     /**
      * The login screen name.
      */
     public static final String CONTENT_LOGIN_SCREEN = "CONTENT_LOGIN_SCREEN";
-
     /**
      * The home screen name.
      */
     public static final String CONTENT_HOME_SCREEN = "CONTENT_HOME_SCREEN";
-
     /**
      * The search screen name.
      */
     public static final String CONTENT_SEARCH_SCREEN = "CONTENT_SEARCH_SCREEN";
-
     /**
      * The details screen name.
      */
     public static final String CONTENT_DETAILS_SCREEN = "CONTENT_DETAILS_SCREEN";
-
     /**
      * The submenu screen name.
      */
     public static final String CONTENT_SUBMENU_SCREEN = "CONTENT_SUBMENU_SCREEN";
-
     /**
      * The recommended content screen name.
      */
     public static final String CONTENT_RECOMMENDED_SCREEN = "CONTENT_RECOMMENDED_SCREEN";
-
     /**
      * The content renderer screen name.
      */
     public static final String CONTENT_RENDERER_SCREEN = "CONTENT_RENDERER_SCREEN";
-
     /**
      * The connectivity screen name.
      */
     public static final String CONTENT_CONNECTIVITY_SCREEN = "CONTENT_CONNECTIVITY_SCREEN";
-
     /**
      * The slide show screen name.
      */
     public static final String CONTENT_SLIDESHOW_SCREEN = "CONTENT_SLIDESHOW_SCREEN";
-
     /* Zype, Evgeny Cherkasov */
     public static final String BUY_VIDEO_SCREEN = "BUY_VIDEO_SCREEN";
     public static final String SUBSCRIPTION_SCREEN = "SUBSCRIPTION_SCREEN";
-
     public static final String USER_SIGN_UP_SCREEN = "USER_SIGN_UP_SCREEN";
-
+    public static final String PLAY_TRAILER_SCREEN = "PLAY_TRAILER_SCREEN";
     /**
      * Free content constant.
      */
     public static final String FREE_CONTENT = "free";
-
     /**
      * Search constant.
      */
     public static final String SEARCH = "Search";
-
     /**
      * Slide show constant.
      */
     public static final String SLIDE_SHOW = "SlideShow";
-
     /**
      * Login constant.
      */
     public static final String LOGIN_LOGOUT = "LoginLogout";
-
     /**
      * Terms constant.
      */
     public static final String TERMS = "Terms";
-
     /**
      * Slide show setting constant.
      */
     public static final String SLIDESHOW_SETTING = "SlideShowSetting";
-
     /* Zype, Evgeny Cherkasov */
     public static final String FAVORITES = "Favorites";
     public static final String MY_LIBRARY = "MyLibrary";
     public static final String NEXT_PAGE = "NextPage";
-
     /**
      * Constant for the "watch now" action.
      */
     public static final int CONTENT_ACTION_WATCH_NOW = 1;
-
     /**
      * Constant for the "watch from beginning" action.
      */
     public static final int CONTENT_ACTION_WATCH_FROM_BEGINNING = 2;
-
     /**
      * Constant for the "resume playback" action.
      */
     public static final int CONTENT_ACTION_RESUME = 3;
-
     /**
      * Constant for the "watch later" action.
      */
     public static final int CONTENT_ACTION_WATCH_LATER = 4;
-
     /**
      * Constant for the "purchase subscription" action.
      */
     public static final int CONTENT_ACTION_SUBSCRIPTION = 5;
-
     /**
      * Constant for the "purchase daily pass" action.
      */
     public static final int CONTENT_ACTION_DAILY_PASS = 6;
-
     /**
      * Constant for the "trial" action.
      */
     public static final int CONTENT_ACTION_TRIAL = 7;
-
     /**
      * Constant for the "buy" action.
      */
     public static final int CONTENT_ACTION_BUY = 8;
-
     /**
      * Constant for the "rent" action.
      */
     public static final int CONTENT_ACTION_RENT = 9;
-
     /**
      * Constant for the "search" action.
      */
     public static final int CONTENT_ACTION_SEARCH = 10;
-
     /**
      * Constant for the "login" action.
      */
     public static final int CONTENT_ACTION_LOGIN_LOGOUT = 11;
-
     /**
      * Constant for the "slide show" action.
      */
     public static final int CONTENT_ACTION_SLIDESHOW = 12;
-
     /**
      * Constant for the "launcher" action.
      */
     public static final int CONTENT_ACTION_CALL_FROM_LAUNCHER = 13;
-
     /**
      * Constant for the "add to watchlist" action.
      */
     public static final int CONTENT_ACTION_ADD_WATCHLIST = 14;
-
     /**
      * Constant for the "remove from watchlist" action.
      */
     public static final int CONTENT_ACTION_REMOVE_WATCHLIST = 15;
-
     /**
      * The maximum number of actions supported.
      */
     public static final int CONTENT_ACTION_MAX = 100;
-
     /* Zype, Evgeny Cherkasov */
     // Choose plan action
     public static final int CONTENT_ACTION_CHOOSE_PLAN = 51;
@@ -295,46 +239,52 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final int CONTENT_ACTION_FAVORITES_REMOVE = 54;
     // Watch ad free action
     public static final int CONTENT_ACTION_SWAF = 55;
-
     public static final int CONTENT_REGISTRATION_REQUIRED = 56;
     public static final int CONTENT_PLAY_TRAILER = 57;
-
-
-    /**
-     * Search algorithm name.
-     */
-    private static final String DEFAULT_SEARCH_ALGO_NAME = "basic";
-
-    /**
-     * Content reload timeout in seconds.
-     */
-    private static final int CONTENT_RELOAD_TIMEOUT = 14400; // Equals 4 hours.
-
     /**
      * Constant for grace time in milliseconds
      */
     public static final long GRACE_TIME_MS = 5000; // 5 seconds.
-
     /**
      * Constant to add to intent extras to inform content browser to restore from the last activity.
      */
     public static final String RESTORE_ACTIVITY = "restore_last_activity";
-
     /**
-     * Application context.
+     * Debug TAG.
      */
-    private final Context mAppContext;
-
+    private static final String TAG = ContentBrowser.class.getSimpleName();
     /**
-     * Singleton instance.
+     * Debug recipe chain flag.
      */
-    private static ContentBrowser sInstance;
-
+    private static final boolean DEBUG_RECIPE_CHAIN = false;
+    /**
+     * Cause a feed error flag for debugging.
+     */
+    private static final boolean CAUSE_A_FEED_ERROR_FOR_DEBUGGING = false;
+    /**
+     * Request from launcher boolean key
+     */
+    private static final String REQUEST_FROM_LAUNCHER = "REQUEST_FROM_LAUNCHER";
+    /**
+     * Search algorithm name.
+     */
+    private static final String DEFAULT_SEARCH_ALGO_NAME = "basic";
+    /**
+     * Content reload timeout in seconds.
+     */
+    private static final int CONTENT_RELOAD_TIMEOUT = 14400; // Equals 4 hours.
     /**
      * Lock object for singleton get instance.
      */
     private static final Object sLock = new Object();
-
+    /**
+     * Singleton instance.
+     */
+    private static ContentBrowser sInstance;
+    /**
+     * Application context.
+     */
+    private final Context mAppContext;
     /**
      * Event bus reference.
      */
@@ -344,98 +294,79 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      * Search manager instance.
      */
     private final SearchManager<ContentContainer, Content> mSearchManager = new SearchManager<>();
-
-    /**
-     * Custom search handler reference.
-     */
-    private ICustomSearchHandler mICustomSearchHandler;
-
-    /**
-     * Root content container listener.
-     */
-    private IRootContentContainerListener mIRootContentContainerListener;
-
-    /**
-     * Last selected content.
-     */
-    private Content mLastSelectedContent;
-
-    /**
-     * Last selected content container.
-     */
-    private ContentContainer mLastSelectedContentContainer;
-
     /**
      * Navigator instance.
      */
     private final Navigator mNavigator;
-
     /**
      * Actions list.
      */
     private final List<Action> mWidgetActionsList = new ArrayList<>();
-
     /**
      * Global content action list.
      */
     private final List<Action> mGlobalContentActionList = new ArrayList<>();
-
     /**
      * Content action listener.
      */
     private final Map<Integer, List<IContentActionListener>> mContentActionListeners = new
             HashMap<>();
-
     /**
      * Settings actions list.
      */
     private final List<Action> mSettingsActions = new ArrayList<>();
-
     /**
      * Powered by logo map.
      */
     private final Map<String, String> mPoweredByLogoUrlMap = new HashMap<>();
-
-    /**
-     * Auth helper instance.
-     */
-    private AuthHelper mAuthHelper;
-
-    /**
-     * Purchase helper instance.
-     */
-    private PurchaseHelper mPurchaseHelper;
-
-    /**
-     * LauncherIntegrationManager instance.
-     */
-    private LauncherIntegrationManager mLauncherIntegrationManager;
-
-    /**
-     * Flag for whether or not the user is subscribed.
-     */
-    private boolean mSubscribed = false;
-
-    /**
-     * Flag for whether or not in-app purchasing is disabled.
-     */
-    private boolean mIAPDisabled = false;
-
-    /**
-     * When set to true, this flag will override the subscription flag for all the content.
-     */
-    private boolean mOverrideAllContentsSubscriptionFlag = false;
-
-    /**
-     * Composite subscription instance; single use only!!!.
-     */
-    private CompositeSubscription mCompositeSubscription = new CompositeSubscription();
-
     /**
      * boolean to read launcher integration status.
      */
     private final boolean mLauncherIntegrationEnabled;
-
+    /**
+     * Custom search handler reference.
+     */
+    private ICustomSearchHandler mICustomSearchHandler;
+    /**
+     * Root content container listener.
+     */
+    private IRootContentContainerListener mIRootContentContainerListener;
+    /**
+     * Last selected content.
+     */
+    private Content mLastSelectedContent;
+    /**
+     * Last selected content container.
+     */
+    private ContentContainer mLastSelectedContentContainer;
+    /**
+     * Auth helper instance.
+     */
+    private AuthHelper mAuthHelper;
+    /**
+     * Purchase helper instance.
+     */
+    private PurchaseHelper mPurchaseHelper;
+    /**
+     * LauncherIntegrationManager instance.
+     */
+    private LauncherIntegrationManager mLauncherIntegrationManager;
+    /**
+     * Flag for whether or not the user is subscribed.
+     */
+    private boolean mSubscribed = false;
+    /**
+     * Flag for whether or not in-app purchasing is disabled.
+     */
+    private boolean mIAPDisabled = false;
+    /**
+     * When set to true, this flag will override the subscription flag for all the content.
+     */
+    private boolean mOverrideAllContentsSubscriptionFlag = false;
+    /**
+     * Composite subscription instance; single use only!!!.
+     */
+    private CompositeSubscription mCompositeSubscription = new CompositeSubscription();
     /**
      * loginLogout action, content browser needs to keep the state updated of this action.
      */
@@ -461,6 +392,164 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
     private FavoritesManager favoritesManager;
     private boolean favoritesLoaded = false;
+
+    /**
+     * Constructor.
+     *
+     * @param activity The activity that is active when ContentBrowser is created.
+     */
+    private ContentBrowser(Activity activity) {
+
+        mAppContext = activity.getApplicationContext();
+        mNavigator = new Navigator(activity);
+        /* Zype, Evgeny Cherkasov */
+//        mSubscribed = Preferences.getBoolean(PurchaseHelper.CONFIG_PURCHASE_VERIFIED);
+        updateUserSubscribed();
+
+        mContentLoader = ContentLoader.getInstance(mAppContext);
+
+        mIAPDisabled = mAppContext.getResources().getBoolean(R.bool.is_iap_disabled);
+        /* Zype, Evgeny Cherkasov */
+        if (!ZypeConfiguration.isNativeSubscriptionEnabled(mAppContext)
+                && !ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(mAppContext)
+                && !ZypeConfiguration.isNativeTVODEnabled(mAppContext)) {
+            mIAPDisabled = true;
+        }
+
+        mLauncherIntegrationEnabled =
+                mAppContext.getResources().getBoolean(R.bool.is_launcher_integration_enabled);
+
+        mOverrideAllContentsSubscriptionFlag =
+                mAppContext.getResources()
+                        .getBoolean(R.bool.override_all_contents_subscription_flag);
+
+        addWidgetsAction(createSearchAction());
+        //addWidgetsAction(createSlideShowAction());
+        /* Zype, Evgeny Cherkasov
+         * begin*/
+        if (!TextUtils.isEmpty(Preferences.getString("ZypeTerms")))
+            addSettingsAction(createTermsOfUseSettingsAction());
+        /* Zype
+         * end */
+        //addSettingsAction(createSlideShowSettingAction());
+        setupLogoutAction();
+        setupFavoritesAction();
+        setupMyLibraryAction();
+
+        mSearchManager.addSearchAlgo(DEFAULT_SEARCH_ALGO_NAME, new ISearchAlgo<Content>() {
+            @Override
+            public boolean onCompare(String query, Content content) {
+
+                return content.searchInFields(query, new String[]{
+                        Content.TITLE_FIELD_NAME,
+                        Content.DESCRIPTION_FIELD_NAME
+                });
+            }
+        });
+        /* Zype, Evgeny Cherkasov */
+        setCustomSearchHandler(new ZypeSearchManager(Recipe.newInstance(mAppContext, "recipes/ZypeSearchContentsRecipe.json"),
+                mAppContext));
+
+        mNavigator.setINavigationListener(new Navigator.INavigationListener() {
+
+            @Override
+            public void onSetTheme(Activity activity) {
+
+            }
+
+            @Override
+            public void onScreenCreate(Activity activity, String screenName) {
+
+                Log.d(TAG, " onScreenCreate for screen " + screenName + " activity " + activity +
+                        " intent " + (activity != null ? activity.getIntent() : null));
+
+                if (!mContentLoader.isContentLoaded() &&
+                        (screenName == null || !screenName.equals(CONTENT_SPLASH_SCREEN))) {
+                    Log.e(TAG, "Immature app, switching to splash");
+                    initFromImmatureApp(activity);
+                } else {
+                    if (screenName != null) {
+                        if (screenName.equals(CONTENT_SUBMENU_SCREEN)) {
+                            runGlobalRecipesForLastSelected(activity, ContentBrowser.this);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onScreenGotFocus(Activity activity, String screenName) {
+
+                Log.d(TAG, "onScreenGotFocus for screen " + screenName + " activity " + activity +
+                        " intent " + (activity != null ? activity.getIntent() : null));
+
+                if (screenName.equals(CONTENT_HOME_SCREEN)) {
+                    if (mContentLoader.isContentReloadRequired() ||
+                            !mContentLoader.isContentLoaded()) {
+                        Log.d(TAG, "Are modules loaded? " + mModulesLoaded);
+                        if (!mModulesLoaded) {
+                            initFromImmatureApp(activity);
+                        } else {
+                            reloadFeed(activity);
+                        }
+
+                    } else if (activity != null &&
+                            activity.getIntent().hasExtra(REQUEST_FROM_LAUNCHER) &&
+                            activity.getIntent().getBooleanExtra(REQUEST_FROM_LAUNCHER, false)) {
+
+                        activity.getIntent().putExtra(REQUEST_FROM_LAUNCHER, false);
+                        switchToRendererScreen(activity.getIntent());
+                    }
+                    // If we're loading from after an app launch, try to restore the state.
+                    else if (shouldRestoreLastActivity(activity)) {
+                        activity.getIntent().putExtra(RESTORE_ACTIVITY, false);
+                        restoreActivityState(screenName);
+                    }
+                } else if (screenName.equals(CONTENT_SPLASH_SCREEN)) {
+                    Log.d(TAG, "runGlobalRecipes due to CONTENT_SPLASH_SCREEN focus");
+                }
+            }
+
+            @Override
+            public void onScreenLostFocus(Activity activity, String screenName) {
+
+                Log.d(TAG, "onScreenLostFocus:" + screenName);
+                if (mAuthHelper != null) {
+                    mAuthHelper.cancelAllRequests();
+                }
+            }
+
+            @Override
+            public void onApplicationGoesToBackground() {
+
+                Log.d(TAG, "onApplicationGoesToBackground:");
+                if (mCompositeSubscription.hasSubscriptions()) {
+                    Log.d(TAG, "mCompositeSubscription.unsubscribe");
+                    mCompositeSubscription.unsubscribe();
+                    // CompositeSubscription is a single use, create a new one for next round.
+                    mCompositeSubscription = null;
+                    mCompositeSubscription = new CompositeSubscription();
+                } else {
+                    Log.d(TAG, "onApplicationGoesToBackground has no subscriptions!!!");
+                }
+            }
+        });
+    }
+
+    /**
+     * Get instance, singleton method.
+     *
+     * @param activity The activity.
+     * @return Content browser singleton instance.
+     */
+    public static ContentBrowser getInstance(Activity activity) {
+
+        synchronized (sLock) {
+            if (sInstance == null) {
+                sInstance = new ContentBrowser(activity);
+            }
+            return sInstance;
+        }
+    }
 
     /**
      * Returns AuthHelper instance.
@@ -559,230 +648,6 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     /**
-     * Content action listener interface.
-     */
-    public interface IContentActionListener {
-
-        /**
-         * Called when an action happens on a content.
-         *
-         * @param activity Activity.
-         * @param content  Content.
-         * @param actionId Action id.
-         */
-        void onContentAction(Activity activity, Content content, int actionId);
-
-        /**
-         * Called when an action is completed.
-         *
-         * @param activity Activity.
-         * @param content  Content.
-         * @param actionId Action id.
-         */
-        void onContentActionCompleted(Activity activity, Content content, int actionId);
-    }
-
-    /**
-     * Custom search handler interface.
-     */
-    public interface ICustomSearchHandler {
-
-        /**
-         * On search requested callback.
-         *
-         * @param query         Query string.
-         * @param iSearchResult Search result listener.
-         */
-        void onSearchRequested(String query, ISearchResult iSearchResult);
-    }
-
-    /**
-     * Root content container listener.
-     */
-    public interface IRootContentContainerListener {
-
-        /**
-         * Root content container populated callback.
-         *
-         * @param contentContainer Root content container reference.
-         */
-        void onRootContentContainerPopulated(ContentContainer contentContainer);
-    }
-
-    /**
-     * Screen switch listener interface.
-     */
-    public interface IScreenSwitchListener {
-
-        /**
-         * On screen switch callback.
-         *
-         * @param extra Extra bundle.
-         */
-        void onScreenSwitch(Bundle extra);
-    }
-
-    /**
-     * Screen switch Error listener interface.
-     */
-    public interface IScreenSwitchErrorHandler {
-
-        /**
-         * Authentication error callback.
-         *
-         * @param iScreenSwitchListener Screen switch listener interface implementation.
-         */
-        void onErrorHandler(IScreenSwitchListener iScreenSwitchListener);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param activity The activity that is active when ContentBrowser is created.
-     */
-    private ContentBrowser(Activity activity) {
-
-        mAppContext = activity.getApplicationContext();
-        mNavigator = new Navigator(activity);
-        /* Zype, Evgeny Cherkasov */
-//        mSubscribed = Preferences.getBoolean(PurchaseHelper.CONFIG_PURCHASE_VERIFIED);
-        updateUserSubscribed();
-
-        mContentLoader = ContentLoader.getInstance(mAppContext);
-
-        mIAPDisabled = mAppContext.getResources().getBoolean(R.bool.is_iap_disabled);
-        /* Zype, Evgeny Cherkasov */
-        if (!ZypeConfiguration.isNativeSubscriptionEnabled(mAppContext)
-                && !ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(mAppContext)
-                && !ZypeConfiguration.isNativeTVODEnabled(mAppContext)) {
-            mIAPDisabled = true;
-        }
-
-        mLauncherIntegrationEnabled =
-                mAppContext.getResources().getBoolean(R.bool.is_launcher_integration_enabled);
-
-        mOverrideAllContentsSubscriptionFlag =
-                mAppContext.getResources()
-                        .getBoolean(R.bool.override_all_contents_subscription_flag);
-
-        addWidgetsAction(createSearchAction());
-        //addWidgetsAction(createSlideShowAction());
-        /* Zype, Evgeny Cherkasov
-        * begin*/
-        if (!TextUtils.isEmpty(Preferences.getString("ZypeTerms")))
-            addSettingsAction(createTermsOfUseSettingsAction());
-        /* Zype
-        * end */
-        //addSettingsAction(createSlideShowSettingAction());
-        setupLogoutAction();
-        setupFavoritesAction();
-        setupMyLibraryAction();
-
-        mSearchManager.addSearchAlgo(DEFAULT_SEARCH_ALGO_NAME, new ISearchAlgo<Content>() {
-            @Override
-            public boolean onCompare(String query, Content content) {
-
-                return content.searchInFields(query, new String[]{
-                        Content.TITLE_FIELD_NAME,
-                        Content.DESCRIPTION_FIELD_NAME
-                });
-            }
-        });
-        /* Zype, Evgeny Cherkasov */
-        setCustomSearchHandler(new ZypeSearchManager(Recipe.newInstance(mAppContext, "recipes/ZypeSearchContentsRecipe.json"),
-                mAppContext));
-
-        mNavigator.setINavigationListener(new Navigator.INavigationListener() {
-
-            @Override
-            public void onSetTheme(Activity activity) {
-
-            }
-
-            @Override
-            public void onScreenCreate(Activity activity, String screenName) {
-
-                Log.d(TAG, " onScreenCreate for screen " + screenName + " activity " + activity +
-                        " intent " + (activity != null ? activity.getIntent() : null));
-
-                if (!mContentLoader.isContentLoaded() &&
-                        (screenName == null || !screenName.equals(CONTENT_SPLASH_SCREEN))) {
-                    Log.e(TAG, "Immature app, switching to splash");
-                    initFromImmatureApp(activity);
-                }
-                else {
-                    if (screenName != null) {
-                        if (screenName.equals(CONTENT_SUBMENU_SCREEN)) {
-                            runGlobalRecipesForLastSelected(activity, ContentBrowser.this);
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onScreenGotFocus(Activity activity, String screenName) {
-
-                Log.d(TAG, "onScreenGotFocus for screen " + screenName + " activity " + activity +
-                        " intent " + (activity != null ? activity.getIntent() : null));
-
-                if (screenName.equals(CONTENT_HOME_SCREEN)) {
-                    if (mContentLoader.isContentReloadRequired() ||
-                            !mContentLoader.isContentLoaded()) {
-                        Log.d(TAG, "Are modules loaded? " + mModulesLoaded);
-                        if (!mModulesLoaded) {
-                            initFromImmatureApp(activity);
-                        }
-                        else {
-                            reloadFeed(activity);
-                        }
-
-                    }
-                    else if (activity != null &&
-                            activity.getIntent().hasExtra(REQUEST_FROM_LAUNCHER) &&
-                            activity.getIntent().getBooleanExtra(REQUEST_FROM_LAUNCHER, false)) {
-
-                        activity.getIntent().putExtra(REQUEST_FROM_LAUNCHER, false);
-                        switchToRendererScreen(activity.getIntent());
-                    }
-                    // If we're loading from after an app launch, try to restore the state.
-                    else if (shouldRestoreLastActivity(activity)) {
-                        activity.getIntent().putExtra(RESTORE_ACTIVITY, false);
-                        restoreActivityState(screenName);
-                    }
-                }
-                else if (screenName.equals(CONTENT_SPLASH_SCREEN)) {
-                    Log.d(TAG, "runGlobalRecipes due to CONTENT_SPLASH_SCREEN focus");
-                }
-            }
-
-            @Override
-            public void onScreenLostFocus(Activity activity, String screenName) {
-
-                Log.d(TAG, "onScreenLostFocus:" + screenName);
-                if (mAuthHelper != null) {
-                    mAuthHelper.cancelAllRequests();
-                }
-            }
-
-            @Override
-            public void onApplicationGoesToBackground() {
-
-                Log.d(TAG, "onApplicationGoesToBackground:");
-                if (mCompositeSubscription.hasSubscriptions()) {
-                    Log.d(TAG, "mCompositeSubscription.unsubscribe");
-                    mCompositeSubscription.unsubscribe();
-                    // CompositeSubscription is a single use, create a new one for next round.
-                    mCompositeSubscription = null;
-                    mCompositeSubscription = new CompositeSubscription();
-                }
-                else {
-                    Log.d(TAG, "onApplicationGoesToBackground has no subscriptions!!!");
-                }
-            }
-        });
-    }
-
-    /**
      * Restores the last active activity that was saved before the app went to the background or
      * was closed.
      *
@@ -827,29 +692,12 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         updateLoginAction();
 
-        if(authenticationStatusUpdateEvent.isRegistration()) {
-          getNavigator().runOnUpcomingActivity(()-> {
-            showRegistrationCompleteDialog();
-          });
+        if (authenticationStatusUpdateEvent.isRegistration()) {
+            getNavigator().runOnUpcomingActivity(() -> {
+                showRegistrationCompleteDialog();
+            });
 
-          updateContentActions();
-        }
-    }
-
-
-    /**
-     * Get instance, singleton method.
-     *
-     * @param activity The activity.
-     * @return Content browser singleton instance.
-     */
-    public static ContentBrowser getInstance(Activity activity) {
-
-        synchronized (sLock) {
-            if (sInstance == null) {
-                sInstance = new ContentBrowser(activity);
-            }
-            return sInstance;
+            updateContentActions();
         }
     }
 
@@ -978,6 +826,16 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     /**
+     * Get last selected content.
+     *
+     * @return Last selected content.
+     */
+    public Content getLastSelectedContent() {
+
+        return mLastSelectedContent;
+    }
+
+    /**
      * Set last selected content.
      *
      * @param content Content.
@@ -991,13 +849,13 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     /**
-     * Get last selected content.
+     * Get last selected content container.
      *
-     * @return Last selected content.
+     * @return Last selected content container.
      */
-    public Content getLastSelectedContent() {
+    public ContentContainer getLastSelectedContentContainer() {
 
-        return mLastSelectedContent;
+        return mLastSelectedContentContainer;
     }
 
     /**
@@ -1010,16 +868,6 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         mLastSelectedContentContainer = contentContainer;
         return this;
-    }
-
-    /**
-     * Get last selected content container.
-     *
-     * @return Last selected content container.
-     */
-    public ContentContainer getLastSelectedContentContainer() {
-
-        return mLastSelectedContentContainer;
     }
 
     /**
@@ -1188,8 +1036,6 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 .setState(LogoutSettingsFragment.TYPE_LOGIN);
     }
 
-    /* Zype, Evgeny Cherkasov */
-
     /**
      * Create favorites Action.
      *
@@ -1249,6 +1095,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         slideShow.setAction(SLIDE_SHOW);
         return slideShow;
     }
+
+    /* Zype, Evgeny Cherkasov */
 
     /**
      * Create slide show setting action.
@@ -1317,8 +1165,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                     recommendedContentContainer.addContent(relatedContent);
                                 }
                             }
-                        }
-                        else {
+                        } else {
                             // User is logged in but has no subscription. Add onlu not subscription videos
                             for (Content relatedContent : parentContainer.getContents()) {
                                 if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId()) && !relatedContent.isSubscriptionRequired()) {
@@ -1326,8 +1173,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                 }
                             }
                         }
-                    }
-                    else {
+                    } else {
                         // User id not logged in. Add only not subscription videos
                         for (Content relatedContent : parentContainer.getContents()) {
                             if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId()) && !relatedContent.isSubscriptionRequired()) {
@@ -1335,8 +1181,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                             }
                         }
                     }
-                }
-                else {
+                } else {
                     // If current video is on subscription it mean we already checked user credentials
                     // and can add all content from the category
                     for (Content relatedContent : parentContainer.getContents()) {
@@ -1346,8 +1191,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     }
                 }
 
-            }
-            else {
+            } else {
                 Log.w(TAG, "The content's container could not be found! " + content.toString());
             }
         }
@@ -1408,8 +1252,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         if (mICustomSearchHandler != null) {
             mICustomSearchHandler.onSearchRequested(query, iSearchResult);
-        }
-        else {
+        } else {
             mSearchManager.syncSearch(DEFAULT_SEARCH_ALGO_NAME,
                     query,
                     iSearchResult,
@@ -1483,8 +1326,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                 .createFragment(activity,
                                         activity.getFragmentManager(),
                                         settingsAction);
-                    }
-                    else {
+                    } else {
                         settingsAction.setState(LogoutSettingsFragment.TYPE_LOGIN);
                         mAuthHelper.authenticateWithActivity().subscribe(resultBundle -> {
                             if (resultBundle != null &&
@@ -1514,15 +1356,13 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                             if (result) {
                                 setLastSelectedContentContainer(contentContainer);
                                 switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
-                            }
-                            else {
+                            } else {
                                 // TODO: Switch to Favorites screen after successful login
                                 mAuthHelper.handleAuthChain(extra -> mNavigator.startActivity(CONTENT_HOME_SCREEN, intent -> {
                                 }));
                             }
                         });
-            }
-            else {
+            } else {
                 setLastSelectedContentContainer(contentContainer);
                 switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
                 loadLocalFavoritesVideos(contentContainer);
@@ -1554,8 +1394,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
                             setLastSelectedContentContainer(contentContainer);
                             switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
-                        }
-                        else {
+                        } else {
                             mAuthHelper.handleAuthChain(extra -> mNavigator.startActivity(CONTENT_HOME_SCREEN, intent -> {
                             }));
                         }
@@ -1599,27 +1438,22 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         if (isSubscriptionNotRequired && !purchaseRequired || mIAPDisabled) {
             showWatch = true;
-        }
-        else if (subscriptionRequired && purchaseRequired) {
+        } else if (subscriptionRequired && purchaseRequired) {
             if (!isUserSubscribed() && !entitled) {
                 showSubscribe = true;
                 showPurchase = true;
-            }
-            else {
+            } else {
                 showWatch = true;
             }
-        }
-        else {
+        } else {
             if (subscriptionRequired) {
                 if (isUserSubscribed()) {
                     showWatch = true;
-                }
-                else {
+                } else {
                     if (ZypeConfiguration.isNativeSubscriptionEnabled(mAppContext)
                             || ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(mAppContext)) {
                         showSubscribe = true;
-                    }
-                    else {
+                    } else {
                         showWatch = true;
                     }
                 }
@@ -1627,8 +1461,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             if (purchaseRequired) {
                 if (entitled) {
                     showWatch = true;
-                }
-                else {
+                } else {
                     if (ZypeConfiguration.isNativeTVODEnabled(mAppContext)) {
                         showPurchase = true;
                     }
@@ -1645,13 +1478,12 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         boolean registrationRequired = content.getExtraValueAsBoolean(Content.EXTRA_REGISTRATION_REQUIRED);
 
-        if(registrationRequired) {
+        if (registrationRequired) {
             //check here if the user is already logged in
 
-            if(!isUserLoggedIn()) {
+            if (!isUserLoggedIn()) {
                 showWatch = false;
-            }
-            else {
+            } else {
                 registrationRequired = false;
             }
         }
@@ -1683,20 +1515,19 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 if (isWatchlistRowEnabled()) {
                     addWatchlistAction(contentActionList, content.getId());
                 }
-            }
-            else {
+            } else {
                 contentActionList.add(createActionButton(CONTENT_ACTION_WATCH_NOW,
                         R.string.watch_now_1, R.string.watch_now_2));
             }
         }
 
-        if(registrationRequired) {
+        if (registrationRequired) {
             contentActionList.add(createActionButton(CONTENT_REGISTRATION_REQUIRED,
-                R.string.action_signup_to_watch1, R.string.action_signup_to_watch2));
+                    R.string.action_signup_to_watch1, R.string.action_signup_to_watch2));
 
-            if(content.hasTrailer()) {
+            if (content.hasTrailer()) {
                 contentActionList.add(createActionButton(CONTENT_PLAY_TRAILER,
-                    R.string.action_play_trailer_1, R.string.action_play_trailer_2));
+                        R.string.action_play_trailer_1, R.string.action_play_trailer_2));
             }
 
             return contentActionList;
@@ -1722,19 +1553,16 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     if (!VideoFavoritesHelper.getInstance().recordExists(mAppContext, content.getId())) {
                         contentActionList.add(createActionButton(CONTENT_ACTION_FAVORITES_ADD,
                                 R.string.action_favorites_add_1, R.string.action_favorites_add_2));
-                    }
-                    else {
+                    } else {
                         contentActionList.add(createActionButton(CONTENT_ACTION_FAVORITES_REMOVE,
                                 R.string.action_favorites_remove_1, R.string.action_favorites_remove_2));
                     }
-                }
-                else {
+                } else {
                     if (ZypeConfiguration.isFavoritesViaApiEnabled(mAppContext)) {
                         // Set next page to 1 for initial loading
                         favoritesContainer.getContentContainers().get(0).setExtraValue(ExtraKeys.NEXT_PAGE, 1);
                         loadFavoritesVideos(favoritesContainer);
-                    }
-                    else {
+                    } else {
                         loadLocalFavoritesVideos(favoritesContainer);
                     }
                 }
@@ -1756,10 +1584,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         contentActionList.addAll(mGlobalContentActionList);
 
-      if(content.hasTrailer()) {
-        contentActionList.add(createActionButton(CONTENT_PLAY_TRAILER,
-            R.string.action_play_trailer_1, R.string.action_play_trailer_2));
-      }
+        if (content.hasTrailer()) {
+            contentActionList.add(createActionButton(CONTENT_PLAY_TRAILER,
+                    R.string.action_play_trailer_1, R.string.action_play_trailer_2));
+        }
 
         return contentActionList;
     }
@@ -1834,12 +1662,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         if (databaseHelper != null) {
             if (addContent) {
                 databaseHelper.addRecord(mAppContext, contentId);
-            }
-            else {
+            } else {
                 databaseHelper.deleteRecord(mAppContext, contentId);
             }
-        }
-        else {
+        } else {
             Log.e(TAG, "Unable to perform watchlist button action because database is null");
         }
         toggleWatchlistButton(addContent, actionAdapter);
@@ -1909,8 +1735,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             if (databaseHelper.recordExists(mAppContext, content.getId())) {
                 record = databaseHelper.getRecord(mAppContext, content.getId());
             }
-        }
-        else {
+        } else {
             Log.e(TAG, "Unable to load content because database is null");
         }
 
@@ -1983,20 +1808,20 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
     private void showRegistrationCompleteDialog() {
         AlertDialogFragment.createAndShowAlertDialogFragment(mNavigator.getActiveActivity(),
-            mAppContext.getString(R.string.action_registration_complete_title),
-            mAppContext.getString(R.string.action_registration_complete_message),
-            mAppContext.getString(R.string.action_registration_complete_btn),
-            null, new AlertDialogFragment.IAlertDialogListener() {
-                @Override
-                public void onDialogPositiveButton(AlertDialogFragment alertDialogFragment) {
+                mAppContext.getString(R.string.action_registration_complete_title),
+                mAppContext.getString(R.string.action_registration_complete_message),
+                mAppContext.getString(R.string.action_registration_complete_btn),
+                null, new AlertDialogFragment.IAlertDialogListener() {
+                    @Override
+                    public void onDialogPositiveButton(AlertDialogFragment alertDialogFragment) {
 
-                }
+                    }
 
-                @Override
-                public void onDialogNegativeButton(AlertDialogFragment alertDialogFragment) {
+                    @Override
+                    public void onDialogNegativeButton(AlertDialogFragment alertDialogFragment) {
 
-                }
-            });
+                    }
+                });
     }
 
     /**
@@ -2075,8 +1900,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
             if (!mAuthHelper.getIAuthentication().isAuthenticationCanBeDoneLater()) {
                 mAuthHelper.handleAuthChain(iScreenSwitchListener::onScreenSwitch);
-            }
-            else {
+            } else {
                 /* Zype, Evgeny Cherkasov */
                 // Don't show login later alert
                 //boolean loginLater = Preferences.getBoolean(AuthHelper.LOGIN_LATER_PREFERENCES_KEY);
@@ -2088,18 +1912,15 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                         if (extras.getBoolean(AuthHelper.RESULT)) {
                             mAuthHelper.handleAuthChain(
                                     iScreenSwitchListener::onScreenSwitch, extras);
-                        }
-                        else {
+                        } else {
                             iScreenSwitchErrorHandler.onErrorHandler(iScreenSwitchListener);
                         }
                     });
-                }
-                else {
+                } else {
                     iScreenSwitchListener.onScreenSwitch(null);
                 }
             }
-        }
-        else {
+        } else {
             iScreenSwitchListener.onScreenSwitch(null);
         }
     }
@@ -2286,8 +2107,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                             if (content.isSubscriptionRequired()) {
                                 if (isUserSubscribed() || actionId == CONTENT_ACTION_SWAF) {
                                     switchToRendererScreen(content, actionId);
-                                }
-                                else {
+                                } else {
                                     AlertDialogFragment.createAndShowAlertDialogFragment(mNavigator.getActiveActivity(),
                                             mAppContext.getResources().getString(R.string.subscription_alert_title),
                                             mAppContext.getResources().getString(R.string.subscription_alert_message),
@@ -2305,12 +2125,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                             }
                                     );
                                 }
-                            }
-                            else {
+                            } else {
                                 switchToRendererScreen(content, actionId);
                             }
-                        }
-                        else {
+                        } else {
                             // With Native Subscription feature enabled user can has a subscription
                             // without being logged in as Zype consumer
                             if (isUserSubscribed() && ZypeConfiguration.isNativeSubscriptionEnabled(mAppContext)) {
@@ -2331,8 +2149,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 //        if (mIAPDisabled) {
         if (mIAPDisabled || !content.isSubscriptionRequired() || ZypeConfiguration.isNativeSubscriptionEnabled(mAppContext)) {
             switchToRendererScreen(content, actionId);
-        }
-        else {
+        } else {
             Log.d(TAG, "validating purchase while handleRendererScreenSwitch");
             mPurchaseHelper
                     .isSubscriptionValidObservable()
@@ -2341,8 +2158,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                 resultBundle.getBoolean(PurchaseHelper.RESULT_VALIDITY)) {
                             // Switch to renderer screen.
                             switchToRendererScreen(content, actionId);
-                        }
-                        else if (resultBundle.getBoolean(PurchaseHelper.RESULT) &&
+                        } else if (resultBundle.getBoolean(PurchaseHelper.RESULT) &&
                                 !resultBundle.getBoolean(PurchaseHelper.RESULT_VALIDITY)) {
 
                             if (showErrorDialog) {
@@ -2367,8 +2183,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                                 alertDialogFragment.dismiss();
                                             }
                                         });
-                            }
-                            else {
+                            } else {
                                 Log.e(TAG, "Purchase expired while handleRendererScreenSwitch");
                                 ContentBrowser.getInstance(activity).setLastSelectedContent(content)
                                         .switchToScreen(ContentBrowser
@@ -2376,8 +2191,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                                 content);
                             }
                             updateContentActions();
-                        }
-                        else {
+                        } else {
                             // IAP errors are handled by IAP sdk.
                             Log.e(TAG, "IAP error!!!");
                         }
@@ -2417,8 +2231,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 switchToLoginScreen();
             }
             break;
-            case CONTENT_PLAY_TRAILER : {
-
+            case CONTENT_PLAY_TRAILER: {
+                switchToPlayTrailerScreen(content);
             }
             break;
             case CONTENT_ACTION_WATCH_NOW:
@@ -2476,8 +2290,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 if (addToList) {
                     action.setLabel1(mAppContext.getResources().getString(R.string.watchlist_2));
                     action.setId(CONTENT_ACTION_REMOVE_WATCHLIST);
-                }
-                else {
+                } else {
                     action.setLabel1(mAppContext.getResources().getString(R.string.watchlist_1));
                     action.setId(CONTENT_ACTION_ADD_WATCHLIST);
                 }
@@ -2494,13 +2307,11 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         if (ZypeConfiguration.isFavoritesViaApiEnabled(mAppContext)) {
             if (isUserLoggedIn()) {
                 favoritesManager.handleAddAction(content);
-            }
-            else {
+            } else {
                 mAuthHelper.handleAuthChain(extra -> mNavigator.startActivity(CONTENT_DETAILS_SCREEN, intent -> {
                 }));
             }
-        }
-        else {
+        } else {
             favoritesManager.handleAddAction(content);
         }
 
@@ -2510,13 +2321,11 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         if (ZypeConfiguration.isFavoritesViaApiEnabled(mAppContext)) {
             if (isUserLoggedIn()) {
                 favoritesManager.handleRemoveAction(content);
-            }
-            else {
+            } else {
                 mAuthHelper.handleAuthChain(extra -> mNavigator.startActivity(CONTENT_DETAILS_SCREEN, intent -> {
                 }));
             }
-        }
-        else {
+        } else {
             favoritesManager.handleRemoveAction(content);
         }
     }
@@ -2610,8 +2419,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                             content.getId());
                                     switchToHomeScreen(intent);
 
-                                }
-                                catch (Exception e) {
+                                } catch (Exception e) {
                                     Log.e(TAG, e.getLocalizedMessage(), e);
                                     AnalyticsHelper.trackLauncherRequest(contentId, null,
                                             getSourceOfContentPlayRequest(activity.getIntent()));
@@ -2647,8 +2455,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                                         }
                                                     });
                                 }
-                            }
-                            else {
+                            } else {
                                 if (cancellable != null &&
                                         cancellable.isLoadingCancelled()) {
                                     Log.d(TAG, "switchToHomeScreen after Splash cancelled");
@@ -2670,8 +2477,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                     Log.d(TAG, "Ran global recipes from app launch. Will " +
                                             "add intent extra to resume previous activity");
                                     switchToHomeScreen(activity.getIntent());
-                                }
-                                else {
+                                } else {
                                     switchToHomeScreen();
                                 }
                             }
@@ -2713,7 +2519,6 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         }
         return false;
     }
-
 
     /* Zype, Evgeny Cherkasov */
     private void addPredefinedContainers(ContentContainer root) {
@@ -2827,8 +2632,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                             content.getId());
                                     switchToHomeScreen(intent);
 
-                                }
-                                catch (Exception e) {
+                                } catch (Exception e) {
                                     Log.e(TAG, e.getLocalizedMessage(), e);
                                     AnalyticsHelper.trackLauncherRequest(contentId, null,
                                             getSourceOfContentPlayRequest(activity.getIntent()));
@@ -2963,7 +2767,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     return mContentLoader.getLoadContentsObservable(Observable.just(contentContainerAsObject), recipeDynamicParserVideos);
                 })
                 .onBackpressureBuffer() // This must be right after concatMap.
-                .doOnNext(o -> { })
+                .doOnNext(o -> {
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         objectPair -> {
@@ -2999,7 +2804,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     return mContentLoader.getLoadContentsObservable(Observable.just(contentContainerAsObject), recipeDynamicParserVideos);
                 })
                 .onBackpressureBuffer() // This must be right after concatMap.
-                .doOnNext(o -> { })
+                .doOnNext(o -> {
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         result -> {
@@ -3037,7 +2843,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     return mContentLoader.getLoadContentsByVideoIdsObservable(Observable.just(contentContainerAsObject), recipeDynamicParserVideos, videoIds);
                 })
                 .onBackpressureBuffer() // This must be right after concatMap.
-                .doOnNext(o -> { })
+                .doOnNext(o -> {
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         result -> {
@@ -3116,8 +2923,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         if (mAuthHelper == null || mAuthHelper.getIAuthentication() == null) {
             return false;
-        }
-        else if (mAuthHelper.getIAuthentication().isAuthenticationCanBeDoneLater()) {
+        } else if (mAuthHelper.getIAuthentication().isAuthenticationCanBeDoneLater()) {
             return false;
         }
         return true;
@@ -3174,6 +2980,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         runGlobalRecipes(activity, ContentBrowser.this);
     }
+
     /* Zype, Evgeny Cherkasov */
     public boolean isFavoritesLoaded() {
         return favoritesLoaded;
@@ -3202,8 +3009,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         if (ZypeConfiguration.isUniversalSubscriptionEnabled(mAppContext)
                 || ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(mAppContext)) {
             setSubscribed(hasZypeSubscription);
-        }
-        else if (ZypeConfiguration.isNativeSubscriptionEnabled(mAppContext)) {
+        } else if (ZypeConfiguration.isNativeSubscriptionEnabled(mAppContext)) {
             setSubscribed(hasNativeSubscription);
         }
     }
@@ -3224,6 +3030,14 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         });
     }
 
+    public void switchToPlayTrailerScreen(Content content) {
+        switchToScreen(PLAY_TRAILER_SCREEN, intent -> {
+           // intent.putExtra("play_trailer", id);
+            intent.putExtra("play_trailer", content);
+
+        });
+    }
+
     public void switchToSubscriptionScreen(Bundle extras) {
         switchToScreen(SUBSCRIPTION_SCREEN, intent -> {
             intent.putExtras(extras);
@@ -3236,5 +3050,82 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
     public boolean isCreateAccountTermsOfServiceRequired() {
         return ZypeConfiguration.isCreateAccountTermsOfServiceRequired();
+    }
+
+    /**
+     * Content action listener interface.
+     */
+    public interface IContentActionListener {
+
+        /**
+         * Called when an action happens on a content.
+         *
+         * @param activity Activity.
+         * @param content  Content.
+         * @param actionId Action id.
+         */
+        void onContentAction(Activity activity, Content content, int actionId);
+
+        /**
+         * Called when an action is completed.
+         *
+         * @param activity Activity.
+         * @param content  Content.
+         * @param actionId Action id.
+         */
+        void onContentActionCompleted(Activity activity, Content content, int actionId);
+    }
+
+    /**
+     * Custom search handler interface.
+     */
+    public interface ICustomSearchHandler {
+
+        /**
+         * On search requested callback.
+         *
+         * @param query         Query string.
+         * @param iSearchResult Search result listener.
+         */
+        void onSearchRequested(String query, ISearchResult iSearchResult);
+    }
+
+    /**
+     * Root content container listener.
+     */
+    public interface IRootContentContainerListener {
+
+        /**
+         * Root content container populated callback.
+         *
+         * @param contentContainer Root content container reference.
+         */
+        void onRootContentContainerPopulated(ContentContainer contentContainer);
+    }
+
+    /**
+     * Screen switch listener interface.
+     */
+    public interface IScreenSwitchListener {
+
+        /**
+         * On screen switch callback.
+         *
+         * @param extra Extra bundle.
+         */
+        void onScreenSwitch(Bundle extra);
+    }
+
+    /**
+     * Screen switch Error listener interface.
+     */
+    public interface IScreenSwitchErrorHandler {
+
+        /**
+         * Authentication error callback.
+         *
+         * @param iScreenSwitchListener Screen switch listener interface implementation.
+         */
+        void onErrorHandler(IScreenSwitchListener iScreenSwitchListener);
     }
 }
