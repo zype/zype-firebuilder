@@ -3032,9 +3032,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
     public void switchToPlayTrailerScreen(Content content) {
         switchToScreen(PLAY_TRAILER_SCREEN, intent -> {
-           // intent.putExtra("play_trailer", id);
             intent.putExtra("play_trailer", content);
-
         });
     }
 

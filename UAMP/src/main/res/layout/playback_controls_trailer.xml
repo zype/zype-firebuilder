@@ -39,21 +39,6 @@ permissions and limitations under the License.
         android:layout_height="fill_parent"
         android:layout_gravity="center" />
 
-    <com.google.android.exoplayer.text.SubtitleLayout
-        android:id="@+id/subtitles"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <FrameLayout
-        android:id="@+id/adsView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_centerInParent="true"
-        android:layout_gravity="center"></FrameLayout>
 
     <ProgressBar
         android:id="@+id/playback_progress"
@@ -63,11 +48,5 @@ permissions and limitations under the License.
         android:layout_gravity="center"
         android:indeterminateDrawable="@drawable/custom_progress"
         android:visibility="visible" />
-
-    <!--<fragment-->
-        <!--android:id="@+id/playback_controls_fragment"-->
-        <!--android:name="com.amazon.android.uamp.ui.PlaybackOverlayFragment"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent" />-->
 
 </FrameLayout>
