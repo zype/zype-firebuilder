@@ -121,8 +121,6 @@ public class PlaybackTrailerActivity extends Activity implements
   private LeanbackPlaybackState mPlaybackState = LeanbackPlaybackState.IDLE;
   private PlayerState mPrevState;
   private PlayerState mCurrentState;
-  private boolean mIsActivityResumed;
-  private boolean mIsContentChangeRequested;
   private ProgressBar mProgressBar;
   private Window mWindow;
   private AudioManager mAudioManager;
@@ -130,7 +128,6 @@ public class PlaybackTrailerActivity extends Activity implements
   private ErrorDialogFragment mErrorDialogFragment = null;
   private MediaSessionController mMediaSessionController;
   private ScheduledExecutorService mScheduledExecutorService;
-  private boolean mIsNetworkError;
 
   /**
    * Called when the activity is first created.
@@ -167,6 +164,7 @@ public class PlaybackTrailerActivity extends Activity implements
     createPlayerAndInitializeListeners();
     mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
     initMediaSession();
+    openSelectedContent();
   }
 
   /**
@@ -197,67 +195,6 @@ public class PlaybackTrailerActivity extends Activity implements
   }
 
   /**
-   * Enable Media Session
-   */
-  private void enableMediaSession() {
-
-    if (mMediaSessionController != null) {
-      mMediaSessionController.setMediaSessionActive(true);
-      //Start the reporting service which reports the playback state every few seconds
-      startPlaybackReportingService();
-    }
-  }
-
-  /**
-   * Disable Media Session
-   */
-  private void disableMediaSession() {
-
-    //Disable the media session
-    if (mMediaSessionController != null) {
-      mMediaSessionController.setMediaSessionActive(false);
-      //Stop the reporting service which reports the playback state every few seconds
-      stopPlaybackReportingService();
-    }
-  }
-
-  /**
-   * Reports the current playback state every few seconds.
-   * The more precise this is, the better alexa is about seeking
-   * to the correct position. It is recommended that the state is
-   * updated every 5 to 10 seconds.
-   */
-  private void startPlaybackReportingService() {
-
-    if (mMediaSessionController == null) {
-      return;
-    }
-    mScheduledExecutorService = Executors.newScheduledThreadPool(1);
-    mScheduledExecutorService.scheduleAtFixedRate(new Runnable() {
-      @Override
-      public void run() {
-
-        if (!Thread.currentThread().isInterrupted()) {
-          // Executor has probably asked us to stop
-          mMediaSessionController.updatePlaybackState(getCurrentPosition());
-        }
-
-      }
-    }, 0, MEDIA_SESSION_REPORTING_INTERVAL, TimeUnit.SECONDS);
-  }
-
-  /**
-   * Stop reporting the playback state now
-   */
-  private void stopPlaybackReportingService() {
-
-    if (mScheduledExecutorService == null) {
-      return;
-    }
-    mScheduledExecutorService.shutdownNow();
-  }
-
-  /**
    * {@inheritDoc}
    */
   @Override
@@ -278,7 +215,6 @@ public class PlaybackTrailerActivity extends Activity implements
     super.onStop();
 
     abandonAudioFocus();
-    mIsContentChangeRequested = false;
 
     if (mPlayer != null) {
       mPlayer.close();
@@ -390,17 +326,6 @@ public class PlaybackTrailerActivity extends Activity implements
     return isPlaying;
   }
 
-  /**
-   * {@inheritDoc}
-   */
-
-  public int getBufferProgressPosition() {
-
-    if (mPlayer != null) {
-      return (mPlayer.getBufferedPercentage() * getDuration()) / 100;
-    }
-    return 0;
-  }
 
 
   private void loadViews() {
@@ -627,9 +552,7 @@ public class PlaybackTrailerActivity extends Activity implements
     switch (newState) {
       case IDLE:
         mWindow.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        if (mIsContentChangeRequested) {
-          openSelectedContent();
-        }
+
         if (mMediaSessionController != null) {
           mMediaSessionController.updatePlaybackState(PlaybackState.STATE_NONE,
               getCurrentPosition());
@@ -638,10 +561,8 @@ public class PlaybackTrailerActivity extends Activity implements
       case OPENING:
         break;
       case OPENED:
-        if (mPlayer != null && mIsActivityResumed) {
+        if (mPlayer != null) {
           mPlayer.prepare();
-        } else {
-          mIsContentChangeRequested = false;
         }
         break;
       case PREPARING:
@@ -748,7 +669,6 @@ public class PlaybackTrailerActivity extends Activity implements
       Log.e(TAG, "Network error during playback", e.mException);
       mErrorDialogFragment = ErrorDialogFragment.newInstance(this, ErrorUtils
           .ERROR_CATEGORY.NETWORK_ERROR, this);
-      mIsNetworkError = true;
     }
     mErrorDialogFragment.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
   }
