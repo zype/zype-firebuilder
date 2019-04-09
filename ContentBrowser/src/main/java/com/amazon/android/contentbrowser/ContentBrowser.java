@@ -170,6 +170,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final String SUBSCRIPTION_SCREEN = "SUBSCRIPTION_SCREEN";
 
     public static final String USER_SIGN_UP_SCREEN = "USER_SIGN_UP_SCREEN";
+
     public static final String PLAY_TRAILER_SCREEN = "PLAY_TRAILER_SCREEN";
     /**
      * Free content constant.
@@ -297,6 +298,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final int CONTENT_ACTION_SWAF = 55;
 
     public static final int CONTENT_REGISTRATION_REQUIRED = 56;
+    
     public static final int CONTENT_PLAY_TRAILER = 57;
 
     /**
