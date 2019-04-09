@@ -30,44 +30,44 @@ permissions and limitations under the License.
      limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.amazon.android.tv.tenfoot"
-    android:versionCode="1"
-    android:versionName="1.1">
+          package="com.amazon.android.tv.tenfoot"
+          android:versionCode="1"
+          android:versionName="1.1">
 
     <uses-sdk
-        android:minSdkVersion="21"
-        android:targetSdkVersion="22"/>
+            android:minSdkVersion="21"
+            android:targetSdkVersion="22"/>
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <uses-feature
-        android:name="android.hardware.microphone"
-        android:required="false"/>
+            android:name="android.hardware.microphone"
+            android:required="false"/>
     <uses-feature
-        android:name="android.hardware.touchscreen"
-        android:required="false"/>
+            android:name="android.hardware.touchscreen"
+            android:required="false"/>
     <uses-feature
-        android:name="android.software.leanback"
-        android:required="true"/>
+            android:name="android.software.leanback"
+            android:required="true"/>
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application>
         <activity
-            android:name="com.amazon.android.tv.tenfoot.ui.activities.FullContentBrowseActivity"
-            android:screenOrientation="landscape"/>
+                android:name="com.amazon.android.tv.tenfoot.ui.activities.FullContentBrowseActivity"
+                android:screenOrientation="landscape"/>
         <activity
-            android:name="com.amazon.android.tv.tenfoot.ui.activities.ContentBrowseActivity"
-            android:screenOrientation="landscape"/>
+                android:name="com.amazon.android.tv.tenfoot.ui.activities.ContentBrowseActivity"
+                android:screenOrientation="landscape"/>
         <activity
             android:name="com.amazon.android.tv.tenfoot.ui.activities.ZypePlaylistContentBrowseActivity"
             android:screenOrientation="landscape"/>
         <activity
-            android:name="com.amazon.android.tv.tenfoot.ui.activities.ContentDetailsActivity"
-            android:exported="true">
+                android:name="com.amazon.android.tv.tenfoot.ui.activities.ContentDetailsActivity"
+                android:exported="true">
 
             <!-- Receives the PendingIntent requests to view a specific content. -->
             <intent-filter>
