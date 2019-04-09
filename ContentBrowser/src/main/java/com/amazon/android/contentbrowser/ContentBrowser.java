@@ -1981,20 +1981,20 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
     private void showRegistrationCompleteDialog() {
         AlertDialogFragment.createAndShowAlertDialogFragment(mNavigator.getActiveActivity(),
-                mAppContext.getString(R.string.action_registration_complete_title),
-                mAppContext.getString(R.string.action_registration_complete_message),
-                mAppContext.getString(R.string.action_registration_complete_btn),
-                null, new AlertDialogFragment.IAlertDialogListener() {
-                    @Override
-                    public void onDialogPositiveButton(AlertDialogFragment alertDialogFragment) {
+            mAppContext.getString(R.string.action_registration_complete_title),
+            mAppContext.getString(R.string.action_registration_complete_message),
+            mAppContext.getString(R.string.action_registration_complete_btn),
+            null, new AlertDialogFragment.IAlertDialogListener() {
+                @Override
+                public void onDialogPositiveButton(AlertDialogFragment alertDialogFragment) {
 
-                    }
+                }
 
-                    @Override
-                    public void onDialogNegativeButton(AlertDialogFragment alertDialogFragment) {
+                @Override
+                public void onDialogNegativeButton(AlertDialogFragment alertDialogFragment) {
 
-                    }
-                });
+                }
+            });
     }
 
     /**
