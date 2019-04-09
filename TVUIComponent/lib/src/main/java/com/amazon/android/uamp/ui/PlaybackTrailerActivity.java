@@ -75,9 +75,6 @@ import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -92,22 +89,12 @@ public class PlaybackTrailerActivity extends Activity implements
     AudioManager.OnAudioFocusChangeListener,
     ErrorDialogFragment.ErrorDialogFragmentListener {
 
-  private static final int TRANSPORT_CONTROLS_DELAY_PERIOD = 50;
   private static final String TAG = PlaybackActivity.class.getSimpleName();
   private static final String HLS_VIDEO_FORMAT = "HLS";
 
-  private static final int HDMI_AUDIO_STATE_UNPLUGGED = 0;
-  private static final int HDMI_AUDIO_STATE_PLUGGED = 1;
 
   private static final float AUDIO_FOCUS_DUCK_VOLUME = 0.1f;
   private static final float AUDIO_FOCUS_DEFAULT_VOLUME = 1.0f;
-  //Reporting interval in seconds for media session
-  private static final int MEDIA_SESSION_REPORTING_INTERVAL = 10;
-  /**
-   * Video position tracking poll time in ms.
-   */
-  private static final int VIDEO_POSITION_TRACKING_POLL_TIME_MS = 1000;
-  // Need to setup cookie policy to make ExoPlayer play live streams from Akamai
   private static final CookieManager DEFAULT_COOKIE_MANAGER;
 
   static {
@@ -127,7 +114,6 @@ public class PlaybackTrailerActivity extends Activity implements
   private AudioFocusState mAudioFocusState = AudioFocusState.NoFocusNoDuck;
   private ErrorDialogFragment mErrorDialogFragment = null;
   private MediaSessionController mMediaSessionController;
-  private ScheduledExecutorService mScheduledExecutorService;
 
   /**
    * Called when the activity is first created.
