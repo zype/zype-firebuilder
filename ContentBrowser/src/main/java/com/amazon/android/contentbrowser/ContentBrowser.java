@@ -667,11 +667,11 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         addWidgetsAction(createSearchAction());
         //addWidgetsAction(createSlideShowAction());
         /* Zype, Evgeny Cherkasov
-         * begin*/
+        * begin*/
         if (!TextUtils.isEmpty(Preferences.getString("ZypeTerms")))
             addSettingsAction(createTermsOfUseSettingsAction());
         /* Zype
-         * end */
+        * end */
         //addSettingsAction(createSlideShowSettingAction());
         setupLogoutAction();
         setupFavoritesAction();
@@ -827,11 +827,11 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         updateLoginAction();
 
         if(authenticationStatusUpdateEvent.isRegistration()) {
-            getNavigator().runOnUpcomingActivity(()-> {
-                showRegistrationCompleteDialog();
-            });
+          getNavigator().runOnUpcomingActivity(()-> {
+            showRegistrationCompleteDialog();
+          });
 
-            updateContentActions();
+          updateContentActions();
         }
     }
 
@@ -1691,7 +1691,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         if(registrationRequired) {
             contentActionList.add(createActionButton(CONTENT_REGISTRATION_REQUIRED,
-                    R.string.action_signup_to_watch1, R.string.action_signup_to_watch2));
+                R.string.action_signup_to_watch1, R.string.action_signup_to_watch2));
 
             if (content.hasTrailer()) {
                 contentActionList.add(createActionButton(CONTENT_PLAY_TRAILER,
