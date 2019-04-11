@@ -80,16 +80,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * PlaybackOverlayActivity for content playback that loads PlaybackOverlayFragment
- */
 public class PlaybackTrailerActivity extends Activity implements
     AMZNMediaPlayer
         .OnStateChangeListener, AMZNMediaPlayer.OnErrorListener, AMZNMediaPlayer.OnInfoListener,
     AudioManager.OnAudioFocusChangeListener,
     ErrorDialogFragment.ErrorDialogFragmentListener {
 
-  private static final String TAG = PlaybackActivity.class.getSimpleName();
+  private static final String TAG = PlaybackTrailerActivity.class.getSimpleName();
   private static final String HLS_VIDEO_FORMAT = "HLS";
 
 
