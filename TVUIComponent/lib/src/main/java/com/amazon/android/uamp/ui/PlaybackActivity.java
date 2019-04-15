@@ -1654,6 +1654,9 @@ public class PlaybackActivity extends Activity implements
             }
 
         }
+        else {
+            hideProgress();
+        }
     }
 
     /**
