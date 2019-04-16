@@ -224,7 +224,8 @@ public class PlaybackOverlayFragment extends TenFootPlaybackOverlayFragment
         if(mSelectedContent == null) {
             mSelectedContent = (Content) getActivity().getIntent()
                 .getSerializableExtra("play_trailer");
-          trailerMode = true;
+            trailerMode = true;
+            mHideMoreActions = true;
         }
         else {
             mShowRelatedContent = ContentBrowser.getInstance(getActivity()).isShowRelatedContent();
@@ -722,6 +723,8 @@ public class PlaybackOverlayFragment extends TenFootPlaybackOverlayFragment
         mPlaybackControlsRow.setCurrentTime(0);
         mPlaybackControlsRow.setBufferedProgress(0);
     }
+
+
 
     private void addOtherRows() {
 

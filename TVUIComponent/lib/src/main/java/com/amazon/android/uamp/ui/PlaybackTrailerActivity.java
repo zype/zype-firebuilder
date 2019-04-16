@@ -463,6 +463,7 @@ public class PlaybackTrailerActivity extends Activity implements
     if (playerData != null) {
       // Url
       content.setUrl(playerData.body.files.get(0).url);
+      content.setTitle("");
       content.setExtraValue(Content.EXTRA_VIDEO_URL, content.getUrl());
       openContentHelper(content);
     }
@@ -532,21 +533,7 @@ public class PlaybackTrailerActivity extends Activity implements
 
     mPrevState = mCurrentState;
     mCurrentState = newState;
-    Log.d(TAG, "State change event! Oldstate= " + oldState + " NewState= " + newState);
-    if (mPrevState == mCurrentState) {
-      // Just to catch this while under dev
-      Log.w(TAG, "Duplicate state change message!!! ");
-    }
-    // If buffering stopped
-    if (mPrevState == PlayerState.BUFFERING && mCurrentState != PlayerState.BUFFERING) {
-      AnalyticsHelper.trackPlaybackControlAction(AnalyticsTags.ACTION_PLAYBACK_BUFFER_END,
-          mSelectedContent, getCurrentPosition());
-      /* Zype, Evgeny Cherkasov */
-      // Akamai analytics
-//            akamaiPlugin.handleBufferEnd();
-    }
-    /* Zype, Evgeny Cherkasov */
-    // Akamai analytics
+
     if (mPrevState == PlayerState.SEEKING && mCurrentState != PlayerState.SEEKING) {
 //            akamaiPlugin.handleSeekEnd(getCurrentPosition());
     }
@@ -592,6 +579,12 @@ public class PlaybackTrailerActivity extends Activity implements
           mMediaSessionController.updatePlaybackState(PlaybackState.STATE_PAUSED,
               getCurrentPosition());
         }
+
+        if (mPlaybackOverlayFragment != null) {
+          mPlaybackOverlayFragment.togglePlaybackUI(false);
+          mPlaybackOverlayFragment.updatePlayback();
+        }
+
         /* Zype, Evgeny Cherkasov */
         // Akamai analytics
 //                akamaiPlugin.handlePause();
