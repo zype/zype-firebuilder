@@ -49,4 +49,10 @@ permissions and limitations under the License.
         android:indeterminateDrawable="@drawable/custom_progress"
         android:visibility="visible" />
 
+    <fragment
+        android:id="@+id/playback_controls_fragment"
+        android:name="com.amazon.android.uamp.ui.PlaybackOverlayFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
 </FrameLayout>

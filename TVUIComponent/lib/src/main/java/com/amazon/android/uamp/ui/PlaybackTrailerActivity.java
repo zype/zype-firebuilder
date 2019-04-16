@@ -35,9 +35,12 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v17.leanback.app.TenFootPlaybackOverlayFragment;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,7 +87,7 @@ public class PlaybackTrailerActivity extends Activity implements
     AMZNMediaPlayer
         .OnStateChangeListener, AMZNMediaPlayer.OnErrorListener, AMZNMediaPlayer.OnInfoListener,
     AudioManager.OnAudioFocusChangeListener,
-    ErrorDialogFragment.ErrorDialogFragmentListener {
+    ErrorDialogFragment.ErrorDialogFragmentListener, PlaybackOverlayFragment.OnPlayPauseClickedListener {
 
   private static final String TAG = PlaybackTrailerActivity.class.getSimpleName();
   private static final String HLS_VIDEO_FORMAT = "HLS";
@@ -93,6 +96,7 @@ public class PlaybackTrailerActivity extends Activity implements
   private static final float AUDIO_FOCUS_DUCK_VOLUME = 0.1f;
   private static final float AUDIO_FOCUS_DEFAULT_VOLUME = 1.0f;
   private static final CookieManager DEFAULT_COOKIE_MANAGER;
+  private static final int TRANSPORT_CONTROLS_DELAY_PERIOD = 50;
 
   static {
     DEFAULT_COOKIE_MANAGER = new CookieManager();
@@ -111,6 +115,12 @@ public class PlaybackTrailerActivity extends Activity implements
   private AudioFocusState mAudioFocusState = AudioFocusState.NoFocusNoDuck;
   private ErrorDialogFragment mErrorDialogFragment = null;
   private MediaSessionController mMediaSessionController;
+  private PlaybackOverlayFragment mPlaybackOverlayFragment;
+  private Handler mTransportControlsUpdateHandler;
+  private ContinualFwdUpdater mContinualFwdUpdater;
+  private ContinualRewindUpdater mContinualRewindUpdater;
+  private boolean mIsLongPress;
+
 
   /**
    * Called when the activity is first created.
@@ -142,6 +152,15 @@ public class PlaybackTrailerActivity extends Activity implements
       finish();
       return;
     }
+
+    mPlaybackOverlayFragment =
+        (PlaybackOverlayFragment) getFragmentManager()
+            .findFragmentById(R.id.playback_controls_fragment);
+
+    mTransportControlsUpdateHandler = new Handler(Looper.getMainLooper());
+    mContinualFwdUpdater = new ContinualFwdUpdater();
+    mContinualRewindUpdater = new ContinualRewindUpdater();
+    mIsLongPress = false;
 
     loadViews();
     createPlayerAndInitializeListeners();
@@ -235,15 +254,12 @@ public class PlaybackTrailerActivity extends Activity implements
   private void play() {
 
     if (mPlayer != null) {
-      if (mAudioFocusState == AudioFocusState.Focused) {
+      if (requestAudioFocus()) {
         mPlayer.play();
       } else {
-        if (requestAudioFocus()) {
-          mPlayer.play();
-        } else {
-          showProgress();
-          mPlaybackState = LeanbackPlaybackState.PLAYING;
-
+        showProgress();
+        if (mPlaybackOverlayFragment != null) {
+          mPlaybackOverlayFragment.togglePlaybackUI(true);
         }
       }
     }
@@ -254,15 +270,17 @@ public class PlaybackTrailerActivity extends Activity implements
     if (mPlayer != null && isPlaying()) {
       mPlayer.pause();
     }
-    mPlaybackState = LeanbackPlaybackState.PAUSED;
-
+    if (mPlaybackOverlayFragment != null) {
+      mPlaybackOverlayFragment.togglePlaybackUI(false);
+    }
   }
+
 
   /**
    * {@inheritDoc}
    */
 
-  private int getDuration() {
+  public int getDuration() {
 
     long duration = 0;
     if (mPlayer != null) {
@@ -280,7 +298,7 @@ public class PlaybackTrailerActivity extends Activity implements
    * {@inheritDoc}
    */
 
-  private int getCurrentPosition() {
+  public int getCurrentPosition() {
 
     if (mPlayer != null) {
       return (int) mPlayer.getCurrentPosition();
@@ -308,7 +326,6 @@ public class PlaybackTrailerActivity extends Activity implements
     }
     return isPlaying;
   }
-
 
 
   private void loadViews() {
@@ -416,6 +433,7 @@ public class PlaybackTrailerActivity extends Activity implements
       contentParameters.encryptionSchema = getAmznMediaEncryptionSchema(drmProvider);
       mPlayer.open(contentParameters);
 
+      mPlaybackOverlayFragment.updateCurrentContent(content);
     }
   }
 
@@ -549,6 +567,10 @@ public class PlaybackTrailerActivity extends Activity implements
         }
         break;
       case PREPARING:
+        if (mPlaybackOverlayFragment != null && mPlaybackOverlayFragment.getView() !=
+            null) {
+          mPlaybackOverlayFragment.getView().setVisibility(View.VISIBLE);
+        }
         break;
       case READY:
         mPlaybackState = LeanbackPlaybackState.PAUSED;
@@ -585,6 +607,9 @@ public class PlaybackTrailerActivity extends Activity implements
           mMediaSessionController.updatePlaybackState(PlaybackState.STATE_PLAYING,
               getCurrentPosition());
         }
+        if (mPlaybackOverlayFragment != null) {
+          mPlaybackOverlayFragment.togglePlaybackUI(true);
+        }
         break;
       case BUFFERING:
         showProgress();
@@ -606,6 +631,9 @@ public class PlaybackTrailerActivity extends Activity implements
         }
         break;
       case CLOSING:
+        if (mPlaybackOverlayFragment != null) {
+          mPlaybackOverlayFragment.stopProgressAutomation();
+        }
         break;
       case ERROR:
         hideProgress();
@@ -626,8 +654,11 @@ public class PlaybackTrailerActivity extends Activity implements
    * Private helper method to do some cleanup when playback has finished.
    */
   private void playbackFinished() {
-    finish();
+    if (mPlaybackOverlayFragment != null) {
+      mPlaybackOverlayFragment.playbackFinished();
+    }
     mWindow.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    finish();
   }
 
   /**
@@ -752,6 +783,148 @@ public class PlaybackTrailerActivity extends Activity implements
 
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+
+    switch (keyCode) {
+      case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
+        startContinualFastForward();
+        return true;
+      case KeyEvent.KEYCODE_MEDIA_REWIND:
+        startContinualRewind();
+        return true;
+      case KeyEvent.KEYCODE_BUTTON_R1:
+        startContinualFastForward();
+        return true;
+      case KeyEvent.KEYCODE_BUTTON_L1:
+        startContinualRewind();
+        return true;
+      default:
+        return super.onKeyLongPress(keyCode, event);
+    }
+  }
+
+  /**
+   * Starts the repeating fast-forward media transport control action
+   */
+  private void startContinualFastForward() {
+
+    mTransportControlsUpdateHandler.post(mContinualFwdUpdater);
+    mIsLongPress = true;
+  }
+
+  /**
+   * Starts the repeating rewind media transport control action
+   */
+  private void startContinualRewind() {
+
+    mTransportControlsUpdateHandler.post(mContinualRewindUpdater);
+    mIsLongPress = true;
+  }
+
+  /**
+   * Stops the currently on-going (if any) media transport control action since the press &
+   * hold of corresponding transport control ceased or {@link @KeyEvent.KEYCODE_HOME} was pressed
+   */
+  private void stopTransportControlAction() {
+
+    mTransportControlsUpdateHandler.removeCallbacksAndMessages(null);
+    mIsLongPress = false;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean onKeyUp(int keyCode, KeyEvent event) {
+
+    PlaybackOverlayFragment playbackOverlayFragment = (PlaybackOverlayFragment)
+        getFragmentManager().findFragmentById(R.id.playback_controls_fragment);
+    switch (keyCode) {
+      case KeyEvent.KEYCODE_MEDIA_PLAY:
+        playbackOverlayFragment.togglePlayback(false);
+        return true;
+      case KeyEvent.KEYCODE_MEDIA_PAUSE:
+        playbackOverlayFragment.togglePlayback(false);
+        return true;
+      case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+        if (isPlaying()) {
+          playbackOverlayFragment.togglePlayback(false);
+        } else {
+          playbackOverlayFragment.togglePlayback(true);
+        }
+        return true;
+      case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
+        if (mIsLongPress) {
+          stopTransportControlAction();
+        } else {
+          playbackOverlayFragment.fastForward();
+        }
+
+        return true;
+      case KeyEvent.KEYCODE_MEDIA_REWIND:
+        if (mIsLongPress) {
+          stopTransportControlAction();
+        } else {
+          playbackOverlayFragment.fastRewind();
+        }
+
+        return true;
+      case KeyEvent.KEYCODE_BUTTON_R1:
+        if (mIsLongPress) {
+          stopTransportControlAction();
+        } else {
+          playbackOverlayFragment.fastForward();
+        }
+
+        return true;
+      case KeyEvent.KEYCODE_BUTTON_L1:
+        if (mIsLongPress) {
+          stopTransportControlAction();
+        } else {
+          playbackOverlayFragment.fastRewind();
+        }
+        return true;
+      default:
+        return super.onKeyUp(keyCode, event);
+    }
+  }
+
+  @Override
+  public void onFragmentPlayPause(boolean playPause) {
+    if (playPause) {
+      play();
+    } else {
+      pause();
+    }
+  }
+
+  public void onFragmentFfwRwd(int position) {
+    if (position >= 0) {
+      seekTo(position);
+      if (isPlaying()) {
+        play();
+      }
+    }
+  }
+
+  public int getBufferProgressPosition() {
+    if (mPlayer != null) {
+      return (mPlayer.getBufferedPercentage() * getDuration()) / 100;
+    }
+    return 0;
+  }
+
+  public void changeContent(Content content) {
+
+  }
+
+  public void onCloseCaptionButtonStateChanged(boolean state) {
+
+  }
 
   enum AudioFocusState {
     Focused,
@@ -759,11 +932,40 @@ public class PlaybackTrailerActivity extends Activity implements
     NoFocusCanDuck
   }
 
+
   /*
    * List of various states that we can be in.
    */
   public enum LeanbackPlaybackState {
     PLAYING, PAUSED, BUFFERING, IDLE
+  }
+
+  /**
+   * Inner class implementing repeating fast-forward media key transport control
+   */
+  private final class ContinualFwdUpdater implements Runnable {
+
+    @Override
+    public void run() {
+
+      mPlaybackOverlayFragment.fastForward();
+      mTransportControlsUpdateHandler.postDelayed(new ContinualFwdUpdater(),
+          TRANSPORT_CONTROLS_DELAY_PERIOD);
+    }
+  }
+
+  /**
+   * Inner class implementing repeating rewind media key transport control
+   */
+  private final class ContinualRewindUpdater implements Runnable {
+
+    @Override
+    public void run() {
+
+      mPlaybackOverlayFragment.fastRewind();
+      mTransportControlsUpdateHandler.postDelayed(new ContinualRewindUpdater(),
+          TRANSPORT_CONTROLS_DELAY_PERIOD);
+    }
   }
 
 

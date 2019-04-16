@@ -219,10 +219,17 @@ public class PlaybackOverlayFragment extends TenFootPlaybackOverlayFragment
         mSelectedContent = (Content) getActivity().getIntent()
                                                   .getSerializableExtra(
                                                           Content.class.getSimpleName());
+        boolean trailerMode = false;
 
-        mShowRelatedContent = ContentBrowser.getInstance(getActivity()).isShowRelatedContent();
-
-        mHideMoreActions = true;
+        if(mSelectedContent == null) {
+            mSelectedContent = (Content) getActivity().getIntent()
+                .getSerializableExtra("play_trailer");
+          trailerMode = true;
+        }
+        else {
+            mShowRelatedContent = ContentBrowser.getInstance(getActivity()).isShowRelatedContent();
+            mHideMoreActions = true;
+        }
 
         mCurrentItem = -1;
         if (mShowRelatedContent) {
@@ -275,6 +282,10 @@ public class PlaybackOverlayFragment extends TenFootPlaybackOverlayFragment
                 updateUI();
             }
         });
+
+        if(trailerMode) {
+          updateCCButtonState(false, false);
+        }
     }
 
     @Override
@@ -341,7 +352,12 @@ public class PlaybackOverlayFragment extends TenFootPlaybackOverlayFragment
     public void onResume() {
 
         super.onResume();
-        togglePlayback(((PlaybackActivity) mContext).isPlaying());
+        if(mContext instanceof PlaybackActivity) {
+            togglePlayback(((PlaybackActivity) mContext).isPlaying());
+        }
+        else if(mContext instanceof PlaybackTrailerActivity) {
+            togglePlayback(((PlaybackTrailerActivity) mContext).isPlaying());
+        }
     }
 
     private void setupRows() {
@@ -456,7 +472,7 @@ public class PlaybackOverlayFragment extends TenFootPlaybackOverlayFragment
      */
     private void trackAnalyticsAction(String action, Content content) {
 
-        if (isAdded() && getActivity() != null) {
+        if (isAdded() && getActivity() != null && getActivity() instanceof PlaybackActivity) {
 
             AnalyticsHelper.trackPlaybackControlAction(action, content,
                                                        ((PlaybackActivity) getActivity())
