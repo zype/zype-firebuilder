@@ -583,6 +583,7 @@ public class PlaybackTrailerActivity extends Activity implements
         if (mPlaybackOverlayFragment != null) {
           mPlaybackOverlayFragment.togglePlaybackUI(false);
           mPlaybackOverlayFragment.updatePlayback();
+          mPlaybackOverlayFragment.startProgressAutomation();
         }
 
         /* Zype, Evgeny Cherkasov */
@@ -649,6 +650,9 @@ public class PlaybackTrailerActivity extends Activity implements
   private void playbackFinished() {
     if (mPlaybackOverlayFragment != null) {
       mPlaybackOverlayFragment.playbackFinished();
+    }
+    if (mPlaybackOverlayFragment != null) {
+      mPlaybackOverlayFragment.stopProgressAutomation();
     }
     mWindow.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     finish();
