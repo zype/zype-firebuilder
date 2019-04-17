@@ -37,6 +37,7 @@ import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.tv.tenfoot.ui.fragments.MenuFragment;
 import com.amazon.android.tv.tenfoot.ui.sliders.HeroSlider;
 import com.amazon.android.tv.tenfoot.ui.sliders.HeroSliderFragment;
+import com.amazon.android.tv.tenfoot.ui.sliders.Slider;
 import com.amazon.android.tv.tenfoot.utils.BrowseHelper;
 import com.amazon.android.ui.constants.ConfigurationConstants;
 import com.amazon.android.ui.fragments.LogoutSettingsFragment;
@@ -75,7 +76,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
  * ContentBrowseActivity class that loads the ContentBrowseFragment.
  */
 public class ContentBrowseActivity extends BaseActivity implements ContentBrowseFragment
-        .OnBrowseRowListener {
+        .OnBrowseRowListener, HeroSliderFragment.OnHeroSliderSelected {
 
     private final String TAG = ContentBrowseActivity.class.getSimpleName();
 
@@ -94,6 +95,8 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
 
     /* Zype, Evgeny Cherkasov */
     private boolean isMenuOpened = false;
+
+    private boolean sliderShown = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -143,21 +146,50 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
 
         HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
 
-        if(HeroSlider.getInstance().isSliderPresent()) {
-            fragment.getView().setVisibility(View.VISIBLE);
+        if(slidersPresent()) {
+            showHeroSlider();
         }
         else {
-            hideHeroSlider();
+            if (fragment != null) {
+                getFragmentManager().beginTransaction()
+                    .hide(fragment)
+                    .commit();
+            }
         }
+
+    }
+
+    private boolean slidersPresent() {
+        return HeroSlider.getInstance().isSliderPresent();
     }
 
     private void hideHeroSlider() {
-        HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
-        if (fragment != null) {
-            getFragmentManager().beginTransaction()
-                .hide(fragment)
-                .commit();
+        if(!sliderShown || !slidersPresent()) {
+            return;
         }
+
+        findViewById(R.id.fragment_background).setVisibility(View.INVISIBLE);
+        /*findViewById(R.id.content_image).setVisibility(View.VISIBLE);
+        findViewById(R.id.content_details).setVisibility(View.VISIBLE);
+        findViewById(R.id.main_logo).setVisibility(View.VISIBLE);*/
+        sliderShown = false;
+    }
+
+    private void showHeroSlider() {
+        if(sliderShown || !slidersPresent()) {
+            return;
+        }
+
+    /*    findViewById(R.id.content_image).setVisibility(View.INVISIBLE);
+        findViewById(R.id.content_details).setVisibility(View.INVISIBLE);
+        findViewById(R.id.main_logo).setVisibility(View.INVISIBLE);*/
+        findViewById(R.id.fragment_background).setVisibility(View.INVISIBLE);
+        sliderShown = true;
+    }
+
+    @Override
+    public void onSliderSelected(Slider slider) {
+        showHeroSlider();
     }
 
     /**
@@ -173,6 +205,8 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
             callImageLoadSubscription(content.getTitle(),
                                       content.getDescription(),
                                       content.getBackgroundImageUrl());
+            hideHeroSlider();
+
         }
         /* Zype, Evgeny Cherkasov */
         // Update screen background with selected playlist (category) image
@@ -181,6 +215,9 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
             callImageLoadSubscription(contentContainer.getName(),
                     contentContainer.getExtraStringValue("description"),
                     contentContainer.getExtraStringValue(Content.BACKGROUND_IMAGE_URL_FIELD_NAME));
+
+            hideHeroSlider();
+
         }
         else if (item instanceof Action) {
             Action settingsAction = (Action) item;
@@ -340,4 +377,6 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         }
         return super.dispatchKeyEvent(event);
     }
+
+
 }

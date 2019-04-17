@@ -56,7 +56,7 @@ public class HeroCardPresenter extends Presenter {
     return size;
   }
 
-  private void updateCardBackgroundColor(ImageCardView view, boolean selected) {
+    private void updateCardBackgroundColor(ImageCardView view, boolean selected) {
     int color = selected ? mSelectedBackgroundColor : mDefaultBackgroundColor;
 
     // Both background colors should be set because the view's
@@ -69,12 +69,15 @@ public class HeroCardPresenter extends Presenter {
   public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
     Slider slider = (Slider) item;
     ((ViewHolder) viewHolder).setSlider(slider);
-    int CARD_WIDTH_PX = 20;
-    mCardWidthDp = getSize().x - Helpers.convertPixelToDp(mContext, CARD_WIDTH_PX);
+    int CARD_WIDTH_PX = 40;
+    mCardWidthDp = getSize().x ; //- Helpers.convertPixelToDp(mContext, CARD_WIDTH_PX);
+
+    int CARD_HEIGHT_PX = 250;
+    mCardHeightDp = Helpers.convertPixelToDp(mContext, CARD_HEIGHT_PX);
 
     if (!TextUtils.isEmpty(slider.getUrl())) {
 
-      ((ViewHolder) viewHolder).mCardView.setMainImageDimensions(mCardWidthDp, ViewGroup.LayoutParams.MATCH_PARENT);
+      ((ViewHolder) viewHolder).mCardView.setMainImageDimensions(mCardWidthDp, mCardHeightDp);
 
       Glide.with(((ViewHolder) viewHolder).mCardView.getContext())
           .load(slider.getUrl())

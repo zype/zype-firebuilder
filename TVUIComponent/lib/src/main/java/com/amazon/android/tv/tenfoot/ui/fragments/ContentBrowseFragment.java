@@ -42,6 +42,7 @@ import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
 import com.amazon.android.tv.tenfoot.presenter.PosterCardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.SettingsCardPresenter;
+import com.amazon.android.tv.tenfoot.ui.sliders.HeroSlider;
 import com.amazon.android.utils.Preferences;
 import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeConfiguration;
@@ -141,15 +142,19 @@ public class ContentBrowseFragment extends RowsFragment {
         setOnItemViewSelectedListener(new ItemViewSelectedListener());
 
         // Wait for WAIT_BEFORE_FOCUS_REQUEST_MS for the data to load before requesting focus.
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(() -> {
-            if (getView() != null) {
-                VerticalGridView verticalGridView = findGridViewFromRoot(getView());
-                if (verticalGridView != null) {
-                    verticalGridView.requestFocus();
+
+        if(!HeroSlider.getInstance().isSliderPresent()) {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.postDelayed(() -> {
+                if (getView() != null) {
+                    VerticalGridView verticalGridView = findGridViewFromRoot(getView());
+                    if (verticalGridView != null) {
+                        verticalGridView.requestFocus();
+                    }
                 }
-            }
-        }, WAIT_BEFORE_FOCUS_REQUEST_MS);
+            }, WAIT_BEFORE_FOCUS_REQUEST_MS);
+        }
+
 
         /* Zype, Evgeny Cherkasov */
         receiver = new BroadcastReceiver() {
