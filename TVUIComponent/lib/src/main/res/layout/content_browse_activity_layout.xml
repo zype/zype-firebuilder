@@ -93,11 +93,18 @@ permissions and limitations under the License.
         </LinearLayout>
 
         <fragment
+            android:id="@+id/header_browse_fragment"
+            android:name="com.amazon.android.tv.tenfoot.ui.sliders.HeaderFragment"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            tools:layout="@layout/action_widget_container"/>
+
+        <fragment
                 android:id="@+id/full_content_browse_fragment"
                 android:name="com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/content_details"
+                android:layout_below="@id/header_browse_fragment"
                 tools:layout="@layout/action_widget_container"/>
         <fragment
             android:layout_width="380dp"
