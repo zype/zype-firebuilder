@@ -404,4 +404,22 @@ public class ZypeApi {
             return null;
         }
     }
+
+    public ZobjectContentResponse getZobjectTopPlayLists() {
+        try {
+            HashMap<String, String> params = new HashMap<>();
+            params.put(APP_KEY, ZypeSettings.APP_KEY);
+            Response response = apiImpl.getZobjectsForTopPlaylist(params).execute();
+            if (response.isSuccessful()) {
+                return (ZobjectContentResponse) response.body();
+            }
+            else {
+                return null;
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

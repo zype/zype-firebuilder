@@ -64,4 +64,16 @@ public class ZobjectContentData {
     @SerializedName("zobject_type_title")
     @Expose
     public String zobjectTypeTitle;
+
+    @SerializedName("playlistid")
+    @Expose
+    public String playlistid;
+
+    @SerializedName("pictures")
+    @Expose
+    public List<Image> images = new ArrayList<>();
+
+
+
+
 }

@@ -127,4 +127,8 @@ public interface IZypeApi {
     // ZObjects
     @GET("/zobjects/?zobject_type=content")
     Call<ZobjectContentResponse> getZobjectContent(@QueryMap HashMap<String, String> params);
+
+    // ZObjects
+    @GET("/zobjects/?zobject_type=top_playlists")
+    Call<ZobjectContentResponse> getZobjectsForTopPlaylist(@QueryMap HashMap<String, String> params);
 }

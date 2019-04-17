@@ -35,6 +35,8 @@ import com.amazon.android.model.Action;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.tv.tenfoot.ui.fragments.MenuFragment;
+import com.amazon.android.tv.tenfoot.ui.sliders.HeroSlider;
+import com.amazon.android.tv.tenfoot.ui.sliders.HeroSliderFragment;
 import com.amazon.android.tv.tenfoot.utils.BrowseHelper;
 import com.amazon.android.ui.constants.ConfigurationConstants;
 import com.amazon.android.ui.fragments.LogoutSettingsFragment;
@@ -138,6 +140,24 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
 
         /*Zype, Evgeny Cherkasov */
         hideMenu();
+
+        HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
+
+        if(HeroSlider.getInstance().isSliderPresent()) {
+            fragment.getView().setVisibility(View.VISIBLE);
+        }
+        else {
+            hideHeroSlider();
+        }
+    }
+
+    private void hideHeroSlider() {
+        HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
+        if (fragment != null) {
+            getFragmentManager().beginTransaction()
+                .hide(fragment)
+                .commit();
+        }
     }
 
     /**

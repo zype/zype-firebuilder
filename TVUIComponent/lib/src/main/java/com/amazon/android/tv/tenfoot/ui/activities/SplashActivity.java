@@ -32,6 +32,7 @@ package com.amazon.android.tv.tenfoot.ui.activities;
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.helper.ErrorHelper;
 import com.amazon.android.interfaces.ICancellableLoad;
+import com.amazon.android.tv.tenfoot.ui.sliders.HeroSlider;
 import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.Helpers;
 import com.amazon.android.tv.tenfoot.R;
@@ -121,6 +122,12 @@ public class SplashActivity extends BaseActivity implements ICancellableLoad {
                         // Notify content browser that the intent is coming from an app launch.
                         splashAct.getIntent().putExtra(ContentBrowser.RESTORE_ACTIVITY, true);
                         contentBrowser.runGlobalRecipes(splashAct, splashAct);
+
+                        HeroSlider.getInstance().loadContent().subscribe(s-> {
+
+                        }, throwable -> {
+
+                        });
                     }
                     catch (Exception e) {
                         Log.e(TAG, "Failed to put data in cache for recipe ", e);
