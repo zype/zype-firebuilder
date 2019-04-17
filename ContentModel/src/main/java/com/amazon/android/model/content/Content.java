@@ -20,6 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.content.Intent;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.Serializable;
@@ -337,6 +338,9 @@ public class Content implements Serializable {
     public static final String EXTRA_VIDEO_URL = "VideoFavoriteId";
 
     public static final String EXTRA_REGISTRATION_REQUIRED = "RegistrationRequired";
+
+    public static final String EXTRA_PREVIEW_IDS = "previewIds";
+
 
     /**
      * Creates a {@link Content} with empty values.
@@ -731,6 +735,20 @@ public class Content implements Serializable {
             return null;
         }
         return mExtras.get(key);
+    }
+
+    public boolean hasTrailer() {
+        return !TextUtils.isEmpty(getTrailerId());
+    }
+
+    public String getTrailerId() {
+        List previewIds = getExtraValueAsList(EXTRA_PREVIEW_IDS);
+
+        if (previewIds != null && previewIds.size() > 0) {
+            return previewIds.get(0).toString();
+        }
+
+        return "";
     }
 
     /**

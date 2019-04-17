@@ -82,6 +82,8 @@ permissions and limitations under the License.
     <string name="action_registration_complete_title">Thank you for providing details</string>
     <string name="action_registration_complete_message">Your account has been successfully logged in</string>
     <string name="action_registration_complete_btn">Dismiss</string>
+    <string name="action_play_trailer_1">Watch</string>
+    <string name="action_play_trailer_2">Trailer</string>
 
 
 </resources>
