@@ -30,6 +30,16 @@ public class Slider implements Serializable {
   private String url;
   private String name;
 
+  public int getPosition() {
+    return position;
+  }
+
+  public void setPosition(int position) {
+    this.position = position;
+  }
+
+  private int position;
+
   public static Slider create(String id, String videoId, String playListId, String url, String name) {
     Slider slider = new Slider();
     slider.id = id;

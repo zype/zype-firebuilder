@@ -220,7 +220,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
 
     @Override
     public void onSliderSelected(Slider slider) {
-        //showHeroSlider();
+
     }
 
     private boolean sliderHasFocus() {

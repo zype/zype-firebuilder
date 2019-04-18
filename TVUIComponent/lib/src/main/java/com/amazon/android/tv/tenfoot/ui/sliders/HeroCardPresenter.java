@@ -25,6 +25,9 @@ public class HeroCardPresenter extends Presenter {
   private View mInfoField;
   private int mSelectedBackgroundColor = -1;
   private int mDefaultBackgroundColor = -1;
+  private static final int CARD_WIDTH_PX = 100;
+  private static final int CARD_HEIGHT_PX = 250;
+
 
   @Override
   public ViewHolder onCreateViewHolder(ViewGroup parent) {
@@ -69,10 +72,10 @@ public class HeroCardPresenter extends Presenter {
   public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
     Slider slider = (Slider) item;
     ((ViewHolder) viewHolder).setSlider(slider);
-    int CARD_WIDTH_PX = 40;
-    mCardWidthDp = getSize().x ; //- Helpers.convertPixelToDp(mContext, CARD_WIDTH_PX);
+    ((ViewHolder) viewHolder).setIndex(slider.getPosition());
 
-    int CARD_HEIGHT_PX = 250;
+    mCardWidthDp = getSize().x - Helpers.convertPixelToDp(mContext, CARD_WIDTH_PX);
+
     mCardHeightDp = Helpers.convertPixelToDp(mContext, CARD_HEIGHT_PX);
 
     if (!TextUtils.isEmpty(slider.getUrl())) {
@@ -102,9 +105,19 @@ public class HeroCardPresenter extends Presenter {
     Log.d(TAG, "onViewAttachedToWindow");
   }
 
-  static class ViewHolder extends Presenter.ViewHolder {
+  public static class ViewHolder extends Presenter.ViewHolder {
     private Slider slider;
     private ImageCardView mCardView;
+
+    public int getIndex() {
+      return index;
+    }
+
+    public void setIndex(int index) {
+      this.index = index;
+    }
+
+    private int index;
 
     public ViewHolder(View view) {
       super(view);
