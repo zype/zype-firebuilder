@@ -40,7 +40,11 @@ public class HeroSliderFragment extends RowsFragment {
       throw new ClassCastException(getActivity().toString() +
           " must implement OnBrowseRowListener: " + e);
     }
-    loadRows();
+
+    if(HeroSlider.getInstance().isSliderPresent()) {
+      loadRows();
+    }
+
   }
 
   private void registerNextScroll() {
@@ -82,7 +86,7 @@ public class HeroSliderFragment extends RowsFragment {
   }
 
   private void loadRows() {
-    ListRowPresenter presenter = new ListRowPresenter(FocusHighlight.ZOOM_FACTOR_MEDIUM, true);
+    ListRowPresenter presenter = new ListRowPresenter(FocusHighlight.ZOOM_FACTOR_SMALL, true);
     presenter.setShadowEnabled(false);
     presenter.setSelectEffectEnabled(true);
 

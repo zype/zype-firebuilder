@@ -25,7 +25,7 @@ public class HeroCardPresenter extends Presenter {
   private View mInfoField;
   private int mSelectedBackgroundColor = -1;
   private int mDefaultBackgroundColor = -1;
-  private static final int CARD_WIDTH_PX = 100;
+  private static final int CARD_WIDTH_PX = 180;
   private static final int CARD_HEIGHT_PX = 250;
 
 

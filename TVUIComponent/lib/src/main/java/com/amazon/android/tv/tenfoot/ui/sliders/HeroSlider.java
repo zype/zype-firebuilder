@@ -45,6 +45,6 @@ public class HeroSlider {
   }
 
   public boolean isSliderPresent() {
-    return sliders.size() > 0;
+    return false;// sliders.size() > 0;
   }
 }
