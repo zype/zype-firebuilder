@@ -49,6 +49,9 @@ import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment;
 import com.zype.fire.api.ZypeConfiguration;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -56,6 +59,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -65,6 +69,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
@@ -97,6 +104,10 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
     private boolean isMenuOpened = false;
 
     private boolean sliderShown = false;
+
+    private int count;
+
+    private final Handler handler = new Handler();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -168,10 +179,9 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
             return;
         }
 
-        findViewById(R.id.fragment_background).setVisibility(View.INVISIBLE);
-        /*findViewById(R.id.content_image).setVisibility(View.VISIBLE);
-        findViewById(R.id.content_details).setVisibility(View.VISIBLE);
-        findViewById(R.id.main_logo).setVisibility(View.VISIBLE);*/
+        HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
+        fadeInFadeOut(Arrays.asList(findViewById(R.id.content_image), findViewById(R.id.content_details),
+            findViewById(R.id.main_logo)), Arrays.asList(fragment.getView()));
         sliderShown = false;
     }
 
@@ -180,16 +190,67 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
             return;
         }
 
-    /*    findViewById(R.id.content_image).setVisibility(View.INVISIBLE);
-        findViewById(R.id.content_details).setVisibility(View.INVISIBLE);
-        findViewById(R.id.main_logo).setVisibility(View.INVISIBLE);*/
-        findViewById(R.id.fragment_background).setVisibility(View.INVISIBLE);
+        HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
+        fadeInFadeOut(Arrays.asList(fragment.getView()), Arrays.asList(findViewById(R.id.content_image), findViewById(R.id.content_details),
+            findViewById(R.id.main_logo)));
         sliderShown = true;
+    }
+
+    private void fadeInFadeOut(List<View> fadeInViews, List<View> fadeOutViews) {
+        final AnimatorSet animatorSet = new AnimatorSet();
+
+        List<Animator> animations = new ArrayList<>();
+
+        for(View view : fadeInViews) {
+            ObjectAnimator fadeIn = ObjectAnimator.ofFloat(view, "alpha", 0f, 1f);
+            fadeIn.setDuration(200);
+            animations.add(fadeIn);
+        }
+
+        for(View view : fadeOutViews) {
+            ObjectAnimator fadeOut = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f);
+            fadeOut.setDuration(200);
+            animations.add(fadeOut);
+        }
+
+        animatorSet.playTogether(animations);
+        animatorSet.start();
+
     }
 
     @Override
     public void onSliderSelected(Slider slider) {
-        showHeroSlider();
+        //showHeroSlider();
+    }
+
+    private boolean sliderHasFocus() {
+        if(slidersPresent()) {
+            HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
+
+            if(fragment != null) {
+                return fragment.hasFocus();
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        boolean processed =  super.onKeyDown(keyCode, event);
+
+        if(slidersPresent()) {
+            handler.postDelayed(() -> {
+                if(sliderHasFocus()) {
+                    showHeroSlider();
+                }
+                else {
+                    hideHeroSlider();
+                }
+            }, 100);
+        }
+
+        return processed;
     }
 
     /**
@@ -205,7 +266,6 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
             callImageLoadSubscription(content.getTitle(),
                                       content.getDescription(),
                                       content.getBackgroundImageUrl());
-            hideHeroSlider();
 
         }
         /* Zype, Evgeny Cherkasov */
@@ -215,9 +275,6 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
             callImageLoadSubscription(contentContainer.getName(),
                     contentContainer.getExtraStringValue("description"),
                     contentContainer.getExtraStringValue(Content.BACKGROUND_IMAGE_URL_FIELD_NAME));
-
-            hideHeroSlider();
-
         }
         else if (item instanceof Action) {
             Action settingsAction = (Action) item;

@@ -56,12 +56,6 @@ permissions and limitations under the License.
             android:layout_width="match_parent"
             android:layout_height="250dp"/>
 
-        <View
-            android:id="@+id/fragment_background"
-            android:layout_width="match_parent"
-            android:background="@color/browse_background_color"
-            android:layout_height="250dp"/>"
-
         <ImageView
                 android:id="@+id/main_logo"
                 android:layout_width="116dp"

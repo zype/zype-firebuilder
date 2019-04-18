@@ -17,10 +17,10 @@ import java.util.List;
 
 public class HeroSliderFragment extends RowsFragment {
 
+  private static final int WAIT_BEFORE_FOCUS_REQUEST_MS = 500;
   private ArrayObjectAdapter rowsAdapter;
   private HeroCardPresenter cardPresenter;
   private OnHeroSliderSelected mCallback;
-  private static final int WAIT_BEFORE_FOCUS_REQUEST_MS = 500;
 
   @Override
   public void onActivityCreated(Bundle savedInstanceState) {
@@ -34,6 +34,7 @@ public class HeroSliderFragment extends RowsFragment {
     }
     loadRows();
   }
+
 
   private void loadRows() {
     ListRowPresenter presenter = new ListRowPresenter(FocusHighlight.ZOOM_FACTOR_MEDIUM, true);
@@ -60,7 +61,7 @@ public class HeroSliderFragment extends RowsFragment {
     setAdapter(rowsAdapter);
 
     setOnItemViewSelectedListener((itemViewHolder, item, rowViewHolder, row) -> {
-      mCallback.onSliderSelected((Slider) item);
+      //mCallback.onSliderSelected((Slider) item);
     });
 
     if (sliderList.size() > 0) {
@@ -71,17 +72,22 @@ public class HeroSliderFragment extends RowsFragment {
           VerticalGridView verticalGridView = findGridViewFromRoot(getView());
           if (verticalGridView != null) {
             verticalGridView.requestFocus();
-
-            verticalGridView.setOnFocusChangeListener((view, b) -> {
-              if(b) {
-
-              }
-            });
           }
         }
       }, WAIT_BEFORE_FOCUS_REQUEST_MS);
 
     }
+  }
+
+  public boolean hasFocus() {
+    if (getView() != null) {
+      VerticalGridView verticalGridView = findGridViewFromRoot(getView());
+      if (verticalGridView != null) {
+        return verticalGridView.hasFocus();
+      }
+    }
+
+    return false;
   }
 
 
