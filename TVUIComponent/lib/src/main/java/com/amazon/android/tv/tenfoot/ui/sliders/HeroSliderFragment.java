@@ -5,13 +5,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v17.leanback.app.RowsFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.FocusHighlight;
 import android.support.v17.leanback.widget.ItemBridgeAdapter;
 import android.support.v17.leanback.widget.ListRow;
-import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.VerticalGridView;
 import android.view.View;
 
+import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
 import com.zype.fire.api.Model.Image;
 import com.zype.fire.api.Model.ZobjectContentData;
 
@@ -38,7 +37,7 @@ public class HeroSliderFragment extends RowsFragment {
       mCallback = (OnHeroSliderSelected) getActivity();
     } catch (ClassCastException e) {
       throw new ClassCastException(getActivity().toString() +
-          " must implement OnBrowseRowListener: " + e);
+              " must implement OnBrowseRowListener: " + e);
     }
 
     if(HeroSlider.getInstance().isSliderPresent()) {
@@ -71,10 +70,10 @@ public class HeroSliderFragment extends RowsFragment {
 
       View view = verticalGridView.getLayoutManager().getChildAt(0);
       ItemBridgeAdapter.ViewHolder ibvh = (ItemBridgeAdapter.ViewHolder)
-          verticalGridView.getChildViewHolder(view);
-      ListRowPresenter rowPresenter = (ListRowPresenter) ibvh.getPresenter();
-      ListRowPresenter.ViewHolder vh = (ListRowPresenter.ViewHolder)
-          rowPresenter.getRowViewHolder(ibvh.getViewHolder());
+              verticalGridView.getChildViewHolder(view);
+      CustomListRowPresenter rowPresenter = (CustomListRowPresenter) ibvh.getPresenter();
+      CustomListRowPresenter.ViewHolder vh = (CustomListRowPresenter.ViewHolder)
+              rowPresenter.getRowViewHolder(ibvh.getViewHolder());
 
       if(smooth) {
         vh.getGridView().setSelectedPositionSmooth(selectedIndex + 1);
@@ -86,11 +85,9 @@ public class HeroSliderFragment extends RowsFragment {
   }
 
   private void loadRows() {
-    ListRowPresenter presenter = new ListRowPresenter(FocusHighlight.ZOOM_FACTOR_SMALL, true);
-    presenter.setShadowEnabled(false);
-    presenter.setSelectEffectEnabled(true);
+    CustomListRowPresenter customListRowPresenter = new CustomListRowPresenter();
 
-    rowsAdapter = new ArrayObjectAdapter(presenter);
+    rowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
     cardPresenter = new HeroCardPresenter();
 
     List<ZobjectContentData> sliderList = HeroSlider.getInstance().getSliders();
@@ -103,7 +100,7 @@ public class HeroSliderFragment extends RowsFragment {
 
       for (Image image : sliderData.images) {
         Slider slider = Slider.create(sliderData.id, "", sliderData.playlistid, image.url,
-            sliderData.friendlyTitle);
+                sliderData.friendlyTitle);
         sliders.add(slider);
       }
     }
@@ -149,6 +146,5 @@ public class HeroSliderFragment extends RowsFragment {
 
     void onSliderSelected(Slider slider);
   }
-
 
 }

@@ -16,6 +16,8 @@ import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.utils.Helpers;
 import com.bumptech.glide.Glide;
 
+import static android.support.v17.leanback.widget.ImageCardView.CARD_TYPE_FLAG_IMAGE_ONLY;
+
 public class HeroCardPresenter extends Presenter {
   private static final String TAG = "HeroCardPresenter";
 
@@ -26,7 +28,7 @@ public class HeroCardPresenter extends Presenter {
   private int mSelectedBackgroundColor = -1;
   private int mDefaultBackgroundColor = -1;
   private static final int CARD_WIDTH_PX = 180;
-  private static final int CARD_HEIGHT_PX = 250;
+  private static final int CARD_HEIGHT_PX = 230;
 
 
   @Override
@@ -42,6 +44,7 @@ public class HeroCardPresenter extends Presenter {
     cardView.setFocusable(true);
     cardView.setFocusableInTouchMode(true);
     cardView.setTitleText(null);
+    cardView.setCardType(CARD_TYPE_FLAG_IMAGE_ONLY);
 
     mInfoField = cardView.findViewById(R.id.info_field);
     updateCardBackgroundColor(cardView, false);
@@ -84,6 +87,7 @@ public class HeroCardPresenter extends Presenter {
 
       Glide.with(((ViewHolder) viewHolder).mCardView.getContext())
           .load(slider.getUrl())
+              .placeholder(mContext.getResources().getColor(R.color.image_card_place_holder))
           .into(((ViewHolder) viewHolder).mCardView.getMainImageView());
 
       mInfoField.setBackgroundColor(mContext.getResources().getColor(R.color.transparent));

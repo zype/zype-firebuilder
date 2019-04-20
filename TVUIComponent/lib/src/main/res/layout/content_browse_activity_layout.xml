@@ -54,7 +54,8 @@ permissions and limitations under the License.
             android:layout_alignParentTop="true"
             android:name="com.amazon.android.tv.tenfoot.ui.sliders.HeroSliderFragment"
             android:layout_width="match_parent"
-            android:layout_height="250dp"/>
+            android:layout_height="wrap_content"
+            android:minHeight="200dp" />
 
         <ImageView
                 android:id="@+id/main_logo"
