@@ -64,10 +64,6 @@ public class HeroSliderFragment extends RowsFragment {
     if (getView() != null) {
       VerticalGridView verticalGridView = findGridViewFromRoot(getView());
 
-      if (verticalGridView != null) {
-        verticalGridView.requestFocus();
-      }
-
       View view = verticalGridView.getLayoutManager().getChildAt(0);
       ItemBridgeAdapter.ViewHolder ibvh = (ItemBridgeAdapter.ViewHolder)
               verticalGridView.getChildViewHolder(view);
@@ -141,6 +137,15 @@ public class HeroSliderFragment extends RowsFragment {
     return false;
   }
 
+
+  public void requestFocus() {
+    if (getView() != null) {
+      VerticalGridView verticalGridView = findGridViewFromRoot(getView());
+      if (verticalGridView != null) {
+        verticalGridView.requestFocus();
+      }
+    }
+  }
 
   public interface OnHeroSliderSelected {
 

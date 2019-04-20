@@ -237,6 +237,29 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if(slidersPresent()) {
+            if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
+                if(sliderHasFocus()) {
+                    requestActionFocus();
+                    return true;
+                }
+            }
+
+            if(isActionFocus()) {
+                if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN) {
+                    HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
+
+                    if(fragment != null) {
+                        fragment.requestFocus();
+                    }
+                }
+
+                return true;
+            }
+        }
+
+
         boolean processed =  super.onKeyDown(keyCode, event);
 
         if(slidersPresent()) {
@@ -247,7 +270,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
                 else {
                     hideHeroSlider();
                 }
-            }, 100);
+            }, 50);
         }
 
         return processed;
@@ -398,6 +421,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         Log.d(TAG, "event=" + event.toString());
 
         switch (event.getKeyCode()) {
+
             case KeyEvent.KEYCODE_MENU:
                 if (event.getAction() == KeyEvent.ACTION_UP) {
                     if (ZypeConfiguration.displayLeftMenu()) {
