@@ -33,7 +33,6 @@ public class HeroSliderFragment extends RowsFragment {
 
   private ArrayObjectAdapter rowsAdapter;
   private HeroCardPresenter cardPresenter;
-  private OnHeroSliderSelected mCallback;
   private int selectedIndex;
   private Handler mHandler = new Handler(Looper.getMainLooper());
   private HeroCardAdapter listRowAdapter = null;
@@ -44,13 +43,6 @@ public class HeroSliderFragment extends RowsFragment {
   @Override
   public void onActivityCreated(Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
-
-    try {
-      mCallback = (OnHeroSliderSelected) getActivity();
-    } catch (ClassCastException e) {
-      throw new ClassCastException(getActivity().toString() +
-          " must implement OnBrowseRowListener: " + e);
-    }
 
     if (HeroSlider.getInstance().isSliderPresent()) {
       loadRows();
@@ -216,10 +208,4 @@ public class HeroSliderFragment extends RowsFragment {
       }
     }
   }
-
-  public interface OnHeroSliderSelected {
-
-    void onSliderSelected(Slider slider);
-  }
-
 }

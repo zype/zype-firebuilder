@@ -83,7 +83,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
  * ContentBrowseActivity class that loads the ContentBrowseFragment.
  */
 public class ContentBrowseActivity extends BaseActivity implements ContentBrowseFragment
-        .OnBrowseRowListener, HeroSliderFragment.OnHeroSliderSelected {
+        .OnBrowseRowListener {
 
     private final String TAG = ContentBrowseActivity.class.getSimpleName();
 
@@ -215,11 +215,6 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
 
         animatorSet.playTogether(animations);
         animatorSet.start();
-
-    }
-
-    @Override
-    public void onSliderSelected(Slider slider) {
 
     }
 
