@@ -35,6 +35,9 @@ import com.amazon.android.model.Action;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.tv.tenfoot.ui.fragments.MenuFragment;
+import com.amazon.android.tv.tenfoot.ui.sliders.HeroSlider;
+import com.amazon.android.tv.tenfoot.ui.sliders.HeroSliderFragment;
+import com.amazon.android.tv.tenfoot.ui.sliders.Slider;
 import com.amazon.android.tv.tenfoot.utils.BrowseHelper;
 import com.amazon.android.ui.constants.ConfigurationConstants;
 import com.amazon.android.ui.fragments.LogoutSettingsFragment;
@@ -46,6 +49,9 @@ import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment;
 import com.zype.fire.api.ZypeConfiguration;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -53,6 +59,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -62,6 +69,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
@@ -92,6 +102,10 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
 
     /* Zype, Evgeny Cherkasov */
     private boolean isMenuOpened = false;
+
+    private boolean sliderShown = false;
+
+    private final Handler handler = new Handler();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -138,6 +152,121 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
 
         /*Zype, Evgeny Cherkasov */
         hideMenu();
+
+        HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
+
+        if(slidersPresent()) {
+            showHeroSlider();
+        }
+        else {
+            if (fragment != null) {
+                getFragmentManager().beginTransaction()
+                    .hide(fragment)
+                    .commit();
+            }
+        }
+
+    }
+
+    private boolean slidersPresent() {
+        return HeroSlider.getInstance().isSliderPresent();
+    }
+
+    private void hideHeroSlider() {
+        if(!sliderShown || !slidersPresent()) {
+            return;
+        }
+
+        HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
+        fadeInFadeOut(Arrays.asList(findViewById(R.id.content_image), findViewById(R.id.content_details),
+            findViewById(R.id.main_logo)), Arrays.asList(fragment.getView()));
+        sliderShown = false;
+    }
+
+    private void showHeroSlider() {
+        if(sliderShown || !slidersPresent()) {
+            return;
+        }
+
+        HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
+        fadeInFadeOut(Arrays.asList(fragment.getView()), Arrays.asList(findViewById(R.id.content_image), findViewById(R.id.content_details),
+            findViewById(R.id.main_logo)));
+        sliderShown = true;
+    }
+
+    private void fadeInFadeOut(List<View> fadeInViews, List<View> fadeOutViews) {
+        final AnimatorSet animatorSet = new AnimatorSet();
+
+        List<Animator> animations = new ArrayList<>();
+
+        for(View view : fadeInViews) {
+            ObjectAnimator fadeIn = ObjectAnimator.ofFloat(view, "alpha", 0f, 1f);
+            fadeIn.setDuration(200);
+            animations.add(fadeIn);
+        }
+
+        for(View view : fadeOutViews) {
+            ObjectAnimator fadeOut = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f);
+            fadeOut.setDuration(200);
+            animations.add(fadeOut);
+        }
+
+        animatorSet.playTogether(animations);
+        animatorSet.start();
+
+    }
+
+    private boolean sliderHasFocus() {
+        if(slidersPresent()) {
+            HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
+
+            if(fragment != null) {
+                return fragment.hasFocus();
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if(slidersPresent()) {
+            if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
+                if(sliderHasFocus()) {
+                    requestActionFocus();
+                    return true;
+                }
+            }
+
+            if(isActionFocus()) {
+                if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN) {
+                    HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
+
+                    if(fragment != null) {
+                        fragment.requestFocus();
+                    }
+                }
+
+                return true;
+            }
+        }
+
+
+        boolean processed =  super.onKeyDown(keyCode, event);
+
+        if(slidersPresent()) {
+            handler.postDelayed(() -> {
+                if(sliderHasFocus()) {
+                    showHeroSlider();
+                }
+                else {
+                    hideHeroSlider();
+                }
+            }, 50);
+        }
+
+        return processed;
     }
 
     /**
@@ -153,6 +282,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
             callImageLoadSubscription(content.getTitle(),
                                       content.getDescription(),
                                       content.getBackgroundImageUrl());
+
         }
         /* Zype, Evgeny Cherkasov */
         // Update screen background with selected playlist (category) image
@@ -284,6 +414,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         Log.d(TAG, "event=" + event.toString());
 
         switch (event.getKeyCode()) {
+
             case KeyEvent.KEYCODE_MENU:
                 if (event.getAction() == KeyEvent.ACTION_UP) {
                     if (ZypeConfiguration.displayLeftMenu()) {
@@ -320,4 +451,6 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         }
         return super.dispatchKeyEvent(event);
     }
+
+
 }

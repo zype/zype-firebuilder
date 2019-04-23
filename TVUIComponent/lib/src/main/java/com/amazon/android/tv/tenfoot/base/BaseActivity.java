@@ -131,6 +131,26 @@ public abstract class BaseActivity extends Activity {
         }
     }
 
+    protected void requestActionFocus() {
+        HorizontalGridView actionWidgetContainer =
+            (HorizontalGridView) findViewById(R.id.widget_grid_view);
+
+        if (actionWidgetContainer != null) {
+            actionWidgetContainer.requestFocus();
+        }
+    }
+
+    protected boolean isActionFocus() {
+        HorizontalGridView actionWidgetContainer =
+            (HorizontalGridView) findViewById(R.id.widget_grid_view);
+
+        if (actionWidgetContainer != null) {
+            return actionWidgetContainer.hasFocus();
+        }
+
+        return false;
+    }
+
     @Override
     protected void onResume() {
 

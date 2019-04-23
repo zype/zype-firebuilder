@@ -34,6 +34,8 @@ permissions and limitations under the License.
     <!-- Used for the category titles and content subtitles -->
     <color name="tertiary_text">#99FFFFFF</color>
 
+    <color name="transparent">#00FFFFFF</color>
+
     <!-- End of App Colors -->
 
     <!-- Splash Screen Customization -->
@@ -75,7 +77,7 @@ permissions and limitations under the License.
 
     <!-- End of Browse Customization -->
 
-    <!-- Movie Info Card Customization -->
+    <!-- Slider Info Card Customization -->
 
     <!-- Background color of the card info -->
     <color name="card_info_bg">@color/card_background</color>
@@ -92,7 +94,7 @@ permissions and limitations under the License.
     <!-- Card info selected content text size -->
     <dimen name="card_info_selected_content_text">15sp</dimen>
 
-    <!-- End of Movie Info Card Customization -->
+    <!-- End of Slider Info Card Customization -->
 
     <!-- Details Customization -->
 

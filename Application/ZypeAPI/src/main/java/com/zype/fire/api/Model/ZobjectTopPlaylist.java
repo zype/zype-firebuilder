@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by Evgeny Cherkasov on 27.03.2019.
  */
-public class ZobjectContentData {
+public class ZobjectTopPlaylist {
     @SerializedName("_id")
     @Expose
     public String id;
@@ -27,10 +27,6 @@ public class ZobjectContentData {
     @SerializedName("friendly_title")
     @Expose
     public String friendlyTitle;
-
-    @SerializedName("help_url")
-    @Expose
-    public List<Object> keywords = new ArrayList<>();
 
     @Expose
     public int limit;
@@ -52,10 +48,6 @@ public class ZobjectContentData {
     @SerializedName("updated_at")
     @Expose
     public String updatedAt;
-
-    @SerializedName("video_ids")
-    @Expose
-    public List<Object> videoIds = new ArrayList<>();
 
     @SerializedName("zobject_type_id")
     @Expose

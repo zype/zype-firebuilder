@@ -16,6 +16,7 @@ import com.zype.fire.api.Model.VideoFavoritesResponse;
 import com.zype.fire.api.Model.VideoResponse;
 import com.zype.fire.api.Model.VideosResponse;
 import com.zype.fire.api.Model.ZobjectContentResponse;
+import com.zype.fire.api.Model.ZobjectTopPlaylistResponse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -127,4 +128,8 @@ public interface IZypeApi {
     // ZObjects
     @GET("/zobjects/?zobject_type=content")
     Call<ZobjectContentResponse> getZobjectContent(@QueryMap HashMap<String, String> params);
+
+    // ZObjects
+    @GET("/zobjects/?zobject_type=top_playlists")
+    Call<ZobjectTopPlaylistResponse> getZobjectsForTopPlaylist(@QueryMap HashMap<String, String> params);
 }

@@ -64,8 +64,10 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -2948,6 +2950,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         mCompositeSubscription.add(subscription);
     }
 
+    public ContentContainer getPlayList(String playListId) {
+        return getRootContentContainer().findContentContainerById(playListId);
+    }
+
     public void loadPlaylistVideos(String playlistId) {
         ContentContainer contentContainer = getRootContentContainer().findContentContainerById(playlistId);
         if (contentContainer == null) {
@@ -3021,6 +3027,17 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                             mEventBus.post(new FavoritesLoadEvent(favoritesLoaded));
                         });
         mCompositeSubscription.add(subscription);
+    }
+
+    public Observable<Content> getContentById(String videoId) {
+        ContentContainer contentContainer = new ContentContainer();
+        Recipe recipeDynamicParserVideos = Recipe.newInstance(mAppContext, "recipes/ZypeSearchContentsRecipe.json");
+
+        return mContentLoader.getLoadContentsByVideoIdsObservable(Observable.just(contentContainer), recipeDynamicParserVideos, Arrays.asList(videoId))
+            .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).flatMap(o -> {
+                Pair pair = (Pair)o;
+                return Observable.just((Content)pair.second);
+            });
     }
 
     public void loadLocalFavoritesVideos(ContentContainer contentContainer) {

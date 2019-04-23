@@ -1517,7 +1517,7 @@ public class PlaybackActivity extends Activity implements
                     playbackFinished();
                 }
                 else {
-                    // Open Movie as pre roll ad pod completed.
+                    // Open Slider as pre roll ad pod completed.
                     openContentHelper(mSelectedContent);
                 }
             }
