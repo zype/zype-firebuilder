@@ -5,6 +5,8 @@ import com.zype.fire.api.Model.ZobjectContentResponse;
 import com.zype.fire.api.ZypeApi;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import rx.Observable;
@@ -38,6 +40,7 @@ public class HeroSlider {
       if (response != null) {
         sliders.clear();
         sliders.addAll(response.zobjectContents);
+        Collections.sort(sliders, (z1, z2) -> z1.priority < z2.priority ? -1 : 1);
       }
 
       return Observable.just(true);

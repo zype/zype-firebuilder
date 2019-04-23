@@ -84,6 +84,7 @@ import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -459,12 +460,13 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
         /* Zype, Evgeny Cherkasov */
         String playlistId = mSelectedContent.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID);
         // Update header for Favorites
-        if (playlistId.equals(ZypeSettings.FAVORITES_PLAYLIST_ID)) {
+        if (!TextUtils.isEmpty(playlistId) && playlistId.equals(ZypeSettings.FAVORITES_PLAYLIST_ID)) {
             recommended.setName(getString(R.string.content_details_recommended_header_favorites));
         }
         // Add a button for loading next page of playlist videos
         ContentContainer contentContainer = ContentBrowser.getInstance(getActivity()).getRootContentContainer()
                 .findContentContainerById(playlistId);
+
         if (contentContainer != null) {
             if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
                 PlaylistAction action = new PlaylistAction();

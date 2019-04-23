@@ -74,6 +74,13 @@ public class ZobjectContentData {
     public List<Image> images = new ArrayList<>();
 
 
+    @SerializedName("videoid")
+    @Expose
+    public String videoid;
 
+
+    @SerializedName("priority")
+    @Expose
+    public int priority;
 
 }

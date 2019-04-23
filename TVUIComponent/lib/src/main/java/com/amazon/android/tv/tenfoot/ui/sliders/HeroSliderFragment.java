@@ -12,6 +12,8 @@ import android.text.TextUtils;
 import android.view.View;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
+import com.amazon.android.contentbrowser.ContentLoader;
+import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
 import com.zype.fire.api.Model.Image;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 public class HeroSliderFragment extends RowsFragment {
@@ -35,6 +38,7 @@ public class HeroSliderFragment extends RowsFragment {
   private Handler mHandler = new Handler(Looper.getMainLooper());
   private HeroCardAdapter listRowAdapter = null;
   private CompositeSubscription mCompositeSubscription = new CompositeSubscription();
+  private boolean selected;
 
 
   @Override
@@ -99,13 +103,11 @@ public class HeroSliderFragment extends RowsFragment {
 
     List<Slider> sliders = new ArrayList<>();
 
-    String videoId;
     for (ZobjectContentData sliderData : sliderList) {
 
-      videoId = sliderData.videoIds.size() > 0 ? sliderData.videoIds.get(0).toString() : "";
       for (Image image : sliderData.images) {
 
-        Slider slider = Slider.create(sliderData.id, videoId, sliderData.playlistid, image.url,
+        Slider slider = Slider.create(sliderData.id, sliderData.videoid, sliderData.playlistid, image.url,
             sliderData.friendlyTitle);
         sliders.add(slider);
       }
@@ -126,33 +128,56 @@ public class HeroSliderFragment extends RowsFragment {
 
     setOnItemViewClickedListener((itemViewHolder, item, rowViewHolder, row) -> {
 
+      if(selected) {
+        return;
+      }
       if (item != null && item instanceof Slider) {
         ContentBrowser contentBrowser = ContentBrowser.getInstance(getActivity());
-
+        selected = true;
         Slider slider = (Slider) item;
 
         if (TextUtils.isEmpty(slider.getVideoId())) {
-          //load the playlist
-          ContentContainer contentContainer = contentBrowser.getPlayList(slider.getPlayListId());
 
-          if (contentContainer != null) {
-            contentBrowser
-                .setLastSelectedContentContainer(contentContainer)
-                .switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
+          if (!TextUtils.isEmpty(slider.getPlayListId())) {
+            //load the playlist
+
+            ContentContainer contentContainer = contentBrowser.getPlayList(slider.getPlayListId());
+
+            if (contentContainer != null) {
+              if (contentContainer.getContents().size() > 0) {
+                Content content = contentContainer.getContents().get(0);
+                contentBrowser
+                    .setLastSelectedContent(content)
+                    .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
+                selected = false;
+              }
+              else {
+                if (Integer.valueOf(contentContainer.getExtraStringValue(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT)) > 0) {
+                  // Playlist has  videos, but they is not loaded yet.
+                  // Load videos and then open video detail screen of the first video in the playlist
+                  ContentLoader.ILoadContentForContentContainer listener = () -> ContentBrowser.getInstance(getActivity())
+                      .setLastSelectedContent(contentContainer.getContents().get(0))
+                      .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                  ContentLoader.getInstance(getActivity()).loadContentForContentContainer(contentContainer, getActivity(), listener);
+                  selected = false;
+                }
+              }
+            }
           }
 
         } else {
           //load the videoId
 
-          mCompositeSubscription.add(contentBrowser.getContentById(slider.getVideoId()).observeOn(AndroidSchedulers.mainThread())
+          mCompositeSubscription.add(contentBrowser.getContentById(slider.getVideoId()).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
               .subscribe(content -> {
                 //move the user to the detail screen
                 contentBrowser
                     .setLastSelectedContent(content)
                     .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
+                selected = false;
 
               }, throwable -> {
-
+                selected = false;
               }));
 
         }
