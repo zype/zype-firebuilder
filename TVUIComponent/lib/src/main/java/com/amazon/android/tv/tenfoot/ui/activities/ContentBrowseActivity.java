@@ -105,8 +105,6 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
 
     private boolean sliderShown = false;
 
-    private int count;
-
     private final Handler handler = new Handler();
 
     @Override
