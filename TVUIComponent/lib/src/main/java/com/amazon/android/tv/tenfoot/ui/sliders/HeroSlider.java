@@ -1,12 +1,11 @@
 package com.amazon.android.tv.tenfoot.ui.sliders;
 
-import com.zype.fire.api.Model.ZobjectContentData;
-import com.zype.fire.api.Model.ZobjectContentResponse;
+import com.zype.fire.api.Model.ZobjectTopPlaylist;
+import com.zype.fire.api.Model.ZobjectTopPlaylistResponse;
 import com.zype.fire.api.ZypeApi;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import rx.Observable;
@@ -15,12 +14,8 @@ import rx.schedulers.Schedulers;
 public class HeroSlider {
 
   private static HeroSlider heroSlider;
+  private List<ZobjectTopPlaylist> sliders = new ArrayList();
 
-  public List<ZobjectContentData> getSliders() {
-    return sliders;
-  }
-
-  private List<ZobjectContentData> sliders = new ArrayList();
   private HeroSlider() {
 
   }
@@ -33,9 +28,13 @@ public class HeroSlider {
     return heroSlider;
   }
 
+  public List<ZobjectTopPlaylist> getSliders() {
+    return sliders;
+  }
+
   public Observable<Boolean> loadContent() {
     return Observable.just(true).subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).flatMap(s -> {
-      ZobjectContentResponse response = ZypeApi.getInstance().getZobjectTopPlayLists();
+      ZobjectTopPlaylistResponse response = ZypeApi.getInstance().getZobjectTopPlayLists();
 
       if (response != null) {
         sliders.clear();

@@ -17,7 +17,7 @@ import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
 import com.zype.fire.api.Model.Image;
-import com.zype.fire.api.Model.ZobjectContentData;
+import com.zype.fire.api.Model.ZobjectTopPlaylist;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,13 +89,13 @@ public class HeroSliderFragment extends RowsFragment {
     rowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
     cardPresenter = new HeroCardPresenter();
 
-    List<ZobjectContentData> sliderList = HeroSlider.getInstance().getSliders();
+    List<ZobjectTopPlaylist> sliderList = HeroSlider.getInstance().getSliders();
 
     listRowAdapter = new HeroCardAdapter(cardPresenter);
 
     List<Slider> sliders = new ArrayList<>();
 
-    for (ZobjectContentData sliderData : sliderList) {
+    for (ZobjectTopPlaylist sliderData : sliderList) {
 
       for (Image image : sliderData.images) {
 
@@ -120,7 +120,7 @@ public class HeroSliderFragment extends RowsFragment {
 
     setOnItemViewClickedListener((itemViewHolder, item, rowViewHolder, row) -> {
 
-      if(selected) {
+      if (selected) {
         return;
       }
       if (item != null && item instanceof Slider) {
@@ -142,8 +142,7 @@ public class HeroSliderFragment extends RowsFragment {
                     .setLastSelectedContent(content)
                     .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
                 selected = false;
-              }
-              else {
+              } else {
                 if (Integer.valueOf(contentContainer.getExtraStringValue(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT)) > 0) {
                   // Playlist has  videos, but they is not loaded yet.
                   // Load videos and then open video detail screen of the first video in the playlist

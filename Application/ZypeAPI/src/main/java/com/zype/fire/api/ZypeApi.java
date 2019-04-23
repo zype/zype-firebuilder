@@ -11,6 +11,7 @@ import com.zype.fire.api.Model.VideoFavoritesResponse;
 import com.zype.fire.api.Model.VideoResponse;
 import com.zype.fire.api.Model.VideosResponse;
 import com.zype.fire.api.Model.ZobjectContentResponse;
+import com.zype.fire.api.Model.ZobjectTopPlaylistResponse;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -405,13 +406,13 @@ public class ZypeApi {
         }
     }
 
-    public ZobjectContentResponse getZobjectTopPlayLists() {
+    public ZobjectTopPlaylistResponse getZobjectTopPlayLists() {
         try {
             HashMap<String, String> params = new HashMap<>();
             params.put(APP_KEY, ZypeSettings.APP_KEY);
             Response response = apiImpl.getZobjectsForTopPlaylist(params).execute();
             if (response.isSuccessful()) {
-                return (ZobjectContentResponse) response.body();
+                return (ZobjectTopPlaylistResponse) response.body();
             }
             else {
                 return null;
