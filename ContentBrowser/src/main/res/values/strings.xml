@@ -84,6 +84,6 @@ permissions and limitations under the License.
     <string name="action_registration_complete_btn">Dismiss</string>
     <string name="action_play_trailer_1">Watch</string>
     <string name="action_play_trailer_2">Trailer</string>
-
+    <string name="epg_label">EPG</string>
 
 </resources>
