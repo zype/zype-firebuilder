@@ -284,16 +284,16 @@ public class PurchaseManager {
         }
         if (sku == null) {
             purchaseManagerListener.onValidPurchaseResponse(new Response(null, Response.Status
-                                                                    .SUCCESSFUL, null),
-                                                            false, sku);
+                            .SUCCESSFUL, null),
+                    false, sku);
         }
         Receipt receipt = mReceiptMap.get(sku);
         // Check if receipt stored with purchaseManager is expired.
         if (!isLocalPurchaseDataValid(receipt)) {
             Log.d(TAG, "local purchase not valid for " + receipt);
             purchaseManagerListener.onValidPurchaseResponse(new Response(null, Response.Status
-                                                                    .SUCCESSFUL, null),
-                                                            false, sku);
+                            .SUCCESSFUL, null),
+                    false, sku);
         }
         else {
             // Local receipt is still valid, now check the purchase system for receipt validity
@@ -314,8 +314,8 @@ public class PurchaseManager {
 
         validateSystemConfiguration();
         PendingAction pendingAction = new PendingAction(sku, purchaseManagerListener,
-                                                        PendingAction.ACTION
-                                                                .PURCHASE);
+                PendingAction.ACTION
+                        .PURCHASE);
         // Action pending on other ongoing requests.
         if (addPendingAction(pendingAction)) {
             Log.d(TAG, "purchase action for sku " + sku + " added in pending list");
@@ -323,8 +323,8 @@ public class PurchaseManager {
         }
         if (isLocalPurchaseDataValid(mReceiptMap.get(sku))) {
             purchaseManagerListener.onValidPurchaseResponse(new Response(null, Response.Status
-                                                                    .SUCCESSFUL, null),
-                                                            true, sku);
+                            .SUCCESSFUL, null),
+                    true, sku);
             return;
         }
         // Initiate purchase.
@@ -374,6 +374,16 @@ public class PurchaseManager {
             unregisterSkuReceipt(receipt);
             return false;
         }
+
+        /* Zype, Evgeny Cherkasov
+         * begin */
+        if (purchaseUtils.isProductEntitled(mSkuDataMap.get(receipt.getSku()))) {
+            // Inform the purchaseManager that this purchase is no longer valid.
+            unregisterSkuReceipt(receipt);
+            return false;
+        }
+        /* Zype
+         * end */
         return true;
     }
 
@@ -607,7 +617,7 @@ public class PurchaseManager {
 
             // Inform the purchase system that this SKU has been fulfilled.
             mPurchaseSystem.notifyFulfillment(sku, mUserData, receipt,
-                                              Receipt.FulfillmentStatus.FULFILLED);
+                    Receipt.FulfillmentStatus.FULFILLED);
             if (receipt.equals(mReceiptMap.get(sku))) {
                 // Remove it from purchaseManager.
                 mReceiptMap.remove(sku);

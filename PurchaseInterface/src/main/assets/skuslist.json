@@ -16,10 +16,17 @@
       "sku": "RentUnPurchased",
       "productType": "RENT",
       "purchaseSku": "RentUnPurchased"
+    },
+    {
+      "sku": "com.zype.aftv.demo.buy",
+      "productType": "BUY",
+      "purchaseSku": "com.zype.aftv.demo.buy",
+      "id": "com.zype.aftv.demo.buy"
     }
   ],
   "actions": {
     "CONTENT_ACTION_DAILY_PASS": "RentUnPurchased",
-    "CONTENT_ACTION_SUBSCRIPTION": "com.zype.aftv.demo.month"
+    "CONTENT_ACTION_SUBSCRIPTION": "com.zype.aftv.demo.month",
+    "CONTENT_ACTION_BUY_VIDEO": "com.zype.aftv.demo.buy"
   }
 }

@@ -104,8 +104,12 @@ public class PurchaseHelper {
     private String mDailyPassSKU;
     private String mSubscriptionSKU;
 
-    /* Zype, Evgeny Cherkasov */
+    /* Zype, Evgeny Cherkasov
+     * begin */
     private String mBuyVideoSKU;
+    private String videoId;
+    /* Zype
+     * end */
 
     /**
      * Event bus reference.
@@ -160,9 +164,9 @@ public class PurchaseHelper {
         // The purchase system should be initialized by the module initializer, if there is no
         // initializer available that means the purchase system is not needed.
         IPurchase purchaseSystem = (IPurchase) ModuleManager.getInstance()
-                                                            .getModule(
-                                                                    IPurchase.class.getSimpleName())
-                                                            .getImpl(true);
+                .getModule(
+                        IPurchase.class.getSimpleName())
+                .getImpl(true);
         if (purchaseSystem == null) {
             Log.i(TAG, "Purchase system not registered.");
             return;
@@ -209,11 +213,20 @@ public class PurchaseHelper {
                     Log.e(TAG, "You should not hit here!!!");
                 }
 
-                /* Zype, Evgeny Cherkasov */
+                /* Zype, Evgeny Cherkasov
+                 * begin */
                 @Override
                 public void onProductDataResponse(Response response, Map<String, Product> products) {
                     Log.e(TAG, "You should not hit here!!!");
                 }
+
+                @Override
+                public String getVideoId() {
+                    Log.e(TAG, "You should not hit here!!!");
+                    return null;
+                }
+                /* Zype
+                 * end */
 
             });
         }
@@ -236,6 +249,8 @@ public class PurchaseHelper {
         Log.d(TAG, "actions registered " + mActionsMap);
         mSubscriptionSKU = mActionsMap.get("CONTENT_ACTION_SUBSCRIPTION");
         mDailyPassSKU = mActionsMap.get("CONTENT_ACTION_DAILY_PASS");
+        /* Zype, Evgeny Cherkasov */
+        mBuyVideoSKU = mActionsMap.get("CONTENT_ACTION_BUY_VIDEO");
     }
 
 
@@ -337,15 +352,22 @@ public class PurchaseHelper {
                                                 String sku) {
 
                 handleOnValidPurchaseResponse(subscriber,
-                                              response,
-                                              validity,
-                                              sku);
+                        response,
+                        validity,
+                        sku);
             }
 
-            /* Zype, Evgeny Cherkasov */
+            /* Zype, Evgeny Cherkasov
+             * begin */
             public void onProductDataResponse(Response response, Map<String, Product> products) {
                 handleProductsResponse(subscriber, response, products);
             }
+
+            public String getVideoId() {
+                return videoId;
+            }
+            /* Zype
+             * end */
         };
     }
 
@@ -360,9 +382,9 @@ public class PurchaseHelper {
         Log.v(TAG, "purchaseSku called:" + sku);
 
         return Observable.create(subscriber -> mPurchaseManager
-                                  .purchaseSku(sku,
-                                               createObservablePurchaseManagerListener(
-                                                       subscriber))
+                .purchaseSku(sku,
+                        createObservablePurchaseManagerListener(
+                                subscriber))
         );
     }
 
@@ -377,9 +399,9 @@ public class PurchaseHelper {
         Log.v(TAG, "isPurchaseValid called:" + purchasedSku);
 
         return Observable.create(subscriber -> mPurchaseManager
-                                  .isPurchaseValid(purchasedSku,
-                                                   createObservablePurchaseManagerListener(
-                                                           subscriber))
+                .isPurchaseValid(purchasedSku,
+                        createObservablePurchaseManagerListener(
+                                subscriber))
         );
     }
 
@@ -413,7 +435,7 @@ public class PurchaseHelper {
         purchaseSkuObservable(sku)
                 .subscribeOn(Schedulers.newThread()) //this needs to be first make sure
                 .observeOn(AndroidSchedulers.mainThread()) //this needs to be last to
-                        // make sure rest is running on separate thread.
+                // make sure rest is running on separate thread.
                 .subscribe(resultBundle -> {
                     Log.e(TAG, "isPurchaseValid subscribe called");
                     /* Zype, Evgeny Cherkasov */
@@ -426,7 +448,7 @@ public class PurchaseHelper {
 
                     ErrorHelper.injectErrorFragment(activity, ErrorUtils.ERROR_CATEGORY
                             .NETWORK_ERROR, (errorDialogFragment, errorButtonType, errorCategory)
-                                                            -> {
+                            -> {
                         errorDialogFragment.dismiss();
                     });
                 });
@@ -470,7 +492,8 @@ public class PurchaseHelper {
         ProgressDialogFragment.createAndShow(activity, mContext.getString(R.string.loading));
     }
 
-    /* Zype,  Evgeny Cherkasov */
+    /* Zype,  Evgeny Cherkasov
+     * begin */
     public void handleProductsChain(Activity activity) {
         triggerProgress(activity);
         Set<String> skuSet = null;
@@ -569,9 +592,14 @@ public class PurchaseHelper {
         return null;
     }
 
-    /* Zype, Evgeny Cherkasov */
     public void setBuyVideoSKU(String sku) {
         mBuyVideoSKU = sku;
     }
 
+    public void setVideoId(String videoId) {
+        this.videoId = videoId;
+    }
+
+    /* Zype
+     * end */
 }

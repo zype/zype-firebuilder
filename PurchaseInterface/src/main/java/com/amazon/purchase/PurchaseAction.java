@@ -18,6 +18,7 @@ import com.amazon.purchase.model.Receipt;
 import com.amazon.purchase.model.Response;
 
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Log;
 
 /**
@@ -108,6 +109,15 @@ class PurchaseAction extends AsyncTask<Void, Void, String> {
         Log.d(TAG, "purchased mSku " + mSku + " with request " + requestId);
         Response response = mPurchaseManager.purchaseResponseMap.get(requestId);
         Receipt receipt = mPurchaseManager.purchaseReceiptMap.get(requestId);
+        /* Zype, Evgeny Cherkasov
+         * begin */
+        if (receipt != null) {
+            Bundle receiptExtras = new Bundle();
+            receiptExtras.putString("VideoId", mPurchaseManagerListener.getVideoId());
+            receipt.setExtras(receiptExtras);
+        }
+        /* Zype
+         * end */
 
         if (Response.Status.SUCCESSFUL.equals(response.getStatus())) {
 
@@ -128,7 +138,7 @@ class PurchaseAction extends AsyncTask<Void, Void, String> {
             else {
                 // Validate that the receipt received is not fake.
                 new PurchaseValidAction(mPurchaseManager, mSku, mPurchaseManagerListener,
-                                        receipt).execute();
+                        receipt).execute();
             }
         }
         else {

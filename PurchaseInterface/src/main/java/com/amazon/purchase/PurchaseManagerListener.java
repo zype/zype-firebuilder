@@ -43,4 +43,6 @@ public interface PurchaseManagerListener {
 
     /* Zype, Evgeny Cherkasov */
     void onProductDataResponse(Response response, Map<String, Product> products);
+
+    String getVideoId();
 }

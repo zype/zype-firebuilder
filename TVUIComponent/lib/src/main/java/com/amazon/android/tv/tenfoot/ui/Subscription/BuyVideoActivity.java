@@ -117,7 +117,7 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
         bindViews();
 
         // TODO: Get sku from the 'Marketplace ids' field of the video object
-        sku = "test.sku";
+        sku = "com.zumba.zumbaathome.singleVideo";
         Set<String> skuSet = new HashSet<>();
         skuSet.add(sku);
         ContentBrowser.getInstance(this).getPurchaseHelper().handleProductsChain(this, skuSet);
@@ -251,7 +251,8 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
     }
 
     private void buyVideo() {
-        contentBrowser.getPurchaseHelper().setBuyVideoSKU(sku);
+//        contentBrowser.getPurchaseHelper().setBuyVideoSKU(sku);
+        contentBrowser.getPurchaseHelper().setVideoId(contentBrowser.getLastSelectedContent().getId());
         if (contentBrowser.isUserLoggedIn()) {
             contentBrowser.actionTriggered(this, contentBrowser.getLastSelectedContent(),
                     ContentBrowser.CONTENT_ACTION_BUY, null, null);
@@ -329,11 +330,13 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
      */
     @Subscribe
     public void onPurchaseEvent(PurchaseEvent event) {
+        contentBrowser.getPurchaseHelper().setVideoId(null);
         if (event.getExtras().getBoolean(PurchaseHelper.RESULT)) {
             if (event.getExtras().getBoolean(PurchaseHelper.RESULT_VALIDITY)) {
                 isVideoPurchased = true;
                 closeScreen();
-            } else {
+            }
+            else {
                 isVideoPurchased = false;
                 updateViews();
                 dialogError = ErrorDialogFragment.newInstance(BuyVideoActivity.this,
@@ -342,7 +345,15 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
                 dialogError.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
             }
         }
+        else {
+            isVideoPurchased = false;
+            updateViews();
+            // TODO: Update error message
+            dialogError = ErrorDialogFragment.newInstance(BuyVideoActivity.this,
+                    ErrorUtils.ERROR_CATEGORY.ZYPE_BUY_VIDEO_ERROR_VERIFY,
+                    BuyVideoActivity.this);
+            dialogError.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
+        }
     }
-
 
 }
