@@ -57,8 +57,8 @@ permissions and limitations under the License.
 
 
     <!-- EPG colors-->
-    <color name="schedule_color">#313131</color>
-    <color name="default_channel_color">#333333</color>
+    <color name="schedule_color">#696a6d</color>
+    <color name="default_channel_color">#696a6d</color>
     <color name="progress_widget_color">#41337a</color>
     <color name="search_item_tab_color">#00adef</color>
     <color name="epg_loader_background">#50000000</color>
