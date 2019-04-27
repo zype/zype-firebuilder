@@ -1,4 +1,6 @@
-package se.kmdev.tvepg.epg.domain;
+package com.amazon.android.tv.tenfoot.ui.epg;
+
+import android.text.TextUtils;
 
 import java.io.Serializable;
 
@@ -50,6 +52,9 @@ public class EPGEvent implements Serializable {
     }
 
     public String getTitle() {
+        if(TextUtils.isEmpty(title))
+            return "";
+
         return title;
     }
 

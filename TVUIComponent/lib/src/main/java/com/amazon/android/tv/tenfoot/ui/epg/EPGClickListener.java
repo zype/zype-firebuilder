@@ -1,7 +1,4 @@
-package se.kmdev.tvepg.epg;
-
-import se.kmdev.tvepg.epg.domain.EPGChannel;
-import se.kmdev.tvepg.epg.domain.EPGEvent;
+package com.amazon.android.tv.tenfoot.ui.epg;
 
 /**
  * Created by Kristoffer on 15-05-25.

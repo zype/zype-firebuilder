@@ -1,4 +1,4 @@
-package se.kmdev.tvepg.epg;
+package com.amazon.android.tv.tenfoot.ui.epg;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -25,10 +25,6 @@ import org.joda.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import se.kmdev.tvepg.epg.domain.EPGEvent;
-import se.kmdev.tvepg.epg.domain.EPGState;
-import se.kmdev.tvepg.epg.misc.EPGUtil;
 
 //import com.squareup.picasso.Picasso;
 //import com.squareup.picasso.Target;
@@ -247,25 +243,6 @@ public class EPG extends ViewGroup {
 
   @Override
   protected void onLayout(boolean changed, int l, int t, int r, int b) {
-  }
-
-  private void drawResetButton(Canvas canvas, Rect drawingRect) {
-    // Show button when scrolled 1/3 of screen width from current time
-    final long threshold = getWidth() / 3;
-    if (Math.abs(getXPositionStart() - getScrollX()) > threshold) {
-      drawingRect = calculateResetButtonHitArea();
-      mPaint.setColor(mTimeBarLineColor);
-      canvas.drawCircle(drawingRect.right - (mResetButtonSize / 2),
-          drawingRect.bottom - (mResetButtonSize / 2),
-          Math.min(drawingRect.width(), drawingRect.height()) / 2,
-          mPaint);
-
-      drawingRect.left += mResetButtonMargin;
-      drawingRect.right -= mResetButtonMargin;
-      drawingRect.top += mResetButtonMargin;
-      drawingRect.bottom -= mResetButtonMargin;
-      canvas.drawBitmap(mResetButtonIcon, null, drawingRect, mPaint);
-    }
   }
 
   private void drawTimebarBottomStroke(Canvas canvas, Rect drawingRect) {

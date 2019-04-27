@@ -1,7 +1,8 @@
-package se.kmdev.tvepg.epg.misc;
+package com.amazon.android.tv.tenfoot.ui.epg;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.text.TextUtils;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -32,6 +33,9 @@ public class EPGUtil {
   }
 
   public static void loadImageInto(Context context, String url, int width, int height, SimpleTarget<Bitmap> simpleTarget) {
+    if(TextUtils.isEmpty(url))
+      return;
+
     Glide.with(context)
         .load(url)
         .asBitmap()

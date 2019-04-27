@@ -1,22 +1,17 @@
 package com.amazon.android.tv.tenfoot.ui.epg;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 
-import se.kmdev.tvepg.epg.EPG;
-import se.kmdev.tvepg.epg.EPGClickListener;
-import se.kmdev.tvepg.epg.EPGData;
-import se.kmdev.tvepg.epg.domain.EPGChannel;
-import se.kmdev.tvepg.epg.domain.EPGEvent;
-import se.kmdev.tvepg.epg.misc.EPGDataImpl;
-import se.kmdev.tvepg.epg.misc.MockDataService;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.subscriptions.CompositeSubscription;
 
 public class EpgActivity extends BaseActivity {
   private EPG epg;
+  private CompositeSubscription compositeSubscription = new CompositeSubscription();
 
   /**
    * Called when the activity is first created.
@@ -54,9 +49,12 @@ public class EpgActivity extends BaseActivity {
       }
     });
 
+    compositeSubscription.add(EPGDataManager.getInstance().epgDataSubject
+        .observeOn(AndroidSchedulers.mainThread()).subscribe(epgData -> {
+          epg.setEPGData(epgData);
+        }, throwable -> {
 
-    // Do initial load of data.
-    new AsyncLoadEPGData(epg).execute();
+        }));
   }
 
   @Override
@@ -69,19 +67,10 @@ public class EpgActivity extends BaseActivity {
     if (epg != null) {
       epg.clearEPGImageCache();
     }
+
+    compositeSubscription.clear();
     super.onDestroy();
   }
-
-  @Override
-  protected void onStart() {
-    super.onStart();
-  }
-
-  @Override
-  protected void onStop() {
-    super.onStop();
-  }
-
 
   @Override
   public boolean dispatchKeyEvent(KeyEvent event) {
@@ -93,25 +82,4 @@ public class EpgActivity extends BaseActivity {
     }
     return super.dispatchKeyEvent(event);
   }
-
-  private static class AsyncLoadEPGData extends AsyncTask<Void, Void, EPGData> {
-
-    EPG epg;
-
-    public AsyncLoadEPGData(EPG epg) {
-      this.epg = epg;
-    }
-
-    @Override
-    protected EPGData doInBackground(Void... voids) {
-      return new EPGDataImpl(MockDataService.getMockData());
-    }
-
-    @Override
-    protected void onPostExecute(EPGData epgData) {
-      epg.setEPGData(epgData);
-      epg.recalculateAndRedraw(null, false);
-    }
-  }
-
 }

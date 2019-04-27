@@ -1,4 +1,4 @@
-package se.kmdev.tvepg.epg.domain;
+package com.amazon.android.tv.tenfoot.ui.epg;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,33 +11,27 @@ public class EPGChannel implements Serializable {
 
   private final String name;
   private final String imageURL;
-  private int channelID;
+  private final int channelID;
+  private final String id;
   private List<EPGEvent> events = new ArrayList();
   private EPGChannel previousChannel;
   private EPGChannel nextChannel;
-  private String link = "";
 
-  public EPGChannel(String imageURL, String name, int channelID) {
+  public EPGChannel(String imageURL, String name, int channelID, String id) {
     this.imageURL = imageURL;
     this.name = name;
     this.channelID = channelID;
+    this.id = id;
   }
 
-  public String getLink() {
-    return link;
-  }
-
-  public void setLink(String link) {
-    this.link = link;
+  public String getId() {
+    return id;
   }
 
   public int getChannelID() {
     return channelID;
   }
 
-  public void setChannelID(int channelID) {
-    this.channelID = channelID;
-  }
 
   public String getName() {
     return name;

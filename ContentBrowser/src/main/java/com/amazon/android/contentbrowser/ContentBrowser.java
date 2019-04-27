@@ -686,7 +686,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         * end */
         //addSettingsAction(createSlideShowSettingAction());
         setupLogoutAction();
-        setupEpgAction();
+
+        if(ZypeSettings.EPG_ENABLED) {
+            setupEpgAction();
+        }
         setupFavoritesAction();
         setupMyLibraryAction();
 

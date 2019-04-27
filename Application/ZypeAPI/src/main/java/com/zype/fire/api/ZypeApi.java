@@ -3,8 +3,12 @@ package com.zype.fire.api;
 import com.zype.fire.api.Model.AccessTokenInfoResponse;
 import com.zype.fire.api.Model.AccessTokenResponse;
 import com.zype.fire.api.Model.AppResponse;
+import com.zype.fire.api.Model.Channel;
 import com.zype.fire.api.Model.ConsumerResponse;
 import com.zype.fire.api.Model.DevicePinResponse;
+import com.zype.fire.api.Model.ChannelResponse;
+import com.zype.fire.api.Model.Program;
+import com.zype.fire.api.Model.ProgramResponse;
 import com.zype.fire.api.Model.PlaylistsResponse;
 import com.zype.fire.api.Model.VideoEntitlementsResponse;
 import com.zype.fire.api.Model.VideoFavoritesResponse;
@@ -14,7 +18,9 @@ import com.zype.fire.api.Model.ZobjectContentResponse;
 import com.zype.fire.api.Model.ZobjectTopPlaylistResponse;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import okhttp3.OkHttpClient;
@@ -423,4 +429,45 @@ public class ZypeApi {
             return null;
         }
     }
+
+    public ChannelResponse loadEpgChannels(int pageIndex) {
+        try {
+            HashMap<String, String> params = new HashMap<>();
+            params.put(APP_KEY, ZypeSettings.APP_KEY);
+            params.put(PAGE, String.valueOf(pageIndex));
+            Response response = apiImpl.epgChannels(params).execute();
+            if (response.isSuccessful()) {
+                return (ChannelResponse) response.body();
+            }
+            else {
+              return null;
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+  public ProgramResponse loadEpgEvents(Channel channel, int pageIndex) {
+    try {
+      HashMap<String, String> params = new HashMap<>();
+      params.put(APP_KEY, ZypeSettings.APP_KEY);
+      params.put(PER_PAGE, String.valueOf(channel.getPerPageCount()));
+      params.put(PAGE, String.valueOf(pageIndex));
+
+      Response response = apiImpl.epgEvents(channel.id, params).execute();
+
+      if (response.isSuccessful()) {
+        return ((ProgramResponse) response.body());
+      }
+      else {
+        return null;
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
 }

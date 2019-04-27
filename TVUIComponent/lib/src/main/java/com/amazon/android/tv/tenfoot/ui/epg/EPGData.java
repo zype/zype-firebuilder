@@ -1,9 +1,6 @@
-package se.kmdev.tvepg.epg;
+package com.amazon.android.tv.tenfoot.ui.epg;
 
 import java.util.List;
-
-import se.kmdev.tvepg.epg.domain.EPGChannel;
-import se.kmdev.tvepg.epg.domain.EPGEvent;
 
 /**
  * Interface to implement and pass to EPG containing data to be used.

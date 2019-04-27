@@ -1,7 +1,9 @@
-package se.kmdev.tvepg.epg.domain;
+package com.amazon.android.tv.tenfoot.ui.epg;
 
 import android.os.Parcelable;
 import android.view.View;
+
+import com.amazon.android.tv.tenfoot.ui.epg.EPGEvent;
 
 /**
  * Created by MVRM on 19/04/2017.

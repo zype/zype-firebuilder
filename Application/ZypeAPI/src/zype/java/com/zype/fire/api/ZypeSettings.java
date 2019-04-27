@@ -22,6 +22,9 @@ public class ZypeSettings {
     // Template version
     public static final String TEMPLATE_VERSION = "1.8.0";
 
+    public static final boolean EPG_ENABLED = true;
+
+
     // Features
     public static final boolean ACCOUNT_CREATION_TOS = false;
     public static final boolean DEVICE_LINKING = false;

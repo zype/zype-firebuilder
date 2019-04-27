@@ -32,11 +32,14 @@ package com.amazon.android.tv.tenfoot.ui.activities;
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.helper.ErrorHelper;
 import com.amazon.android.interfaces.ICancellableLoad;
+import com.amazon.android.tv.tenfoot.BuildConfig;
+import com.amazon.android.tv.tenfoot.ui.epg.EPGDataManager;
 import com.amazon.android.tv.tenfoot.ui.sliders.HeroSlider;
 import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.Helpers;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
+import com.zype.fire.api.ZypeSettings;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -128,6 +131,10 @@ public class SplashActivity extends BaseActivity implements ICancellableLoad {
                         }, throwable -> {
 
                         });
+
+                        if(ZypeSettings.EPG_ENABLED) {
+                            EPGDataManager.getInstance().load();
+                        }
                     }
                     catch (Exception e) {
                         Log.e(TAG, "Failed to put data in cache for recipe ", e);
