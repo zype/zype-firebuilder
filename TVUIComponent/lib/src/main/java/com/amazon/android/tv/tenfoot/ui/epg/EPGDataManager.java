@@ -60,7 +60,7 @@ public class EPGDataManager {
               .filter(epgChannel -> epgChannel.isActive()).flatMap(epgChannel -> {
                 int eventPageIndex = 1;
                 ProgramResponse programResponse = zypeApi.loadEpgEvents(epgChannel, eventPageIndex);
-                epgChannel.getPrograms().addAll(programResponse.response);
+                epgChannel.addProgram(programResponse.response);
 
                 if (programResponse.pagination != null) {
                   if (programResponse.pagination.pages != null) {
@@ -70,7 +70,7 @@ public class EPGDataManager {
                       programResponse = zypeApi.loadEpgEvents(epgChannel, i);
 
                       if(programResponse != null) {
-                        epgChannel.getPrograms().addAll(programResponse.response);
+                        epgChannel.addProgram(programResponse.response);
                       }
                     }
                   }

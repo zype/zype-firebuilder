@@ -42,6 +42,15 @@ public class Channel implements Serializable {
     return programs;
   }
 
+  public void addProgram(List<Program> programs) {
+
+    for(Program program : programs) {
+      if(program.getStartTime() > (System.currentTimeMillis() - 24 * 60 * 60 * 1000)) {
+        this.programs.add(program);
+      }
+    }
+
+  }
   public void setPrograms(List<Program> programs) {
     this.programs = programs;
   }
