@@ -55,7 +55,6 @@ permissions and limitations under the License.
     <color name="error_dialog_bg_color">#13181F</color>
     <color name="image_card_place_holder">#D3D3D3</color>
 
-
     <!-- EPG colors-->
     <color name="schedule_color">#696a6d</color>
     <color name="default_channel_color">#696a6d</color>
@@ -67,8 +66,8 @@ permissions and limitations under the License.
     <color name="epg_event_layout_background">@color/default_channel_color</color>
     <color name="epg_event_layout_background_current">@color/search_item_tab_color</color>
     <color name="epg_event_layout_text">@color/lb_basic_card_content_text_color</color>
-    <color name="epg_time_bar">@color/lb_basic_card_content_text_color</color>
-    <color name="epg_event_layout_background_selected">#EE962D</color>
+    <color name="epg_time_bar">#33ffffff</color>
+    <color name="epg_event_layout_background_selected">@color/accent</color>
     <color name="epg_event_layout_background_pressed">#6e7aef</color>
 
 

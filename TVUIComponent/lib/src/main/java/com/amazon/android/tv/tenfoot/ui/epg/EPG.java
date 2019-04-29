@@ -8,6 +8,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Parcelable;
+import android.text.TextPaint;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.GestureDetector;
@@ -438,13 +440,14 @@ public class EPG extends ViewGroup {
 
 
     //local changes for setup channel name
+    TextPaint textPaint = new TextPaint();
     String nameChannel = epgData.getChannel(position).getName();
-    tPaint.setColor(mEventLayoutTextColor);
-    tPaint.setTextSize(mChannelTextSize);
-    canvas.drawText(nameChannel,
-        drawingRect.left + ((drawingRect.right - drawingRect.left) / 2),
-        drawingRect.top + (((drawingRect.bottom - drawingRect.top) / 2) + (mChannelTextSize / 2)), tPaint);
-    tPaint.setTextAlign(Paint.Align.CENTER);
+    textPaint.setColor(mEventLayoutTextColor);
+    textPaint.setTextSize(mChannelTextSize);
+    textPaint.setTextAlign(Paint.Align.CENTER);
+
+    CharSequence txt = TextUtils.ellipsize(nameChannel, textPaint, drawingRect.width() - 10, TextUtils.TruncateAt.END);
+    canvas.drawText(txt, 0, txt.length(), drawingRect.left + ((drawingRect.right - drawingRect.left) / 2), drawingRect.top + (((drawingRect.bottom - drawingRect.top) / 2) + (mChannelTextSize / 2)), textPaint);
 
     // Loading channel image into target for
     final String imageURL = epgData.getChannel(position).getImageURL();
@@ -453,26 +456,6 @@ public class EPG extends ViewGroup {
       Bitmap image = mChannelImageCache.get(imageURL);
       drawingRect = getDrawingRectForChannelImage(drawingRect, image);
       canvas.drawBitmap(image, null, drawingRect, null);
-    } else {
-      final int smallestSide = Math.min(mChannelLayoutHeight, mChannelLayoutWidth);
-
-
-      //work here for load image
-      if (!mChannelImageTargetCache.containsKey(imageURL)) {
-        mChannelImageTargetCache.put(imageURL, new SimpleTarget() {
-          @Override
-          public void onResourceReady(Object resource, GlideAnimation glideAnimation) {
-            //set here cache image
-            // mChannelImageCache.put(imageURL, bitmap);
-            redraw();
-            mChannelImageTargetCache.remove(imageURL);
-          }
-        });
-
-        EPGUtil.loadImageInto(getContext(), imageURL, smallestSide, smallestSide, mChannelImageTargetCache.get(imageURL));
-
-      }
-
     }
   }
 
