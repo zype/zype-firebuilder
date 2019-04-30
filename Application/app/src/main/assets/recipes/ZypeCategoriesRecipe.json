@@ -12,6 +12,8 @@
     "thumbnail_layout@ThumbnailLayout",
     "thumbnails@Thumbnails",
     "playlist_item_count@playlistItemCount",
+    "purchase_price@PurchasePrice",
+    "purchase_required@PurchaseRequired",
     "description@description"
   ],
   "keyDataType": "_id@keyDataPath"

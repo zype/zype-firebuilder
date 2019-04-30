@@ -33,6 +33,14 @@ public class PlaylistData {
     @Expose
     public List<Image> images = new ArrayList<>();
 
+    @SerializedName("purchase_price")
+    @Expose
+    public String purchasePrice;
+
+    @SerializedName("purchase_required")
+    @Expose
+    public Boolean purchaseRequired;
+
     @SerializedName("site_id")
     @Expose
     public String siteId;

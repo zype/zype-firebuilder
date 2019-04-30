@@ -83,6 +83,10 @@ public class ContentContainer implements Iterable<Content> {
     public static final String EXTRA_IMAGE_POSTER_URL = "ImagePosterUrl";
     // Playlist item count
     public static final String EXTRA_PLAYLIST_ITEM_COUNT = "playlistItemCount";
+    // Purchase price
+    public static final String EXTRA_PURCHASE_PRICE = "PurchasePrice";
+    // Purchase required flag
+    public static final String EXTRA_PURCHASE_REQUIRED = "PurchaseRequired";
     // Thumbnail layout
     public static final String EXTRA_THUMBNAIL_LAYOUT = "ThumbnailLayout";
     // Poster thumbnail url
@@ -301,6 +305,22 @@ public class ContentContainer implements Iterable<Content> {
         }
 
         return (int) mExtras.get(key);
+    }
+
+    /**
+     * Get a value from the extras map as a boolean. Warning: This method expects that the value
+     * that the key maps to is a boolean. If its not, errors may occur.
+     *
+     * @param key The key to the value.
+     * @return A boolean value; false if the value doesn't exist in the extras.
+     */
+    public boolean getExtraValueAsBoolean(String key) {
+
+        if (mExtras == null || mExtras.get(key) == null) {
+            return false;
+        }
+
+        return (boolean) mExtras.get(key);
     }
 
     /**

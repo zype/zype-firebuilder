@@ -60,10 +60,18 @@ public class ZypeContentContainerTranslator extends AModelTranslator<ContentCont
     @Override
     public boolean setMemberVariable(ContentContainer model, String field, Object value) {
 
-        if (model == null || field == null || field.isEmpty() || value == null) {
+        /* Zype, begin */
+        if (model == null || field == null || field.isEmpty()) {
             Log.e(TAG, "Input parameters should not be null and field cannot be empty.");
             return false;
         }
+        // This allows for some content to have extra values that others might not have.
+        if (value == null) {
+            Log.w(TAG, "Value for " + field + " was null so not set for Content Container, this may be " +
+                    "intentional.");
+            return true;
+        }
+        /* Zype end*/
 
         try {
             if (field.equals(ContentContainer.NAME_FIELD_NAME)) {
