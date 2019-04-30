@@ -1,7 +1,6 @@
 package com.amazon.android.tv.tenfoot.ui.epg;
 
 import com.zype.fire.api.Model.Channel;
-import com.zype.fire.api.Model.ChannelResponse;
 import com.zype.fire.api.Model.Program;
 import com.zype.fire.api.Model.ProgramResponse;
 import com.zype.fire.api.ZypeApi;
@@ -40,21 +39,8 @@ public class EPGDataManager {
 
           List<Channel> channels = new ArrayList<>();
 
-          int pageIndex = 1;
-
-          ChannelResponse epgChannelResponse = zypeApi.loadEpgChannels(pageIndex);
-          channels.addAll(epgChannelResponse.response);
-
-          if (epgChannelResponse.pagination != null) {
-            if (epgChannelResponse.pagination.pages != null) {
-              pageIndex++;
-
-              for (int i = pageIndex; i <= epgChannelResponse.pagination.pages; i++) {
-                epgChannelResponse = zypeApi.loadEpgChannels(i);
-                channels.addAll(epgChannelResponse.response);
-              }
-            }
-          }
+          List<Channel> channelsList = zypeApi.loadEpgChannels();
+          channels.addAll(channelsList);
 
           compositeSubscription.add(Observable.just(channels).flatMapIterable(channelList -> channelList)
               .filter(epgChannel -> epgChannel.isActive()).flatMap(epgChannel -> {
@@ -69,7 +55,7 @@ public class EPGDataManager {
                     for (int i = eventPageIndex; i <= programResponse.pagination.pages; i++) {
                       programResponse = zypeApi.loadEpgEvents(epgChannel, i);
 
-                      if(programResponse != null) {
+                      if (programResponse != null) {
                         epgChannel.addProgram(programResponse.response);
                       }
                     }

@@ -430,14 +430,15 @@ public class ZypeApi {
         }
     }
 
-    public ChannelResponse loadEpgChannels(int pageIndex) {
+    public List<Channel> loadEpgChannels() {
         try {
             HashMap<String, String> params = new HashMap<>();
             params.put(APP_KEY, ZypeSettings.APP_KEY);
-            params.put(PAGE, String.valueOf(pageIndex));
+            params.put(PAGE, String.valueOf(1));
+            params.put(PER_PAGE, "100");
             Response response = apiImpl.epgChannels(params).execute();
             if (response.isSuccessful()) {
-                return (ChannelResponse) response.body();
+                return ((ChannelResponse) response.body()).response;
             }
             else {
               return null;
