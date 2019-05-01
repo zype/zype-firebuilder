@@ -17,7 +17,7 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class EPGUtil {
   private static final String TAG = "EPGUtil";
-  private static final DateTimeFormatter dtfShortTime = DateTimeFormat.forPattern("HH:mm");
+  private static final DateTimeFormatter dtfShortTime = DateTimeFormat.forPattern("hh:mm a");
 
   public static String getShortTime(long timeMillis) {
     return dtfShortTime.print(timeMillis);
