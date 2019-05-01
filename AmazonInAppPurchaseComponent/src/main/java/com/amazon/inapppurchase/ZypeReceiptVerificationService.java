@@ -83,6 +83,7 @@ public class ZypeReceiptVerificationService extends AReceiptVerifier {
             body.amount = "";
             body.appId = ZypeConfiguration.getAppId(context);
             body.consumerId = Preferences.getString("ZypeConsumerId");
+            body.playlistId = receipt.getExtras().getString("PlaylistId");;
             body.siteId = ZypeConfiguration.getSiteId(context);
             body.transactionType = "purchase";
             body.videoId = receipt.getExtras().getString("VideoId");;

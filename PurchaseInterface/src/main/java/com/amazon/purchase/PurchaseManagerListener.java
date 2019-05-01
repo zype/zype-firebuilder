@@ -14,6 +14,8 @@
  */
 package com.amazon.purchase;
 
+import android.os.Bundle;
+
 import com.amazon.purchase.model.Product;
 import com.amazon.purchase.model.Response;
 
@@ -44,5 +46,7 @@ public interface PurchaseManagerListener {
     /* Zype, Evgeny Cherkasov */
     void onProductDataResponse(Response response, Map<String, Product> products);
 
-    String getVideoId();
+    Bundle getPurchaseExtras();
+
+//    String getVideoId();
 }

@@ -62,8 +62,8 @@ permissions and limitations under the License.
     <!--
         Zype, Evgeny Cherkasov
     -->
-    <string name="action_buy_playlist_1">Buy all</string>
-    <string name="action_buy_playlist_2">%1$s videos - $%2$s</string>
+    <string name="action_buy_playlist_1">Buy all %1$s videos</string>
+    <string name="action_buy_playlist_2">$%1$s</string>
     <string name="action_buy_video_1">Buy</string>
     <string name="action_buy_video_2">Video</string>
     <string name="action_favorites_add_1">Add to</string>

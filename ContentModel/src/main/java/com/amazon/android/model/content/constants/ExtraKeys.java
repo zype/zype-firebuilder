@@ -8,4 +8,6 @@ package com.amazon.android.model.content.constants;
 
 public class ExtraKeys {
     public static final String NEXT_PAGE = "NextPage";
+
+    public static final String PLAYLIST_ID = "PlaylistId";
 }

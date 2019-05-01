@@ -290,18 +290,19 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final int CONTENT_ACTION_MAX = 100;
 
     /* Zype, Evgeny Cherkasov */
-    // Choose plan action
+    // In=-app purchase actions
     public static final int CONTENT_ACTION_CHOOSE_PLAN = 51;
     public static final int CONTENT_ACTION_CONFIRM_PURCHASE = 52;
+    public static final int CONTENT_ACTION_CONFIRM_PURCHASE_PLAYLIST = 53;
     // Favorites actions
-    public static final int CONTENT_ACTION_FAVORITES_ADD = 53;
-    public static final int CONTENT_ACTION_FAVORITES_REMOVE = 54;
+    public static final int CONTENT_ACTION_FAVORITES_ADD = 54;
+    public static final int CONTENT_ACTION_FAVORITES_REMOVE = 55;
     // Watch ad free action
-    public static final int CONTENT_ACTION_SWAF = 55;
+    public static final int CONTENT_ACTION_SWAF = 56;
 
-    public static final int CONTENT_REGISTRATION_REQUIRED = 56;
+    public static final int CONTENT_REGISTRATION_REQUIRED = 57;
     
-    public static final int CONTENT_PLAY_TRAILER = 57;
+    public static final int CONTENT_PLAY_TRAILER = 58;
 
     /**
      * Search algorithm name.
@@ -1740,9 +1741,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             if (playlist != null) {
                 String purchasePrice = playlist.getExtraStringValue(ContentContainer.EXTRA_PURCHASE_PRICE);
                 int itemCount = playlist.getExtraValueAsInt(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT);
-                Action action = createActionButton(CONTENT_ACTION_CONFIRM_PURCHASE,
+                Action action = createActionButton(CONTENT_ACTION_CONFIRM_PURCHASE_PLAYLIST,
                         R.string.action_buy_playlist_1, R.string.action_buy_playlist_2);
-                action.setLabel2(String.format(mAppContext.getResources().getString(R.string.action_buy_playlist_2), String.valueOf(itemCount), purchasePrice));
+                action.setLabel1(String.format(mAppContext.getResources().getString(R.string.action_buy_playlist_1), String.valueOf(itemCount)));
+                action.setLabel2(String.format(mAppContext.getResources().getString(R.string.action_buy_playlist_2), purchasePrice));
                 contentActionList.add(action);
             }
         }
@@ -2470,6 +2472,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             case CONTENT_ACTION_BUY:
             case CONTENT_ACTION_CHOOSE_PLAN:
             case CONTENT_ACTION_CONFIRM_PURCHASE:
+            case CONTENT_ACTION_CONFIRM_PURCHASE_PLAYLIST:
                 mPurchaseHelper.handleAction(activity, content, actionId);
                 break;
             case CONTENT_ACTION_FAVORITES_ADD:

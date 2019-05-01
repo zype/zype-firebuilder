@@ -17,6 +17,7 @@ package com.amazon.android.contentbrowser.helper;
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.R;
 import com.amazon.android.model.content.Content;
+import com.amazon.android.model.content.constants.ExtraKeys;
 import com.amazon.android.model.event.ProgressOverlayDismissEvent;
 import com.amazon.android.model.event.ProductsUpdateEvent;
 import com.amazon.android.model.event.PurchaseEvent;
@@ -108,6 +109,7 @@ public class PurchaseHelper {
      * begin */
     private String mBuyVideoSKU;
     private String videoId;
+    private Bundle purchaseExtras;
     /* Zype
      * end */
 
@@ -220,8 +222,14 @@ public class PurchaseHelper {
                     Log.e(TAG, "You should not hit here!!!");
                 }
 
+//                @Override
+//                public String getVideoId() {
+//                    Log.e(TAG, "You should not hit here!!!");
+//                    return null;
+//                }
+
                 @Override
-                public String getVideoId() {
+                public Bundle getPurchaseExtras() {
                     Log.e(TAG, "You should not hit here!!!");
                     return null;
                 }
@@ -363,8 +371,12 @@ public class PurchaseHelper {
                 handleProductsResponse(subscriber, response, products);
             }
 
-            public String getVideoId() {
-                return videoId;
+//            public String getVideoId() {
+//                return videoId;
+//            }
+
+            public Bundle getPurchaseExtras() {
+                return purchaseExtras;
             }
             /* Zype
              * end */
@@ -479,6 +491,11 @@ public class PurchaseHelper {
         }
         else if (actionId == ContentBrowser.CONTENT_ACTION_CONFIRM_PURCHASE) {
             mContentBrowser.switchToBuyVideoScreen(new Bundle());
+        }
+        else if (actionId == ContentBrowser.CONTENT_ACTION_CONFIRM_PURCHASE_PLAYLIST) {
+            Bundle extras = new Bundle();
+            extras.putString(ExtraKeys.PLAYLIST_ID, content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+            mContentBrowser.switchToBuyVideoScreen(extras);
         }
     }
 
@@ -596,10 +613,34 @@ public class PurchaseHelper {
         mBuyVideoSKU = sku;
     }
 
-    public void setVideoId(String videoId) {
-        this.videoId = videoId;
+    /**
+     * Search in configuration file the SKU that is used for 'Buy Playlist' action.
+     * Returns first found SKU which `id` is equal to `BuyPlaylist`
+     */
+    public Set<String> getBuyPlaylistSKU() throws IOException {
+        Set<String> result = new HashSet<>();
+
+        Recipe recipe = Recipe.newInstance(FileHelper.readFile(mContext, mContext.getString(R.string.skus_file)));
+        List<Map<String, String>> skuList = (List<Map<String, String>>) recipe.getMap().get(SKUS_LIST);
+        for (Map<String, String> item : skuList) {
+            if (item.containsKey("id") && item.get("id").equals("BuyPlaylist")) {
+                String sku = item.get("sku");
+                result.add(sku);
+                mBuyVideoSKU = sku;
+                break;
+            }
+        }
+
+        return result;
     }
 
+//    public void setVideoId(String videoId) {
+//        this.videoId = videoId;
+//    }
+
+    public void setPurchaseExtras(Bundle extras) {
+        this.purchaseExtras = extras;
+    }
     /* Zype
      * end */
 }
