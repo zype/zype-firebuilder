@@ -69,6 +69,7 @@ permissions and limitations under the License.
     <color name="epg_time_bar">#33ffffff</color>
     <color name="epg_event_layout_background_selected">@color/accent</color>
     <color name="epg_event_layout_background_pressed">#6e7aef</color>
+    <color name="stroke_background">#fe0103</color>
 
 
 </resources>

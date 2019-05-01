@@ -90,6 +90,7 @@ public class EPG extends ViewGroup {
   private EPGData epgData = null;
   private EPGEvent selectedEvent = null;
   private int orientation;
+  private final int mEPGBottomStrokeBackground;
 
   public EPG(Context context) {
     this(context, null);
@@ -120,7 +121,7 @@ public class EPG extends ViewGroup {
     mScroller.setFriction(0.2f);
 
     mEPGBackground = getResources().getColor(R.color.epg_background);
-
+    mEPGBottomStrokeBackground = getResources().getColor(R.color.stroke_background);
     mChannelLayoutMargin = getResources().getDimensionPixelSize(R.dimen.epg_channel_layout_margin);
     mChannelLayoutPadding = getResources().getDimensionPixelSize(R.dimen.epg_channel_layout_padding);
     mChannelLayoutHeight = getResources().getDimensionPixelSize(R.dimen.epg_channel_layout_height);
@@ -256,7 +257,7 @@ public class EPG extends ViewGroup {
     drawingRect.bottom = drawingRect.top + mChannelLayoutMargin;
 
     // Bottom stroke
-    mPaint.setColor(mEPGBackground);
+    mPaint.setColor(mEPGBottomStrokeBackground);
     canvas.drawRect(drawingRect, mPaint);
   }
 
@@ -378,6 +379,7 @@ public class EPG extends ViewGroup {
       mPaint.setColor(mEventLayoutBackgroundSelected);
     } else if (event.isCurrent()) {
       mPaint.setColor(mEventLayoutBackgroundCurrent);
+      mPaint.setAlpha(70);
     } else {
       mPaint.setColor(mEventLayoutBackground);
     }

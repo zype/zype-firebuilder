@@ -120,7 +120,7 @@ permissions and limitations under the License.
     <dimen name="epg_channel_layout_height">50dp</dimen>
     <dimen name="epg_channel_layout_width">100dp</dimen>
     <dimen name="epg_event_layout_text">15sp</dimen>
-    <dimen name="epg_time_bar_height">40dp</dimen>
+    <dimen name="epg_time_bar_height">35dp</dimen>
     <dimen name="epg_time_bar_text">14sp</dimen>
     <dimen name="epg_time_bar_month_text">15sp</dimen>
     <dimen name="epg_time_bar_line_width">2dp</dimen>

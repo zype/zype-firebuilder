@@ -30,7 +30,7 @@ public class EPGUtil {
 
   public static String getEPGdayName(long dateMillis) {
     LocalDate date = new LocalDate(dateMillis);
-    return date.monthOfYear().getAsText() + " , " + date.getDayOfMonth();
+    return date.monthOfYear().getAsText() + ", " + date.getDayOfMonth();
 
   }
 
