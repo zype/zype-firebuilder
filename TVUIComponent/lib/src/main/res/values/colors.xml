@@ -56,12 +56,12 @@ permissions and limitations under the License.
     <color name="image_card_place_holder">#D3D3D3</color>
 
     <!-- EPG colors-->
-    <color name="schedule_color">#696a6d</color>
-    <color name="default_channel_color">#696a6d</color>
+    <color name="schedule_color">#181818</color>
+    <color name="default_channel_color">#000000</color>
     <color name="progress_widget_color">#41337a</color>
     <color name="search_item_tab_color">#00adef</color>
     <color name="epg_loader_background">#50000000</color>
-    <color name="epg_background">#b0b0b3</color>
+    <color name="epg_background">#A6000000</color>
     <color name="epg_channel_layout_background">@color/schedule_color</color>
     <color name="epg_event_layout_background">@color/default_channel_color</color>
     <color name="epg_event_layout_background_current">@color/search_item_tab_color</color>

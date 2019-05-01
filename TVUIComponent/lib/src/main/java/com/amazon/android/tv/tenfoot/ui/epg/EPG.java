@@ -73,6 +73,7 @@ public class EPG extends ViewGroup {
   private final int mResetButtonSize;
   private final int mResetButtonMargin;
   private final Bitmap mResetButtonIcon;
+  private final int mTimeBarMonthTextSize;
 
   private final int mEPGBackground;
   private final Map<String, Bitmap> mChannelImageCache;
@@ -134,6 +135,7 @@ public class EPG extends ViewGroup {
 
     mTimeBarHeight = getResources().getDimensionPixelSize(R.dimen.epg_time_bar_height);
     mTimeBarTextSize = getResources().getDimensionPixelSize(R.dimen.epg_time_bar_text);
+    mTimeBarMonthTextSize = getResources().getDimensionPixelSize(R.dimen.epg_time_bar_month_text);
     mTimeBarLineWidth = getResources().getDimensionPixelSize(R.dimen.epg_time_bar_line_width);
     mTimeBarLineColor = getResources().getColor(R.color.epg_time_bar);
     mChannelTextSize = getResources().getDimensionPixelSize(R.dimen.epg_channel_bar_text);
@@ -309,11 +311,11 @@ public class EPG extends ViewGroup {
 
     // Text
     mPaint.setColor(mEventLayoutTextColor);
-    mPaint.setTextSize(mTimeBarTextSize);
+    mPaint.setTextSize(mTimeBarMonthTextSize);
     mPaint.setTextAlign(Paint.Align.CENTER);
     canvas.drawText(EPGUtil.getEPGdayName(mTimeLowerBoundary),
         drawingRect.left + ((drawingRect.right - drawingRect.left) / 2),
-        drawingRect.top + (((drawingRect.bottom - drawingRect.top) / 2) + (mTimeBarTextSize / 2)), mPaint);
+        drawingRect.top + (((drawingRect.bottom - drawingRect.top) / 2) + (mTimeBarMonthTextSize / 2)), mPaint);
 
     mPaint.setTextAlign(Paint.Align.LEFT);
   }

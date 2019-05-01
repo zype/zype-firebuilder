@@ -3,6 +3,7 @@ package com.amazon.android.tv.tenfoot.ui.epg;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -29,7 +30,8 @@ public class EPGUtil {
 
   public static String getEPGdayName(long dateMillis) {
     LocalDate date = new LocalDate(dateMillis);
-    return date.dayOfWeek().getAsShortText() + " " + date.getDayOfMonth() + "/" + date.getMonthOfYear();
+    return date.monthOfYear().getAsText() + " , " + date.getDayOfMonth();
+
   }
 
   public static void loadImageInto(Context context, String url, int width, int height, SimpleTarget<Bitmap> simpleTarget) {
