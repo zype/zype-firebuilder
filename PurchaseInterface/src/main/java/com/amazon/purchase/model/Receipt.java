@@ -14,6 +14,8 @@
  */
 package com.amazon.purchase.model;
 
+import android.os.Bundle;
+
 import java.util.Date;
 
 /**
@@ -40,6 +42,9 @@ public class Receipt {
     private Product.ProductType mProductType;
     private Date mPurchasedDate;
     private Date mExpiryDate;
+
+    /*Zype, Evgeny Cherkasov */
+    private Bundle extras;
 
     /**
      * Gets the receipt id.
@@ -140,6 +145,30 @@ public class Receipt {
 
         mProductType = productType;
     }
+
+    /* Zype, Evgeny Cherkasov
+     * begin */
+    /**
+     * Gets extra data.
+     *
+     * @return The extras.
+     */
+    public Bundle getExtras() {
+
+        return extras;
+    }
+
+    /**
+     * Sets extra data.
+     *
+     * @param extras The extras.
+     */
+    public void setExtras(Bundle extras) {
+
+        this.extras = extras;
+    }
+    /* Zype
+     * end */
 
     /**
      * {@inheritDoc}

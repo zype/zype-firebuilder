@@ -98,7 +98,7 @@ public class AmazonInAppPurchase implements IPurchase {
     public void init(Context context, Bundle extras) {
 
         this.mContext = ObjectVerification.notNull(context, "Context cannot be null")
-                                          .getApplicationContext();
+                .getApplicationContext();
         this.mExtras = extras;
 
         String receiptVerificationClassPath =
@@ -210,7 +210,7 @@ public class AmazonInAppPurchase implements IPurchase {
         Log.d(TAG, "calling validateReceipt");
         String requestId = createRandomString(receipt.getReceiptId(), 10);
         mReceiptVerifier.validateReceipt(mContext, requestId, sku, userData, receipt,
-                                         mPurchaseListener);
+                mPurchaseListener);
 
         return requestId;
     }
@@ -240,7 +240,7 @@ public class AmazonInAppPurchase implements IPurchase {
 
                 Log.d(TAG, "UserDataResponse received " + userDataResponse.toString());
                 Response response = createResponse(isSuccessful(userDataResponse),
-                                                   userDataResponse.getRequestId().toString());
+                        userDataResponse.getRequestId().toString());
 
                 UserData userData = createUserDataFromIapUserData(userDataResponse.getUserData());
                 listener.onGetUserDataResponse(response, userData);
@@ -251,13 +251,13 @@ public class AmazonInAppPurchase implements IPurchase {
 
                 Log.d(TAG, "ProductDataResponse received " + productDataResponse.toString());
                 Response response = createResponse(isSuccessful(productDataResponse),
-                                                   productDataResponse.getRequestId().toString());
+                        productDataResponse.getRequestId().toString());
 
                 Map<String, Product> productMap = createProductMapFromProductDataResponse
                         (productDataResponse.getProductData());
 
                 listener.onProductDataResponse(response, productMap,
-                                               productDataResponse.getUnavailableSkus());
+                        productDataResponse.getUnavailableSkus());
             }
 
             @Override
@@ -265,7 +265,7 @@ public class AmazonInAppPurchase implements IPurchase {
 
                 Log.d(TAG, "purchaseResponse received " + purchaseResponse.toString());
                 Response response = createResponse(isSuccessful(purchaseResponse),
-                                                   purchaseResponse.getRequestId().toString());
+                        purchaseResponse.getRequestId().toString());
 
                 com.amazon.device.iap.model.Receipt iapReceipt = purchaseResponse.getReceipt();
 
@@ -274,8 +274,8 @@ public class AmazonInAppPurchase implements IPurchase {
                     sku = iapReceipt.getSku();
                 }
                 listener.onPurchaseResponse(response, sku, createReceipt(iapReceipt),
-                                            createUserDataFromIapUserData(purchaseResponse
-                                                                                  .getUserData()));
+                        createUserDataFromIapUserData(purchaseResponse
+                                .getUserData()));
             }
 
             @Override
@@ -284,12 +284,12 @@ public class AmazonInAppPurchase implements IPurchase {
                 Log.d(TAG, "purchaseUpdatesResponse received " + purchaseUpdatesResponse.toString
                         ());
                 Response response = createResponse(isSuccessful(purchaseUpdatesResponse),
-                                                   purchaseUpdatesResponse.getRequestId()
-                                                                          .toString());
+                        purchaseUpdatesResponse.getRequestId()
+                                .toString());
 
                 List<Receipt> receipts = createReceiptList(purchaseUpdatesResponse.getReceipts());
                 UserData userData = createUserDataFromIapUserData(purchaseUpdatesResponse
-                                                                          .getUserData());
+                        .getUserData());
 
                 listener.onUserDataResponse(response, receipts, userData, purchaseUpdatesResponse
                         .hasMore());
@@ -392,10 +392,16 @@ public class AmazonInAppPurchase implements IPurchase {
             return null;
         }
         switch (productType) {
+            /* Zype, Evgeny Cherkasov
+             * begin */
+//            case CONSUMABLE:
+//                return Product.ProductType.RENT;
             case CONSUMABLE:
-                return Product.ProductType.RENT;
-            case ENTITLED:
                 return Product.ProductType.BUY;
+//            case ENTITLED:
+//                return Product.ProductType.BUY;
+            /* Zype
+             * end */
             case SUBSCRIPTION:
                 return Product.ProductType.SUBSCRIBE;
             default:
@@ -432,7 +438,7 @@ public class AmazonInAppPurchase implements IPurchase {
         }
         else {
             return new Response(requestId, Response.Status.FAILED,
-                                new Exception("Could not retrieve data from IAP"));
+                    new Exception("Could not retrieve data from IAP"));
         }
     }
 

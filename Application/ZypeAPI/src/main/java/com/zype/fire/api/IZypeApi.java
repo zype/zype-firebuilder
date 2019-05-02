@@ -12,6 +12,7 @@ import com.zype.fire.api.Model.MarketplaceConnectBody;
 import com.zype.fire.api.Model.MarketplaceConnectResponse;
 import com.zype.fire.api.Model.PlayerResponse;
 import com.zype.fire.api.Model.PlaylistsResponse;
+import com.zype.fire.api.Model.VideoData;
 import com.zype.fire.api.Model.VideoEntitlementsResponse;
 import com.zype.fire.api.Model.VideoFavoriteResponse;
 import com.zype.fire.api.Model.VideoFavoritesResponse;
@@ -25,6 +26,7 @@ import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.FieldMap;
@@ -108,7 +110,7 @@ public interface IZypeApi {
 
     // Marketplace connect
     @POST("https://mkt.zype.com/v1/amazon/transactions")
-    Call<MarketplaceConnectResponse> verifyPurchaseAmazon(@Body MarketplaceConnectBody body);
+    Call<ResponseBody> verifyPurchaseAmazon(@Body MarketplaceConnectBody body);
 
     // Playlist
     @GET("/playlists")

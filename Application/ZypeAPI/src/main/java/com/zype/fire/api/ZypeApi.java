@@ -1,5 +1,6 @@
 package com.zype.fire.api;
 
+import com.google.gson.Gson;
 import com.zype.fire.api.Model.AccessTokenInfoResponse;
 import com.zype.fire.api.Model.AccessTokenResponse;
 import com.zype.fire.api.Model.AppResponse;
@@ -41,7 +42,6 @@ public class ZypeApi {
     public static final String APP_KEY = "app_key";
     private static final String CLIENT_GRANT_TYPE = "grant_type";
     private static final String CLIENT_ID = "client_id";
-//    private static final String CLIENT_SECRET = "client_secret";
     public static final String CONSUMER_EMAIL = "consumer[email]";
     public static final String CONSUMER_ID = "consumer_id";
     public static final String CONSUMER_PASSWORD = "consumer[password]";
@@ -84,7 +84,7 @@ public class ZypeApi {
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .client(client)
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(new Gson()))
                     .build();
             apiImpl = retrofit.create(IZypeApi.class);
         }

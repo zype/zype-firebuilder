@@ -1,12 +1,14 @@
 package com.amazon.inapppurchase;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.amazon.android.utils.Preferences;
 import com.amazon.purchase.IPurchase;
 import com.amazon.purchase.model.Receipt;
 import com.amazon.purchase.model.Response;
 import com.amazon.purchase.model.UserData;
+import com.google.gson.Gson;
 import com.zype.fire.api.Model.BifrostResponse;
 import com.zype.fire.api.Model.MarketplaceConnectBody;
 import com.zype.fire.api.Model.MarketplaceConnectBodyData;
@@ -26,6 +28,8 @@ import java.util.Map;
  */
 
 public class ZypeReceiptVerificationService extends AReceiptVerifier {
+    private static final String TAG = ZypeReceiptVerificationService.class.getSimpleName();
+
     /**
      * {@inheritDoc}
      */
@@ -76,30 +80,36 @@ public class ZypeReceiptVerificationService extends AReceiptVerifier {
         }
         else if (ZypeConfiguration.isUniversalTVODEnabled(context)) {
             MarketplaceConnectBody body = new MarketplaceConnectBody();
-            body.amount = String.valueOf("");
+            body.amount = "";
             body.appId = ZypeConfiguration.getAppId(context);
             body.consumerId = Preferences.getString("ZypeConsumerId");
             body.siteId = ZypeConfiguration.getSiteId(context);
             body.transactionType = "purchase";
+            body.videoId = receipt.getExtras().getString("VideoId");;
             MarketplaceConnectBodyData bodyData = new MarketplaceConnectBodyData();
             bodyData.receiptId = receipt.getReceiptId();
             bodyData.userId = userData.getUserId();
             body.data = bodyData;
-
+            Log.i(TAG, "validateReceipt(): body=" + (new Gson()).toJson(body));
             try {
                 retrofit2.Response response = ZypeApi.getInstance().getApi().verifyPurchaseAmazon(body).execute();
                 if (response.isSuccessful()) {
+                    Log.i(TAG, "validateReceipt(): Receipt is valid");
                     Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
                     listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
                     return requestId;
                 }
                 else {
+                    Log.i(TAG, "validateReceipt(): Receipt is not valid");
+//                    Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
+//                    listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
                     Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
                     listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
                     return requestId;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                Log.i(TAG, "validateReceipt(): Error marketplace connect call");
                 Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
                 listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
                 return requestId;

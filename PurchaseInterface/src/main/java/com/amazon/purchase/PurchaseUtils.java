@@ -114,7 +114,7 @@ public class PurchaseUtils {
 
         Recipe recipe =
                 Recipe.newInstance(FileHelper.readFile(context,
-                                                       context.getString(R.string.skus_file)));
+                        context.getString(R.string.skus_file)));
         if (!recipe.containsItem(SKUS_LIST)) {
             throw new IllegalStateException("sku list file does not contain skulist");
         }
@@ -156,7 +156,7 @@ public class PurchaseUtils {
     public boolean isReceiptExpired(@NonNull Receipt receipt) {
 
         return receipt.getExpiryDate() != null && compareDates(receipt.getExpiryDate(),
-                                                               getCurrentDate());
+                getCurrentDate());
     }
 
     /**
@@ -180,4 +180,19 @@ public class PurchaseUtils {
         }
         return skuDataMap;
     }
+
+    /* Zype, Evgeny Cherkasov
+     * begin */
+    /**
+     * Determines if this SKU is entitlement.
+     *
+     * @param skuData The SKU to be checked.
+     * @return True if the product is entitlement; false otherwise.
+     */
+    public boolean isProductEntitled(SkuData skuData) {
+        return skuData != null && Product.ProductType.BUY.equals(skuData.getProductType());
+    }
+
+    /* Zype
+     * end */
 }
