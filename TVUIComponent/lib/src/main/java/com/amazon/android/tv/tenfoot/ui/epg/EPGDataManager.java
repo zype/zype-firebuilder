@@ -72,6 +72,7 @@ public class EPGDataManager {
   }
 
   private void loadAgain() {
+    compositeSubscription.clear();
     compositeSubscription.add(Observable.timer(EPG_INTERVAL_IN_HOURS, TimeUnit.HOURS).subscribe(aLong -> {
       load();
     }));
