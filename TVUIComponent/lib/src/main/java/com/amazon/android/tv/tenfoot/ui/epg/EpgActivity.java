@@ -2,9 +2,13 @@ package com.amazon.android.tv.tenfoot.ui.epg;
 
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
+
+import java.util.concurrent.TimeUnit;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.CompositeSubscription;
@@ -12,7 +16,7 @@ import rx.subscriptions.CompositeSubscription;
 public class EpgActivity extends BaseActivity {
   private EPG epg;
   private CompositeSubscription compositeSubscription = new CompositeSubscription();
-
+  private ProgressBar progressBar;
   /**
    * Called when the activity is first created.
    */
@@ -20,6 +24,8 @@ public class EpgActivity extends BaseActivity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.epg_activity_layout);
+    progressBar = (ProgressBar) findViewById(R.id.progressView);
+    progressBar.setVisibility(View.VISIBLE);
     initListener();
   }
 
@@ -50,10 +56,11 @@ public class EpgActivity extends BaseActivity {
     });
 
     compositeSubscription.add(EPGDataManager.getInstance().epgDataSubject
-        .observeOn(AndroidSchedulers.mainThread()).subscribe(epgData -> {
+        .delay(1, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe(epgData -> {
           epg.setEPGData(epgData);
+          progressBar.setVisibility(View.GONE);
         }, throwable -> {
-
+          progressBar.setVisibility(View.GONE);
         }));
   }
 

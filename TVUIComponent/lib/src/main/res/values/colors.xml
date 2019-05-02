@@ -54,6 +54,7 @@ permissions and limitations under the License.
 
     <color name="error_dialog_bg_color">#13181F</color>
     <color name="image_card_place_holder">#D3D3D3</color>
+    <color name="progress_white">#ffffff</color>
 
     <!-- EPG colors-->
     <color name="schedule_color">#181818</color>
