@@ -450,12 +450,16 @@ public class ZypeApi {
         }
     }
 
-  public ProgramResponse loadEpgEvents(Channel channel, int pageIndex) {
+  public ProgramResponse loadEpgEvents(Channel channel, String startDate, String endDate) {
     try {
+
       HashMap<String, String> params = new HashMap<>();
       params.put(APP_KEY, ZypeSettings.APP_KEY);
-      params.put(PER_PAGE, String.valueOf(channel.getPerPageCount()));
-      params.put(PAGE, String.valueOf(pageIndex));
+      params.put(PER_PAGE, "500");
+      params.put("sort", "start_time");
+      params.put("order", "asc");
+      params.put("start_time.gte", startDate);
+      params.put("end_time.lte", endDate);
 
       Response response = apiImpl.epgEvents(channel.id, params).execute();
 

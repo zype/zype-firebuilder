@@ -26,10 +26,6 @@ public class Channel implements Serializable {
   public int programGuideEntryCount;
   private List<Program> programs = new ArrayList<>();
 
-  public int getPerPageCount() {
-    return 500;
-  }
-
   public boolean isActive() {
     if (!TextUtils.isEmpty(status)) {
       return status.equalsIgnoreCase("synced");
@@ -42,18 +38,14 @@ public class Channel implements Serializable {
     return programs;
   }
 
-  public void addProgram(List<Program> programs) {
-
-    for(Program program : programs) {
-      if(program.getStartTime() > (System.currentTimeMillis() - 24 * 60 * 60 * 1000)) {
-        this.programs.add(program);
-      }
-    }
-
-  }
   public void setPrograms(List<Program> programs) {
     this.programs = programs;
   }
 
+  public void addProgram(List<Program> programs) {
 
+    for (Program program : programs) {
+      this.programs.add(program);
+    }
+  }
 }

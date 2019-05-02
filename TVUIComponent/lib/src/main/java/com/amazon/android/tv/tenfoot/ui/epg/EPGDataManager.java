@@ -5,8 +5,12 @@ import com.zype.fire.api.Model.Program;
 import com.zype.fire.api.Model.ProgramResponse;
 import com.zype.fire.api.ZypeApi;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.schedulers.Schedulers;
@@ -17,6 +21,8 @@ public class EPGDataManager {
   private static EPGDataManager instance;
   public final BehaviorSubject<EPGData> epgDataSubject = BehaviorSubject.create();
   private CompositeSubscription compositeSubscription = new CompositeSubscription();
+
+  private static final int EPG_INTERVAL_IN_HOURS = 4;
 
   private EPGDataManager() {
 
@@ -44,38 +50,31 @@ public class EPGDataManager {
 
           compositeSubscription.add(Observable.just(channels).flatMapIterable(channelList -> channelList)
               .filter(epgChannel -> epgChannel.isActive()).flatMap(epgChannel -> {
-                int eventPageIndex = 1;
-                ProgramResponse programResponse = zypeApi.loadEpgEvents(epgChannel, eventPageIndex);
+                String startDate = DateTimeFormat.forPattern("yyyy-MM-dd").print(DateTime.now().minusDays(1));
+                String endDate = DateTimeFormat.forPattern("yyyy-MM-dd").print(DateTime.now().plusDays(1));
+                ProgramResponse programResponse = zypeApi.loadEpgEvents(epgChannel, startDate, endDate);
                 epgChannel.addProgram(programResponse.response);
-
-                if (programResponse.pagination != null) {
-                  if (programResponse.pagination.pages != null) {
-                    eventPageIndex++;
-
-                    for (int i = eventPageIndex; i <= programResponse.pagination.pages; i++) {
-                      programResponse = zypeApi.loadEpgEvents(epgChannel, i);
-
-                      if (programResponse != null) {
-                        epgChannel.addProgram(programResponse.response);
-                      }
-                    }
-                  }
-                }
-
                 return Observable.just(epgChannel);
               }, 3).filter(epgChannel -> epgChannel.getPrograms().size() > 0)
               .toSortedList((epgChannel1, epgChannel2) -> epgChannel1.name.compareToIgnoreCase(epgChannel2.name))
 
               .subscribe(epgChannels -> {
                 buildEpg(epgChannels);
+                loadAgain();
 
               }, throwable -> {
-                throwable.printStackTrace();
+                loadAgain();
               }));
 
         }, throwable -> {
-
+          loadAgain();
         }));
+  }
+
+  private void loadAgain() {
+    compositeSubscription.add(Observable.timer(EPG_INTERVAL_IN_HOURS, TimeUnit.HOURS).subscribe(aLong -> {
+      load();
+    }));
   }
 
   private void buildEpg(List<Channel> channels) {
