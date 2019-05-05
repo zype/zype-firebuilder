@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.text.TextPaint;
 import android.text.TextUtils;
@@ -19,9 +20,9 @@ import android.view.ViewGroup;
 import android.widget.Scroller;
 
 import com.amazon.android.tv.tenfoot.R;
-import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
+import org.joda.time.DateTime;
 import org.joda.time.LocalDateTime;
 
 import java.util.HashMap;
@@ -78,6 +79,7 @@ public class EPG extends ViewGroup {
   private final int mEPGBackground;
   private final Map<String, Bitmap> mChannelImageCache;
   private final Map<String, SimpleTarget> mChannelImageTargetCache;
+  private final int mEPGBottomStrokeBackground;
   private EPGClickListener mClickListener;
   private int mMaxHorizontalScroll;
   private int mMaxVerticalScroll;
@@ -90,7 +92,6 @@ public class EPG extends ViewGroup {
   private EPGData epgData = null;
   private EPGEvent selectedEvent = null;
   private int orientation;
-  private final int mEPGBottomStrokeBackground;
 
   public EPG(Context context) {
     this(context, null);
@@ -121,7 +122,7 @@ public class EPG extends ViewGroup {
     mScroller.setFriction(0.2f);
 
     mEPGBackground = getResources().getColor(R.color.epg_background);
-    mEPGBottomStrokeBackground = getResources().getColor(R.color.stroke_background);
+    mEPGBottomStrokeBackground = getResources().getColor(R.color.lb_tv_white);
     mChannelLayoutMargin = getResources().getDimensionPixelSize(R.dimen.epg_channel_layout_margin);
     mChannelLayoutPadding = getResources().getDimensionPixelSize(R.dimen.epg_channel_layout_padding);
     mChannelLayoutHeight = getResources().getDimensionPixelSize(R.dimen.epg_channel_layout_height);
@@ -197,7 +198,7 @@ public class EPG extends ViewGroup {
       drawChannelListItems(canvas, drawingRect);
       drawEvents(canvas, drawingRect);
       drawTimebar(canvas, drawingRect);
-      drawTimeLine(canvas, drawingRect);
+      //drawTimeLine(canvas, drawingRect);
       //drawResetButton(canvas, drawingRect);
 
       // If scroller is scrolling/animating do scroll. This applies when doing a fling.
@@ -251,13 +252,17 @@ public class EPG extends ViewGroup {
   }
 
   private void drawTimebarBottomStroke(Canvas canvas, Rect drawingRect) {
-    drawingRect.left = getScrollX();
+    drawingRect.left =  getScrollX() + mChannelLayoutWidth + mChannelLayoutMargin;
     drawingRect.top = getScrollY() + mTimeBarHeight;
     drawingRect.right = drawingRect.left + getWidth();
     drawingRect.bottom = drawingRect.top + mChannelLayoutMargin;
 
     // Bottom stroke
     mPaint.setColor(mEPGBottomStrokeBackground);
+    canvas.drawRect(drawingRect, mPaint);
+
+    mPaint.setColor(mEventLayoutBackgroundSelected);
+    drawingRect.right = getXFrom(DateTime.now().getMillis());
     canvas.drawRect(drawingRect, mPaint);
   }
 
@@ -673,25 +678,46 @@ public class EPG extends ViewGroup {
 
       //Select initial event
       if (selectedEvent != null) {
-        selectEvent(selectedEvent, withAnimation);
+        selectEvent(selectedEvent, withAnimation, true);
       } else {
         int position = getProgramPosition(0, getTimeFrom(getXPositionStart() + (getWidth() / 2)));
         if (position == -1) {
           position = 0;
         }
-        selectEvent(epgData.getEvent(0, position), withAnimation);
+
+        selectEvent(epgData.getEvent(0, position), withAnimation, false);
+
+        int scrollX = getXFrom(getMostRecentHourTimeWithOffset());
+
+        new Handler().post(() -> {
+          mScroller.startScroll(0, getScrollY(),
+              scrollX,
+              0, withAnimation ? 600 : 0);
+
+          redraw();
+        });
       }
 
-      //re-center
-            /*
-            mScroller.startScroll(getScrollX(), getScrollY(),
-                    getXPositionStart() - getScrollX(),
-                    0, withAnimation ? 600 : 0);
-*/
       redraw();
-
     }
   }
+
+  private long getMostRecentHourTime() {
+    DateTime dateTime = DateTime.now().withSecondOfMinute(0);
+
+    if (dateTime.getMinuteOfHour() >= 30) {
+      dateTime = dateTime.withMinuteOfHour(30);
+    } else {
+      dateTime = dateTime.withMinuteOfHour(0);
+    }
+
+    return dateTime.getMillis();
+  }
+
+  private long getMostRecentHourTimeWithOffset() {
+    return getMostRecentHourTime() - 15 * 60 * 1000;
+  }
+
 
   /**
    * Does a invalidate() and requestLayout() which causes a redraw of screen.
@@ -716,16 +742,18 @@ public class EPG extends ViewGroup {
     }
   }
 
-  public void selectEvent(EPGEvent epgEvent, boolean withAnimation) {
+  public void selectEvent(EPGEvent epgEvent, boolean withAnimation, boolean optimizeVisibility) {
     if (this.selectedEvent != null) {
       this.selectedEvent.selected = false;
     }
     epgEvent.selected = true;
     this.selectedEvent = epgEvent;
-    optimizeVisibility(epgEvent, withAnimation);
+
+    if (optimizeVisibility) {
+      optimizeVisibility(epgEvent, withAnimation);
+    }
+
     loadProgramDetails(epgEvent);
-
-
     //redraw to get the coloring of the selected event
     redraw();
   }
