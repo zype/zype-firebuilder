@@ -1,8 +1,5 @@
 package com.amazon.android.tv.tenfoot.ui.epg;
 
-/**
- * Created by Kristoffer on 15-05-25.
- */
 public interface EPGClickListener {
 
     void onChannelClicked(int channelPosition, EPGChannel epgChannel);

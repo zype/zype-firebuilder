@@ -29,17 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//import com.squareup.picasso.Picasso;
-//import com.squareup.picasso.Target;
-
-
-/**
- * Classic EPG, electronic program guide, that scrolls both horizontal, vertical and diagonal.
- * It utilize onDraw() to draw the graphic on screen. So there are some private helper methods calculating positions etc.
- * Listed on Y-axis are channels and X-axis are programs/events. Data is added to EPG by using setEPGData()
- * and pass in an EPGData implementation. A click listener can be added using setEPGClickListener().
- * Created by Kristoffer, http://kmdev.se
- */
 public class EPG extends ViewGroup {
 
     public static final int DAYS_BACK_MILLIS = 3 * 24 * 60 * 60 * 1000;        // 3 days
