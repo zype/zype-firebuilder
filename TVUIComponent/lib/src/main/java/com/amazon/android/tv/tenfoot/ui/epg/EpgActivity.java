@@ -4,13 +4,19 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.amazon.android.contentbrowser.ContentBrowser;
+import com.amazon.android.model.content.Content;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.CompositeSubscription;
+
+import static com.amazon.android.model.content.Content.EXTRA_PREVIEW_IDS;
 
 public class EpgActivity extends BaseActivity {
     private EPG epg;
@@ -40,6 +46,12 @@ public class EpgActivity extends BaseActivity {
             @Override
             public void onEventClicked(EPGEvent epgEvent) {
                 //launch player activity
+                Content content = new Content();
+                List<String> list = new ArrayList<>();
+                list.add("5c8fa9ff3bbf420fd200c9e9");
+                content.setExtraValue(EXTRA_PREVIEW_IDS, list);
+
+                ContentBrowser.getInstance(EpgActivity.this).switchToPlayTrailerScreen(content);
             }
 
             @Override
