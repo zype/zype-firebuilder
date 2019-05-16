@@ -11,6 +11,8 @@ import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.ui.fragments.AlertDialogFragment;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -71,8 +73,15 @@ public class EpgActivity extends BaseActivity {
                 List<String> list = new ArrayList<>();
                 list.add(epgEvent.getChannel().getVideoId());
                 content.setExtraValue(EXTRA_PREVIEW_IDS, list);
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("&start=" + epgEvent.getStartDateTime());
+                stringBuilder.append("&end=" + epgEvent.getEndDateTime());
 
-                ContentBrowser.getInstance(EpgActivity.this).switchToPlayTrailerScreen(content);
+                if (epgEvent.getEnd() < DateTime.now().getMillis()) {
+                    ContentBrowser.getInstance(EpgActivity.this).switchToPlayTrailerScreen(content, stringBuilder.toString());
+                } else {
+                    ContentBrowser.getInstance(EpgActivity.this).switchToPlayTrailerScreen(content);
+                }
             }
 
             @Override
