@@ -1,6 +1,7 @@
 package com.amazon.android.tv.tenfoot.ui.epg;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -8,6 +9,7 @@ import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
+import com.amazon.android.ui.fragments.AlertDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,9 +48,28 @@ public class EpgActivity extends BaseActivity {
             @Override
             public void onEventClicked(EPGEvent epgEvent) {
                 //launch player activity
+                if (TextUtils.isEmpty(epgEvent.getChannel().getVideoId())) {
+
+                    AlertDialogFragment.createAndShowAlertDialogFragment(EpgActivity.this,
+                            getString(com.amazon.android.contentbrowser.R.string.alert),
+                            getString(com.amazon.android.contentbrowser.R.string.alert_msg),
+                            getString(com.amazon.android.contentbrowser.R.string.ok),
+                            null, new AlertDialogFragment.IAlertDialogListener() {
+                                @Override
+                                public void onDialogPositiveButton(AlertDialogFragment alertDialogFragment) {
+
+                                }
+
+                                @Override
+                                public void onDialogNegativeButton(AlertDialogFragment alertDialogFragment) {
+
+                                }
+                            });
+                    return;
+                }
                 Content content = new Content();
                 List<String> list = new ArrayList<>();
-                list.add("5c8fa9ff3bbf420fd200c9e9");
+                list.add(epgEvent.getChannel().getVideoId());
                 content.setExtraValue(EXTRA_PREVIEW_IDS, list);
 
                 ContentBrowser.getInstance(EpgActivity.this).switchToPlayTrailerScreen(content);
