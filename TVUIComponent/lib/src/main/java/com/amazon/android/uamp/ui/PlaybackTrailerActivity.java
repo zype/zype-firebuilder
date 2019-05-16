@@ -96,7 +96,6 @@ public class PlaybackTrailerActivity extends Activity implements
   private static final float AUDIO_FOCUS_DEFAULT_VOLUME = 1.0f;
   private static final CookieManager DEFAULT_COOKIE_MANAGER;
   private static final int TRANSPORT_CONTROLS_DELAY_PERIOD = 50;
-  private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
   static {
     DEFAULT_COOKIE_MANAGER = new CookieManager();
