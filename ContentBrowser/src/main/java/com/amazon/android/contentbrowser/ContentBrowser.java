@@ -174,6 +174,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final String USER_SIGN_UP_SCREEN = "USER_SIGN_UP_SCREEN";
 
     public static final String PLAY_TRAILER_SCREEN = "PLAY_TRAILER_SCREEN";
+
+    public static final String EPG_SCREEN = "EPG_SCREEN";
+
     /**
      * Free content constant.
      */
@@ -208,6 +211,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final String FAVORITES = "Favorites";
     public static final String MY_LIBRARY = "MyLibrary";
     public static final String NEXT_PAGE = "NextPage";
+    public static final String EPG = "EPG";
 
     /**
      * Constant for the "watch now" action.
@@ -523,6 +527,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         addSettingsAction(createFavoritesSettingsAction());
     }
 
+    private void setupEpgAction(){
+        addSettingsAction(createEpgSettingsAction());
+    }
+
     private void setupMyLibraryAction() {
         if (ZypeConfiguration.isUniversalTVODEnabled(mAppContext)) {
             addSettingsAction(createMyLibrarySettingsAction());
@@ -678,8 +686,13 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         * end */
         //addSettingsAction(createSlideShowSettingAction());
         setupLogoutAction();
+
+        if(ZypeSettings.EPG_ENABLED) {
+            setupEpgAction();
+        }
         setupFavoritesAction();
         setupMyLibraryAction();
+
 
         mSearchManager.addSearchAlgo(DEFAULT_SEARCH_ALGO_NAME, new ISearchAlgo<Content>() {
             @Override
@@ -1205,6 +1218,19 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     /**
+     * Create epg Action.
+     *
+     * @return action.
+     */
+    private Action createEpgSettingsAction() {
+        return new Action().setAction(EPG)
+            .setIconResourceId(R.drawable.ic_star_white_48dp)
+            .setLabel1(mAppContext.getString(R.string.epg_label));
+    }
+
+
+
+    /**
      * Create My Library Action.
      *
      * @return action.
@@ -1444,12 +1470,16 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 slideShowSettingActionTriggered(activity, settingsAction);
                 break;
             /* Zype, Evgeny Cherkasov */
+            case EPG:
+                epgActionTriggered(activity);
+                break;
             case FAVORITES:
                 favoritesActionTriggered(activity);
                 break;
             case MY_LIBRARY:
                 myLibraryActionTriggered(activity);
                 break;
+
             default:
                 Log.e(TAG, "Unsupported action " + settingsAction);
                 break;
@@ -1532,6 +1562,12 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             }
         }
     }
+
+    /* Zype, Epg */
+    private void epgActionTriggered(Activity activity) {
+        switchToScreen(ContentBrowser.EPG_SCREEN);
+    }
+
 
     private void myLibraryActionTriggered(Activity activity) {
         ContentContainer contentContainer = getRootContentContainer()

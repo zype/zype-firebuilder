@@ -80,6 +80,7 @@ permissions and limitations under the License.
         <activity android:name="com.amazon.android.tv.tenfoot.ui.activities.SplashActivity"/>
         <activity android:name="com.amazon.android.uamp.ui.PlaybackActivity"/>
         <activity android:name="com.amazon.android.uamp.ui.PlaybackTrailerActivity" />
+        <activity android:name="com.amazon.android.tv.tenfoot.ui.epg.EpgActivity" />
         <!-- Zype, Evgeny Cherkasov -->
         <activity
             android:name="com.amazon.android.tv.tenfoot.ui.Subscription.BuyVideoActivity"
