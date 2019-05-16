@@ -30,11 +30,11 @@ public class Channel implements Serializable {
   private List<String> videoIds = new ArrayList<>();
 
   public boolean isActive() {
-    if (!TextUtils.isEmpty(status)) {
+    /*if (!TextUtils.isEmpty(status)) {
       return status.equalsIgnoreCase("synced");
-    }
+    }*/
 
-    return false;
+    return true;
   }
 
   public List<Program> getPrograms() {
