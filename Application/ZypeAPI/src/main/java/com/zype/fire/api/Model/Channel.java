@@ -52,7 +52,7 @@ public class Channel implements Serializable {
     }
   }
 
-  public String getNowVideoId() {
+  public String getVideoId() {
     if (videoIds != null && videoIds.size() > 0) {
       return videoIds.get(0);
     }
