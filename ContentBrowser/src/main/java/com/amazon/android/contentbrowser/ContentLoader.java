@@ -1041,6 +1041,9 @@ public class ContentLoader {
                                 .subscribe(result -> {
                                         },
                                         throwable -> {
+                                            if(contentContainer.getContentCount() > 0) {
+                                                callback.onContentsLoaded();
+                                            }
                                         },
                                         () -> {
                                             callback.onContentsLoaded();

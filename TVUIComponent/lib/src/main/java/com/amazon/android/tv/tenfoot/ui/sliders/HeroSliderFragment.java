@@ -146,9 +146,12 @@ public class HeroSliderFragment extends RowsFragment {
                 if (Integer.valueOf(contentContainer.getExtraStringValue(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT)) > 0) {
                   // Playlist has  videos, but they is not loaded yet.
                   // Load videos and then open video detail screen of the first video in the playlist
-                  ContentLoader.ILoadContentForContentContainer listener = () -> ContentBrowser.getInstance(getActivity())
-                      .setLastSelectedContent(contentContainer.getContents().get(0))
-                      .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                  ContentLoader.ILoadContentForContentContainer listener = () -> {
+                    Content content = contentContainer.getContents().get(0);
+                    ContentBrowser.getInstance(getActivity())
+                        .setLastSelectedContent(content)
+                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
+                  };
                   ContentLoader.getInstance(getActivity()).loadContentForContentContainer(contentContainer, getActivity(), listener);
                   selected = false;
                 }
