@@ -50,7 +50,7 @@ public class EpgActivity extends BaseActivity {
       @Override
       public void onEventClicked(EPGEvent epgEvent) {
         //launch player activity
-        if (TextUtils.isEmpty(epgEvent.getChannel().getVideoId())) {
+        if (TextUtils.isEmpty(epgEvent.getChannel().getVideoId()) || epgEvent.getStart() > DateTime.now().getMillis()) {
 
           AlertDialogFragment.createAndShowAlertDialogFragment(EpgActivity.this,
               getString(com.amazon.android.contentbrowser.R.string.alert),
