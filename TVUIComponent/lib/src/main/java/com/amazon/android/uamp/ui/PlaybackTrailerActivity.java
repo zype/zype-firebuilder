@@ -50,7 +50,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import com.amazon.analytics.AnalyticsTags;
 import com.amazon.android.contentbrowser.helper.AnalyticsHelper;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.module.ModuleManager;
@@ -120,7 +119,7 @@ public class PlaybackTrailerActivity extends Activity implements
   private ContinualFwdUpdater mContinualFwdUpdater;
   private ContinualRewindUpdater mContinualRewindUpdater;
   private boolean mIsLongPress;
-
+  private String previousPlayUrl = "";
 
   /**
    * Called when the activity is first created.
@@ -144,7 +143,7 @@ public class PlaybackTrailerActivity extends Activity implements
 
     mSelectedContent =
         (Content) getIntent().getSerializableExtra("play_trailer");
-
+    previousPlayUrl = getIntent().getStringExtra("previous_play_url");
 
     if (mSelectedContent == null || TextUtils.isEmpty(mSelectedContent.getTrailerId())) {
       AnalyticsHelper.trackError(TAG, "Received an Intent to play trailer without a " +
@@ -462,7 +461,13 @@ public class PlaybackTrailerActivity extends Activity implements
   private void updateContentWithPlayerData(Content content, PlayerData playerData) {
     if (playerData != null) {
       // Url
-      content.setUrl(playerData.body.files.get(0).url);
+      String url = playerData.body.files.get(0).url;
+
+      if (!TextUtils.isEmpty(previousPlayUrl)) {
+        url = url + previousPlayUrl;
+      }
+
+      content.setUrl(url);
       content.setTitle("");
       content.setExtraValue(Content.EXTRA_VIDEO_URL, content.getUrl());
       openContentHelper(content);
