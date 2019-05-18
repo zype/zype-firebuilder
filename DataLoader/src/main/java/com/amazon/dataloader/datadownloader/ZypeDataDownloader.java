@@ -126,6 +126,9 @@ public class ZypeDataDownloader extends ADataDownloader {
         Gson gson = builder.create();
 
         for (PlaylistData playlistData : playlists) {
+            if (TextUtils.isEmpty(playlistData.description)) {
+                playlistData.description = " ";
+            }
             // Skip playlist that are not direct child of the root playlist
             if (TextUtils.isEmpty(playlistData.parentId)
                     || !playlistData.parentId.equals(ZypeConfiguration.getRootPlaylistId(mContext))) {

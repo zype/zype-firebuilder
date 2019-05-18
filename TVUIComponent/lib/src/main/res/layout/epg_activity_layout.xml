@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_margin="24dp"
-            android:format12Hour="hh:mm a"
+            android:format12Hour="h:mm a"
             android:gravity="right"
             android:textColor="@color/epg_event_layout_text"
             android:textSize="16sp" />

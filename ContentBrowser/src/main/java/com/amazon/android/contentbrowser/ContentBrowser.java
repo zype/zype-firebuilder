@@ -304,7 +304,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final int CONTENT_ACTION_SWAF = 55;
 
     public static final int CONTENT_REGISTRATION_REQUIRED = 56;
-    
+
     public static final int CONTENT_PLAY_TRAILER = 57;
 
     /**
@@ -3283,6 +3283,12 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         });
     }
 
+    public void switchToPlayTrailerScreen(Content content ,String appendUrl) {
+        switchToScreen(PLAY_TRAILER_SCREEN, intent -> {
+            intent.putExtra("play_trailer", content);
+            intent.putExtra("previous_play_url", appendUrl);
+        });
+    }
     public void switchToSubscriptionScreen(Bundle extras) {
         switchToScreen(SUBSCRIPTION_SCREEN, intent -> {
             intent.putExtras(extras);
