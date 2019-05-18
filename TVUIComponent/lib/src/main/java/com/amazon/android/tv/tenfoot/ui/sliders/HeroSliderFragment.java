@@ -90,7 +90,7 @@ public class HeroSliderFragment extends RowsFragment {
     cardPresenter = new HeroCardPresenter();
 
     List<ZobjectTopPlaylist> sliderList = HeroSlider.getInstance().getSliders();
-
+    cardPresenter.setSingleImage(sliderList.size() == 1);
     listRowAdapter = new HeroCardAdapter(cardPresenter);
 
     List<Slider> sliders = new ArrayList<>();
