@@ -37,7 +37,6 @@ public class HeroSliderFragment extends RowsFragment {
   private Handler mHandler = new Handler(Looper.getMainLooper());
   private HeroCardAdapter listRowAdapter = null;
   private CompositeSubscription mCompositeSubscription = new CompositeSubscription();
-  private boolean selected;
 
 
   @Override
@@ -120,12 +119,8 @@ public class HeroSliderFragment extends RowsFragment {
 
     setOnItemViewClickedListener((itemViewHolder, item, rowViewHolder, row) -> {
 
-      if (selected) {
-        return;
-      }
       if (item != null && item instanceof Slider) {
         ContentBrowser contentBrowser = ContentBrowser.getInstance(getActivity());
-        selected = true;
         Slider slider = (Slider) item;
 
         if (TextUtils.isEmpty(slider.getVideoId())) {
@@ -141,7 +136,6 @@ public class HeroSliderFragment extends RowsFragment {
                 contentBrowser
                     .setLastSelectedContent(content)
                     .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
-                selected = false;
               } else {
                 if (Integer.valueOf(contentContainer.getExtraStringValue(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT)) > 0) {
                   // Playlist has  videos, but they is not loaded yet.
@@ -153,7 +147,6 @@ public class HeroSliderFragment extends RowsFragment {
                         .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
                   };
                   ContentLoader.getInstance(getActivity()).loadContentForContentContainer(contentContainer, getActivity(), listener);
-                  selected = false;
                 }
               }
             }
@@ -168,10 +161,8 @@ public class HeroSliderFragment extends RowsFragment {
                 contentBrowser
                     .setLastSelectedContent(content)
                     .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
-                selected = false;
 
               }, throwable -> {
-                selected = false;
               }));
 
         }
