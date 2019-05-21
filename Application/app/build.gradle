@@ -83,7 +83,7 @@ android {
         zype {
         }
         template {
-            applicationId "com.zype.aftv.eftv.demo"
+            applicationId "com.zype.aftv.eftv"
         }
     }
 

@@ -30,7 +30,7 @@ permissions and limitations under the License.
     <!-- Color of splash screen spinning loader animation -->
     <color name="spinner_color">#FFFFFFFF</color>
     <!-- The color of button highlights and widgets. -->
-    <color name="accent">#00AEEF</color>
+    <color name="accent">#ceff00</color>
     <!-- FullContentBrowser:
          The header's bar color (left-hand navigation bar). -->
     <color name="browse_headers_bar">#0DFFFFFF</color>
