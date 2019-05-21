@@ -47,70 +47,75 @@ permissions and limitations under the License.
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <RelativeLayout
+            android:id="@+id/top_layout"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:layout_alignParentTop="true">
+            android:layout_height="wrap_content">
 
-            <fragment
-                android:id="@+id/hero_slider_fragment"
-                android:name="com.amazon.android.tv.tenfoot.ui.sliders.HeroSliderFragment"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="250dp"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="75dp">
 
-        </LinearLayout>
+                <fragment
+                    android:id="@+id/hero_slider_fragment"
+                    android:name="com.amazon.android.tv.tenfoot.ui.sliders.HeroSliderFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
 
 
-        <ImageView
-            android:id="@+id/main_logo"
-            android:layout_width="116dp"
-            android:layout_height="46dp"
-            android:layout_marginLeft="@dimen/lb_browse_padding_start"
-            android:layout_marginTop="@dimen/lb_browse_padding_top"
-            android:layout_marginBottom="24dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/company_logo" />
+            <ImageView
+                android:id="@+id/main_logo"
+                android:layout_width="116dp"
+                android:layout_height="46dp"
+                android:layout_marginBottom="24dp"
+                android:layout_marginLeft="@dimen/lb_browse_padding_start"
+                android:layout_marginTop="@dimen/lb_browse_padding_top"
+                android:scaleType="centerInside"
+                android:src="@drawable/company_logo" />
 
-        <include layout="@layout/powered_by_image_view" />
+            <include layout="@layout/powered_by_image_view" />
 
-        <LinearLayout
-            android:id="@+id/content_details"
-            android:layout_width="352dp"
-            android:layout_height="125dp"
-            android:layout_below="@id/main_logo"
-            android:layout_marginLeft="@dimen/lb_browse_padding_start"
-            android:layout_marginBottom="71dp"
-            android:orientation="vertical">
+            <LinearLayout
+                android:id="@+id/content_details"
+                android:layout_width="352dp"
+                android:layout_height="125dp"
+                android:layout_below="@id/main_logo"
+                android:layout_marginBottom="71dp"
+                android:layout_marginLeft="@dimen/lb_browse_padding_start"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/content_detail_title"
-                style="@style/Widget.Leanback.DetailsDescriptionTitleStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:textSize="@dimen/lb_details_description_title_text_size" />
+                <TextView
+                    android:id="@+id/content_detail_title"
+                    style="@style/Widget.Leanback.DetailsDescriptionTitleStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:ellipsize="end"
+                    android:textSize="@dimen/lb_details_description_title_text_size" />
 
-            <TextView
-                android:id="@+id/content_detail_description"
-                style="@style/Widget.Leanback.DetailsDescriptionBodyStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:ellipsize="end"
-                android:maxLines="4"
-                android:textSize="@dimen/lb_details_description_body_text_size" />
+                <TextView
+                    android:id="@+id/content_detail_description"
+                    style="@style/Widget.Leanback.DetailsDescriptionBodyStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:ellipsize="end"
+                    android:maxLines="4"
+                    android:textSize="@dimen/lb_details_description_body_text_size" />
 
-        </LinearLayout>
-
+            </LinearLayout>
+        </RelativeLayout>
 
         <fragment
             android:id="@+id/full_content_browse_fragment"
             android:name="com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/content_details"
+            android:layout_below="@id/top_layout"
             tools:layout="@layout/action_widget_container" />
 
         <fragment

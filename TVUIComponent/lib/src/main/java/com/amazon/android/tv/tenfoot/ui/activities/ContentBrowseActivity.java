@@ -178,8 +178,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         }
 
         HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
-        fadeInFadeOut(Arrays.asList(findViewById(R.id.content_image), findViewById(R.id.content_details),
-            findViewById(R.id.main_logo)), Arrays.asList(fragment.getView()));
+        fadeInFadeOut(Arrays.asList(findViewById(R.id.content_image), findViewById(R.id.content_details)), Arrays.asList(fragment.getView()));
         sliderShown = false;
     }
 
@@ -189,8 +188,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         }
 
         HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
-        fadeInFadeOut(Arrays.asList(fragment.getView()), Arrays.asList(findViewById(R.id.content_image), findViewById(R.id.content_details),
-            findViewById(R.id.main_logo)));
+        fadeInFadeOut(Arrays.asList(fragment.getView()), Arrays.asList(findViewById(R.id.content_image), findViewById(R.id.content_details)));
         sliderShown = true;
     }
 
