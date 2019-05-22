@@ -147,6 +147,9 @@ public class HeroSliderFragment extends RowsFragment {
                         .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
                   };
                   ContentLoader.getInstance(getActivity()).loadContentForContentContainer(contentContainer, getActivity(), listener);
+                } else {
+                  contentBrowser.setLastSelectedContentContainer(contentContainer);
+                  contentBrowser.switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
                 }
               }
             }
