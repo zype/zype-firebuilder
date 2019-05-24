@@ -131,27 +131,15 @@ public class HeroSliderFragment extends RowsFragment {
             ContentContainer contentContainer = contentBrowser.getPlayList(slider.getPlayListId());
 
             if (contentContainer != null) {
-              if (contentContainer.getContents().size() > 0) {
-                Content content = contentContainer.getContents().get(0);
-                contentBrowser
-                    .setLastSelectedContent(content)
-                    .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
-              } else {
-                if (Integer.valueOf(contentContainer.getExtraStringValue(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT)) > 0) {
-                  // Playlist has  videos, but they is not loaded yet.
-                  // Load videos and then open video detail screen of the first video in the playlist
-                  ContentLoader.ILoadContentForContentContainer listener = () -> {
-                    Content content = contentContainer.getContents().get(0);
-                    ContentBrowser.getInstance(getActivity())
-                        .setLastSelectedContent(content)
-                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
-                  };
-                  ContentLoader.getInstance(getActivity()).loadContentForContentContainer(contentContainer, getActivity(), listener);
-                } else {
-                  contentBrowser.setLastSelectedContentContainer(contentContainer);
-                  contentBrowser.switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
-                }
-              }
+              processContentContainer(contentContainer);
+            } else {
+              //load the playlist
+              mCompositeSubscription.add(contentBrowser.getContentLoader().loadPlayList(contentBrowser.getRootContentContainer(), slider.getPlayListId())
+                  .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(container -> {
+                    processContentContainer(container);
+                  }, throwable -> {
+
+                  }));
             }
           }
 
@@ -181,6 +169,34 @@ public class HeroSliderFragment extends RowsFragment {
         scrollToNextItem(false);
       }, WAIT_BEFORE_FOCUS_REQUEST_MS);
 
+    }
+  }
+
+  private void processContentContainer(ContentContainer contentContainer) {
+    ContentBrowser contentBrowser = ContentBrowser.getInstance(getActivity());
+
+    if (contentContainer != null) {
+      if (contentContainer.getContents().size() > 0) {
+        Content content = contentContainer.getContents().get(0);
+        contentBrowser
+            .setLastSelectedContent(content)
+            .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
+      } else {
+        if (Integer.valueOf(contentContainer.getExtraStringValue(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT)) > 0) {
+          // Playlist has  videos, but they is not loaded yet.
+          // Load videos and then open video detail screen of the first video in the playlist
+          ContentLoader.ILoadContentForContentContainer listener = () -> {
+            Content content = contentContainer.getContents().get(0);
+            ContentBrowser.getInstance(getActivity())
+                .setLastSelectedContent(content)
+                .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
+          };
+          ContentLoader.getInstance(getActivity()).loadContentForContentContainer(contentContainer, getActivity(), listener);
+        } else {
+          contentBrowser.setLastSelectedContentContainer(contentContainer);
+          contentBrowser.switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
+        }
+      }
     }
   }
 
