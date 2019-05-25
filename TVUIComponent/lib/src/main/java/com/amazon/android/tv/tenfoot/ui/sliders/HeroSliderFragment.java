@@ -18,6 +18,7 @@ import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
 import com.zype.fire.api.Model.Image;
 import com.zype.fire.api.Model.ZobjectTopPlaylist;
+import com.zype.fire.api.ZypeSettings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,12 +131,20 @@ public class HeroSliderFragment extends RowsFragment {
 
             ContentContainer contentContainer = contentBrowser.getPlayList(slider.getPlayListId());
 
+            //not in root playlist
+            if(contentContainer == null) {
+              ContentContainer sliderContainer = contentBrowser.getPlayList(ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID);
+              contentContainer = sliderContainer.findContentContainerById(slider.getPlayListId());
+            }
+
             if (contentContainer != null) {
               processContentContainer(contentContainer);
             } else {
+
               //load the playlist
               mCompositeSubscription.add(contentBrowser.getContentLoader().loadPlayList(contentBrowser.getRootContentContainer(), slider.getPlayListId())
                   .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(container -> {
+                    contentBrowser.getHeroSliderContentContainer().addContentContainer(container);
                     processContentContainer(container);
                   }, throwable -> {
 
