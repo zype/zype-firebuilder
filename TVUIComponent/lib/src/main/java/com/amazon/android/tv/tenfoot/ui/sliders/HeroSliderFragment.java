@@ -131,12 +131,6 @@ public class HeroSliderFragment extends RowsFragment {
 
             ContentContainer contentContainer = contentBrowser.getPlayList(slider.getPlayListId());
 
-            //not in root playlist
-            if(contentContainer == null) {
-              ContentContainer sliderContainer = contentBrowser.getPlayList(ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID);
-              contentContainer = sliderContainer.findContentContainerById(slider.getPlayListId());
-            }
-
             if (contentContainer != null) {
               processContentContainer(contentContainer);
             } else {
