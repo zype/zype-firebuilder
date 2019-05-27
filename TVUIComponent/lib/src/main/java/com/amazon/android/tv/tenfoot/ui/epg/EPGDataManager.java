@@ -27,6 +27,12 @@ public class EPGDataManager {
 
   }
 
+  public void setNowPlayingText(String nowPlayingText) {
+    this.nowPlayingText = nowPlayingText;
+  }
+
+  private String nowPlayingText = "";
+
   public static synchronized EPGDataManager getInstance() {
     if (instance == null) {
       instance = new EPGDataManager();
@@ -84,6 +90,9 @@ public class EPGDataManager {
     List<EPGChannel> epgChannels = new ArrayList<>();
 
     for (Channel channel : channels) {
+
+      channel.addCurrentTimeProgramIfMissing(nowPlayingText);
+
       EPGChannel epgChannel = new EPGChannel("", channel.name, pos++, channel.id, channel.getVideoId());
       epgChannel.setPreviousChannel(prevChannel);
 
