@@ -2779,12 +2779,12 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         return rootFavorites;
     }
 
-    public ContentContainer getHeroSliderContentContainer() {
+    public ContentContainer rootSliders() {
         ContentContainer root = getRootContentContainer();
         ContentContainer contentContainer = root.findContentContainerByName(ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID);
 
         if (contentContainer == null) {
-            ContentContainer sliderContainer = createHeroSliderContentContainer(root);
+            ContentContainer sliderContainer = createRootSliders(root);
             root.getContentContainers().add(sliderContainer);
             contentContainer = sliderContainer;
         }
@@ -2792,7 +2792,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         return contentContainer;
     }
 
-    private ContentContainer createHeroSliderContentContainer(ContentContainer parent) {
+    private ContentContainer createRootSliders(ContentContainer parent) {
         ContentContainer rootFavorites = new ContentContainer(ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID);
         rootFavorites.setExtraValue(Recipe.KEY_DATA_TYPE_TAG, ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID);
         rootFavorites.setExtraValue("description", ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID);
