@@ -133,6 +133,7 @@ public class SplashActivity extends BaseActivity implements ICancellableLoad {
                         });
 
                         if(ZypeSettings.EPG_ENABLED) {
+                            EPGDataManager.getInstance().setNowPlayingText(getString(com.amazon.android.contentbrowser.R.string.currently_playing));
                             EPGDataManager.getInstance().load();
                         }
                     }

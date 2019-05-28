@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.List;
 
 public class Channel implements Serializable {
 
-  private static final int TIME_BLOCK = 30 * 60 * 1000;
+  private static final int TIME_BLOCK = 60 * 60 * 1000;
 
   @SerializedName("_id")
   @Expose
@@ -63,9 +64,23 @@ public class Channel implements Serializable {
     return "";
   }
 
+  private long getMostRecentHourTime() {
+    long currentTime = DateTime.now().getMillis() - DateTimeZone.getDefault().getOffset(DateTime.now());
+
+    DateTime dateTime = DateTime.now().withMillis(currentTime).withSecondOfMinute(0);
+
+    if (dateTime.getMinuteOfHour() >= 30) {
+      dateTime = dateTime.withMinuteOfHour(30);
+    } else {
+      dateTime = dateTime.withMinuteOfHour(0);
+    }
+
+    return dateTime.getMillis();
+  }
+
   public void addCurrentTimeProgramIfMissing(String text) {
     boolean currentProgramAvailable = false;
-    long currentTime = DateTime.now().getMillis();
+    long currentTime = getMostRecentHourTime();
 
     for (Program program : programs) {
       if (program.getStartTime() <= currentTime && program.getEndTime() >= currentTime) {
@@ -81,7 +96,7 @@ public class Channel implements Serializable {
     if (programs.size() == 0) {
       //add a 1 hr block
       Program program = new Program();
-      program.setStartTime(currentTime - TIME_BLOCK);
+      program.setStartTime(currentTime);
       program.setEndTime(currentTime + TIME_BLOCK);
       program.name = text;
       addProgram(Arrays.asList(program));
@@ -99,7 +114,7 @@ public class Channel implements Serializable {
         }
       }
 
-      long startTime = currentTime - TIME_BLOCK;
+      long startTime = currentTime;
 
       if (beforeCurrenTime.getStartTime() > startTime) {
         startTime = beforeCurrenTime.getStartTime();
