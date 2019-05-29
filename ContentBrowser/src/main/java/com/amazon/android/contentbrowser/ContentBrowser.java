@@ -2763,11 +2763,11 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     private ContentContainer createFavoritesContentContainer(ContentContainer parent) {
-        ContentContainer rootSliders = new ContentContainer(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID);
-        rootSliders.setExtraValue(Recipe.KEY_DATA_TYPE_TAG, ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID);
-        rootSliders.setExtraValue("description", ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID);
-        rootSliders.setExtraValue("parentId", parent.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
-        rootSliders.setExtraValue(ContentContainer.EXTRA_THUMBNAIL_LAYOUT, "landscape");
+        ContentContainer rootFavorites = new ContentContainer(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID);
+        rootFavorites.setExtraValue(Recipe.KEY_DATA_TYPE_TAG, ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID);
+        rootFavorites.setExtraValue("description", ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID);
+        rootFavorites.setExtraValue("parentId", parent.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+        rootFavorites.setExtraValue(ContentContainer.EXTRA_THUMBNAIL_LAYOUT, "landscape");
 
         ContentContainer favorites = new ContentContainer(ZypeSettings.FAVORITES_PLAYLIST_ID);
         favorites.setExtraValue(Recipe.KEY_DATA_TYPE_TAG, ZypeSettings.FAVORITES_PLAYLIST_ID);
@@ -2775,8 +2775,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         favorites.setExtraValue("parentId", ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID);
         favorites.setExtraValue(ContentContainer.EXTRA_THUMBNAIL_LAYOUT, "landscape");
 
-        rootSliders.getContentContainers().add(favorites);
-        return rootSliders;
+        rootFavorites.getContentContainers().add(favorites);
+        return rootFavorites;
     }
 
     public ContentContainer rootSliders() {
@@ -2793,12 +2793,12 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     private ContentContainer createRootSliders(ContentContainer parent) {
-        ContentContainer rootFavorites = new ContentContainer(ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID);
-        rootFavorites.setExtraValue(Recipe.KEY_DATA_TYPE_TAG, ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID);
-        rootFavorites.setExtraValue("description", ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID);
-        rootFavorites.setExtraValue("parentId", parent.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
-        rootFavorites.setExtraValue(ContentContainer.EXTRA_THUMBNAIL_LAYOUT, "landscape");
-        return rootFavorites;
+        ContentContainer rootSliders = new ContentContainer(ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID);
+        rootSliders.setExtraValue(Recipe.KEY_DATA_TYPE_TAG, ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID);
+        rootSliders.setExtraValue("description", ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID);
+        rootSliders.setExtraValue("parentId", parent.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+        rootSliders.setExtraValue(ContentContainer.EXTRA_THUMBNAIL_LAYOUT, "landscape");
+        return rootSliders;
     }
 
     public void runGlobalRecipesForLastSelected(Activity activity, ICancellableLoad cancellable) {
