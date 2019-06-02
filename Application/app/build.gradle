@@ -73,6 +73,10 @@ android {
             setVersionNameSuffix(".${currentCodeVersion}")
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            def int newVersionCode = currentCodeVersion + 1
+            versionProperties[versionCodeKey] = newVersionCode.toString()
+            store(versionPropertiesFile, versionProperties)
         }
         debug {
             setVersionNameSuffix(".${currentCodeVersion} DEBUG [${date}]")
