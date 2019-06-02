@@ -14,11 +14,18 @@ public class EPGChannel implements Serializable {
     private EPGChannel previousChannel;
     private EPGChannel nextChannel;
 
-    public EPGChannel(String imageURL, String name, int channelID, String id) {
+    public String getVideoId() {
+        return videoId;
+    }
+
+    private String videoId;
+
+    public EPGChannel(String imageURL, String name, int channelID, String id, String videoId) {
         this.imageURL = imageURL;
         this.name = name;
         this.channelID = channelID;
         this.id = id;
+        this.videoId = videoId;
     }
 
     public String getId() {

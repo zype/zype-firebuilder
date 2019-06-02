@@ -37,7 +37,6 @@ public class HeroSliderFragment extends RowsFragment {
   private Handler mHandler = new Handler(Looper.getMainLooper());
   private HeroCardAdapter listRowAdapter = null;
   private CompositeSubscription mCompositeSubscription = new CompositeSubscription();
-  private boolean selected;
 
 
   @Override
@@ -90,7 +89,7 @@ public class HeroSliderFragment extends RowsFragment {
     cardPresenter = new HeroCardPresenter();
 
     List<ZobjectTopPlaylist> sliderList = HeroSlider.getInstance().getSliders();
-
+    cardPresenter.setSingleImage(sliderList.size() == 1);
     listRowAdapter = new HeroCardAdapter(cardPresenter);
 
     List<Slider> sliders = new ArrayList<>();
@@ -120,12 +119,8 @@ public class HeroSliderFragment extends RowsFragment {
 
     setOnItemViewClickedListener((itemViewHolder, item, rowViewHolder, row) -> {
 
-      if (selected) {
-        return;
-      }
       if (item != null && item instanceof Slider) {
         ContentBrowser contentBrowser = ContentBrowser.getInstance(getActivity());
-        selected = true;
         Slider slider = (Slider) item;
 
         if (TextUtils.isEmpty(slider.getVideoId())) {
@@ -141,16 +136,20 @@ public class HeroSliderFragment extends RowsFragment {
                 contentBrowser
                     .setLastSelectedContent(content)
                     .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
-                selected = false;
               } else {
                 if (Integer.valueOf(contentContainer.getExtraStringValue(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT)) > 0) {
                   // Playlist has  videos, but they is not loaded yet.
                   // Load videos and then open video detail screen of the first video in the playlist
-                  ContentLoader.ILoadContentForContentContainer listener = () -> ContentBrowser.getInstance(getActivity())
-                      .setLastSelectedContent(contentContainer.getContents().get(0))
-                      .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                  ContentLoader.ILoadContentForContentContainer listener = () -> {
+                    Content content = contentContainer.getContents().get(0);
+                    ContentBrowser.getInstance(getActivity())
+                        .setLastSelectedContent(content)
+                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
+                  };
                   ContentLoader.getInstance(getActivity()).loadContentForContentContainer(contentContainer, getActivity(), listener);
-                  selected = false;
+                } else {
+                  contentBrowser.setLastSelectedContentContainer(contentContainer);
+                  contentBrowser.switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
                 }
               }
             }
@@ -165,10 +164,8 @@ public class HeroSliderFragment extends RowsFragment {
                 contentBrowser
                     .setLastSelectedContent(content)
                     .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
-                selected = false;
 
               }, throwable -> {
-                selected = false;
               }));
 
         }

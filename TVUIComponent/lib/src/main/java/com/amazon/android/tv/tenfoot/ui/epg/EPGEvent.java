@@ -16,12 +16,33 @@ public class EPGEvent implements Serializable {
     private String desc;
     private EPGEvent previousEvent;
     private EPGEvent nextEvent;
-    public EPGEvent(EPGChannel epgChannel, long start, long end, String title, String programUrl) {
+    private String startDateTime;
+    private String endDateTime;
+
+    public EPGEvent(EPGChannel epgChannel, long start, long end, String title, String programUrl, String startDateTime, String endDateTime) {
         this.channel = epgChannel;
         this.start = start;
         this.end = end;
         this.title = title;
         this.programUrl = programUrl;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+    }
+
+    public String getStartDateTime() {
+        return startDateTime;
+    }
+
+    public void setStartDateTime(String startDateTime) {
+        this.startDateTime = startDateTime;
+    }
+
+    public String getEndDateTime() {
+        return endDateTime;
+    }
+
+    public void setEndDateTime(String endDateTime) {
+        this.endDateTime = endDateTime;
     }
 
     public String getDesc() {
