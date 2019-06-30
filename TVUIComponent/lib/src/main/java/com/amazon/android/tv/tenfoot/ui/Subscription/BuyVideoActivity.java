@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -32,7 +31,6 @@ import com.zype.fire.auth.ZypeAuthentication;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -126,7 +124,10 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
             // Buy playlist
             mode = MODE_PLAYLIST;
             try {
-                skuSet = ContentBrowser.getInstance(this).getPurchaseHelper().getBuyPlaylistSKU();
+                Content content = ContentBrowser.getInstance(this).getLastSelectedContent();
+                ContentContainer playlist = contentBrowser.getRootContentContainer()
+                        .findContentContainerById(content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+                skuSet = ContentBrowser.getInstance(this).getPurchaseHelper().getPlaylistSKU(playlist);
                 ContentBrowser.getInstance(this).getPurchaseHelper().handleProductsChain(this, skuSet);
             }
             catch (Exception e) {

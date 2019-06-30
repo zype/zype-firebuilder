@@ -7,6 +7,7 @@
   "query": "$.categories[?(@.parent_id in [$$par0$$])]",
   "matchList": [
     "images@Images",
+    "marketplace_ids/amazon_fire_tv@MarketplaceId",
     "title@mName",
     "parent_id@parentId",
     "thumbnail_layout@ThumbnailLayout",

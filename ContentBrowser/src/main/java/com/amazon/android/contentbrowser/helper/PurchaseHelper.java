@@ -17,6 +17,7 @@ package com.amazon.android.contentbrowser.helper;
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.R;
 import com.amazon.android.model.content.Content;
+import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.model.content.constants.ExtraKeys;
 import com.amazon.android.model.event.ProgressOverlayDismissEvent;
 import com.amazon.android.model.event.ProductsUpdateEvent;
@@ -34,10 +35,12 @@ import com.amazon.purchase.model.Product;
 import com.amazon.purchase.model.Response;
 
 import org.greenrobot.eventbus.EventBus;
+import org.w3c.dom.Text;
 
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.IOException;
@@ -614,22 +617,32 @@ public class PurchaseHelper {
     }
 
     /**
-     * Search in configuration file the SKU that is used for 'Buy Playlist' action.
-     * Returns first found SKU which `id` is equal to `BuyPlaylist`
+     * If 'playlist' parameter is not empty, returns marketplace id extra attribute
+     * of specified playlist
+     *
+     * Otherwise, search in configuration file the SKU that is used for 'Buy Playlist' action.
+     * Returns first found SKU with `BuyPlaylist` id
      */
-    public Set<String> getBuyPlaylistSKU() throws IOException {
+    public Set<String> getPlaylistSKU(ContentContainer playlist) throws IOException {
         Set<String> result = new HashSet<>();
+        String sku = null;
 
-        Recipe recipe = Recipe.newInstance(FileHelper.readFile(mContext, mContext.getString(R.string.skus_file)));
-        List<Map<String, String>> skuList = (List<Map<String, String>>) recipe.getMap().get(SKUS_LIST);
-        for (Map<String, String> item : skuList) {
-            if (item.containsKey("id") && item.get("id").equals("BuyPlaylist")) {
-                String sku = item.get("sku");
-                result.add(sku);
-                mBuyVideoSKU = sku;
-                break;
+        if (playlist != null) {
+            sku = playlist.getExtraStringValue(ContentContainer.EXTRA_MARKETPLACE_ID);
+        }
+        if (TextUtils.isEmpty(sku)) {
+            Recipe recipe = Recipe.newInstance(FileHelper.readFile(mContext, mContext.getString(R.string.skus_file)));
+            List<Map<String, String>> skuList = (List<Map<String, String>>) recipe.getMap().get(SKUS_LIST);
+            for (Map<String, String> item : skuList) {
+                if (item.containsKey("id") && item.get("id").equals("BuyPlaylist")) {
+                    sku = item.get("sku");
+                    break;
+                }
             }
         }
+        Log.i(TAG, "getPlaylistSKU(): sku=" + sku);
+        result.add(sku);
+        mBuyVideoSKU = sku;
 
         return result;
     }

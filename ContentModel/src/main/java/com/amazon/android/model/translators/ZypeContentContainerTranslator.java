@@ -80,6 +80,9 @@ public class ZypeContentContainerTranslator extends AModelTranslator<ContentCont
             else if (field.equals(ContentContainer.FIELD_IMAGES)) {
                 model.setExtraValue(ContentContainer.EXTRA_IMAGE_POSTER_URL, findImagePosterUrl(value));
             }
+            else if (field.equals(ContentContainer.FIELD_MARKETPLACE_IDS)) {
+                model.setExtraValue(ContentContainer.EXTRA_MARKETPLACE_ID, getAmazonMarketplaceId(value));
+            }
             else if (field.equals(ContentContainer.FIELD_THUMBNAILES)) {
                 model.setExtraValue(Content.CARD_IMAGE_URL_FIELD_NAME, findThumbnailUrl(Content.CARD_IMAGE_URL_FIELD_NAME, value));
                 model.setExtraValue(Content.BACKGROUND_IMAGE_URL_FIELD_NAME, findThumbnailUrl(Content.BACKGROUND_IMAGE_URL_FIELD_NAME, value));
@@ -182,4 +185,18 @@ public class ZypeContentContainerTranslator extends AModelTranslator<ContentCont
         }
         return result;
     }
+
+    private String getAmazonMarketplaceId(Object value) {
+        String result = "null";
+        try {
+            JSONObject jsonValue = new JSONObject(value.toString());
+            if (jsonValue.has("amazon_fire_tv")) {
+                result = jsonValue.getString("amazon_fire_tv");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
 }

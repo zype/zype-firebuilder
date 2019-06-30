@@ -72,6 +72,8 @@ public class ContentContainer implements Iterable<Content> {
      */
     // Images
     public static final String FIELD_IMAGES = "Images";
+    // Images
+    public static final String FIELD_MARKETPLACE_IDS = "MarketplaceIds";
     // Thumbnails
     public static final String FIELD_THUMBNAILES = "Thumbnails";
 
@@ -81,6 +83,8 @@ public class ContentContainer implements Iterable<Content> {
     // TODO: Move extra field names to the ExtraKeys helper class
     // Poster image url
     public static final String EXTRA_IMAGE_POSTER_URL = "ImagePosterUrl";
+    // Poster image url
+    public static final String EXTRA_MARKETPLACE_ID = "MarketplaceId";
     // Playlist item count
     public static final String EXTRA_PLAYLIST_ITEM_COUNT = "playlistItemCount";
     // Purchase price
