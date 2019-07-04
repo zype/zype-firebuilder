@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -27,6 +28,8 @@ import com.amazon.android.ui.fragments.ErrorDialogFragment;
 import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.NetworkUtils;
 import com.amazon.android.utils.Preferences;
+import com.zype.fire.api.ZypeApi;
+import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.auth.ZypeAuthentication;
 
 import org.greenrobot.eventbus.EventBus;
@@ -37,6 +40,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by Evgeny Cherkasov on 24.09.2018.
@@ -218,6 +226,7 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
     }
 
     private void closeScreen() {
+        EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
         contentBrowser.onAuthenticationStatusUpdateEvent(new AuthHelper.AuthenticationStatusUpdateEvent(true));
         EventBus.getDefault().post(new AuthHelper.AuthenticationStatusUpdateEvent(true));
 
@@ -242,6 +251,7 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
                                     if (resultBundle != null) {
                                         if (resultBundle.getBoolean(AuthHelper.RESULT)) {
                                             updateViews();
+                                            checkVideoEntitlement();
                                         }
                                         else {
                                             contentBrowser.getNavigator().runOnUpcomingActivity(() -> contentBrowser.getAuthHelper()
@@ -295,6 +305,44 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
     public void doButtonClick(ErrorDialogFragment errorDialogFragment, ErrorUtils.ERROR_BUTTON_TYPE errorButtonType, ErrorUtils.ERROR_CATEGORY errorCategory) {
         if (dialogError  != null) {
             dialogError .dismiss();
+        }
+    }
+
+    private void checkVideoEntitlement() {
+        if (ZypeConfiguration.isUniversalTVODEnabled(this)) {
+            Content content = contentBrowser.getLastSelectedContent();
+            ContentContainer playlist = ContentBrowser.getInstance(this)
+                    .getRootContentContainer()
+                    .findContentContainerById(content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+            if (content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED)
+                    || (playlist != null && playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED))) {
+                String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
+                HashMap<String, String> params = new HashMap<>();
+                params.put(ZypeApi.ACCESS_TOKEN, accessToken);
+                ZypeApi.getInstance().getApi().checkVideoEntitlement(content.getId(), params).enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        Log.i(TAG, "checkVideoEntitlement(): code=" + response.code());
+                        if (response.isSuccessful()) {
+                            content.setExtraValue(Content.EXTRA_ENTITLED, true);
+                            closeScreen();
+                            contentBrowser.actionTriggered(BuyVideoActivity.this,
+                                    contentBrowser.getLastSelectedContent(),
+                                    ContentBrowser.CONTENT_ACTION_WATCH_NOW,
+                                    null,
+                                    null);
+                        }
+                        else {
+                            content.setExtraValue(Content.EXTRA_ENTITLED, false);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Log.e(TAG, "checkVideoEntitlement(): failed");
+                    }
+                });
+            }
         }
     }
 
@@ -398,9 +446,16 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
         contentBrowser.getPurchaseHelper().setPurchaseExtras(null);
 //        contentBrowser.getPurchaseHelper().setVideoId(null);
         if (event.getExtras().getBoolean(PurchaseHelper.RESULT)) {
-            if (event.getExtras().getBoolean(PurchaseHelper.RESULT_VALIDITY)) {
+            boolean validity = event.getExtras().getBoolean(PurchaseHelper.RESULT_VALIDITY);
+            Log.i(TAG, "onPurchaseEvent(): " + validity);
+            if (validity) {
                 isVideoPurchased = true;
                 closeScreen();
+                contentBrowser.actionTriggered(this,
+                        contentBrowser.getLastSelectedContent(),
+                        ContentBrowser.CONTENT_ACTION_WATCH_NOW,
+                        null,
+                        null);
             }
             else {
                 isVideoPurchased = false;

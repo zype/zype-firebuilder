@@ -83,7 +83,7 @@ public class ZypeReceiptVerificationService extends AReceiptVerifier {
             body.amount = "";
             body.appId = ZypeConfiguration.getAppId(context);
             body.consumerId = Preferences.getString("ZypeConsumerId");
-            body.playlistId = receipt.getExtras().getString("PlaylistId");;
+            body.playlistId = receipt.getExtras().getString("PlaylistId");
             body.siteId = ZypeConfiguration.getSiteId(context);
             body.transactionType = "purchase";
             body.videoId = receipt.getExtras().getString("VideoId");;
@@ -102,10 +102,10 @@ public class ZypeReceiptVerificationService extends AReceiptVerifier {
                 }
                 else {
                     Log.i(TAG, "validateReceipt(): Receipt is not valid");
-//                    Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
-//                    listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
-                    Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
-                    listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
+                    Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
+                    listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
+//                    Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
+//                    listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
                     return requestId;
                 }
             } catch (IOException e) {

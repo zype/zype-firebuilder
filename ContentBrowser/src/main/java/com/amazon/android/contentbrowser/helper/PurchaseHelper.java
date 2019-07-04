@@ -478,11 +478,13 @@ public class PurchaseHelper {
      */
     public void handleAction(Activity activity, Content content, int actionId) {
 
-        triggerProgress(activity);
+//        triggerProgress(activity);
         if (actionId == ContentBrowser.CONTENT_ACTION_DAILY_PASS) {
+            triggerProgress(activity);
             handlePurchaseChain(activity, mDailyPassSKU);
         }
         else if (actionId == ContentBrowser.CONTENT_ACTION_SUBSCRIPTION) {
+            triggerProgress(activity);
             handlePurchaseChain(activity, mSubscriptionSKU);
         }
         /* Zype, Evgeny Cherkasov */
