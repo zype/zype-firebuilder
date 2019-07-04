@@ -58,8 +58,7 @@ android {
     buildToolsVersion "25.0.0"
 
     defaultConfig {
-//        applicationId "com.zype.aftv.demo"
-        applicationId "intergalactic.sports.network.aftv"
+        applicationId "com.zype.aftv.demo"
         minSdkVersion 21
         targetSdkVersion 23
         versionCode currentCodeVersion
