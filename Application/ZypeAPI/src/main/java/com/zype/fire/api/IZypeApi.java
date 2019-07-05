@@ -6,6 +6,8 @@ import com.zype.fire.api.Model.AppResponse;
 import com.zype.fire.api.Model.BifrostResponse;
 import com.zype.fire.api.Model.ConsumerResponse;
 import com.zype.fire.api.Model.DevicePinResponse;
+import com.zype.fire.api.Model.ChannelResponse;
+import com.zype.fire.api.Model.ProgramResponse;
 import com.zype.fire.api.Model.MarketplaceConnectBody;
 import com.zype.fire.api.Model.MarketplaceConnectResponse;
 import com.zype.fire.api.Model.PlayerResponse;
@@ -134,4 +136,12 @@ public interface IZypeApi {
     // ZObjects
     @GET("/zobjects/?zobject_type=top_playlists")
     Call<ZobjectTopPlaylistResponse> getZobjectsForTopPlaylist(@QueryMap HashMap<String, String> params);
+
+    // EPG Channels
+    @GET("/program_guides")
+    Call<ChannelResponse> epgChannels(@QueryMap HashMap<String, String> params);
+
+    // EPG events
+    @GET("/program_guides/{id}/entries")
+    Call<ProgramResponse> epgEvents(@Path("id") String id, @QueryMap HashMap<String, String> params);
 }

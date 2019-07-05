@@ -86,6 +86,7 @@ permissions and limitations under the License.
     <string name="action_registration_complete_btn">Dismiss</string>
     <string name="action_play_trailer_1">Watch</string>
     <string name="action_play_trailer_2">Trailer</string>
-
-
+    <string name="epg_label">GUIDE</string>
+    <string name="alert">Alert</string>
+    <string name="alert_msg">We\'re sorry, that program is not yet available.</string>
 </resources>

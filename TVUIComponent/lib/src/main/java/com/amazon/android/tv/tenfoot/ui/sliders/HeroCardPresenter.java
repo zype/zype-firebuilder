@@ -28,7 +28,14 @@ public class HeroCardPresenter extends Presenter {
   private int mSelectedBackgroundColor = -1;
   private int mDefaultBackgroundColor = -1;
   private static final int CARD_WIDTH_PX = 180;
+  private static final int SINGLE_CARD_WIDTH_PX = 110;
   private static final int CARD_HEIGHT_PX = 230;
+
+    public void setSingleImage(boolean singleImage) {
+        this.singleImage = singleImage;
+    }
+
+    private boolean singleImage=false;
 
 
   @Override
@@ -77,7 +84,7 @@ public class HeroCardPresenter extends Presenter {
     ((ViewHolder) viewHolder).setSlider(slider);
     ((ViewHolder) viewHolder).setIndex(slider.getPosition());
 
-    mCardWidthDp = getSize().x - Helpers.convertPixelToDp(mContext, CARD_WIDTH_PX);
+    mCardWidthDp = getSize().x - Helpers.convertPixelToDp(mContext, singleImage ? SINGLE_CARD_WIDTH_PX : CARD_WIDTH_PX);
 
     mCardHeightDp = Helpers.convertPixelToDp(mContext, CARD_HEIGHT_PX);
 

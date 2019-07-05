@@ -10,15 +10,15 @@
   },
   "branding": {
     "globalTheme": "AppTheme",
-    "lightFont" : "Roboto Light",
-    "boldFont" : "Roboto Bold",
-    "regularFont" : "Roboto Regular"
+    "lightFont": "Roboto Light",
+    "boldFont": "Roboto Bold",
+    "regularFont": "Roboto Regular"
   },
   "globalRecipes": [
     {
       "categories": {
-        "dataLoader" : "recipes/ZypeDataLoaderRecipe.json",
-        "dynamicParser" : "recipes/ZypeCategoriesRecipe.json"
+        "dataLoader": "recipes/ZypeDataLoaderRecipe.json",
+        "dynamicParser": "recipes/ZypeCategoriesRecipe.json"
       },
       "contents": {
         "dataLoader": "recipes/ZypeDataLoaderRecipe.json",
@@ -76,6 +76,11 @@
       "verifyScreenAccess": true,
       "verifyNetworkConnection": true,
       "onAction": "PLAY_TRAILER_SCREEN"
+    },
+    "com.amazon.android.tv.tenfoot.ui.epg.EpgActivity": {
+      "verifyScreenAccess": false,
+      "verifyNetworkConnection": true,
+      "onAction": "EPG_SCREEN"
     }
   }
 }

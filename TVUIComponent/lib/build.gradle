@@ -28,6 +28,7 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
+
     }
     buildTypes {
         release {
@@ -70,7 +71,7 @@ dependencies {
         exclude module: 'xpp3'
     }
 
-
+    compile 'joda-time:joda-time:2.7'
     androidTestCompile 'com.jayway.android.robotium:robotium-solo:5.3.1'
 
     androidTestCompile 'junit:junit:4.12'

@@ -73,9 +73,9 @@ Non-Amazon Android devices and Amazon Fire phones and tablets are not supported 
 
 ## Creating Custom App Based on the Template<a name="template"></a>
 
-1. Select `templateDebug` (or `templateRelease`) build variant for `app` and `ZypeAPI` modules
+1. Select `templateDebug` (or `templateRelease`) build variant for `app`, `PurchaseInterface`  and `ZypeAPI` modules
 
-2. Set `templateRelease` value to `defaultPublishConfig` parameters in `PurchaseInterface/build.gradle` and `Application/ZypeAPI/build.gradle` files.
+2. In `PurchaseInterface/build.gradle` and `Application/ZypeAPI/build.gradle` files set `defaultPublishConfig` parameter to `templateRelease` value.
 
 3. Replace following placeholders with actual values:
 
@@ -94,6 +94,8 @@ Also replace features and monetization options placeholders with `true` or `fals
 - ```<APP_NAME_SHORT>```
 
 **Application/app/src/template/res/values-en/strings.xml**
+**Application/app/src/template/res/values-de/strings.xml**
+**Application/app/src/template/res/values-ja/strings.xml**
 - ```<APP_NAME>```
 
 **Application/app/src/template/res/values/custom.xml**

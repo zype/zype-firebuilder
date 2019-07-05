@@ -4,8 +4,12 @@ import com.google.gson.Gson;
 import com.zype.fire.api.Model.AccessTokenInfoResponse;
 import com.zype.fire.api.Model.AccessTokenResponse;
 import com.zype.fire.api.Model.AppResponse;
+import com.zype.fire.api.Model.Channel;
 import com.zype.fire.api.Model.ConsumerResponse;
 import com.zype.fire.api.Model.DevicePinResponse;
+import com.zype.fire.api.Model.ChannelResponse;
+import com.zype.fire.api.Model.Program;
+import com.zype.fire.api.Model.ProgramResponse;
 import com.zype.fire.api.Model.PlaylistsResponse;
 import com.zype.fire.api.Model.VideoEntitlementsResponse;
 import com.zype.fire.api.Model.VideoFavoritesResponse;
@@ -15,7 +19,9 @@ import com.zype.fire.api.Model.ZobjectContentResponse;
 import com.zype.fire.api.Model.ZobjectTopPlaylistResponse;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import okhttp3.OkHttpClient;
@@ -423,4 +429,50 @@ public class ZypeApi {
             return null;
         }
     }
+
+    public List<Channel> loadEpgChannels() {
+        try {
+            HashMap<String, String> params = new HashMap<>();
+            params.put(APP_KEY, ZypeSettings.APP_KEY);
+            params.put(PAGE, String.valueOf(1));
+            params.put(PER_PAGE, "100");
+            Response response = apiImpl.epgChannels(params).execute();
+            if (response.isSuccessful()) {
+                return ((ChannelResponse) response.body()).response;
+            }
+            else {
+              return null;
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+  public ProgramResponse loadEpgEvents(Channel channel, String startDate, String endDate) {
+    try {
+
+      HashMap<String, String> params = new HashMap<>();
+      params.put(APP_KEY, ZypeSettings.APP_KEY);
+      params.put(PER_PAGE, "500");
+      params.put("sort", "start_time");
+      params.put("order", "asc");
+      params.put("start_time.gte", startDate);
+      params.put("end_time.lte", endDate);
+
+      Response response = apiImpl.epgEvents(channel.id, params).execute();
+
+      if (response.isSuccessful()) {
+        return ((ProgramResponse) response.body());
+      }
+      else {
+        return null;
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
 }
