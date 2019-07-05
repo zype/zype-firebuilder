@@ -60,10 +60,18 @@ public class ZypeContentContainerTranslator extends AModelTranslator<ContentCont
     @Override
     public boolean setMemberVariable(ContentContainer model, String field, Object value) {
 
-        if (model == null || field == null || field.isEmpty() || value == null) {
+        /* Zype, begin */
+        if (model == null || field == null || field.isEmpty()) {
             Log.e(TAG, "Input parameters should not be null and field cannot be empty.");
             return false;
         }
+        // This allows for some content to have extra values that others might not have.
+        if (value == null) {
+            Log.w(TAG, "Value for " + field + " was null so not set for Content Container, this may be " +
+                    "intentional.");
+            return true;
+        }
+        /* Zype end*/
 
         try {
             if (field.equals(ContentContainer.NAME_FIELD_NAME)) {
@@ -71,6 +79,9 @@ public class ZypeContentContainerTranslator extends AModelTranslator<ContentCont
             }
             else if (field.equals(ContentContainer.FIELD_IMAGES)) {
                 model.setExtraValue(ContentContainer.EXTRA_IMAGE_POSTER_URL, findImagePosterUrl(value));
+            }
+            else if (field.equals(ContentContainer.FIELD_MARKETPLACE_IDS)) {
+                model.setExtraValue(ContentContainer.EXTRA_MARKETPLACE_ID, getAmazonMarketplaceId(value));
             }
             else if (field.equals(ContentContainer.FIELD_THUMBNAILES)) {
                 model.setExtraValue(Content.CARD_IMAGE_URL_FIELD_NAME, findThumbnailUrl(Content.CARD_IMAGE_URL_FIELD_NAME, value));
@@ -174,4 +185,18 @@ public class ZypeContentContainerTranslator extends AModelTranslator<ContentCont
         }
         return result;
     }
+
+    private String getAmazonMarketplaceId(Object value) {
+        String result = "null";
+        try {
+            JSONObject jsonValue = new JSONObject(value.toString());
+            if (jsonValue.has("amazon_fire_tv")) {
+                result = jsonValue.getString("amazon_fire_tv");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
 }

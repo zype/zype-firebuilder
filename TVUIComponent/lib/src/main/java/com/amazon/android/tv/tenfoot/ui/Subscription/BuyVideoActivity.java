@@ -17,6 +17,8 @@ import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.helper.AuthHelper;
 import com.amazon.android.contentbrowser.helper.PurchaseHelper;
 import com.amazon.android.model.content.Content;
+import com.amazon.android.model.content.ContentContainer;
+import com.amazon.android.model.content.constants.ExtraKeys;
 import com.amazon.android.model.event.ProductsUpdateEvent;
 import com.amazon.android.model.event.ProgressOverlayDismissEvent;
 import com.amazon.android.model.event.PurchaseEvent;
@@ -26,17 +28,23 @@ import com.amazon.android.ui.fragments.ErrorDialogFragment;
 import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.NetworkUtils;
 import com.amazon.android.utils.Preferences;
+import com.zype.fire.api.ZypeApi;
+import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.auth.ZypeAuthentication;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by Evgeny Cherkasov on 24.09.2018.
@@ -62,6 +70,12 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
     private String sku = null;
     private String price = null;
     private boolean isVideoPurchased = false;
+
+    //
+    private int mode;
+
+    private static final int MODE_VIDEO = 1;
+    private static final int MODE_PLAYLIST = 2;
 
     private ContentBrowser contentBrowser;
     private ErrorDialogFragment dialogError = null;
@@ -113,14 +127,32 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
             }
         });
 
+        Set<String> skuSet;
+        if (getIntent().getExtras() != null && getIntent().getExtras().containsKey(ExtraKeys.PLAYLIST_ID)) {
+            // Buy playlist
+            mode = MODE_PLAYLIST;
+            try {
+                Content content = ContentBrowser.getInstance(this).getLastSelectedContent();
+                ContentContainer playlist = contentBrowser.getRootContentContainer()
+                        .findContentContainerById(content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+                skuSet = ContentBrowser.getInstance(this).getPurchaseHelper().getPlaylistSKU(playlist);
+                ContentBrowser.getInstance(this).getPurchaseHelper().handleProductsChain(this, skuSet);
+            }
+            catch (Exception e) {
+                // TODO: Handle error
+            }
+        }
+        else {
+            // Buy video
+            mode = MODE_VIDEO;
+            sku = "com.zumba.zumbaathome.singleVideo";
+            skuSet = new HashSet<>();
+            skuSet.add(sku);
+            ContentBrowser.getInstance(this).getPurchaseHelper().handleProductsChain(this, skuSet);
+        }
+
         updateViews();
         bindViews();
-
-        // TODO: Get sku from the 'Marketplace ids' field of the video object
-        sku = "com.zumba.zumbaathome.singleVideo";
-        Set<String> skuSet = new HashSet<>();
-        skuSet.add(sku);
-        ContentBrowser.getInstance(this).getPurchaseHelper().handleProductsChain(this, skuSet);
     }
 
     @Override
@@ -141,7 +173,14 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
     //
     private void bindViews() {
         Content content = ContentBrowser.getInstance(this).getLastSelectedContent();
-        textVideo.setText(content.getTitle());
+        if (mode == MODE_VIDEO) {
+            textVideo.setText(content.getTitle());
+        }
+        else if (mode == MODE_PLAYLIST ){
+            ContentContainer playlist = contentBrowser.getRootContentContainer()
+                    .findContentContainerById(content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+            textVideo.setText(playlist.getName());
+        }
     }
 
     private void updateViews() {
@@ -152,10 +191,27 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
         else {
             buttonConfirm.setVisibility(View.VISIBLE);
             buttonRestore.setVisibility(View.GONE);
-            if (!TextUtils.isEmpty(price)) {
-                buttonConfirm.setText(String.format(getString(R.string.buy_video_button_confirm_price), price));
-            } else {
-                buttonConfirm.setText(getString(R.string.buy_video_button_confirm));
+            if (mode == MODE_VIDEO) {
+                if (!TextUtils.isEmpty(price)) {
+                    buttonConfirm.setText(String.format(getString(R.string.buy_video_button_confirm_price), price));
+                }
+                else {
+                    buttonConfirm.setText(getString(R.string.buy_video_button_confirm));
+                }
+            }
+            else if (mode == MODE_PLAYLIST) {
+                Content content = ContentBrowser.getInstance(this).getLastSelectedContent();
+                ContentContainer playlist = contentBrowser.getRootContentContainer()
+                        .findContentContainerById(content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+                if (!TextUtils.isEmpty(price)) {
+                    buttonConfirm.setText(String.format(getString(R.string.buy_playlist_button_confirm_price),
+                            String.valueOf(playlist.getExtraValueAsInt(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT)),
+                            price));
+                }
+                else {
+                    buttonConfirm.setText(String.format(getString(R.string.buy_playlist_button_confirm),
+                            String.valueOf(playlist.getExtraValueAsInt(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT))));
+                }
             }
         }
         if (contentBrowser.isUserLoggedIn()) {
@@ -170,6 +226,7 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
     }
 
     private void closeScreen() {
+        EventBus.getDefault().post(new ProgressOverlayDismissEvent(true));
         contentBrowser.onAuthenticationStatusUpdateEvent(new AuthHelper.AuthenticationStatusUpdateEvent(true));
         EventBus.getDefault().post(new AuthHelper.AuthenticationStatusUpdateEvent(true));
 
@@ -194,6 +251,7 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
                                     if (resultBundle != null) {
                                         if (resultBundle.getBoolean(AuthHelper.RESULT)) {
                                             updateViews();
+                                            checkVideoEntitlement();
                                         }
                                         else {
                                             contentBrowser.getNavigator().runOnUpcomingActivity(() -> contentBrowser.getAuthHelper()
@@ -250,9 +308,58 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
         }
     }
 
+    private void checkVideoEntitlement() {
+        if (ZypeConfiguration.isUniversalTVODEnabled(this)) {
+            Content content = contentBrowser.getLastSelectedContent();
+            ContentContainer playlist = ContentBrowser.getInstance(this)
+                    .getRootContentContainer()
+                    .findContentContainerById(content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+            if (content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED)
+                    || (playlist != null && playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED))) {
+                String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
+                HashMap<String, String> params = new HashMap<>();
+                params.put(ZypeApi.ACCESS_TOKEN, accessToken);
+                ZypeApi.getInstance().getApi().checkVideoEntitlement(content.getId(), params).enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        Log.i(TAG, "checkVideoEntitlement(): code=" + response.code());
+                        if (response.isSuccessful()) {
+                            content.setExtraValue(Content.EXTRA_ENTITLED, true);
+                            closeScreen();
+                            contentBrowser.actionTriggered(BuyVideoActivity.this,
+                                    contentBrowser.getLastSelectedContent(),
+                                    ContentBrowser.CONTENT_ACTION_WATCH_NOW,
+                                    null,
+                                    null);
+                        }
+                        else {
+                            content.setExtraValue(Content.EXTRA_ENTITLED, false);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Log.e(TAG, "checkVideoEntitlement(): failed");
+                    }
+                });
+            }
+        }
+    }
+
     private void buyVideo() {
 //        contentBrowser.getPurchaseHelper().setBuyVideoSKU(sku);
-        contentBrowser.getPurchaseHelper().setVideoId(contentBrowser.getLastSelectedContent().getId());
+        if (mode == MODE_VIDEO) {
+            Bundle extras = new Bundle();
+            extras.putString("VideoId", contentBrowser.getLastSelectedContent().getId());
+            contentBrowser.getPurchaseHelper().setPurchaseExtras(extras);
+//            contentBrowser.getPurchaseHelper().setVideoId(contentBrowser.getLastSelectedContent().getId());
+        }
+        else if (mode == MODE_PLAYLIST) {
+            Bundle extras = new Bundle();
+            extras.putString("PlaylistId", contentBrowser.getLastSelectedContent()
+                    .getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+            contentBrowser.getPurchaseHelper().setPurchaseExtras(extras);
+        }
         if (contentBrowser.isUserLoggedIn()) {
             contentBrowser.actionTriggered(this, contentBrowser.getLastSelectedContent(),
                     ContentBrowser.CONTENT_ACTION_BUY, null, null);
@@ -306,12 +413,18 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
     public void onProductsUpdateEvent(ProductsUpdateEvent event) {
         ArrayList<HashMap<String, String>> products = (ArrayList<HashMap<String, String>>) event.getExtras().getSerializable(PurchaseHelper.RESULT_PRODUCTS);
         if (products != null && !products.isEmpty()) {
-            for (HashMap<String, String> product : products) {
-                if (product.get("SKU").equals(sku)) {
-                    price = products.get(0).get("Price");
-                    // TODO: Check if the product already purchased and update action button - Buy ot Restore
-                    break;
+            if (mode == MODE_VIDEO) {
+                for (HashMap<String, String> product : products) {
+                    if (product.get("SKU").equals(sku)) {
+                        price = products.get(0).get("Price");
+                        // TODO: Check if the product already purchased and update action button - Buy ot Restore
+                        break;
+                    }
                 }
+            }
+            else if (mode == MODE_PLAYLIST) {
+                sku = products.get(0).get("SKU");
+                price = products.get(0).get("Price");
             }
             updateViews();
         }
@@ -330,11 +443,19 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
      */
     @Subscribe
     public void onPurchaseEvent(PurchaseEvent event) {
-        contentBrowser.getPurchaseHelper().setVideoId(null);
+        contentBrowser.getPurchaseHelper().setPurchaseExtras(null);
+//        contentBrowser.getPurchaseHelper().setVideoId(null);
         if (event.getExtras().getBoolean(PurchaseHelper.RESULT)) {
-            if (event.getExtras().getBoolean(PurchaseHelper.RESULT_VALIDITY)) {
+            boolean validity = event.getExtras().getBoolean(PurchaseHelper.RESULT_VALIDITY);
+            Log.i(TAG, "onPurchaseEvent(): " + validity);
+            if (validity) {
                 isVideoPurchased = true;
                 closeScreen();
+                contentBrowser.actionTriggered(this,
+                        contentBrowser.getLastSelectedContent(),
+                        ContentBrowser.CONTENT_ACTION_WATCH_NOW,
+                        null,
+                        null);
             }
             else {
                 isVideoPurchased = false;

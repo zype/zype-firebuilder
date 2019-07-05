@@ -77,6 +77,8 @@ permissions and limitations under the License.
         Zype, Evgeny Cherkasov
     -->
     <!-- Buy video -->
+    <string name="buy_playlist_button_confirm">Buy all %1$s videos</string>
+    <string name="buy_playlist_button_confirm_price">Buy all %1$s videos - %2$s</string>
     <string name="buy_video_button_confirm">Buy Video</string>
     <string name="buy_video_button_confirm_price">Buy Video - %1$s</string>
     <string name="buy_video_button_cancel">Cancel</string>

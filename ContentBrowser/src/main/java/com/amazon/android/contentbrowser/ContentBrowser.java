@@ -294,18 +294,19 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final int CONTENT_ACTION_MAX = 100;
 
     /* Zype, Evgeny Cherkasov */
-    // Choose plan action
+    // In=-app purchase actions
     public static final int CONTENT_ACTION_CHOOSE_PLAN = 51;
     public static final int CONTENT_ACTION_CONFIRM_PURCHASE = 52;
+    public static final int CONTENT_ACTION_CONFIRM_PURCHASE_PLAYLIST = 53;
     // Favorites actions
-    public static final int CONTENT_ACTION_FAVORITES_ADD = 53;
-    public static final int CONTENT_ACTION_FAVORITES_REMOVE = 54;
+    public static final int CONTENT_ACTION_FAVORITES_ADD = 54;
+    public static final int CONTENT_ACTION_FAVORITES_REMOVE = 55;
     // Watch ad free action
-    public static final int CONTENT_ACTION_SWAF = 55;
+    public static final int CONTENT_ACTION_SWAF = 56;
 
-    public static final int CONTENT_REGISTRATION_REQUIRED = 56;
-
-    public static final int CONTENT_PLAY_TRAILER = 57;
+    public static final int CONTENT_REGISTRATION_REQUIRED = 57;
+    
+    public static final int CONTENT_PLAY_TRAILER = 58;
 
     /**
      * Search algorithm name.
@@ -1622,11 +1623,13 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         boolean showWatch = false;
         boolean showSubscribe = false;
         boolean showPurchase = false;
+        boolean showPurchasePlaylist = false;
         boolean showAdFree = false;
         boolean showFavorites = false;
 
         boolean subscriptionRequired = content.isSubscriptionRequired();
         boolean purchaseRequired = false;
+        boolean playlistPurchaseRequired = false;
         boolean entitled = false;
 
         if (ZypeConfiguration.isUniversalTVODEnabled(mAppContext)) {
@@ -1634,9 +1637,18 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             if (purchaseRequired && content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
                 entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
             }
+
+            ContentContainer playlist = getRootContentContainer()
+                    .findContentContainerById(content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+            if (playlist != null) {
+                playlistPurchaseRequired = playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED);
+                if (!entitled && playlistPurchaseRequired && content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
+                    entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
+                }
+            }
         }
 
-        if (isSubscriptionNotRequired && !purchaseRequired || mIAPDisabled) {
+        if (isSubscriptionNotRequired && !purchaseRequired && !playlistPurchaseRequired || mIAPDisabled) {
             showWatch = true;
         }
         else if (subscriptionRequired && purchaseRequired) {
@@ -1670,6 +1682,17 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 else {
                     if (ZypeConfiguration.isNativeTVODEnabled(mAppContext)) {
                         showPurchase = true;
+                    }
+                }
+            }
+            if (playlistPurchaseRequired) {
+                if (entitled) {
+                    showWatch = true;
+                }
+                else {
+                    if (ZypeConfiguration.isNativeTVODEnabled(mAppContext)) {
+                        showPurchasePlaylist = true;
+                        showWatch = false;
                     }
                 }
             }
@@ -1747,6 +1770,19 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         if (showPurchase) {
             contentActionList.add(createActionButton(CONTENT_ACTION_CONFIRM_PURCHASE,
                     R.string.action_buy_video_1, R.string.action_buy_video_2));
+        }
+        if (showPurchasePlaylist) {
+            ContentContainer playlist = getRootContentContainer()
+                    .findContentContainerById(content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+            if (playlist != null) {
+                String purchasePrice = playlist.getExtraStringValue(ContentContainer.EXTRA_PURCHASE_PRICE);
+                int itemCount = playlist.getExtraValueAsInt(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT);
+                Action action = createActionButton(CONTENT_ACTION_CONFIRM_PURCHASE_PLAYLIST,
+                        R.string.action_buy_playlist_1, R.string.action_buy_playlist_2);
+                action.setLabel1(String.format(mAppContext.getResources().getString(R.string.action_buy_playlist_1), String.valueOf(itemCount)));
+                action.setLabel2(String.format(mAppContext.getResources().getString(R.string.action_buy_playlist_2), purchasePrice));
+                contentActionList.add(action);
+            }
         }
         if (showAdFree) {
             contentActionList.add(createActionButton(CONTENT_ACTION_SWAF,
@@ -2472,6 +2508,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             case CONTENT_ACTION_BUY:
             case CONTENT_ACTION_CHOOSE_PLAN:
             case CONTENT_ACTION_CONFIRM_PURCHASE:
+            case CONTENT_ACTION_CONFIRM_PURCHASE_PLAYLIST:
                 mPurchaseHelper.handleAction(activity, content, actionId);
                 break;
             case CONTENT_ACTION_FAVORITES_ADD:

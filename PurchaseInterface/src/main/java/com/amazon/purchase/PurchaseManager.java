@@ -540,7 +540,7 @@ public class PurchaseManager {
                     }
                     else {
                         Log.d(TAG, "purchase valid " + response);
-                        // Purchase is not valid, register it into the system.
+                        // Purchase is valid, register it into the system.
                         registerReceiptSku(receipt);
                         result = true;
                     }

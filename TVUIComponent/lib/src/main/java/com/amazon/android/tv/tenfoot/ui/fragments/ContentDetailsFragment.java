@@ -627,14 +627,18 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
 
     private void checkVideoEntitlement() {
         if (ZypeConfiguration.isUniversalTVODEnabled(getActivity())) {
-            if (mSelectedContent.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED)) {
+            ContentContainer playlist = ContentBrowser.getInstance(getActivity())
+                    .getRootContentContainer()
+                    .findContentContainerById(mSelectedContent.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+            if (mSelectedContent.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED)
+                || (playlist != null && playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED))) {
                 String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
                 HashMap<String, String> params = new HashMap<>();
                 params.put(ZypeApi.ACCESS_TOKEN, accessToken);
                 ZypeApi.getInstance().getApi().checkVideoEntitlement(mSelectedContent.getId(), params).enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        Log.e(TAG, "checkVideoEntitlement(): code=" + response.code());
+                        Log.i(TAG, "checkVideoEntitlement(): code=" + response.code());
                         if (response.isSuccessful()) {
                             mSelectedContent.setExtraValue(Content.EXTRA_ENTITLED, true);
                         }

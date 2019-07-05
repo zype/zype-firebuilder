@@ -72,6 +72,8 @@ public class ContentContainer implements Iterable<Content> {
      */
     // Images
     public static final String FIELD_IMAGES = "Images";
+    // Images
+    public static final String FIELD_MARKETPLACE_IDS = "MarketplaceIds";
     // Thumbnails
     public static final String FIELD_THUMBNAILES = "Thumbnails";
 
@@ -81,8 +83,14 @@ public class ContentContainer implements Iterable<Content> {
     // TODO: Move extra field names to the ExtraKeys helper class
     // Poster image url
     public static final String EXTRA_IMAGE_POSTER_URL = "ImagePosterUrl";
+    // Poster image url
+    public static final String EXTRA_MARKETPLACE_ID = "MarketplaceId";
     // Playlist item count
     public static final String EXTRA_PLAYLIST_ITEM_COUNT = "playlistItemCount";
+    // Purchase price
+    public static final String EXTRA_PURCHASE_PRICE = "PurchasePrice";
+    // Purchase required flag
+    public static final String EXTRA_PURCHASE_REQUIRED = "PurchaseRequired";
     // Thumbnail layout
     public static final String EXTRA_THUMBNAIL_LAYOUT = "ThumbnailLayout";
     // Poster thumbnail url
@@ -301,6 +309,22 @@ public class ContentContainer implements Iterable<Content> {
         }
 
         return (int) mExtras.get(key);
+    }
+
+    /**
+     * Get a value from the extras map as a boolean. Warning: This method expects that the value
+     * that the key maps to is a boolean. If its not, errors may occur.
+     *
+     * @param key The key to the value.
+     * @return A boolean value; false if the value doesn't exist in the extras.
+     */
+    public boolean getExtraValueAsBoolean(String key) {
+
+        if (mExtras == null || mExtras.get(key) == null) {
+            return false;
+        }
+
+        return (boolean) mExtras.get(key);
     }
 
     /**

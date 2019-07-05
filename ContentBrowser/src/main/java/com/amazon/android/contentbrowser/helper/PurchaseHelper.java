@@ -17,6 +17,8 @@ package com.amazon.android.contentbrowser.helper;
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.R;
 import com.amazon.android.model.content.Content;
+import com.amazon.android.model.content.ContentContainer;
+import com.amazon.android.model.content.constants.ExtraKeys;
 import com.amazon.android.model.event.ProgressOverlayDismissEvent;
 import com.amazon.android.model.event.ProductsUpdateEvent;
 import com.amazon.android.model.event.PurchaseEvent;
@@ -33,10 +35,12 @@ import com.amazon.purchase.model.Product;
 import com.amazon.purchase.model.Response;
 
 import org.greenrobot.eventbus.EventBus;
+import org.w3c.dom.Text;
 
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.IOException;
@@ -108,6 +112,7 @@ public class PurchaseHelper {
      * begin */
     private String mBuyVideoSKU;
     private String videoId;
+    private Bundle purchaseExtras;
     /* Zype
      * end */
 
@@ -220,8 +225,14 @@ public class PurchaseHelper {
                     Log.e(TAG, "You should not hit here!!!");
                 }
 
+//                @Override
+//                public String getVideoId() {
+//                    Log.e(TAG, "You should not hit here!!!");
+//                    return null;
+//                }
+
                 @Override
-                public String getVideoId() {
+                public Bundle getPurchaseExtras() {
                     Log.e(TAG, "You should not hit here!!!");
                     return null;
                 }
@@ -363,8 +374,12 @@ public class PurchaseHelper {
                 handleProductsResponse(subscriber, response, products);
             }
 
-            public String getVideoId() {
-                return videoId;
+//            public String getVideoId() {
+//                return videoId;
+//            }
+
+            public Bundle getPurchaseExtras() {
+                return purchaseExtras;
             }
             /* Zype
              * end */
@@ -463,11 +478,13 @@ public class PurchaseHelper {
      */
     public void handleAction(Activity activity, Content content, int actionId) {
 
-        triggerProgress(activity);
+//        triggerProgress(activity);
         if (actionId == ContentBrowser.CONTENT_ACTION_DAILY_PASS) {
+            triggerProgress(activity);
             handlePurchaseChain(activity, mDailyPassSKU);
         }
         else if (actionId == ContentBrowser.CONTENT_ACTION_SUBSCRIPTION) {
+            triggerProgress(activity);
             handlePurchaseChain(activity, mSubscriptionSKU);
         }
         /* Zype, Evgeny Cherkasov */
@@ -479,6 +496,11 @@ public class PurchaseHelper {
         }
         else if (actionId == ContentBrowser.CONTENT_ACTION_CONFIRM_PURCHASE) {
             mContentBrowser.switchToBuyVideoScreen(new Bundle());
+        }
+        else if (actionId == ContentBrowser.CONTENT_ACTION_CONFIRM_PURCHASE_PLAYLIST) {
+            Bundle extras = new Bundle();
+            extras.putString(ExtraKeys.PLAYLIST_ID, content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+            mContentBrowser.switchToBuyVideoScreen(extras);
         }
     }
 
@@ -596,10 +618,44 @@ public class PurchaseHelper {
         mBuyVideoSKU = sku;
     }
 
-    public void setVideoId(String videoId) {
-        this.videoId = videoId;
+    /**
+     * If 'playlist' parameter is not empty, returns marketplace id extra attribute
+     * of specified playlist
+     *
+     * Otherwise, search in configuration file the SKU that is used for 'Buy Playlist' action.
+     * Returns first found SKU with `BuyPlaylist` id
+     */
+    public Set<String> getPlaylistSKU(ContentContainer playlist) throws IOException {
+        Set<String> result = new HashSet<>();
+        String sku = null;
+
+        if (playlist != null) {
+            sku = playlist.getExtraStringValue(ContentContainer.EXTRA_MARKETPLACE_ID);
+        }
+        if (TextUtils.isEmpty(sku)) {
+            Recipe recipe = Recipe.newInstance(FileHelper.readFile(mContext, mContext.getString(R.string.skus_file)));
+            List<Map<String, String>> skuList = (List<Map<String, String>>) recipe.getMap().get(SKUS_LIST);
+            for (Map<String, String> item : skuList) {
+                if (item.containsKey("id") && item.get("id").equals("BuyPlaylist")) {
+                    sku = item.get("sku");
+                    break;
+                }
+            }
+        }
+        Log.i(TAG, "getPlaylistSKU(): sku=" + sku);
+        result.add(sku);
+        mBuyVideoSKU = sku;
+
+        return result;
     }
 
+//    public void setVideoId(String videoId) {
+//        this.videoId = videoId;
+//    }
+
+    public void setPurchaseExtras(Bundle extras) {
+        this.purchaseExtras = extras;
+    }
     /* Zype
      * end */
 }
