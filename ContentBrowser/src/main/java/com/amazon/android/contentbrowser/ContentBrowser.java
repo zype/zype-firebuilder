@@ -2816,6 +2816,28 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         return rootFavorites;
     }
 
+    public ContentContainer rootSliders() {
+        ContentContainer root = getRootContentContainer();
+        ContentContainer contentContainer = root.findContentContainerByName(ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID);
+
+        if (contentContainer == null) {
+            ContentContainer sliderContainer = createRootSliders(root);
+            root.getContentContainers().add(sliderContainer);
+            contentContainer = sliderContainer;
+        }
+
+        return contentContainer;
+    }
+
+    private ContentContainer createRootSliders(ContentContainer parent) {
+        ContentContainer rootSliders = new ContentContainer(ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID);
+        rootSliders.setExtraValue(Recipe.KEY_DATA_TYPE_TAG, ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID);
+        rootSliders.setExtraValue("description", ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID);
+        rootSliders.setExtraValue("parentId", parent.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+        rootSliders.setExtraValue(ContentContainer.EXTRA_THUMBNAIL_LAYOUT, "landscape");
+        return rootSliders;
+    }
+
     public void runGlobalRecipesForLastSelected(Activity activity, ICancellableLoad cancellable) {
         final ContentContainer root = getLastSelectedContentContainer();
         Subscription subscription =

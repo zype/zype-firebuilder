@@ -4,6 +4,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.amazon.android.recipe.Recipe;
+import com.zype.fire.api.Model.PlaylistData;
+import com.zype.fire.api.Model.PlaylistsResponse;
 import com.zype.fire.api.Model.VideoData;
 import com.zype.fire.api.Model.VideoEntitlementData;
 import com.zype.fire.api.Model.VideoFavoriteData;
@@ -55,6 +57,10 @@ public class ZypeDataDownloaderHelper {
         }
 
         return result;
+    }
+
+    public static PlaylistData loadPlayList(String playlistId) {
+        return ZypeApi.getInstance().loadPlayList(playlistId);
     }
 
     public static VideosResponse loadPlaylistVideos(String playlistId, int page) {

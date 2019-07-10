@@ -7,6 +7,8 @@ import com.zype.fire.api.Model.BifrostResponse;
 import com.zype.fire.api.Model.ConsumerResponse;
 import com.zype.fire.api.Model.DevicePinResponse;
 import com.zype.fire.api.Model.ChannelResponse;
+import com.zype.fire.api.Model.PlaylistData;
+import com.zype.fire.api.Model.PlaylistResponse;
 import com.zype.fire.api.Model.ProgramResponse;
 import com.zype.fire.api.Model.MarketplaceConnectBody;
 import com.zype.fire.api.Model.MarketplaceConnectResponse;
@@ -144,4 +146,8 @@ public interface IZypeApi {
     // EPG events
     @GET("/program_guides/{id}/entries")
     Call<ProgramResponse> epgEvents(@Path("id") String id, @QueryMap HashMap<String, String> params);
+
+    //for single playlist
+    @GET("/playlists/{id}")
+    Call<PlaylistResponse> loadPlaylist(@Path("id") String id, @QueryMap HashMap<String, String> params);
 }

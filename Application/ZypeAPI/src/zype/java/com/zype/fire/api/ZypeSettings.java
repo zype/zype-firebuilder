@@ -18,6 +18,7 @@ public class ZypeSettings {
     public static final String MY_LIBRARY_PLAYLIST_ID = "MyLibrary";
     public static final String ROOT_FAVORITES_PLAYLIST_ID = "RootFavorites";
     public static final String ROOT_MY_LIBRARY_PLAYLIST_ID = "RootMyLibrary";
+    public static final String ROOT_SLIDERS_PLAYLIST_ID = "RootSliders";
 
     // Template version
     public static final String TEMPLATE_VERSION = "1.8.0";

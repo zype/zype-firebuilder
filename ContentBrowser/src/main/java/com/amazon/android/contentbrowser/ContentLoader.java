@@ -35,6 +35,7 @@ import com.amazon.dynamicparser.DynamicParser;
 import com.amazon.utils.model.Data;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.zype.fire.api.Model.PlaylistData;
 import com.zype.fire.api.Model.VideoData;
 import com.zype.fire.api.Model.VideoEntitlementData;
 import com.zype.fire.api.Model.VideoEntitlementsResponse;
@@ -52,6 +53,7 @@ import android.util.Log;
 import android.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -775,6 +777,36 @@ public class ContentLoader {
             return Observable.just(Pair.create(contentContainerAsObject, ""));
         }
     }
+
+    public Observable<ContentContainer> loadPlayList(ContentContainer root, String playListId) {
+        return Observable.just(playListId).subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).flatMap(id -> {
+            PlaylistData playlistData = ZypeDataDownloaderHelper.loadPlayList(playListId);
+
+            if(playlistData != null) {
+                //need to convert this to a content container
+                playlistData.parentId = playListId;
+                HashMap map = new HashMap();
+                map.put("categories", Arrays.asList(playlistData));
+                GsonBuilder builder = new GsonBuilder();
+                Gson gson = builder.create();
+                String feed = gson.toJson(map);
+                String[] params = new String[] { playListId };
+                Recipe recipeDynamicParserContainer = Recipe.newInstance(mContext, "recipes/ZypeCategoriesRecipe.json");
+
+                return  mDynamicParser.cookRecipeObservable
+                    (recipeDynamicParserContainer,
+                        feed,
+                        null, params).flatMap(o -> {
+
+                            ContentContainer contentContainer = (ContentContainer)o;
+                            return Observable.just(contentContainer);
+                });
+            }
+
+            return Observable.error(new Exception("unable to load the playlist"));
+        });
+    }
+
 
     public Observable<Pair> getPlaylistVideosFeedObservable(Object contentContainerAsObject) {
         ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
