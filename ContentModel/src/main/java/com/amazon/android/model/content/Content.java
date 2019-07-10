@@ -81,6 +81,12 @@ public class Content implements Serializable {
      */
     private String mBackgroundImageUrl;
 
+
+    /**
+     * Url for the featured thumbnail image of the content.
+     */
+    private String mFeaturedImageUrl;
+
     /**
      * Flag to detect if a subscription is required for this content.
      */
@@ -490,6 +496,10 @@ public class Content implements Serializable {
      */
     public String getBackgroundImageUrl() {
 
+        if(!TextUtils.isEmpty(getFeaturedImageUrl())) {
+            return getFeaturedImageUrl();
+        }
+
         return mBackgroundImageUrl;
     }
 
@@ -501,6 +511,14 @@ public class Content implements Serializable {
     public void setBackgroundImageUrl(String backgroundImageUrl) {
 
         mBackgroundImageUrl = backgroundImageUrl;
+    }
+
+    public String getFeaturedImageUrl() {
+        return mFeaturedImageUrl;
+    }
+
+    public void setFeaturedImageUrl(String featuredImageUrl) {
+        this.mFeaturedImageUrl = featuredImageUrl;
     }
 
     /**
