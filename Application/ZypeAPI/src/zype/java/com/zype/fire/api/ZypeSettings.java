@@ -8,11 +8,11 @@ import android.content.Context;
 
 public class ZypeSettings {
     // Zype app key
-    public static final String APP_KEY = "C0zChR4FyNVixEOsyJCi1_HLdmklFlj-uUbOAamfEq0f7ML7aJkekOFIbPmbiS9j";
+    public static final String APP_KEY = "8PaJoG1oCydoGkBi8HmtMKLucel98UdqE35WjlFHd-9tKM6DfRMFA3OsHggcQAD4";
     // OAuth credentials
-    public static final String CLIENT_ID = "6f861db9b340975edddd68d853069e095a37a1609ca328b96b35b17be68b0470";
+    public static final String CLIENT_ID = "b32fcaa722c05351e9b2e91b0ea585d625e16ebddc9f2940f32fc7815c9feee4";
     // Playlist
-    public static final String ROOT_PLAYLIST_ID = "5c91b0d2be3b9e14f51c450e";
+    public static final String ROOT_PLAYLIST_ID = "5b732451eabece13730085ac";
 
     public static final String FAVORITES_PLAYLIST_ID = "Favorites";
     public static final String MY_LIBRARY_PLAYLIST_ID = "MyLibrary";

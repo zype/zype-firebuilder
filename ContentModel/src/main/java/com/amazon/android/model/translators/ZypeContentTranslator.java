@@ -127,6 +127,7 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
                     break;
                 case Content.FIELD_IMAGES:
                     model.setExtraValue(Content.EXTRA_IMAGE_POSTER_URL, findImagePosterUrl(value));
+                    model.setFeaturedImageUrl(findFeaturedImageUrl(value));
                     break;
                 default:
                     model.setExtraValue(field, value);
@@ -207,6 +208,28 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
                     if (Math.abs(jsonObject.getInt("height") - requiredImageHeight) < Math.abs(jsonImage.getInt("height") - requiredImageHeight)) {
                         jsonImage = jsonObject;
                     }
+                }
+            }
+            if (jsonImage != null) {
+                result = jsonImage.getString("url");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    private String findFeaturedImageUrl(Object value) {
+        String result = null;
+        try {
+            JSONArray jsonValue = new JSONArray(value.toString());
+            JSONObject jsonImage = null;
+            for (int i = 0; i < jsonValue.length(); i++) {
+                JSONObject jsonObject = jsonValue.getJSONObject(i);
+                if (jsonObject.getString("layout").equals("landscape") &&
+                    jsonObject.optString("title").equals("featured-thumbnail")  ) {
+                    jsonImage = jsonObject;
+                    break;
                 }
             }
             if (jsonImage != null) {
