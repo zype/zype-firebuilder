@@ -44,6 +44,14 @@ public class Program implements Serializable {
   @Expose
   public String startDateTime;
 
+  public void setStartTime(long time) {
+    startTime =  DateTimeFormat.forPattern(DATE_FORMAT).print(time);
+  }
+
+  public void setEndTime(long time) {
+    endTime =  DateTimeFormat.forPattern(DATE_FORMAT).print(time);
+  }
+
 
   public long getStartTime() {
     try {
