@@ -12,6 +12,7 @@ import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.ImageView.ScaleType;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.utils.Helpers;
 import com.bumptech.glide.Glide;
@@ -27,9 +28,9 @@ public class HeroCardPresenter extends Presenter {
   private View mInfoField;
   private int mSelectedBackgroundColor = -1;
   private int mDefaultBackgroundColor = -1;
-  private static final int CARD_WIDTH_PX = 180;
+  private static final int CARD_WIDTH_PX = 320;
   private static final int SINGLE_CARD_WIDTH_PX = 110;
-  private static final int CARD_HEIGHT_PX = 230;
+  private static final int CARD_HEIGHT_PX = 250;
 
     public void setSingleImage(boolean singleImage) {
         this.singleImage = singleImage;
@@ -52,6 +53,7 @@ public class HeroCardPresenter extends Presenter {
     cardView.setFocusableInTouchMode(true);
     cardView.setTitleText(null);
     cardView.setCardType(CARD_TYPE_FLAG_IMAGE_ONLY);
+    //cardView.setMainImageScaleType(ScaleType.FIT_CENTER);
 
     mInfoField = cardView.findViewById(R.id.info_field);
     updateCardBackgroundColor(cardView, false);
