@@ -60,7 +60,7 @@ public class AppData {
     @Expose
     public String universalTVOD;
 
-    @SerializedName("device_linking")
+    @SerializedName("universal_svod")
     @Expose
     public String universalSubscription;
 }

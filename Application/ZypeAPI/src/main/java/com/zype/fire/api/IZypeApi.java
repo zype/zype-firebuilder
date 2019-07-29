@@ -7,6 +7,7 @@ import com.zype.fire.api.Model.BifrostResponse;
 import com.zype.fire.api.Model.ConsumerResponse;
 import com.zype.fire.api.Model.DevicePinResponse;
 import com.zype.fire.api.Model.ChannelResponse;
+import com.zype.fire.api.Model.PlanResponse;
 import com.zype.fire.api.Model.PlaylistData;
 import com.zype.fire.api.Model.PlaylistResponse;
 import com.zype.fire.api.Model.ProgramResponse;
@@ -114,14 +115,50 @@ public interface IZypeApi {
     @POST("https://mkt.zype.com/v1/amazon/transactions")
     Call<ResponseBody> verifyPurchaseAmazon(@Body MarketplaceConnectBody body);
 
+    // Plans
+
+    /**
+     * Retrieve single subscription plan
+     *
+     * @param planId
+     * @param queryParams
+     * @return
+     */
+    @GET("/plans/{plan_id}")
+    Call<PlanResponse> getPlan(@Path("plan_id") String planId,
+                               @QueryMap HashMap<String, String> queryParams);
+
     // Playlist
+
     @GET("/playlists")
     Call<PlaylistsResponse> getPlaylists(@Query(PARAM_PAGE) int page, @QueryMap HashMap<String, String> params);
 
+    /**
+     * Retrieve single playlist
+     *
+     * @param id
+     * @param params
+     * @return
+     */
+    @GET("/playlists/{id}")
+    Call<PlaylistResponse> loadPlaylist(@Path("id") String id,
+                                        @QueryMap HashMap<String, String> params);
+
+    /**
+     * Retrieve playlist videos
+     *
+     * @param playlistId
+     * @param page
+     * @param params
+     * @return
+     */
     @GET("/playlists/{playlist_id}/videos")
-    Call<VideosResponse> getPlaylistVideos(@Path("playlist_id") String playlistId, @Query(PARAM_PAGE) int page, @QueryMap HashMap<String, String> params);
+    Call<VideosResponse> getPlaylistVideos(@Path("playlist_id") String playlistId,
+                                           @Query(PARAM_PAGE) int page,
+                                           @QueryMap HashMap<String, String> params);
 
     // Videos
+
     @GET("/videos")
     Call<VideosResponse> getVideos(@Query(PARAM_PAGE) int page, @QueryMap HashMap<String, String> params);
 
@@ -147,7 +184,4 @@ public interface IZypeApi {
     @GET("/program_guides/{id}/entries")
     Call<ProgramResponse> epgEvents(@Path("id") String id, @QueryMap HashMap<String, String> params);
 
-    //for single playlist
-    @GET("/playlists/{id}")
-    Call<PlaylistResponse> loadPlaylist(@Path("id") String id, @QueryMap HashMap<String, String> params);
 }
