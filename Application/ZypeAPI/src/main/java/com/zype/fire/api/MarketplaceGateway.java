@@ -14,8 +14,10 @@ import com.zype.fire.api.Util.FileHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class MarketplaceGateway {
     private static final String TAG = MarketplaceGateway.class.getSimpleName();
@@ -113,9 +115,18 @@ public class MarketplaceGateway {
         for (PlanData plan : plans) {
             Map<String, String> skuData = new HashMap<>();
             skuData.put("productType", "SUBSCRIBE");
-            skuData.put("sku", plan.marketplaceIds.amazon);
+            skuData.put("sku", plan.marketplaceIds.amazon.substring(0, plan.marketplaceIds.amazon.lastIndexOf(".")));
             skuData.put("purchaseSku", plan.marketplaceIds.amazon);
+            skuData.put("id", plan.marketplaceIds.amazon);
             result.add(skuData);
+        }
+        return result;
+    }
+
+    public Set<String> getSubscriptionSkus() {
+        Set<String> result = new HashSet<>();
+        for (PlanData plan : plans) {
+            result.add(plan.marketplaceIds.amazon.substring(0, plan.marketplaceIds.amazon.lastIndexOf(".")));
         }
         return result;
     }
