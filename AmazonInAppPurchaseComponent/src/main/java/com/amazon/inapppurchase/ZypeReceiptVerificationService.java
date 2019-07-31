@@ -37,42 +37,78 @@ public class ZypeReceiptVerificationService extends AReceiptVerifier {
     public String validateReceipt(Context context, String requestId, String sku, UserData
             userData, Receipt receipt, IPurchase.PurchaseListener listener) {
 
-        if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(context)) {
-            Map<String, String> fieldParams = new HashMap<>();
-            // TODO: Get preference id from ZypeAuthentication
-            fieldParams.put(ZypeApi.APP_KEY, ZypeSettings.APP_KEY);
-            fieldParams.put(ZypeApi.SUBSCRIPTION_CONSUMER_ID, Preferences.getString("ZypeConsumerId"));
-            fieldParams.put(ZypeApi.SUBSCRIPTION_DEVICE_TYPE, "amazon");
-            fieldParams.put(ZypeApi.SUBSCRIPTION_RECEIPT_ID, receipt.getReceiptId());
-            fieldParams.put(ZypeApi.SUBSCRIPTION_SHARED_SECRET, ZypeSettings.AMAZON_SHARED_KEY);
-            // Need to remove all dots from sku because Bifrost service does not allows any symbols
-            // except letters and numbers
-            fieldParams.put(ZypeApi.SUBSCRIPTION_THIRD_PARTY_ID, sku.replaceAll("\\.", ""));
-            fieldParams.put(ZypeApi.SUBSCRIPTION_USER_ID, userData.getUserId());
-            // TODO: Comment 3 below lines for release build
-//        Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
-//        listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
-//        return requestId;
+//        if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(context)) {
+//            Map<String, String> fieldParams = new HashMap<>();
+//            // TODO: Get preference id from ZypeAuthentication
+//            fieldParams.put(ZypeApi.APP_KEY, ZypeSettings.APP_KEY);
+//            fieldParams.put(ZypeApi.SUBSCRIPTION_CONSUMER_ID, Preferences.getString("ZypeConsumerId"));
+//            fieldParams.put(ZypeApi.SUBSCRIPTION_DEVICE_TYPE, "amazon");
+//            fieldParams.put(ZypeApi.SUBSCRIPTION_RECEIPT_ID, receipt.getReceiptId());
+//            fieldParams.put(ZypeApi.SUBSCRIPTION_SHARED_SECRET, ZypeSettings.AMAZON_SHARED_KEY);
+//            // Need to remove all dots from sku because Bifrost service does not allows any symbols
+//            // except letters and numbers
+//            fieldParams.put(ZypeApi.SUBSCRIPTION_THIRD_PARTY_ID, sku.replaceAll("\\.", ""));
+//            fieldParams.put(ZypeApi.SUBSCRIPTION_USER_ID, userData.getUserId());
+//            // TODO: Comment 3 below lines for release build
+////        Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
+////        listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
+////        return requestId;
+//            try {
+//                retrofit2.Response response = ZypeApi.getInstance().getApi().verifySubscription(fieldParams).execute();
+//                if (response.isSuccessful()) {
+//                    BifrostResponse bifrostResponse = (BifrostResponse) response.body();
+//                    if (bifrostResponse.success) {
+//                        Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
+//                        listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
+//                        return requestId;
+//                    } else {
+//                        Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
+//                        listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
+//                        return requestId;
+//                    }
+//                } else {
+//                    Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
+//                    listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
+//                    return requestId;
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
+//                listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
+//                return requestId;
+//            }
+//        }
+        if (ZypeConfiguration.isUniversalSubscriptionEnabled(context)) {
+            MarketplaceConnectBody body = new MarketplaceConnectBody();
+            body.amount = "";
+            body.appId = ZypeConfiguration.getAppId(context);
+            body.consumerId = Preferences.getString("ZypeConsumerId");
+            body.planId = receipt.getExtras().getString("PlanId");
+            body.siteId = ZypeConfiguration.getSiteId(context);
+            body.transactionType = "purchase";
+            body.videoId = receipt.getExtras().getString("VideoId");;
+            MarketplaceConnectBodyData bodyData = new MarketplaceConnectBodyData();
+            bodyData.receiptId = receipt.getReceiptId();
+            bodyData.userId = userData.getUserId();
+            body.data = bodyData;
+            Log.i(TAG, "validateReceipt(): body=" + (new Gson()).toJson(body));
             try {
-                retrofit2.Response response = ZypeApi.getInstance().getApi().verifySubscription(fieldParams).execute();
+                retrofit2.Response response = ZypeApi.getInstance().getApi().verifyPurchaseAmazon(body).execute();
                 if (response.isSuccessful()) {
-                    BifrostResponse bifrostResponse = (BifrostResponse) response.body();
-                    if (bifrostResponse.success) {
-                        Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
-                        listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
-                        return requestId;
-                    } else {
-                        Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
-                        listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
-                        return requestId;
-                    }
-                } else {
+                    Log.i(TAG, "validateReceipt(): Receipt is valid");
+                    Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
+                    listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
+                    return requestId;
+                }
+                else {
+                    Log.i(TAG, "validateReceipt(): Receipt is not valid");
                     Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
                     listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
                     return requestId;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                Log.i(TAG, "validateReceipt(): Error marketplace connect call");
                 Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
                 listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
                 return requestId;

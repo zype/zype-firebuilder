@@ -108,6 +108,15 @@ public class MarketplaceGateway {
         }
     }
 
+    public PlanData findPlanBySku(String sku) {
+        for (PlanData plan : plans) {
+            if (plan.marketplaceIds.amazon.substring(0, plan.marketplaceIds.amazon.lastIndexOf(".")).equals(sku)) {
+                return plan;
+            }
+        }
+        return null;
+    }
+
     // SKU data
 
     public List<Map<String, String>> getSkuData() {

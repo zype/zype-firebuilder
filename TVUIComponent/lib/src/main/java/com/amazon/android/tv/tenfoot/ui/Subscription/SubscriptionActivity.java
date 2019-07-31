@@ -284,6 +284,9 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
     }
 
     private void purchaseSubscription(SubscriptionItem item) {
+        Bundle extras = new Bundle();
+        extras.putString("PlanId", item.planId);
+        contentBrowser.getPurchaseHelper().setPurchaseExtras(extras);
         contentBrowser.updateSubscriptionSku(item.sku);
         contentBrowser.actionTriggered(this, contentBrowser.getLastSelectedContent(), ContentBrowser.CONTENT_ACTION_SUBSCRIPTION, null, null);
     }
