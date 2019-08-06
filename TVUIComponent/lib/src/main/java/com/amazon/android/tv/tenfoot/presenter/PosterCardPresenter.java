@@ -56,6 +56,7 @@ import com.amazon.android.utils.GlideHelper;
 import com.amazon.android.utils.Helpers;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.zype.fire.api.AppConfiguration;
 import com.zype.fire.api.ZypeConfiguration;
 
 /**
@@ -79,12 +80,14 @@ public class PosterCardPresenter extends Presenter {
     private Drawable imageUnlocked;
     private static Drawable infoFieldWithProgressBarBackground;
     private ContentBrowser contentBrowser;
+    private AppConfiguration appConf;
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
 
         mContext = parent.getContext();
         contentBrowser = ContentBrowser.getInstance((Activity) mContext);
+        appConf = ZypeConfiguration.readAppConfiguration(mContext);
         try {
             mDefaultCardImage = ContextCompat.getDrawable(mContext, R.drawable.movie);
             sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused);

@@ -40,6 +40,7 @@ import com.amazon.android.utils.Helpers;
 import com.amazon.android.tv.tenfoot.R;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.zype.fire.api.AppConfiguration;
 import com.zype.fire.api.ZypeConfiguration;
 
 import android.app.Activity;
@@ -74,6 +75,7 @@ public class CardPresenter extends Presenter {
     private View mInfoField;
     private Context mContext;
     /* Zype, Evgeny Cherkasov */
+    private AppConfiguration appConf;
     private Drawable imageLocked;
     private Drawable imageUnlocked;
     private static Drawable infoFieldWithProgressBarBackground;
@@ -85,9 +87,14 @@ public class CardPresenter extends Presenter {
         mContext = parent.getContext();
         /* Zype, Evgeny Cherkasov */
         contentBrowser = ContentBrowser.getInstance((Activity) mContext);
+        appConf = ZypeConfiguration.readAppConfiguration(mContext);
         try {
             mDefaultCardImage = ContextCompat.getDrawable(mContext, R.drawable.movie);
-            sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused);
+            if (appConf.showItemTitles) {
+                sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused);
+            }else{
+                sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_trance);
+            }
             /* Zype, Evgeny Cherkasov */
             infoFieldWithProgressBarBackground = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_progress_bar);
             imageLocked = ContextCompat.getDrawable(mContext, R.drawable.locked);
