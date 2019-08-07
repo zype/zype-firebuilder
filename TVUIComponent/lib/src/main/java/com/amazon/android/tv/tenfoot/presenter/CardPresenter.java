@@ -158,10 +158,16 @@ public class CardPresenter extends Presenter {
                 // the 'TitleText' is actually smaller text compared to 'ContentText',
                 // so we are using TitleText to show subtitle and ContentText to show the
                 // actual Title.
-                cardView.setTitleText(ContentHelper.getCardViewSubtitle(mContext, content));
 
 
-                cardView.setContentText(content.getTitle());
+                if (appConf.showItemTitles) {
+                    cardView.setTitleText(ContentHelper.getCardViewSubtitle(mContext, content));
+                    cardView.setContentText(content.getTitle());
+                }
+                else {
+                    cardView.setContentText("");
+                    cardView.setTitleText("");
+                }
                 cardView.setMainImageDimensions(mCardWidthDp, mCardHeightDp);
                 /* Zype, Evgeny Cherkasov */
                 double playbackPercentage = content.getExtraValueAsDouble(Content.EXTRA_PLAYBACK_POSITION_PERCENTAGE);
@@ -208,7 +214,13 @@ public class CardPresenter extends Presenter {
         }
         else if (item instanceof ContentContainer) {
             ContentContainer contentContainer = (ContentContainer) item;
-            cardView.setContentText(contentContainer.getName());
+            if (appConf.showItemTitles) {
+                cardView.setContentText(contentContainer.getName());
+            }
+            else {
+                cardView.setContentText("");
+            }
+
             cardView.setMainImageDimensions(mCardWidthDp, mCardHeightDp);
             /* Zype, Evgeny Cherkasov */
             // Show image for playlist

@@ -90,7 +90,12 @@ public class PosterCardPresenter extends Presenter {
         appConf = ZypeConfiguration.readAppConfiguration(mContext);
         try {
             mDefaultCardImage = ContextCompat.getDrawable(mContext, R.drawable.movie);
-            sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused);
+            if (appConf.showItemTitles) {
+                sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused);
+            }else{
+                sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_trance);
+            }
+
             infoFieldWithProgressBarBackground = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_progress_bar);
             imageLocked = ContextCompat.getDrawable(mContext, R.drawable.locked);
             imageUnlocked = ContextCompat.getDrawable(mContext, R.drawable.unlocked);
@@ -154,7 +159,13 @@ public class PosterCardPresenter extends Presenter {
                 cardView.setTitleText(ContentHelper.getCardViewSubtitle(mContext, content));
 
 
-                cardView.setContentText(content.getTitle());
+                if (appConf.showItemTitles) {
+                    cardView.setContentText(content.getTitle());
+                }
+                else {
+                    cardView.setContentText("");
+                    cardView.setTitleText("");
+                }
                 cardView.setMainImageDimensions(mCardWidthDp, mCardHeightDp);
                 String url = content.getExtraValueAsString(Content.EXTRA_IMAGE_POSTER_URL);
                 if (TextUtils.isEmpty(url) || url.equals("null")) {
@@ -203,7 +214,12 @@ public class PosterCardPresenter extends Presenter {
         }
         else if (item instanceof ContentContainer) {
             ContentContainer contentContainer = (ContentContainer) item;
-            cardView.setContentText(contentContainer.getName());
+            if (appConf.showItemTitles) {
+                cardView.setContentText(contentContainer.getName());
+            }
+            else {
+                cardView.setContentText("");
+            }
             cardView.setMainImageDimensions(mCardWidthDp, mCardHeightDp);
             // Show image for playlist
             String url = contentContainer.getExtraStringValue(ContentContainer.EXTRA_IMAGE_POSTER_URL);
