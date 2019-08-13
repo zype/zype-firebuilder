@@ -30,7 +30,7 @@ public class ZypeSettings {
     public static final boolean ACCOUNT_CREATION_TOS = false;
 
     // Monetization
-    public static final boolean NATIVE_SUBSCRIPTION_ENABLED = Boolean.valueOf("true");
+    public static final boolean NATIVE_SUBSCRIPTION_ENABLED = Boolean.valueOf("false");
     public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = Boolean.valueOf("false");
     public static final boolean NATIVE_TVOD = Boolean.valueOf("false");
 
