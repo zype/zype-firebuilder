@@ -55,10 +55,10 @@ android {
     def currentCodeVersion = versionProperties[versionCodeKey].toString().toInteger()
 
     compileSdkVersion 23
-    buildToolsVersion "25.0.0"
+    buildToolsVersion "25.0.3"
 
     defaultConfig {
-        applicationId "com.zype.aftv.demo"
+        applicationId "com.twowheelstv"
         minSdkVersion 21
         targetSdkVersion 23
         versionCode currentCodeVersion
