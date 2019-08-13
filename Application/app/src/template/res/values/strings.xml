@@ -18,7 +18,7 @@ permissions and limitations under the License.
          Currently used with recommendations on the Home Screen -->
     <string translatable="false" name="app_name_short">Two Wheels TV</string>
     <!-- Copyright string -->
-    <string name="copyright">Copyright 2016. All Rights Reserved.</string>
+    <string name="copyright">Copyright 2019. All Rights Reserved.</string>
     <!-- Search hint text -->
     <string name="search_bar_hint">I\'m looking for…</string>
 </resources>

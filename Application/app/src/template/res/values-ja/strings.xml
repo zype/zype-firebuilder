@@ -15,6 +15,6 @@ permissions and limitations under the License.
 -->
 <resources>
   <string name="app_name">Two Wheels TV</string>
-  <string name="copyright">Copyright 2016. All Rights Reserved.</string>
+  <string name="copyright">Copyright 2019. All Rights Reserved.</string>
   <string name="search_bar_hint">検索語を入力</string>
 </resources>
