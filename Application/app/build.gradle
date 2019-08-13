@@ -55,10 +55,10 @@ android {
     def currentCodeVersion = versionProperties[versionCodeKey].toString().toInteger()
 
     compileSdkVersion 23
-    buildToolsVersion "25.0.3"
+    buildToolsVersion "25.0.0"
 
     defaultConfig {
-        applicationId "com.twowheelstv"
+        applicationId "com.zype.aftv.demo"
         minSdkVersion 21
         targetSdkVersion 23
         versionCode currentCodeVersion
@@ -85,13 +85,13 @@ android {
         zype {
         }
         template {
-            applicationId "<APPLICATION_ID>"
+            applicationId "com.twowheelstv"
         }
     }
 
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
-            def outputNameNew = "Zype-AFTV" + "-" + variant.productFlavors.name + "-" + variant.buildType.name +
+            def outputNameNew = "TwoWheels-TV-AFTV" + "-" + variant.productFlavors.name + "-" + variant.buildType.name +
                     "-" + defaultConfig.versionName + "-" + getDate() + ".apk"
             output.outputFile = new File(output.outputFile.parent, outputNameNew)
         }
