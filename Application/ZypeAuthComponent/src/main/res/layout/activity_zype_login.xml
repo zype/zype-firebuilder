@@ -69,6 +69,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="16dp"
             android:id="@+id/editUsername"
+            android:backgroundTint="@color/background_tint_color_selector"
             android:hint="@string/zype_login_username"
             tools:text="Email"
             />
@@ -79,6 +80,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="16dp"
             android:id="@+id/editPassword"
+            android:backgroundTint="@color/background_tint_color_selector"
             android:hint="@string/zype_login_password"
             android:inputType="textPassword"
             tools:text="Password"
