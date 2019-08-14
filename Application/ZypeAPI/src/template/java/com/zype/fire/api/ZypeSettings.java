@@ -22,7 +22,7 @@ public class ZypeSettings {
     // Template version
     public static final String TEMPLATE_VERSION = "1.8.0";
 
-    public static final boolean EPG_ENABLED = true;
+    public static final boolean EPG_ENABLED = false;
 
     // Features
     public static final boolean DEVICE_LINKING = Boolean.valueOf("false");
