@@ -101,6 +101,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
+
 
 /**
  * LeanbackDetailsFragment extends DetailsFragment, a Wrapper fragment for leanback
@@ -537,7 +539,8 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
         mActionInProgress = false;
         /* Zype, Evgeny Cherkasov */
         if (receiver != null) {
-            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, new IntentFilter("DataUpdated"));
+            LocalBroadcastManager.getInstance(getActivity())
+                    .registerReceiver(receiver, new IntentFilter(BROADCAST_DATA_LOADED));
         }
         checkVideoEntitlement();
     }

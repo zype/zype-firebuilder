@@ -84,6 +84,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
+
 /**
  * This fragment displays content in horizontal rows for browsing. Each row has its title displayed
  * above it.
@@ -182,7 +184,8 @@ public class ContentBrowseFragment extends RowsFragment {
 
         /* Zype, Evgeny Cherkasov */
         if (receiver != null) {
-            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, new IntentFilter("DataUpdated"));
+            LocalBroadcastManager.getInstance(getActivity())
+                    .registerReceiver(receiver, new IntentFilter(BROADCAST_DATA_LOADED));
         }
 
         ArrayObjectAdapter rowsAdapter = (ArrayObjectAdapter) getAdapter();
