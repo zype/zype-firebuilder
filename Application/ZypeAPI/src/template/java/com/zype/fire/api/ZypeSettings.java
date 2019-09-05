@@ -8,12 +8,12 @@ import android.content.Context;
 
 public class ZypeSettings {
     // Zype app key
-    public static final String APP_KEY = "<APP_KEY>";
+    public static final String APP_KEY = "XpDq-SxyifAKCeEduGxHshpc-qlhoJPekrdBWoQalealzGUn-gyDCXO83PUILBYb";
     // OAuth credentials
-    public static final String CLIENT_ID = "<CLIENT_ID>";
+    public static final String CLIENT_ID = "950d6c75184c4279adec8602d2e3b046f60b600526fd80b1a2a4f2e5d558d00a";
 //    public static final String CLIENT_SECRET = "<CLIENT_SECRET>";
     // Playlist
-    public static final String ROOT_PLAYLIST_ID = "<ROOT_PLAYLIST_ID>";
+    public static final String ROOT_PLAYLIST_ID = "5d66a68d861c0d58abc018f1";
 
     public static final String FAVORITES_PLAYLIST_ID = "Favorites";
     public static final String MY_LIBRARY_PLAYLIST_ID = "MyLibrary";
@@ -32,13 +32,12 @@ public class ZypeSettings {
     public static final boolean ACCOUNT_CREATION_TOS = false;
 
     // Monetization
-    public static final boolean NATIVE_SUBSCRIPTION_ENABLED = Boolean.valueOf("<NATIVE_SUBSCRIPTION_ENABLED>");
-    public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = Boolean.valueOf("<NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED>");
-    public static final boolean NATIVE_TVOD = Boolean.valueOf("<NATIVE_TVOD_ENABLED>");;
-    public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = Boolean.valueOf("<SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED>");
-    public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = Boolean.valueOf("<UNIVERSAL_SUBSCRIPTION_ENABLED>");
-    public static final boolean UNIVERSAL_TVOD = Boolean.valueOf("<UNIVERSAL_TVOD>");
-
+    public static final boolean NATIVE_SUBSCRIPTION_ENABLED = Boolean.valueOf("false");
+    public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = Boolean.valueOf("false");
+    public static final boolean NATIVE_TVOD = Boolean.valueOf("false");
+    public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = Boolean.valueOf("false");
+    public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = Boolean.valueOf("false");
+    public static final boolean UNIVERSAL_TVOD = Boolean.valueOf("false");
     /**
      * Amazon shared key is required for native subscription feature. It is used in request to Zype Bifrost
      * service for verifying subscription.
