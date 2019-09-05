@@ -11,6 +11,7 @@ import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v17.leanback.widget.VerticalGridView;
+import android.util.Log;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.helper.PurchaseHelper;
@@ -100,9 +101,11 @@ public class SubscriptionFragment extends RowsFragment {
                 item.priceText = productData.get("Price");
                 item.sku = productData.get("SKU");
                 PlanData plan = MarketplaceGateway.getInstance(getActivity()).findPlanBySku(item.sku);
-                if (plan != null) {
-                    item.planId = plan.id;
+                if (plan == null) {
+                    Log.e(TAG, "updateSubscriptionOptions(): Plan not found for sku " + item.sku);
+                    continue;
                 }
+                item.planId = plan.id;
                 subscriptionsAdapter.add(item);
             }
         }

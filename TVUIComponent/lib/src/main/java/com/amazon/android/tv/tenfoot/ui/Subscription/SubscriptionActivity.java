@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -253,17 +254,14 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
     @Override
     public void onSubscriptionSelected(SubscriptionItem item) {
         selectedSubscription = item;
-        if (ZypeConfiguration.isNativeSubscriptionEnabled(SubscriptionActivity.this)) {
-            showConfirm();
-        }
-        else {
-            if (contentBrowser.isUserLoggedIn()) {
-                showConfirm();
-            } else {
+        if (ZypeConfiguration.isUniversalSubscriptionEnabled(SubscriptionActivity.this)) {
+            if (!contentBrowser.isUserLoggedIn()) {
                 Intent intent = new Intent(SubscriptionActivity.this, CreateLoginActivity.class);
                 startActivityForResult(intent, REQUEST_CREATE_LOGIN);
+                return;
             }
         }
+        showConfirm();
     }
 
     //
@@ -284,11 +282,15 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
     }
 
     private void purchaseSubscription(SubscriptionItem item) {
+        Log.i(TAG, "purchaseSubscription(): sku=" + item.sku + ", planId=" + item.planId);
         Bundle extras = new Bundle();
         extras.putString("PlanId", item.planId);
         contentBrowser.getPurchaseHelper().setPurchaseExtras(extras);
         contentBrowser.updateSubscriptionSku(item.sku);
-        contentBrowser.actionTriggered(this, contentBrowser.getLastSelectedContent(), ContentBrowser.CONTENT_ACTION_SUBSCRIPTION, null, null);
+        contentBrowser.actionTriggered(this,
+                contentBrowser.getLastSelectedContent(),
+                ContentBrowser.CONTENT_ACTION_SUBSCRIPTION,
+                null, null);
     }
 
     /**

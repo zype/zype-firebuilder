@@ -99,7 +99,7 @@ public class MarketplaceGateway {
     private static PlanData loadPlan(String planId) {
         PlanResponse response = ZypeApi.getInstance().getPlan(planId);
         if (response != null) {
-            Log.d(TAG, "loadPlan(): success");
+            Log.d(TAG, "loadPlan(): success, sku=" + response.response.marketplaceIds.amazon);
             return response.response;
         }
         else {
@@ -110,7 +110,8 @@ public class MarketplaceGateway {
 
     public PlanData findPlanBySku(String sku) {
         for (PlanData plan : plans) {
-            if (plan.marketplaceIds.amazon.substring(0, plan.marketplaceIds.amazon.lastIndexOf(".")).equals(sku)) {
+//            if (plan.marketplaceIds.amazon.substring(0, plan.marketplaceIds.amazon.lastIndexOf(".")).equals(sku)) {
+              if (plan.marketplaceIds.amazon.equals(sku)) {
                 return plan;
             }
         }
@@ -135,7 +136,8 @@ public class MarketplaceGateway {
     public Set<String> getSubscriptionSkus() {
         Set<String> result = new HashSet<>();
         for (PlanData plan : plans) {
-            result.add(plan.marketplaceIds.amazon.substring(0, plan.marketplaceIds.amazon.lastIndexOf(".")));
+//            result.add(plan.marketplaceIds.amazon.substring(0, plan.marketplaceIds.amazon.lastIndexOf(".")));
+            result.add(plan.marketplaceIds.amazon);
         }
         return result;
     }

@@ -79,14 +79,14 @@ public class ZypeReceiptVerificationService extends AReceiptVerifier {
 //            }
 //        }
         if (ZypeConfiguration.isUniversalSubscriptionEnabled(context)) {
+            Log.i(TAG, "validateReceipt(): Subscription");
             MarketplaceConnectBody body = new MarketplaceConnectBody();
             body.amount = "";
             body.appId = ZypeConfiguration.getAppId(context);
             body.consumerId = Preferences.getString("ZypeConsumerId");
             body.planId = receipt.getExtras().getString("PlanId");
             body.siteId = ZypeConfiguration.getSiteId(context);
-            body.transactionType = "purchase";
-            body.videoId = receipt.getExtras().getString("VideoId");;
+            body.transactionType = "subscription";
             MarketplaceConnectBodyData bodyData = new MarketplaceConnectBodyData();
             bodyData.receiptId = receipt.getReceiptId();
             bodyData.userId = userData.getUserId();
