@@ -80,6 +80,8 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
+import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
+
 /* Zype, Evgeny Cherkasov */
 
 /**
@@ -244,7 +246,8 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
     protected void onResume() {
         super.onResume();
         if (receiver != null) {
-            LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter("DataUpdated"));
+            LocalBroadcastManager.getInstance(this)
+                    .registerReceiver(receiver, new IntentFilter(BROADCAST_DATA_LOADED));
         }
         if (ContentBrowser.getInstance(this).getAuthHelper() != null) {
             ContentBrowser.getInstance(this).getAuthHelper()

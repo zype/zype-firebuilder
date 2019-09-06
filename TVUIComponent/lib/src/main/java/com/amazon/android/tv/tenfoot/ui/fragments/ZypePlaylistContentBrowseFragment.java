@@ -82,6 +82,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
+
 /* Zype, Evgeny Cherkasov */
 
 /**
@@ -111,7 +113,8 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
     public void onResume() {
         super.onResume();
         if (receiver != null) {
-            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, new IntentFilter("DataUpdated"));
+            LocalBroadcastManager.getInstance(getActivity())
+                    .registerReceiver(receiver, new IntentFilter(BROADCAST_DATA_LOADED));
         }
 //        updateContents();
     }
@@ -279,15 +282,24 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
         boolean isMyLibrary = rootContentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID);
         boolean isFavorites = rootContentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID);
 
+        CardPresenter cardPresenter = new CardPresenter();
+        PosterCardPresenter posterCardPresenter = new PosterCardPresenter();
+
         int index = 0;
         for (ContentContainer contentContainer : rootContentContainer.getContentContainers()) {
-            if (index >= rowsAdapter.size()) {
-                break;
-            }
             // Skip 'My Library' and 'Favorites' content container
             if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)
                     || contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID)) {
                 continue;
+            }
+
+            if (index >= rowsAdapter.size()) {
+                HeaderItem header = new HeaderItem(0, contentContainer.getName());
+                ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
+                if (contentContainer.getExtraStringValue(ContentContainer.EXTRA_THUMBNAIL_LAYOUT).equals("poster")) {
+                    listRowAdapter = new ArrayObjectAdapter(posterCardPresenter);
+                }
+                rowsAdapter.add(new ListRow(header, listRowAdapter));
             }
 
             ListRow row = (ListRow) rowsAdapter.get(index);
