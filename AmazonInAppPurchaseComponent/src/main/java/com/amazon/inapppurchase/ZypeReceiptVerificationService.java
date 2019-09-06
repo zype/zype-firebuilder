@@ -93,7 +93,7 @@ public class ZypeReceiptVerificationService extends AReceiptVerifier {
             body.data = bodyData;
             Log.i(TAG, "validateReceipt(): body=" + (new Gson()).toJson(body));
             try {
-                retrofit2.Response response = ZypeApi.getInstance().getApi().verifyPurchaseAmazon(body).execute();
+                retrofit2.Response response = ZypeApi.getInstance().getApi().verifySubscriptionPurchaseAmazon(body).execute();
                 if (response.isSuccessful()) {
                     Log.i(TAG, "validateReceipt(): Receipt is valid");
                     Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);

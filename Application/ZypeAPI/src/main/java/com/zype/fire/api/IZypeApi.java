@@ -112,6 +112,9 @@ public interface IZypeApi {
                                            @QueryMap HashMap<String, String> queryParams);
 
     // Marketplace connect
+    @POST("https://mkt.zype.com/v1/amazon")
+    Call<ResponseBody> verifySubscriptionPurchaseAmazon(@Body MarketplaceConnectBody body);
+
     @POST("https://mkt.zype.com/v1/amazon/transactions")
     Call<ResponseBody> verifyPurchaseAmazon(@Body MarketplaceConnectBody body);
 
