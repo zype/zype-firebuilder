@@ -670,7 +670,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         mIAPDisabled = mAppContext.getResources().getBoolean(R.bool.is_iap_disabled);
         /* Zype, Evgeny Cherkasov */
         if (!ZypeConfiguration.isNativeSubscriptionEnabled(mAppContext)
-                && !ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(mAppContext)
+                && !ZypeConfiguration.marketplaceConnectSvodEnabled(mAppContext)
                 && !ZypeConfiguration.isNativeTVODEnabled(mAppContext)) {
             mIAPDisabled = true;
         }
@@ -1672,7 +1672,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 }
                 else {
                     if (ZypeConfiguration.isNativeSubscriptionEnabled(mAppContext)
-                            || ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(mAppContext)) {
+                            || ZypeConfiguration.marketplaceConnectSvodEnabled(mAppContext)) {
                         showSubscribe = true;
                     }
                     else {
@@ -3319,7 +3319,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         // TODO: This line must be commented for release build
 //            hasZypeSubscription = true;
         if (ZypeConfiguration.isUniversalSubscriptionEnabled(mAppContext)
-                || ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(mAppContext)) {
+                || ZypeConfiguration.marketplaceConnectSvodEnabled(mAppContext)) {
             setSubscribed(hasZypeSubscription);
         }
         else if (ZypeConfiguration.isNativeSubscriptionEnabled(mAppContext)) {

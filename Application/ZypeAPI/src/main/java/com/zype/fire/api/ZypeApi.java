@@ -8,6 +8,7 @@ import com.zype.fire.api.Model.Channel;
 import com.zype.fire.api.Model.ConsumerResponse;
 import com.zype.fire.api.Model.DevicePinResponse;
 import com.zype.fire.api.Model.ChannelResponse;
+import com.zype.fire.api.Model.PlanResponse;
 import com.zype.fire.api.Model.PlaylistData;
 import com.zype.fire.api.Model.PlaylistResponse;
 import com.zype.fire.api.Model.Program;
@@ -265,6 +266,24 @@ public class ZypeApi {
             Response response = apiImpl.getConsumer(consumerId, params).execute();
             if (response.isSuccessful()) {
                 return (ConsumerResponse) response.body();
+            }
+            else {
+                return null;
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public PlanResponse getPlan(String planId) {
+        try {
+            HashMap<String, String> params = new HashMap<>();
+            params.put(APP_KEY, ZypeSettings.APP_KEY);
+            Response response = apiImpl.getPlan(planId, params).execute();
+            if (response.isSuccessful()) {
+                return (PlanResponse) response.body();
             }
             else {
                 return null;

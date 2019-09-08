@@ -32,8 +32,8 @@ public class ZypeSettings {
     public static final boolean FAVORITES_VIA_API = false;
 
     // Monetization
+    public static final boolean MARKETPLACE_CONNECT_SVOD = true;
     public static final boolean NATIVE_SUBSCRIPTION_ENABLED = false;
-    public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = false;
     public static final boolean NATIVE_TVOD = false;
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = false;
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = false;

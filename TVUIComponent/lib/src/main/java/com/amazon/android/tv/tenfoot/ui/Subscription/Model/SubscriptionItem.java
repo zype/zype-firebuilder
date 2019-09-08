@@ -6,6 +6,7 @@ package com.amazon.android.tv.tenfoot.ui.Subscription.Model;
 
 public class SubscriptionItem {
     public String description;
+    public String planId;
     public float price;
     public String priceText;
     public String sku;

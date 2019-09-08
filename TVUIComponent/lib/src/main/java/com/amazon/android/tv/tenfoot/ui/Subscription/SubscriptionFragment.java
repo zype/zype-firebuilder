@@ -11,6 +11,7 @@ import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v17.leanback.widget.VerticalGridView;
+import android.util.Log;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.helper.PurchaseHelper;
@@ -18,6 +19,8 @@ import com.amazon.android.model.event.ProductsUpdateEvent;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
 import com.amazon.android.tv.tenfoot.presenter.SubscriptionCardPresenter;
 import com.amazon.android.tv.tenfoot.ui.Subscription.Model.SubscriptionItem;
+import com.zype.fire.api.MarketplaceGateway;
+import com.zype.fire.api.Model.PlanData;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -84,7 +87,8 @@ public class SubscriptionFragment extends RowsFragment {
         super.onStop();
     }
 
-    private void updateSubscriptionOptions(ArrayObjectAdapter arrayObjectAdapter, ArrayList<HashMap<String, String>> products) {
+    private void updateSubscriptionOptions(ArrayObjectAdapter arrayObjectAdapter,
+                                           ArrayList<HashMap<String, String>> products) {
         SubscriptionCardPresenter cardPresenter = new SubscriptionCardPresenter();
         subscriptionsAdapter = new ArrayObjectAdapter(cardPresenter);
 
@@ -96,6 +100,12 @@ public class SubscriptionFragment extends RowsFragment {
                 item.description = productData.get("Description");
                 item.priceText = productData.get("Price");
                 item.sku = productData.get("SKU");
+                PlanData plan = MarketplaceGateway.getInstance(getActivity()).findPlanBySku(item.sku);
+                if (plan == null) {
+                    Log.e(TAG, "updateSubscriptionOptions(): Plan not found for sku " + item.sku);
+                    continue;
+                }
+                item.planId = plan.id;
                 subscriptionsAdapter.add(item);
             }
         }

@@ -20,6 +20,8 @@ import com.amazon.purchase.model.Response;
 import com.amazon.purchase.model.SkuData;
 import com.amazon.purchase.model.UserData;
 import com.amazon.utils.ObjectVerification;
+import com.zype.fire.api.MarketplaceGateway;
+import com.zype.fire.api.ZypeConfiguration;
 
 import android.content.Context;
 import android.support.annotation.VisibleForTesting;
@@ -250,10 +252,30 @@ public class PurchaseManager {
      */
     private void registerSkusAndPurchases(PurchaseManagerListener listener) throws Exception {
 
-        List<Map<String, String>> skuSet = purchaseUtils.readSkusFromConfigFile(sContext);
-        mSkuDataMap.putAll(purchaseUtils.updateSkuSet(skuSet));
-        UpdatePurchasesAction.setListener(listener);
-        new UpdatePurchasesAction(this, true).execute();
+        /* Zype, Evgeny Cherkasov
+         * begin */
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(sContext)
+            || ZypeConfiguration.marketplaceConnectSvodEnabled(sContext)) {
+            final PurchaseManagerListener purchaseManagerListener = listener;
+            MarketplaceGateway.ILoadPlansTask onPlansLoaded = new MarketplaceGateway.ILoadPlansTask() {
+                @Override
+                public void onComplete() {
+                    List<Map<String, String>> skuSet = MarketplaceGateway.getInstance(sContext).getSkuData();
+                    mSkuDataMap.putAll(purchaseUtils.updateSkuSet(skuSet));
+                    UpdatePurchasesAction.setListener(purchaseManagerListener);
+                    new UpdatePurchasesAction(PurchaseManager.this, true).execute();
+                }
+            };
+            MarketplaceGateway.getInstance(sContext);
+            new MarketplaceGateway.LoadPlansTask(onPlansLoaded).execute();
+        }
+        else {
+            List<Map<String, String>> skuSet = purchaseUtils.readSkusFromConfigFile(sContext);
+            mSkuDataMap.putAll(purchaseUtils.updateSkuSet(skuSet));
+            UpdatePurchasesAction.setListener(listener);
+            new UpdatePurchasesAction(this, true).execute();
+        }
+        /* Zype, end */
     }
 
     /**

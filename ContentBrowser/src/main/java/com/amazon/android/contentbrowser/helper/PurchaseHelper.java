@@ -33,6 +33,7 @@ import com.amazon.purchase.PurchaseManager;
 import com.amazon.purchase.PurchaseManagerListener;
 import com.amazon.purchase.model.Product;
 import com.amazon.purchase.model.Response;
+import com.zype.fire.api.MarketplaceGateway;
 
 import org.greenrobot.eventbus.EventBus;
 import org.w3c.dom.Text;
@@ -519,16 +520,16 @@ public class PurchaseHelper {
     public void handleProductsChain(Activity activity) {
         triggerProgress(activity);
         Set<String> skuSet = null;
-        try {
-            skuSet = getSubscriptionSKUs();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            ErrorHelper.injectErrorFragment(activity, ErrorUtils.ERROR_CATEGORY.NETWORK_ERROR,
-                    (errorDialogFragment, errorButtonType, errorCategory) -> {
-                        errorDialogFragment.dismiss();
-                    });
-        }
+//        try {
+            skuSet = MarketplaceGateway.getInstance(activity).getSubscriptionSkus();
+//        }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//            ErrorHelper.injectErrorFragment(activity, ErrorUtils.ERROR_CATEGORY.NETWORK_ERROR,
+//                    (errorDialogFragment, errorButtonType, errorCategory) -> {
+//                        errorDialogFragment.dismiss();
+//                    });
+//        }
         handleProductsChain(activity, skuSet);
     }
 
@@ -586,6 +587,7 @@ public class PurchaseHelper {
     }
 
     public Set<String> getSubscriptionSKUs() throws IOException {
+
         Set<String> result = new HashSet<>();
 
         Recipe recipe = Recipe.newInstance(FileHelper.readFile(mContext, mContext.getString(R.string.skus_file)));
