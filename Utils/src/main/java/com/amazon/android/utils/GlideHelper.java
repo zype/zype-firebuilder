@@ -176,6 +176,29 @@ public class GlideHelper {
     }
 
     /**
+     * Loads an image as a bitmap into a Bitmap simple target.
+     *
+     * @param context      The context to use.
+     * @param url          The URL that points to the image to load.
+     * @param listener     The request listener to use.
+     * @param error        The id of the resource to use as a placeholder if there's an
+     *                     error.
+     * @param simpleTarget The target to load the resource into.
+     */
+    public static void loadImageDetailIntoSimpleTargetBitmap(Context context, String url,
+                                                             LoggingListener listener, int error,
+                                                             SimpleTarget<Bitmap> simpleTarget) {
+
+        Glide.with(context)
+                .load(url)
+                .asBitmap()
+                .listener(listener)
+                .fitCenter()
+                .error(error)
+                .into(simpleTarget);
+    }
+
+    /**
      * Creates a Glide drawable request builder using the given parameters for loading an image
      * into an image view.
      *

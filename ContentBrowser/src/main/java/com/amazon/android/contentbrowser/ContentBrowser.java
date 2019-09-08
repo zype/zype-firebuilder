@@ -328,6 +328,11 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      */
     public static final String RESTORE_ACTIVITY = "restore_last_activity";
 
+    /* Zype, Evgeny Cherkasov
+     * begin */
+    public static final String BROADCAST_DATA_LOADED = "DataLoaded";
+    /* Zype, end */
+
     /**
      * Application context.
      */
@@ -3038,7 +3043,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 //                                switchToHomeScreen();
                                 // TODO: Consider to use event bus instead of broadcast
                                 // This broadcast is handled in ZypePlaylistContentBrowseFragment to update content
-                                LocalBroadcastManager.getInstance(mNavigator.getActiveActivity()).sendBroadcast(new Intent("DataUpdated"));
+                                LocalBroadcastManager.getInstance(mNavigator.getActiveActivity())
+                                        .sendBroadcast(new Intent(BROADCAST_DATA_LOADED));
                             }
                         });
 
@@ -3084,7 +3090,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                             Log.v(TAG, "loadPlaylistVideos(): completed");
                             // TODO: Consider to use event bus instead of broadcast
                             // This broadcast is handled in ZypePlaylistContentBrowseFragment to update content
-                            LocalBroadcastManager.getInstance(mNavigator.getActiveActivity()).sendBroadcast(new Intent("DataUpdated"));
+                            LocalBroadcastManager.getInstance(mNavigator.getActiveActivity())
+                                    .sendBroadcast(new Intent(BROADCAST_DATA_LOADED));
                         });
         mCompositeSubscription.add(subscription);
     }

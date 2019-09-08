@@ -1,4 +1,6 @@
 {
+  "lockIcons": false,
   "marketplaceConnectSVOD": false,
-  "planIds": []
+  "planIds": [],
+  "showItemTitles": "false"
 }

@@ -48,6 +48,8 @@ import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
 
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
@@ -66,6 +68,8 @@ import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+
+import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
 
 /**
  * Class that initializes the content for the app. This includes running the recipes that download
@@ -684,6 +688,9 @@ public class ContentLoader {
                         return getFavoriteVideosFeedObservable(contentContainerAsObject);
                     }
                     else {
+                        LocalBroadcastManager.getInstance(mContext)
+                                .sendBroadcast(new Intent(BROADCAST_DATA_LOADED));
+
                         // Loading playlist videos
                         return getPlaylistVideosFeedObservable(contentContainerAsObject);
                     }

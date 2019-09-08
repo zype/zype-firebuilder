@@ -5,7 +5,9 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
 import com.zype.fire.api.Model.AppData;
+import com.zype.fire.api.Util.FileHelper;
 
 /**
  * Created by Evgeny Cherkasov on 13.11.2017.
@@ -166,5 +168,18 @@ public class ZypeConfiguration {
 
     public static boolean isCreateAccountTermsOfServiceRequired() {
         return ZypeSettings.ACCOUNT_CREATION_TOS;
+    }
+
+    // App configuration
+    public static AppConfiguration readAppConfiguration(Context context) {
+        AppConfiguration result = null;
+
+        String jsonAppConfiguration = FileHelper.readAssetsFile(context, R.raw.zype_app_configuration);
+        if (!TextUtils.isEmpty(jsonAppConfiguration)) {
+            Gson gson = new Gson();
+            result = gson.fromJson(jsonAppConfiguration, AppConfiguration.class);
+        }
+
+        return result;
     }
 }

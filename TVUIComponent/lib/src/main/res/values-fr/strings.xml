@@ -45,7 +45,7 @@ permissions and limitations under the License.
   <string name="time_remaining">Temps restant&#160;: %s</string>
   <string name="duration">%1$d:%2$02d:%3$02d</string>
   <string name="settings_title">Paramètres</string>
-  <string name="copyright">Copyright 2015 Amazon.com, Inc. ou ses affiliés. Tous droits
+  <string name="copyright">Copyright 2019. Tous droits
         réservés.
     </string>
   <string name="terms_title">Conditions d\'utilisation</string>

@@ -14,6 +14,6 @@ express or implied. See the License for the specific language governing
 permissions and limitations under the License.
 -->
 <resources>
-  <string name="copyright">Copyright 2016. Tous droits réservés.</string>
+  <string name="copyright">Copyright 2019. Tous droits réservés.</string>
   <string name="search_bar_hint">Je recherche...</string>
 </resources>
