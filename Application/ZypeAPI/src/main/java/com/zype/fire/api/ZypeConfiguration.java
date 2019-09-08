@@ -3,7 +3,6 @@ package com.zype.fire.api;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.text.TextUtils;
 
 import com.zype.fire.api.Model.AppData;
@@ -18,7 +17,7 @@ public class ZypeConfiguration {
     private static final String PREFERENCE_DEVICE_LINKING_URL = "ZypeDeviceLinkingUrl";
     private static final String PREFERENCE_FAVORITES_API = "ZypeFavoritesApi";
     private static final String PREFERENCE_NATIVE_SUBSCRIPTION = "ZypeNativeSubscription";
-    private static final String PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION = "ZypeNativeToUniversalSubscription";
+    private static final String PREFERENCE_MARKETPLACE_CONNECT_SVOD = "ZypeMarketplaceConnectSVOD";
     private static final String PREFERENCE_NATIVE_TVOD = "ZypeNativeTVOD";
     private static final String PREFERENCE_ROOT_PLAYLIST_ID = "ZypeRootPlaylistId";
     private static final String PREFERENCE_SITE_ID = "ZypeSiteId";
@@ -50,9 +49,9 @@ public class ZypeConfiguration {
         if (!TextUtils.isEmpty(appData.nativeSubscription)) {
             editor.putBoolean(PREFERENCE_NATIVE_SUBSCRIPTION, Boolean.valueOf(appData.nativeSubscription));
         }
-        if (!TextUtils.isEmpty(appData.nativeToUniversalSubscription)) {
-            editor.putBoolean(PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION, Boolean.valueOf(appData.nativeToUniversalSubscription));
-        }
+//        if (!TextUtils.isEmpty(appData.nativeToUniversalSubscription)) {
+//            editor.putBoolean(PREFERENCE_MARKETPLACE_CONNECT_SVOD, Boolean.valueOf(appData.nativeToUniversalSubscription));
+//        }
         if (!TextUtils.isEmpty(appData.nativeTVOD)) {
             editor.putBoolean(PREFERENCE_NATIVE_TVOD, Boolean.valueOf(appData.nativeTVOD));
         }
@@ -81,7 +80,7 @@ public class ZypeConfiguration {
         editor.remove(PREFERENCE_DEVICE_LINKING);
         editor.remove(PREFERENCE_FAVORITES_API);
         editor.remove(PREFERENCE_NATIVE_SUBSCRIPTION);
-        editor.remove(PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION);
+        editor.remove(PREFERENCE_MARKETPLACE_CONNECT_SVOD);
         editor.remove(PREFERENCE_NATIVE_TVOD);
         editor.remove(PREFERENCE_ROOT_PLAYLIST_ID);
         editor.remove(PREFERENCE_SITE_ID);
@@ -135,8 +134,8 @@ public class ZypeConfiguration {
         return getBooleanPreference(PREFERENCE_NATIVE_SUBSCRIPTION, ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED, context);
     }
 
-    public static boolean isNativeToUniversalSubscriptionEnabled(Context context) {
-        return getBooleanPreference(PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION, ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED, context);
+    public static boolean marketplaceConnectSvodEnabled(Context context) {
+        return getBooleanPreference(PREFERENCE_MARKETPLACE_CONNECT_SVOD, ZypeSettings.MARKETPLACE_CONNECT_SVOD, context);
     }
 
     public static boolean isNativeTVODEnabled(Context context) {

@@ -255,7 +255,7 @@ public class PurchaseManager {
         /* Zype, Evgeny Cherkasov
          * begin */
         if (ZypeConfiguration.isNativeSubscriptionEnabled(sContext)
-            && ZypeConfiguration.isUniversalSubscriptionEnabled(sContext)) {
+            || ZypeConfiguration.marketplaceConnectSvodEnabled(sContext)) {
             final PurchaseManagerListener purchaseManagerListener = listener;
             MarketplaceGateway.ILoadPlansTask onPlansLoaded = new MarketplaceGateway.ILoadPlansTask() {
                 @Override

@@ -9,17 +9,12 @@ import com.amazon.purchase.model.Receipt;
 import com.amazon.purchase.model.Response;
 import com.amazon.purchase.model.UserData;
 import com.google.gson.Gson;
-import com.zype.fire.api.Model.BifrostResponse;
 import com.zype.fire.api.Model.MarketplaceConnectBody;
 import com.zype.fire.api.Model.MarketplaceConnectBodyData;
-import com.zype.fire.api.Model.MarketplaceConnectResponse;
 import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeConfiguration;
-import com.zype.fire.api.ZypeSettings;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by Evgeny Cherkasov on 30.08.2017.
@@ -37,7 +32,7 @@ public class ZypeReceiptVerificationService extends AReceiptVerifier {
     public String validateReceipt(Context context, String requestId, String sku, UserData
             userData, Receipt receipt, IPurchase.PurchaseListener listener) {
 
-//        if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(context)) {
+//        if (ZypeConfiguration.marketplaceConnectSvodEnabled(context)) {
 //            Map<String, String> fieldParams = new HashMap<>();
 //            // TODO: Get preference id from ZypeAuthentication
 //            fieldParams.put(ZypeApi.APP_KEY, ZypeSettings.APP_KEY);
@@ -78,7 +73,7 @@ public class ZypeReceiptVerificationService extends AReceiptVerifier {
 //                return requestId;
 //            }
 //        }
-        if (ZypeConfiguration.isUniversalSubscriptionEnabled(context)) {
+        if (ZypeConfiguration.marketplaceConnectSvodEnabled(context)) {
             Log.i(TAG, "validateReceipt(): Subscription");
             MarketplaceConnectBody body = new MarketplaceConnectBody();
             body.amount = "";

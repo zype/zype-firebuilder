@@ -254,7 +254,8 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
     @Override
     public void onSubscriptionSelected(SubscriptionItem item) {
         selectedSubscription = item;
-        if (ZypeConfiguration.isUniversalSubscriptionEnabled(SubscriptionActivity.this)) {
+        if (ZypeConfiguration.isUniversalSubscriptionEnabled(SubscriptionActivity.this)
+            || ZypeConfiguration.marketplaceConnectSvodEnabled(SubscriptionActivity.this)) {
             if (!contentBrowser.isUserLoggedIn()) {
                 Intent intent = new Intent(SubscriptionActivity.this, CreateLoginActivity.class);
                 startActivityForResult(intent, REQUEST_CREATE_LOGIN);
@@ -305,7 +306,7 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
                 closeScreen();
             }
             else {
-                // Relogin required after successful purchase validation by Bifrost
+                // Relogin required after successful purchase validation with Marketplace connect
                 Consumer consumer = new Consumer();
                 consumer.email = Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_EMAIL);
                 consumer.password = Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_PASSWORD);
