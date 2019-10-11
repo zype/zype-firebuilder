@@ -24,6 +24,7 @@ public class ZypeSettings {
     public static final String TEMPLATE_VERSION = "1.8.0";
 
     public static final boolean EPG_ENABLED = true;
+    public static final boolean DETAIL_BACKGROUND_IMAGE = false;
 
 
     // Features

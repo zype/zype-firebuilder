@@ -102,6 +102,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
+import static com.zype.fire.api.ZypeSettings.DETAIL_BACKGROUND_IMAGE;
 
 
 /**
@@ -189,7 +190,10 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
                 setupRelatedContentRow();
             }
             setupContentListRowPresenter();
-            updateBackground(mSelectedContent.getBackgroundImageUrl());
+
+            if (DETAIL_BACKGROUND_IMAGE){
+                updateBackground(mSelectedContent.getBackgroundImageUrl());
+            }
             setOnItemViewClickedListener(new ItemViewClickedListener());
         }
         else {

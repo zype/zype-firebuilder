@@ -133,6 +133,7 @@ public class CardPresenter extends Presenter {
 
         TextView subtitle = (TextView) cardView.findViewById(R.id.content_text);
         if (subtitle != null) {
+            subtitle.setMaxLines(2);
             subtitle.setEllipsize(TextUtils.TruncateAt.END);
         }
 
