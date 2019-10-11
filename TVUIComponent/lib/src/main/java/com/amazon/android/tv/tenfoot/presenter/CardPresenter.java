@@ -80,7 +80,7 @@ public class CardPresenter extends Presenter {
     private Drawable imageUnlocked;
     private static Drawable infoFieldWithProgressBarBackground;
     private ContentBrowser contentBrowser;
-
+    private  TextView titleText;
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
 
@@ -90,11 +90,8 @@ public class CardPresenter extends Presenter {
         appConf = ZypeConfiguration.readAppConfiguration(mContext);
         try {
             mDefaultCardImage = ContextCompat.getDrawable(mContext, R.drawable.movie);
-            if (appConf.showItemTitles) {
-                sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused);
-            }else{
-                sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_trance);
-            }
+            sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_trance);
+
             /* Zype, Evgeny Cherkasov */
             infoFieldWithProgressBarBackground = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_progress_bar);
             imageLocked = ContextCompat.getDrawable(mContext, R.drawable.locked);
@@ -115,11 +112,12 @@ public class CardPresenter extends Presenter {
 //                }
             }
         };
+        cardView.setInfoAreaBackground(sFocusedFadeMask);
         cardView.setFocusable(true);
         cardView.setFocusableInTouchMode(true);
 
         // Set the type and visibility of the info area.
-        cardView.setCardType(BaseCardView.CARD_TYPE_INFO_OVER);
+        cardView.setCardType(appConf.showItemTitles ? BaseCardView.CARD_TYPE_INFO_UNDER : BaseCardView.CARD_TYPE_INFO_OVER);
         cardView.setInfoVisibility(BaseCardView.CARD_REGION_VISIBLE_ALWAYS);
 
         /* Zype, Evgeny Cherkasov */
@@ -132,16 +130,14 @@ public class CardPresenter extends Presenter {
         mCardHeightDp = Helpers.convertPixelToDp(mContext, CARD_HEIGHT_PX);
 
         TextView subtitle = (TextView) cardView.findViewById(R.id.content_text);
+        titleText = (TextView) cardView.findViewById(R.id.title_text);
+
         if (subtitle != null) {
             subtitle.setMaxLines(2);
             subtitle.setEllipsize(TextUtils.TruncateAt.END);
         }
 
         mInfoField = cardView.findViewById(R.id.info_field);
-        if (mInfoField != null) {
-            mInfoField.setBackground(sFocusedFadeMask);
-        }
-
         return new ViewHolder(cardView);
     }
 
@@ -162,7 +158,19 @@ public class CardPresenter extends Presenter {
 
 
                 if (appConf.showItemTitles) {
-                    cardView.setTitleText(ContentHelper.getCardViewSubtitle(mContext, content));
+
+                    String title = ContentHelper.getCardViewSubtitle(mContext, content);
+
+                    if(titleText != null) {
+                        if(TextUtils.isEmpty(title)) {
+                            titleText.setVisibility(View.GONE);
+                        }
+                        else {
+                            titleText.setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                    cardView.setTitleText(title);
                     cardView.setContentText(content.getTitle());
                 }
                 else {
