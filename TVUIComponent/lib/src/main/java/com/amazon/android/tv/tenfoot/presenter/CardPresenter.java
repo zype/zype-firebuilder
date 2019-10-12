@@ -223,6 +223,10 @@ public class CardPresenter extends Presenter {
         }
         else if (item instanceof ContentContainer) {
             ContentContainer contentContainer = (ContentContainer) item;
+            if(titleText != null) {
+                titleText.setVisibility(View.GONE);
+            }
+
             if (appConf.showItemTitles) {
                 cardView.setContentText(contentContainer.getName());
             }
