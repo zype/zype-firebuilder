@@ -116,4 +116,6 @@ permissions and limitations under the License.
     <string name="subscription_title_confirm">Confirm Subscription</string>
 
     <string name="action_load_more">Load more…</string>
+    <string name="search">Search</string>
+
 </resources>
