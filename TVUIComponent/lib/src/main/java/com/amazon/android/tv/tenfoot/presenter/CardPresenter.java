@@ -59,6 +59,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import static com.zype.fire.api.ZypeSettings.SHOW_TITLE;
+
 /**
  * A CardPresenter is used to generate Views and bind Objects to them on demand.
  * It contains an Image CardView
@@ -117,7 +119,7 @@ public class CardPresenter extends Presenter {
         cardView.setFocusableInTouchMode(true);
 
         // Set the type and visibility of the info area.
-        cardView.setCardType(appConf.showItemTitles ? BaseCardView.CARD_TYPE_INFO_UNDER : BaseCardView.CARD_TYPE_INFO_OVER);
+        cardView.setCardType(SHOW_TITLE ? BaseCardView.CARD_TYPE_INFO_UNDER : BaseCardView.CARD_TYPE_INFO_OVER);
         cardView.setInfoVisibility(BaseCardView.CARD_REGION_VISIBLE_ALWAYS);
 
         /* Zype, Evgeny Cherkasov */
@@ -157,7 +159,7 @@ public class CardPresenter extends Presenter {
                 // actual Title.
 
 
-                if (appConf.showItemTitles) {
+                if (SHOW_TITLE) {
 
                     String title = ContentHelper.getCardViewSubtitle(mContext, content);
 
@@ -227,7 +229,7 @@ public class CardPresenter extends Presenter {
                 titleText.setVisibility(View.GONE);
             }
 
-            if (appConf.showItemTitles) {
+            if (SHOW_TITLE) {
                 cardView.setContentText(contentContainer.getName());
             }
             else {

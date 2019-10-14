@@ -25,6 +25,7 @@ public class ZypeSettings {
 
     public static final boolean EPG_ENABLED = true;
     public static final boolean DETAIL_BACKGROUND_IMAGE = false;
+    public static final boolean SHOW_TITLE = true;
 
 
     // Features

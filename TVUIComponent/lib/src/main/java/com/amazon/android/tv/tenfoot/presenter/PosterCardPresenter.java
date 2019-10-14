@@ -59,6 +59,8 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.zype.fire.api.AppConfiguration;
 import com.zype.fire.api.ZypeConfiguration;
 
+import static com.zype.fire.api.ZypeSettings.SHOW_TITLE;
+
 /**
  * Zype, Evgeny Cherkasov
  *
@@ -90,7 +92,7 @@ public class PosterCardPresenter extends Presenter {
         appConf = ZypeConfiguration.readAppConfiguration(mContext);
         try {
             mDefaultCardImage = ContextCompat.getDrawable(mContext, R.drawable.movie);
-            if (appConf.showItemTitles) {
+            if (SHOW_TITLE) {
                 sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused);
             }else{
                 sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_trance);
@@ -160,7 +162,7 @@ public class PosterCardPresenter extends Presenter {
                 cardView.setTitleText(ContentHelper.getCardViewSubtitle(mContext, content));
 
 
-                if (appConf.showItemTitles) {
+                if (SHOW_TITLE) {
                     cardView.setContentText(content.getTitle());
                 }
                 else {
@@ -215,7 +217,7 @@ public class PosterCardPresenter extends Presenter {
         }
         else if (item instanceof ContentContainer) {
             ContentContainer contentContainer = (ContentContainer) item;
-            if (appConf.showItemTitles) {
+            if (SHOW_TITLE) {
                 cardView.setContentText(contentContainer.getName());
             }
             else {
