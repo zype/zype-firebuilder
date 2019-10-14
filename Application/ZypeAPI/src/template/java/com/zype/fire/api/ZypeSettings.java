@@ -25,6 +25,8 @@ public class ZypeSettings {
     public static final String TEMPLATE_VERSION = "1.8.0";
     
     public static final boolean EPG_ENABLED = false;
+    public static final boolean DETAIL_BACKGROUND_IMAGE = false;
+    public static final boolean SHOW_TITLE = false;
 
     // Features
     public static final boolean DEVICE_LINKING = Boolean.valueOf("<DEVICE_LINKING>");
