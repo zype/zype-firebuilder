@@ -136,7 +136,7 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
         display.getSize(windowSize);
         int imageWidth = (int) getResources().getDimension(R.dimen.content_image_width);
         int imageHeight = (int) getResources().getDimension(R.dimen.content_image_height);
-        int gradientSize = (int) getResources().getDimension(R.dimen.content_image_gradient_size);
+        int gradientSize = (int) getResources().getDimension(R.dimen.content_image_gradient_size_zype);
         // Create the background
         Bitmap background =
                 BackgroundImageUtils.createBackgroundWithPreviewWindow(

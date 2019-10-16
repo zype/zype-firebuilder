@@ -41,7 +41,7 @@ permissions and limitations under the License.
         android:layout_height="400dp"
         android:layout_alignParentRight="true"
         android:adjustViewBounds="true"
-        android:scaleType="centerCrop"/>
+        android:scaleType="fitCenter"/>
 
 <!--
     <RelativeLayout

@@ -31,10 +31,12 @@ permissions and limitations under the License.
 
     <string name="login_label">Login</string>
     <string name="logout_label">Logout</string>
+    <string name="account_label">Account</string>
+
     <string name="slideshow_label">Slide Show Setting</string>
     <string name="auto_play_speed">Slide speed</string>
 
-    <string name="terms_title">Terms of Use</string>
+    <string name="terms_title">Terms and Privacy Policy</string>
     <string name="terms_description">Review the Legal Notices.</string>
     <string name="slideshow_title">Slide show speed</string>
     <string name="slideshow_description">Set slide show speed.</string>

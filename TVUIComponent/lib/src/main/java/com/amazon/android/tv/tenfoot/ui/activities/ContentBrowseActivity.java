@@ -48,6 +48,7 @@ import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment;
 import com.zype.fire.api.ZypeConfiguration;
+import com.zype.fire.api.ZypeSettings;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
@@ -78,6 +79,8 @@ import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
+
+import static com.zype.fire.api.ZypeSettings.SHOW_MENU;
 
 /**
  * ContentBrowseActivity class that loads the ContentBrowseFragment.
@@ -135,7 +138,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         display.getSize(windowSize);
         int imageWidth = (int) getResources().getDimension(R.dimen.content_image_width);
         int imageHeight = (int) getResources().getDimension(R.dimen.content_image_height);
-        int gradientSize = (int) getResources().getDimension(R.dimen.content_image_gradient_size);
+        int gradientSize = (int) getResources().getDimension(R.dimen.content_image_gradient_size_zype);
         // Create the background
         Bitmap background =
                 BackgroundImageUtils.createBackgroundWithPreviewWindow(
@@ -165,6 +168,13 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
                     .commit();
             }
         }
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+               findViewById(R.id.hero_slider_ly).setAlpha(1);
+            }
+        },500);
 
     }
 
@@ -417,7 +427,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
 
             case KeyEvent.KEYCODE_MENU:
                 if (event.getAction() == KeyEvent.ACTION_UP) {
-                    if (ZypeConfiguration.displayLeftMenu()) {
+                    if (ZypeSettings.SHOW_MENU) {
                         Log.d(TAG, "Menu button pressed");
                         if (!isMenuOpened) {
                             showMenu();
