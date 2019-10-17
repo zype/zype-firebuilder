@@ -58,6 +58,10 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -256,6 +260,10 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
 
         mBackgroundManager = BackgroundManager.getInstance(getActivity());
         mBackgroundManager.attach(getActivity().getWindow());
+        // BackgroundManager has default dim drawable set to 'R.color.lb_background_protection'. This
+        // makes the background image dark. We should set the dim drawable to be transparent for
+        // light theme.
+        mBackgroundManager.setDimLayer(ContextCompat.getDrawable(getActivity(), R.color.transparent));
         mDefaultBackground = ContextCompat.getDrawable(getActivity(), android.R.color.transparent);
         mMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(mMetrics);
@@ -274,9 +282,12 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
             public void onResourceReady(Bitmap resource,
                                         GlideAnimation<? super Bitmap> glideAnimation) {
 
-                Bitmap bitmap = Helpers.adjustOpacity(resource, getResources().getInteger(
-                        R.integer.content_details_fragment_bg_opacity));
-
+//                Bitmap bitmap = Helpers.adjustOpacity(resource, getResources().getInteger(
+//                        R.integer.content_details_fragment_bg_opacity));
+//
+                Bitmap bitmap = Helpers.adjustOpacityAndBackground(resource,
+                        getResources().getInteger(R.integer.content_details_fragment_bg_opacity),
+                        ContextCompat.getColor(getActivity(), R.color.background));
                 mBackgroundManager.setBitmap(bitmap);
             }
         };

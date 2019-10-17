@@ -71,6 +71,7 @@
             android:id="@+id/editUsername"
             android:backgroundTint="@color/background_tint_color_selector"
             android:hint="@string/zype_login_username"
+            android:textColorHint="@color/tertiary_text"
             tools:text="Email"
             />
         <EditText
@@ -83,6 +84,7 @@
             android:backgroundTint="@color/background_tint_color_selector"
             android:hint="@string/zype_login_password"
             android:inputType="textPassword"
+            android:textColorHint="@color/tertiary_text"
             tools:text="Password"
             />
         <Button

@@ -29,7 +29,8 @@ permissions and limitations under the License.
         <item name="detailsActionButtonStyle">
             @style/Widget.Leanback.DetailsActionButtonStyle.Custom
         </item>
-    </style>
+        <item name="android:windowBackground">@color/background</item>
+   </style>
 
     <declare-styleable name="LeanbackTheme">
 

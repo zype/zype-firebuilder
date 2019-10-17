@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Used for the category titles and content subtitles -->
+    <color name="tertiary_text">#99FFFFFF</color>
+
+</resources>
