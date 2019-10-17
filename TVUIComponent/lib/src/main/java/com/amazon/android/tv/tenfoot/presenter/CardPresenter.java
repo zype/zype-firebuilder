@@ -128,7 +128,7 @@ public class CardPresenter extends Presenter {
         int CARD_WIDTH_PX = 210;
         mCardWidthDp = Helpers.convertPixelToDp(mContext, CARD_WIDTH_PX);
 
-        int CARD_HEIGHT_PX = 120;
+        int CARD_HEIGHT_PX = 118;
         mCardHeightDp = Helpers.convertPixelToDp(mContext, CARD_HEIGHT_PX);
 
         TextView subtitle = (TextView) cardView.findViewById(R.id.content_text);

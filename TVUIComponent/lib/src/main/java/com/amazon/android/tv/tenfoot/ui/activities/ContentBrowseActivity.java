@@ -174,7 +174,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
             public void run() {
                findViewById(R.id.hero_slider_ly).setAlpha(1);
             }
-        },500);
+        },700);
 
     }
 

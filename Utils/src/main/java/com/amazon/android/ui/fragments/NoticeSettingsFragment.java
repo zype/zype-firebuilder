@@ -58,6 +58,7 @@ public class NoticeSettingsFragment extends ASettingsFragment {
                                Action settingsItem) {
 
         final ReadDialogFragment dialog = new ReadDialogFragment();
+        dialog.setDialogLayout(R.layout.tnc_dialog);
         dialog.setContentViewProvider(getSingleViewProvider(activity));
         dialog.setArguments(getArguments(activity));
         commitFragment(manager, dialog, activity.getString(R.string.notice_settings_fragment_tag));

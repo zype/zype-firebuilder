@@ -34,14 +34,22 @@ permissions and limitations under the License.
     android:layout_width="match_parent" android:layout_height="match_parent"
     >
 
-
-    <ImageView
-        android:id="@+id/content_image"
+    <LinearLayout
         android:layout_width="560dp"
         android:layout_height="400dp"
-        android:layout_alignParentRight="true"
-        android:adjustViewBounds="true"
-        android:scaleType="fitCenter"/>
+        android:layout_alignParentTop="true"
+        android:gravity="top"
+        android:layout_alignParentRight="true">
+
+        <ImageView
+            android:id="@+id/content_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:layout_gravity="top"
+            android:background="@color/accent"
+            android:scaleType="fitCenter" />
+    </LinearLayout>
 
 <!--
     <RelativeLayout
