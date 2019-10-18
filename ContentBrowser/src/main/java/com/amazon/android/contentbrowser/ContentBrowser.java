@@ -1507,7 +1507,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 loginLogoutActionTriggered(activity, settingsAction);
                 break;
             case TERMS:
-                tNcActionTriggered(activity);
+                openTermsTriggered(activity);
                 break;
             case SLIDESHOW_SETTING:
                 slideShowSettingActionTriggered(activity, settingsAction);
@@ -1621,7 +1621,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
 
 
-    private void tNcActionTriggered(Activity activity) {
+    private void openTermsTriggered(Activity activity) {
         ContentBrowser.getInstance(activity)
                 .switchToScreen(ContentBrowser.CONTENT_TERMS_SCREEN);
     }
