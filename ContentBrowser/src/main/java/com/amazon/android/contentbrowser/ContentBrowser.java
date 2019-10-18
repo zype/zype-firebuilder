@@ -167,6 +167,11 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      */
     public static final String CONTENT_SLIDESHOW_SCREEN = "CONTENT_SLIDESHOW_SCREEN";
 
+    /**
+     * The TnC screen name.
+     */
+    public static final String CONTENT_TnC_SCREEN = "CONTENT_TnC_SCREEN";
+
     /* Zype, Evgeny Cherkasov */
     public static final String BUY_VIDEO_SCREEN = "BUY_VIDEO_SCREEN";
     public static final String SUBSCRIPTION_SCREEN = "SUBSCRIPTION_SCREEN";
@@ -305,7 +310,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final int CONTENT_ACTION_SWAF = 56;
 
     public static final int CONTENT_REGISTRATION_REQUIRED = 57;
-    
+
     public static final int CONTENT_PLAY_TRAILER = 58;
 
     /**
@@ -1502,10 +1507,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 loginLogoutActionTriggered(activity, settingsAction);
                 break;
             case TERMS:
-                new NoticeSettingsFragment()
-                        .createFragment(activity,
-                                activity.getFragmentManager(),
-                                settingsAction);
+                tNcActionTriggered(activity);
                 break;
             case SLIDESHOW_SETTING:
                 slideShowSettingActionTriggered(activity, settingsAction);
@@ -1618,6 +1620,11 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
 
+
+    private void tNcActionTriggered(Activity activity) {
+        ContentBrowser.getInstance(activity)
+                .switchToScreen(ContentBrowser.CONTENT_TnC_SCREEN);
+    }
 
     private void myLibraryActionTriggered(Activity activity) {
         ContentContainer contentContainer = getRootContentContainer()
@@ -2226,6 +2233,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             iScreenSwitchListener.onScreenSwitch(null);
         }
     }
+
+
 
     /**
      * Switch to screen by name.

@@ -30,6 +30,8 @@ public class ZypeSettings {
     public static final boolean SHOW_MENU = false;
     public static final boolean SHOW_SEARCH_ICON = true;
 
+    public static final String TERMS_CONDITION_URL = "https://www.zype.com/";
+
     // Features
     public static final boolean DEVICE_LINKING = Boolean.valueOf("<DEVICE_LINKING>");
     public static final boolean FAVORITES_VIA_API = Boolean.valueOf("<FAVORITES_VIA_API>");

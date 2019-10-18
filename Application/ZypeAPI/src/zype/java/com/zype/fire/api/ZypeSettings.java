@@ -29,6 +29,7 @@ public class ZypeSettings {
     public static final boolean SHOW_MENU = true;
     public static final boolean SHOW_SEARCH_ICON = false;
 
+    public static final String TERMS_CONDITION_URL  = "https://www.zype.com/";
 
     // Features
     public static final boolean ACCOUNT_CREATION_TOS = false;
