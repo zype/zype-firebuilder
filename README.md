@@ -126,13 +126,15 @@ Light theme will display all background for all screens in white color and text 
 To enable light appearance update following values in the *Application/app/src/template/res/values/custom.xml* file:
 
 
-| ***Attribute name***       | ***Value***      |
-|:---------------------------|:-----------------|
-|`background`                |#FFFFFF           |
-|`card_background`           |#FFFFFF           |
-|`spinner_color`             |#FF000000         |
-|`primary_text`              |#E6000000         |
-|`tertiary_text`             |#99000000         |
+| ***Attribute name***                 | ***Value***      |
+|:-------------------------------------|:-----------------|
+|`background`                          |#FFFFFF           |
+|`card_background`                     |#FFFFFF           |
+|`spinner_color`                       |#FF000000         |
+|`primary_text`                        |#E6000000         |
+|`tertiary_text`                       |#99000000         |
+|`search_edit_text_bg_color`           |#4D000000         |
+|`search_edit_text_bg_color_unfocused` |#1A000000         |
 
 
 
