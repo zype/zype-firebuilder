@@ -73,6 +73,7 @@ permissions and limitations under the License.
     <dimen name="content_image_width">540dp</dimen>
     <!-- Size of gradient fade for content preview window -->
     <dimen name="content_image_gradient_size">100dp</dimen>
+    <dimen name="content_image_gradient_size_zype">35dp</dimen>
 
     <!-- End of Browse Customization -->
 

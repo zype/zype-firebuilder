@@ -58,6 +58,7 @@ public class NoticeSettingsFragment extends ASettingsFragment {
                                Action settingsItem) {
 
         final ReadDialogFragment dialog = new ReadDialogFragment();
+        dialog.setDialogLayout(R.layout.tnc_dialog);
         dialog.setContentViewProvider(getSingleViewProvider(activity));
         dialog.setArguments(getArguments(activity));
         commitFragment(manager, dialog, activity.getString(R.string.notice_settings_fragment_tag));
@@ -87,17 +88,17 @@ public class NoticeSettingsFragment extends ASettingsFragment {
 
         /* Zype, Evgeny Cherkasov
         * begin */
-//        String content = "";
-//        try {
-//            content = Helpers.getContentFromFile(context,
-//                                                 context.getString(R.string.terms_of_use_file));
-//        }
-//        catch (Exception e) {
-//            Log.e(TAG, "could not read terms of use file", e);
-//        }
+        String content = "";
+        try {
+            content = Helpers.getContentFromFile(context,
+                                                 context.getString(R.string.terms_of_use_file));
+        }
+        catch (Exception e) {
+            Log.e(TAG, "could not read terms of use file", e);
+        }
         // Terms of services are loading when the app is starting
         // from Zobject Content with the 'privacy_policy' id
-        String content = Preferences.getString("ZypeTerms");
+      //  String content = Preferences.getString("ZypeTerms");
         /* Zype
         * end */
         /* Zype, Evgeny Cherkasov */

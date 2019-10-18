@@ -75,7 +75,7 @@ public class BrowseHelper {
     public static ArrayObjectAdapter addSettingsActionsToRowAdapter(Activity activity,
                                                                     ArrayObjectAdapter rowAdapter) {
 
-        List<Action> settings = ContentBrowser.getInstance(activity).getSettingsActions();
+        List<Action> settings = ContentBrowser.getInstance(activity).getSettingsHomeActions();
 
         if (settings == null || settings.isEmpty()) {
             Log.d(TAG, "No settings were found");

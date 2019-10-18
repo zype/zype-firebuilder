@@ -103,6 +103,8 @@ public class ContentBrowseFragment extends RowsFragment {
     ArrayObjectAdapter mRowsAdapter = null;
     private BroadcastReceiver receiver;
 
+    private boolean userAuthenticated;
+
     // Container Activity must implement this interface.
     public interface OnBrowseRowListener {
 
@@ -182,6 +184,8 @@ public class ContentBrowseFragment extends RowsFragment {
 
         super.onResume();
 
+        userAuthenticated = ContentBrowser.getInstance(getActivity()).isUserLoggedIn();
+
         /* Zype, Evgeny Cherkasov */
         if (receiver != null) {
             LocalBroadcastManager.getInstance(getActivity())
@@ -209,6 +213,13 @@ public class ContentBrowseFragment extends RowsFragment {
     @Subscribe
     public void onAuthenticationStatusUpdateEvent(AuthHelper.AuthenticationStatusUpdateEvent
                                                           authenticationStatusUpdateEvent) {
+
+        if(userAuthenticated == authenticationStatusUpdateEvent.isUserAuthenticated()) {
+            return;
+        }
+
+        userAuthenticated = authenticationStatusUpdateEvent.isUserAuthenticated();
+
 
         if (mSettingsAdapter != null) {
             if (mLoginButtonIndex != -1) {

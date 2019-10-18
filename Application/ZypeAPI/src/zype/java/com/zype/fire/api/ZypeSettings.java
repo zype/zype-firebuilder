@@ -24,7 +24,12 @@ public class ZypeSettings {
     public static final String TEMPLATE_VERSION = "1.8.0";
 
     public static final boolean EPG_ENABLED = true;
+    public static final boolean DETAIL_BACKGROUND_IMAGE = false;
+    public static final boolean SHOW_TITLE = true;
+    public static final boolean SHOW_MENU = true;
+    public static final boolean SHOW_SEARCH_ICON = false;
 
+    public static final String TERMS_CONDITION_URL  = "https://www.zype.com/";
 
     // Features
     public static final boolean ACCOUNT_CREATION_TOS = false;

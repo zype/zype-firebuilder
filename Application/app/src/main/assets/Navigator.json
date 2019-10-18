@@ -81,6 +81,11 @@
       "verifyScreenAccess": false,
       "verifyNetworkConnection": true,
       "onAction": "EPG_SCREEN"
+    },
+    "com.amazon.android.tv.tenfoot.ui.activities.TermsConditionActivity": {
+      "verifyScreenAccess": false,
+      "verifyNetworkConnection": true,
+      "onAction": "CONTENT_TERMS_SCREEN"
     }
   }
 }
