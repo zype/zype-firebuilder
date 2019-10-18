@@ -39,6 +39,7 @@ import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -50,6 +51,7 @@ import android.support.v17.leanback.widget.ObjectAdapter;
 import android.support.v17.leanback.widget.PlaybackControlsRowPresenter;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.VerticalGridView;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.InputEvent;
@@ -59,6 +61,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -78,7 +81,7 @@ public class TenFootPlaybackOverlayFragment extends DetailsFragment {
     /**
      * A dark translucent background.
      */
-    private static final int BG_DARK = 1;
+    protected static final int BG_DARK = 1;
 
     /**
      * A light translucent background.
@@ -393,22 +396,33 @@ public class TenFootPlaybackOverlayFragment extends DetailsFragment {
                 try {
                     int playPauseIndex = parent.indexOfChild((View) mPlayPauseView.getParent());
 
+                    tintIcon((ImageView) ((ViewGroup) parent.getChildAt(playPauseIndex)).getChildAt(1));
+
                     mRewindView = ((ViewGroup) parent.getChildAt(playPauseIndex - 1))
                             .getChildAt(index);
                     mRewindViewIcon = ((ViewGroup) parent.getChildAt(playPauseIndex - 1))
                             .getChildAt(index + 1);
+                    tintIcon((ImageView) mRewindViewIcon);
                     mFastForwardView = ((ViewGroup) parent.getChildAt(playPauseIndex + 1))
                             .getChildAt(index);
                     mFastForwardViewIcon = ((ViewGroup) parent.getChildAt(playPauseIndex + 1))
                             .getChildAt(index + 1);
+                    tintIcon((ImageView) mFastForwardViewIcon);
                     mSkipNextView = ((ViewGroup) parent.getChildAt(playPauseIndex + 2))
                             .getChildAt(index);
                     mSkipNextViewIcon = ((ViewGroup) parent.getChildAt(playPauseIndex + 2))
                             .getChildAt(index + 1);
+                    tintIcon((ImageView) mSkipNextViewIcon);
+
+                    ImageView ccIcon = (ImageView) ((ViewGroup) parent.getChildAt(playPauseIndex + 3))
+                            .getChildAt(index + 1);
+                    tintIcon(ccIcon);
+
                     mSkipPreviousView = ((ViewGroup) parent.getChildAt(playPauseIndex - 2))
                             .getChildAt(index);
                     mSkipPreviousViewIcon = ((ViewGroup) parent.getChildAt(playPauseIndex - 2))
                             .getChildAt(index + 1);
+                    tintIcon((ImageView) mSkipPreviousViewIcon);
                     mControlViewsInitialized = true;
                 }
                 catch (Exception e) {
@@ -1370,4 +1384,7 @@ public class TenFootPlaybackOverlayFragment extends DetailsFragment {
         abstract void getViews(ArrayList<View> views);
     }
 
+    private void tintIcon(ImageView icon) {
+        icon.setColorFilter(ContextCompat.getColor(getActivity(), R.color.primary_text), PorterDuff.Mode.MULTIPLY);
+    }
 }
