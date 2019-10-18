@@ -32,6 +32,7 @@
         android:inputType="textEmailAddress"
         android:textSize="20sp"
         android:hint="@string/create_login_email"
+        android:textColorHint="@color/tertiary_text"
         android:backgroundTint="@color/background_tint_color_selector"
         />
     <EditText
@@ -43,6 +44,7 @@
         android:inputType="textPassword"
         android:textSize="20sp"
         android:hint="@string/create_login_password"
+        android:textColorHint="@color/tertiary_text"
         android:backgroundTint="@color/background_tint_color_selector"
         />
     <Button

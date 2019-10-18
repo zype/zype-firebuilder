@@ -120,6 +120,24 @@ You can use icon generator in Android Studio to produce icons with required dime
 
 5. Setup UI options
 
+**Light theme**
+
+Light theme will display all background for all screens in white color and text elements in black/grey color.
+To enable light appearance update following values in the *Application/app/src/template/res/values/custom.xml* file:
+
+
+| ***Attribute name***                 | ***Value***      |
+|:-------------------------------------|:-----------------|
+|`background`                          |#FFFFFF           |
+|`card_background`                     |#FFFFFF           |
+|`spinner_color`                       |#FF000000         |
+|`primary_text`                        |#E6000000         |
+|`tertiary_text`                       |#99000000         |
+|`search_edit_text_bg_color`           |#4D000000         |
+|`search_edit_text_bg_color_unfocused` |#1A000000         |
+
+
+
 **Left menu**
 
 Left menu will appear when the user press `Menu` button on the device retomte control. It contains the same actions like Settings row at the bottom of the main screen.

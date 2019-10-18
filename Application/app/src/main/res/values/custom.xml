@@ -31,7 +31,7 @@ permissions and limitations under the License.
     <!-- Color of buffered progress bar -->
     <color name="playback_buffered_progress">#FF5A5A5A</color>
     <!-- Color of the progress bar -->
-    <color name="progress_bar">#99FFFFFF</color>
+    <color name="progress_bar">@color/accent</color>
     <!-- Color of splash screen spinning loader animation -->
     <color name="spinner_color">#FFFFFFFF</color>
     <!-- The color of button highlights and widgets. -->
@@ -101,6 +101,9 @@ permissions and limitations under the License.
 
     <!-- Playback Overlay Customization -->
 
+    <!-- Text color of the playback time -->
+    <color name="playback_time_text">@color/primary_text</color>
+
     <!-- Hide More options status activation status-->
     <bool name="hide_more_options">true</bool>
 
@@ -111,7 +114,10 @@ permissions and limitations under the License.
     <!-- Icon to display inside of search orb -->
     <drawable name="search_icon">@drawable/ic_search</drawable>
     <!-- Background color of Search screen -->
-    <drawable name="search_background">@drawable/bg_gradient_search</drawable>
+    <drawable name="search_background">@color/background</drawable>
+
+    <color name="search_edit_text_bg_color">#4DFFFFFF</color>
+    <color name="search_edit_text_bg_color_unfocused">#1AFFFFFF</color>
 
     <!-- End of Search Bar Customization -->
 
@@ -134,5 +140,7 @@ permissions and limitations under the License.
     <string translatable="false" name="second_screen_login_instruction_line_2">Visit facebook.com/device</string>
 
     <!-- End of Authentication Customization -->
+
+    <color name="error_dialog_bg_color">@color/background</color>
 
 </resources>

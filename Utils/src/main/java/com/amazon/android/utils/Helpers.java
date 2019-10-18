@@ -375,6 +375,26 @@ public class Helpers {
     }
 
     /**
+     * This method updates the opacity and background of the bitmap.
+     *
+     * @param bitmap  The bitmap.
+     * @param opacity The value of alpha.
+     * @return The bitmap after adjusting the opacity.
+     */
+    public static Bitmap adjustOpacityAndBackground(Bitmap bitmap, int opacity, int backgroundColor) {
+
+        Paint alphaPaint = new Paint();
+        alphaPaint.setAlpha(opacity);
+        Bitmap mutableBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(),
+                Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(mutableBitmap);
+        canvas.drawColor(backgroundColor);
+        canvas.drawBitmap(bitmap, 0, 0, alphaPaint);
+
+        return mutableBitmap;
+    }
+
+    /**
      * Handles the activity's enter fade transition.
      *
      * @param activity     The activity.

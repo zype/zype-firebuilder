@@ -50,11 +50,15 @@ permissions and limitations under the License.
 
     <color name="lb_playback_controls_background_dark">#c0000000</color>
     <color name="lb_playback_controls_background_light">#80000000</color>
+<!--
     <color name="playback_video_details_text_color">@color/primary_text</color>
+-->
 
     <color name="error_dialog_bg_color">#13181F</color>
     <color name="image_card_place_holder">#D3D3D3</color>
     <color name="progress_white">#ffffff</color>
+
+    <color name="lb_control_button_color">@color/primary_text</color>
 
     <!-- EPG colors-->
     <color name="schedule_color">#181818</color>
