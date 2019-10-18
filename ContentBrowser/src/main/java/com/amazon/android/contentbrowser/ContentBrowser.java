@@ -170,7 +170,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     /**
      * The TnC screen name.
      */
-    public static final String CONTENT_TnC_SCREEN = "CONTENT_TnC_SCREEN";
+    public static final String CONTENT_TERMS_SCREEN = "CONTENT_TERMS_SCREEN";
 
     /* Zype, Evgeny Cherkasov */
     public static final String BUY_VIDEO_SCREEN = "BUY_VIDEO_SCREEN";
@@ -1623,7 +1623,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
     private void tNcActionTriggered(Activity activity) {
         ContentBrowser.getInstance(activity)
-                .switchToScreen(ContentBrowser.CONTENT_TnC_SCREEN);
+                .switchToScreen(ContentBrowser.CONTENT_TERMS_SCREEN);
     }
 
     private void myLibraryActionTriggered(Activity activity) {
