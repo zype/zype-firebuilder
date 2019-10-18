@@ -59,6 +59,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import static com.zype.fire.api.ZypeSettings.SHOW_TITLE;
+
 /**
  * A CardPresenter is used to generate Views and bind Objects to them on demand.
  * It contains an Image CardView
@@ -80,7 +82,7 @@ public class CardPresenter extends Presenter {
     private Drawable imageUnlocked;
     private static Drawable infoFieldWithProgressBarBackground;
     private ContentBrowser contentBrowser;
-
+    private  TextView titleText;
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
 
@@ -90,11 +92,8 @@ public class CardPresenter extends Presenter {
         appConf = ZypeConfiguration.readAppConfiguration(mContext);
         try {
             mDefaultCardImage = ContextCompat.getDrawable(mContext, R.drawable.movie);
-            if (appConf.showItemTitles) {
-                sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused);
-            }else{
-                sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_trance);
-            }
+            sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_trance);
+
             /* Zype, Evgeny Cherkasov */
             infoFieldWithProgressBarBackground = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_progress_bar);
             imageLocked = ContextCompat.getDrawable(mContext, R.drawable.locked);
@@ -115,11 +114,12 @@ public class CardPresenter extends Presenter {
 //                }
             }
         };
+        cardView.setInfoAreaBackground(sFocusedFadeMask);
         cardView.setFocusable(true);
         cardView.setFocusableInTouchMode(true);
 
         // Set the type and visibility of the info area.
-        cardView.setCardType(BaseCardView.CARD_TYPE_INFO_OVER);
+        cardView.setCardType(SHOW_TITLE ? BaseCardView.CARD_TYPE_INFO_UNDER : BaseCardView.CARD_TYPE_INFO_OVER);
         cardView.setInfoVisibility(BaseCardView.CARD_REGION_VISIBLE_ALWAYS);
 
         /* Zype, Evgeny Cherkasov */
@@ -128,19 +128,18 @@ public class CardPresenter extends Presenter {
         int CARD_WIDTH_PX = 210;
         mCardWidthDp = Helpers.convertPixelToDp(mContext, CARD_WIDTH_PX);
 
-        int CARD_HEIGHT_PX = 120;
+        int CARD_HEIGHT_PX = 118;
         mCardHeightDp = Helpers.convertPixelToDp(mContext, CARD_HEIGHT_PX);
 
         TextView subtitle = (TextView) cardView.findViewById(R.id.content_text);
+        titleText = (TextView) cardView.findViewById(R.id.title_text);
+
         if (subtitle != null) {
+            subtitle.setMaxLines(2);
             subtitle.setEllipsize(TextUtils.TruncateAt.END);
         }
 
         mInfoField = cardView.findViewById(R.id.info_field);
-        if (mInfoField != null) {
-            mInfoField.setBackground(sFocusedFadeMask);
-        }
-
         return new ViewHolder(cardView);
     }
 
@@ -160,8 +159,20 @@ public class CardPresenter extends Presenter {
                 // actual Title.
 
 
-                if (appConf.showItemTitles) {
-                    cardView.setTitleText(ContentHelper.getCardViewSubtitle(mContext, content));
+                if (SHOW_TITLE) {
+
+                    String title = ContentHelper.getCardViewSubtitle(mContext, content);
+
+                    if(titleText != null) {
+                        if(TextUtils.isEmpty(title)) {
+                            titleText.setVisibility(View.GONE);
+                        }
+                        else {
+                            titleText.setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                    cardView.setTitleText(title);
                     cardView.setContentText(content.getTitle());
                 }
                 else {
@@ -214,7 +225,11 @@ public class CardPresenter extends Presenter {
         }
         else if (item instanceof ContentContainer) {
             ContentContainer contentContainer = (ContentContainer) item;
-            if (appConf.showItemTitles) {
+            if(titleText != null) {
+                titleText.setVisibility(View.GONE);
+            }
+
+            if (SHOW_TITLE) {
                 cardView.setContentText(contentContainer.getName());
             }
             else {

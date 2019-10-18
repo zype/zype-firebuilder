@@ -167,6 +167,11 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      */
     public static final String CONTENT_SLIDESHOW_SCREEN = "CONTENT_SLIDESHOW_SCREEN";
 
+    /**
+     * The TnC screen name.
+     */
+    public static final String CONTENT_TERMS_SCREEN = "CONTENT_TERMS_SCREEN";
+
     /* Zype, Evgeny Cherkasov */
     public static final String BUY_VIDEO_SCREEN = "BUY_VIDEO_SCREEN";
     public static final String SUBSCRIPTION_SCREEN = "SUBSCRIPTION_SCREEN";
@@ -305,7 +310,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final int CONTENT_ACTION_SWAF = 56;
 
     public static final int CONTENT_REGISTRATION_REQUIRED = 57;
-    
+
     public static final int CONTENT_PLAY_TRAILER = 58;
 
     /**
@@ -403,6 +408,12 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      * Settings actions list.
      */
     private final List<Action> mSettingsActions = new ArrayList<>();
+
+    /**
+     * Settings actions home list.
+     */
+    private final List<Action> mHomeSettingsActions = new ArrayList<>();
+
 
     /**
      * Powered by logo map.
@@ -520,21 +531,31 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     break;
                 }
             }
-            if (Navigator.isScreenAccessVerificationRequired(mNavigator.getNavigatorModel())
-                    && (ZypeConfiguration.isUniversalSubscriptionEnabled(mAppContext)
-                    || ZypeConfiguration.isUniversalTVODEnabled(mAppContext)
-                    || userLoggedIn)) {
-                addSettingsAction(mLoginAction);
-            }
+            addSettingsAction(mLoginAction);
+//            if (Navigator.isScreenAccessVerificationRequired(mNavigator.getNavigatorModel())
+//                    && (ZypeConfiguration.isUniversalSubscriptionEnabled(mAppContext)
+//                    || ZypeConfiguration.isUniversalTVODEnabled(mAppContext)
+//                    || userLoggedIn)) {
+//                addSettingsAction(mLoginAction);
+//            }
         }
+    }
+
+    private void setupLoginAction() {
+        addSettingsAction(createLogoutButtonSettingsAction());
+    }
+
+    private void setupSearchAction() {
+        addSettingsAction(createSearchAction());
     }
 
     private void setupFavoritesAction() {
         addSettingsAction(createFavoritesSettingsAction());
+        addSettingsHomeAction(createFavoritesSettingsAction());
     }
 
     private void setupEpgAction(){
-        addSettingsAction(createEpgSettingsAction());
+        addSettingsHomeAction(createEpgSettingsAction());
     }
 
     private void setupMyLibraryAction() {
@@ -682,22 +703,21 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 mAppContext.getResources()
                         .getBoolean(R.bool.override_all_contents_subscription_flag);
 
-        addWidgetsAction(createSearchAction());
+        if (ZypeSettings.SHOW_SEARCH_ICON){
+            addWidgetsAction(createSearchAction());
+        }
         //addWidgetsAction(createSlideShowAction());
-        /* Zype, Evgeny Cherkasov
-        * begin*/
-        if (!TextUtils.isEmpty(Preferences.getString("ZypeTerms")))
-            addSettingsAction(createTermsOfUseSettingsAction());
-        /* Zype
-        * end */
-        //addSettingsAction(createSlideShowSettingAction());
-        setupLogoutAction();
 
+        //addSettingsAction(createSlideShowSettingAction());
+        setupSearchAction();
+        setupLoginAction();
         if(ZypeSettings.EPG_ENABLED) {
             setupEpgAction();
         }
         setupFavoritesAction();
-        setupMyLibraryAction();
+        //if (!TextUtils.isEmpty(Preferences.getString("ZypeTerms")))
+        addSettingsAction(createTermsOfUseSettingsAction());
+      //  setupMyLibraryAction();
 
 
         mSearchManager.addSearchAlgo(DEFAULT_SEARCH_ALGO_NAME, new ISearchAlgo<Content>() {
@@ -1180,6 +1200,26 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     /**
+     * Get settings home actions.
+     *
+     * @return List of settings home actions.
+     */
+    public List<Action> getSettingsHomeActions() {
+
+        return mHomeSettingsActions;
+    }
+
+    /**
+     * Add settings action.
+     *
+     * @param settingsHomeAction Settings action.
+     */
+    private void addSettingsHomeAction(Action settingsHomeAction) {
+
+        mHomeSettingsActions.add(settingsHomeAction);
+    }
+
+    /**
      * Get terms of use {@link Action}.
      *
      * @return terms of use action.
@@ -1200,11 +1240,11 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         return new Action().setAction(LOGIN_LOGOUT)
                 .setId(ContentBrowser.CONTENT_ACTION_LOGIN_LOGOUT)
                 .setLabel1(LogoutSettingsFragment.TYPE_LOGOUT,
-                        mAppContext.getString(R.string.logout_label))
+                        mAppContext.getString(R.string.account_label))
                 .setIconResourceId(LogoutSettingsFragment.TYPE_LOGOUT, R
                         .drawable.ic_login_logout)
                 .setLabel1(LogoutSettingsFragment.TYPE_LOGIN,
-                        mAppContext.getString(R.string.login_label))
+                        mAppContext.getString(R.string.account_label))
                 .setIconResourceId(LogoutSettingsFragment.TYPE_LOGIN, R
                         .drawable.ic_login_logout)
                 .setState(LogoutSettingsFragment.TYPE_LOGIN);
@@ -1467,10 +1507,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 loginLogoutActionTriggered(activity, settingsAction);
                 break;
             case TERMS:
-                new NoticeSettingsFragment()
-                        .createFragment(activity,
-                                activity.getFragmentManager(),
-                                settingsAction);
+                openTermsTriggered(activity);
                 break;
             case SLIDESHOW_SETTING:
                 slideShowSettingActionTriggered(activity, settingsAction);
@@ -1484,6 +1521,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 break;
             case MY_LIBRARY:
                 myLibraryActionTriggered(activity);
+                break;
+            case SEARCH:
+                searchActionTriggered(activity);
                 break;
 
             default:
@@ -1574,6 +1614,17 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         switchToScreen(ContentBrowser.EPG_SCREEN);
     }
 
+    private void searchActionTriggered(Activity activity) {
+        ContentBrowser.getInstance(activity)
+                .switchToScreen(ContentBrowser.CONTENT_SEARCH_SCREEN);
+    }
+
+
+
+    private void openTermsTriggered(Activity activity) {
+        ContentBrowser.getInstance(activity)
+                .switchToScreen(ContentBrowser.CONTENT_TERMS_SCREEN);
+    }
 
     private void myLibraryActionTriggered(Activity activity) {
         ContentContainer contentContainer = getRootContentContainer()
@@ -2182,6 +2233,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             iScreenSwitchListener.onScreenSwitch(null);
         }
     }
+
+
 
     /**
      * Switch to screen by name.
