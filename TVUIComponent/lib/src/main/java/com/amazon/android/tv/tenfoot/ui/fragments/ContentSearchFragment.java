@@ -199,7 +199,11 @@ public class ContentSearchFragment extends android.support.v17.leanback.app.Sear
                 if (searchEditText != null) {
 
                     mSearchEditText = searchEditText;
-                    mSearchEditText.setImeActionLabel(getString(R.string.search), EditorInfo.IME_ACTION_SEARCH);
+                    mSearchEditText.setImeActionLabel(getString(R.string.ime_action_label_search), EditorInfo.IME_ACTION_SEARCH);
+                    Bundle extras = mSearchEditText.getInputExtras(true);
+                    if (extras != null) {
+                        extras.putString("backLabel", getString(R.string.ime_action_label_previous));
+                    }
 
                     // Handle keyboard being dismissed to prevent focus going to SearchOrb
                     // If user presses back from keyboard, you don't get KeyboardDismissListener
