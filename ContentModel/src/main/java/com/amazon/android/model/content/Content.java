@@ -995,6 +995,12 @@ public class Content implements Serializable {
      * @return True if they have similar tags; false otherwise.
      */
     public boolean hasSimilarTags(Content givenContent) {
+        String contentPlaylistId = getExtraValueAsString(EXTRA_PLAYLIST_ID);
+        String givenPlaylistId = givenContent.getExtraValueAsString(EXTRA_PLAYLIST_ID);
+        if (!TextUtils.isEmpty(contentPlaylistId) && !TextUtils.isEmpty(givenPlaylistId) && contentPlaylistId.equalsIgnoreCase(givenPlaylistId)){
+            return true;
+        }
+
         // Get list of givenContentTags.
         List<String> givenContentTags = givenContent.getTags();
 
