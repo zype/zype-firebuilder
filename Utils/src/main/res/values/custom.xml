@@ -14,6 +14,8 @@ express or implied. See the License for the specific language governing
 permissions and limitations under the License.
 -->
 <resources>
+    <!-- The background color of the screens. -->
+    <color name="background">#22282E</color>
     <!-- The color of button highlights and widgets. -->
     <color name="accent">#EE962D</color>
     <!-- Used for the text of a selected item's title and description.
@@ -21,6 +23,8 @@ permissions and limitations under the License.
     <color name="primary_text">#E6FFFFFF</color>
     <!-- Used for the text on the card views and playback progress bar text. -->
     <color name="secondary_text">#FFFFFFFF</color>
+    <!-- Used for the category titles and content subtitles -->
+    <color name="tertiary_text">#99FFFFFF</color>
     <!-- Background color for focused action button -->
     <drawable name="action_button_focused">@drawable/btn_generic_focused</drawable>
     <!-- Background color for normal state of action button -->

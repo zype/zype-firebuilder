@@ -17,10 +17,10 @@ permissions and limitations under the License.
 
     <!-- logout dialog -->
     <color name="logout_title_color">@color/primary_text</color>
-    <color name="logout_desc_color">@color/secondary_text</color>
+    <color name="logout_desc_color">@color/tertiary_text</color>
     <!-- Second screen authentication -->
     <color name="login_instructions_color">@color/primary_text</color>
-    <color name="login_code_color">@color/secondary_text</color>
+    <color name="login_code_color">@color/tertiary_text</color>
     <!-- Details description extended body text color -->
     <color name="details_description_extended">@color/primary_text</color>
     <color name="error_dialog_bg_color">#13181F</color>
