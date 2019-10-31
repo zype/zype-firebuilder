@@ -127,4 +127,6 @@ permissions and limitations under the License.
     <!-- End of Authentication Customization -->
     <color name="background_hero_slider_image">#99000000</color>
 
+    <color name="lock_color">#FF0000</color>
+    <color name="unlock_color">#0000FF</color>
 </resources>

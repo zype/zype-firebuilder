@@ -160,6 +160,8 @@ permissions and limitations under the License.
     <color name="error_message_text_color">@color/primary_text</color>
     <integer name="error_button_height">64</integer>
 
+    <color name="lock_color">#FF0000</color>
+    <color name="unlock_color">#0000FF</color>
     <!-- End of Error Activity Customization -->
 
 
