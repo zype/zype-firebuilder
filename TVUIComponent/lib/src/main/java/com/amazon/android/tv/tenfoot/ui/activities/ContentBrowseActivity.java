@@ -393,7 +393,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
         if (fragment != null) {
             isMenuOpened = true;
-            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.lb_error_background_color_translucent));
+            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.background_color_translucent));
             getFragmentManager().beginTransaction()
                     .show(fragment)
                     .commit();

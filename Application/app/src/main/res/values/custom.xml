@@ -142,5 +142,6 @@ permissions and limitations under the License.
     <!-- End of Authentication Customization -->
 
     <color name="error_dialog_bg_color">@color/background</color>
+    <color name="background_color_translucent">#CC000000</color>
 
 </resources>
