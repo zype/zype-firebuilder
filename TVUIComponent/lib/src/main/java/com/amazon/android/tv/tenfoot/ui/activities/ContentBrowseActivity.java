@@ -186,7 +186,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         if(!sliderShown || !slidersPresent()) {
             return;
         }
-
+        mContentImage.setVisibility(View.VISIBLE);
         HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
         fadeInFadeOut(Arrays.asList(findViewById(R.id.content_image), findViewById(R.id.content_details),
             findViewById(R.id.main_logo)), Arrays.asList(fragment.getView()));
@@ -197,7 +197,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         if(sliderShown || !slidersPresent()) {
             return;
         }
-
+        mContentImage.setVisibility(View.GONE);
         HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
         fadeInFadeOut(Arrays.asList(fragment.getView()), Arrays.asList(findViewById(R.id.content_image), findViewById(R.id.content_details),
             findViewById(R.id.main_logo)));
@@ -240,7 +240,6 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-
         if(slidersPresent()) {
             if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
                 if(sliderHasFocus()) {
@@ -249,7 +248,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
                 }
             }
 
-            if(isActionFocus()) {
+            if(isActionFocus() && !isMenuOpened) {
                 if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN) {
                     HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
 
@@ -267,11 +266,14 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
 
         if(slidersPresent()) {
             handler.postDelayed(() -> {
-                if(sliderHasFocus()) {
-                    showHeroSlider();
+              if(sliderHasFocus() || event.getKeyCode()== KeyEvent.KEYCODE_BACK) {
+                  sliderShown=false;
+                  showHeroSlider();
                 }
                 else {
-                    hideHeroSlider();
+                    if (!isMenuOpened){
+                        hideHeroSlider();
+                    }
                 }
             }, 50);
         }
@@ -435,15 +437,21 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
                         return true;
                     }
                 }
-            case KeyEvent.KEYCODE_BACK:
+            case KeyEvent.KEYCODE_BACK: {
+               if (sliderHasFocus()){
+                   sliderShown=false;
+                   showHeroSlider();
+               }
+
                 if (event.getAction() == KeyEvent.ACTION_UP) {
                     Log.d(TAG, "Back button pressed");
                     if (isMenuOpened) {
                         hideMenu();
                         return true;
                     }
-                    break;
                 }
+                break;
+            }
             case KeyEvent.KEYCODE_DPAD_DOWN:
                 Log.d(TAG, "Down button pressed");
                 if (isMenuOpened) {
