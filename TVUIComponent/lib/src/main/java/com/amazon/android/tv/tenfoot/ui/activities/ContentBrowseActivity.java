@@ -304,6 +304,13 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         }
         else if (item instanceof Action) {
             Action settingsAction = (Action) item;
+
+            // Favorites of use action.
+            if (ContentBrowser.FAVORITES.equals(settingsAction.getAction())) {
+                callImageLoadSubscription(getString(R.string.content_details_recommended_header_favorites),
+                        "",
+                        null);
+            }
             // Terms of use action.
             if (ContentBrowser.TERMS.equals(settingsAction.getAction())) {
                 callImageLoadSubscription(getString(R.string.terms_title),

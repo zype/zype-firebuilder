@@ -136,8 +136,8 @@ public class ContentBrowseFragment extends RowsFragment {
 //        ArrayObjectAdapter rowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
         mRowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
 
-        BrowseHelper.loadRootContentContainer(getActivity(), mRowsAdapter);
         mSettingsAdapter = BrowseHelper.addSettingsActionsToRowAdapter(getActivity(), mRowsAdapter);
+        BrowseHelper.loadRootContentContainer(getActivity(), mRowsAdapter);
         mLoginButtonIndex = BrowseHelper.getLoginButtonIndex(mSettingsAdapter);
 
         setAdapter(mRowsAdapter);
