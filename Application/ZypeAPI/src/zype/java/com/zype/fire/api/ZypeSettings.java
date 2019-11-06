@@ -27,7 +27,7 @@ public class ZypeSettings {
     public static final boolean DETAIL_BACKGROUND_IMAGE = false;
     public static final boolean SHOW_TITLE = true;
     public static final boolean SHOW_MENU = true;
-    public static final boolean SHOW_SEARCH_ICON = false;
+    public static final boolean SHOW_SEARCH_ICON = true;
 
     public static final String TERMS_CONDITION_URL  = "https://www.zype.com/";
 

@@ -50,7 +50,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:id="@+id/layoutEmail"
-        tools:visibility="gone"
+        tools:visibility="visible"
         >
         <TextView
             android:layout_width="match_parent"
@@ -69,6 +69,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="16dp"
             android:id="@+id/editUsername"
+            android:textColor="@color/primary_text"
             android:backgroundTint="@color/background_tint_color_selector"
             android:hint="@string/zype_login_username"
             android:textColorHint="@color/tertiary_text"
@@ -81,6 +82,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="16dp"
             android:id="@+id/editPassword"
+            android:textColor="@color/primary_text"
             android:backgroundTint="@color/background_tint_color_selector"
             android:hint="@string/zype_login_password"
             android:inputType="textPassword"
@@ -113,7 +115,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:id="@+id/layoutPin"
-        tools:visibility="visible"
+        tools:visibility="gone"
         >
         <TextView
             android:layout_width="match_parent"
