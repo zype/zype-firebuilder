@@ -173,7 +173,7 @@ public class CardPresenter extends Presenter {
                     }
 
                     cardView.setTitleText(title);
-                    cardView.setContentText(content.getTitle());
+                    cardView.setContentText(content.getTitle()+ "\n ");
                 }
                 else {
                     cardView.setContentText("");
@@ -230,7 +230,7 @@ public class CardPresenter extends Presenter {
             }
 
             if (SHOW_TITLE) {
-                cardView.setContentText(contentContainer.getName());
+                cardView.setContentText(contentContainer.getName()+ "\n ");
             }
             else {
                 cardView.setContentText("");
