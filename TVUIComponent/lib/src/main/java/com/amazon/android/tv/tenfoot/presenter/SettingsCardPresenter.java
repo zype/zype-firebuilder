@@ -26,6 +26,7 @@ import android.support.v17.leanback.widget.BaseCardView;
 import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,7 +65,7 @@ public class SettingsCardPresenter extends Presenter {
 
                 super.setSelected(selected);
                 if (mInfoField != null) {
-                    mInfoField.setBackground(sFocusedFadeMask);
+//                    mInfoField.setBackground(sFocusedFadeMask);
                 }
             }
         };
@@ -83,7 +84,7 @@ public class SettingsCardPresenter extends Presenter {
 
         mInfoField = cardView.findViewById(R.id.info_field);
         if (mInfoField != null) {
-            mInfoField.setBackground(sFocusedFadeMask);
+//            mInfoField.setBackground(sFocusedFadeMask);
         }
 
         return new ViewHolder(cardView);
@@ -102,9 +103,10 @@ public class SettingsCardPresenter extends Presenter {
         cardView.setMainImageScaleType(ImageView.ScaleType.CENTER);
         cardView.setMainImageDimensions(mCardWidthDp, mCardHeightDp);
         try {
-            cardView.setMainImage(ContextCompat.getDrawable(TenFootApp.getInstance()
-                                                                      .getApplicationContext(),
-                                                            settingsItem.getIconResourceId()));
+            Context context = TenFootApp.getInstance().getApplicationContext();
+            Drawable iconDrawable = ContextCompat.getDrawable(context, settingsItem.getIconResourceId());
+            DrawableCompat.setTint(iconDrawable, ContextCompat.getColor(context, R.color.primary_text));
+            cardView.setMainImage(iconDrawable);
         }
         catch (Resources.NotFoundException e) {
             Log.e(TAG, "Resource not found", e);

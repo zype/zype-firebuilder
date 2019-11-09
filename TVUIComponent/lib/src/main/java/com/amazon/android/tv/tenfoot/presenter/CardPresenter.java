@@ -53,6 +53,7 @@ import android.support.v17.leanback.widget.BaseCardView;
 import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -115,7 +116,7 @@ public class CardPresenter extends Presenter {
 //                }
             }
         };
-        cardView.setInfoAreaBackground(sFocusedFadeMask);
+//        cardView.setInfoAreaBackground(sFocusedFadeMask);
         cardView.setFocusable(true);
         cardView.setFocusableInTouchMode(true);
 
@@ -272,8 +273,10 @@ public class CardPresenter extends Presenter {
             cardView.setMainImageScaleType(ImageView.ScaleType.CENTER);
             cardView.setMainImageDimensions(mCardWidthDp, mCardHeightDp);
             try {
-                cardView.setMainImage(ContextCompat.getDrawable(TenFootApp.getInstance().getApplicationContext(),
-                        action.getIconResourceId()));
+                Drawable iconDrawable = ContextCompat.getDrawable(TenFootApp.getInstance().getApplicationContext(),
+                        action.getIconResourceId());
+                DrawableCompat.setTint(iconDrawable, ContextCompat.getColor(mContext, R.color.primary_text));
+                cardView.setMainImage(iconDrawable);
             }
             catch (Resources.NotFoundException e) {
                 Log.e(TAG, "Resource not found", e);
