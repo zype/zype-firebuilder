@@ -48,7 +48,6 @@ permissions and limitations under the License.
             android:id="@+id/details_description_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
             android:layout_marginBottom="@dimen/details_description_subtitle_bottom_margin"
             style="?attr/detailsDescriptionSubtitleStyle"
             />
