@@ -133,7 +133,11 @@ public class DetailsDescriptionPresenter extends Presenter {
                                              config.getTypefacePath(ConfigurationConstants
                                                                             .BOLD_FONT));
 
-        viewHolder.getSubtitle().setText(ContentHelper.getDescriptiveSubtitle(mContext, content));
+        if (TextUtils.isEmpty(ContentHelper.getDescriptiveSubtitle(mContext, content))){
+            viewHolder.getSubtitle().setText(ContentHelper.getEpisodeSubTitle(mContext, content));
+        }else{
+            viewHolder.getSubtitle().setText(ContentHelper.getDescriptiveSubtitle(mContext, content));
+        }
 
         viewHolder.getBody().setText(content.getDescription().trim());
         CalligraphyUtils.applyFontToTextView(TenFootApp.getInstance(), viewHolder.getBody(),
