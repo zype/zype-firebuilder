@@ -51,6 +51,7 @@ public class DetailsDescriptionPresenter extends Presenter {
         private final TextView mTitle;
         private final TextView mSubtitle;
         private final TextView mBody;
+        private final TextView episode;
 
         public ViewHolder(final View view) {
 
@@ -58,11 +59,17 @@ public class DetailsDescriptionPresenter extends Presenter {
             mTitle = (TextView) view.findViewById(R.id.details_description_title);
             mSubtitle = (TextView) view.findViewById(R.id.details_description_subtitle);
             mBody = (EllipsizedTextView) view.findViewById(R.id.ellipsized_description_text);
+            episode = (TextView) view.findViewById(R.id.details_episode);
         }
 
         public TextView getTitle() {
 
             return mTitle;
+        }
+
+        public TextView getEpisode() {
+
+            return episode;
         }
 
         public TextView getSubtitle() {
@@ -133,10 +140,14 @@ public class DetailsDescriptionPresenter extends Presenter {
                                              config.getTypefacePath(ConfigurationConstants
                                                                             .BOLD_FONT));
 
-        if (TextUtils.isEmpty(ContentHelper.getDescriptiveSubtitle(mContext, content))){
-            viewHolder.getSubtitle().setText(ContentHelper.getEpisodeSubTitle(mContext, content));
+        if (!TextUtils.isEmpty(ContentHelper.getEpisodeSubTitle(mContext, content))){
+            viewHolder.getEpisode().setVisibility(View.VISIBLE);
+            viewHolder.getEpisode().setText(ContentHelper.getEpisodeSubTitle(mContext, content));
         }else{
-            viewHolder.getSubtitle().setText(ContentHelper.getDescriptiveSubtitle(mContext, content));
+            if (!TextUtils.isEmpty(ContentHelper.getDescriptiveSubtitle(mContext, content))) {
+                viewHolder.getSubtitle().setVisibility(View.VISIBLE);
+                viewHolder.getSubtitle().setText(ContentHelper.getDescriptiveSubtitle(mContext, content));
+            }
         }
 
         viewHolder.getBody().setText(content.getDescription().trim());

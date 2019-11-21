@@ -101,7 +101,7 @@ public class ContentHelper {
 
     public static String getEpisodeSubTitle(Context context,Content content){
         Integer episode = (Integer) content.getExtraValue(EPISODE);
-        if (episode != null){
+        if (episode != null && !TextUtils.isEmpty(String.valueOf(episode))) {
             return context.getString(R.string.episode)+" "+episode;
         }
         return "";
