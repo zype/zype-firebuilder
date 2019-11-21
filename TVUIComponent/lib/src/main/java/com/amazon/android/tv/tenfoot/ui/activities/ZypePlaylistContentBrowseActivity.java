@@ -43,6 +43,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
@@ -62,6 +63,7 @@ import com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentDetailsFragment;
 import com.amazon.android.tv.tenfoot.ui.fragments.ZypePlaylistContentBrowseFragment;
 import com.amazon.android.tv.tenfoot.utils.BrowseHelper;
+import com.amazon.android.tv.tenfoot.utils.ContentHelper;
 import com.amazon.android.ui.constants.ConfigurationConstants;
 import com.amazon.android.ui.fragments.ErrorDialogFragment;
 import com.amazon.android.ui.fragments.LogoutSettingsFragment;
@@ -101,6 +103,7 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
     private TextView mContentDescription;
     private ImageView mContentImage;
     private ProgressBar progressBar;
+    private TextView mContentEpisode;
     private Subscription mContentImageLoadSubscription;
 
     // View that contains the background
@@ -124,6 +127,10 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
 
         mContentDescription = (TextView) findViewById(R.id.content_detail_description);
         CalligraphyUtils.applyFontToTextView(this, mContentDescription, ConfigurationManager
+                .getInstance(this).getTypefacePath(ConfigurationConstants.LIGHT_FONT));
+
+        mContentEpisode = (TextView) findViewById(R.id.content_episode);
+        CalligraphyUtils.applyFontToTextView(this, mContentEpisode, ConfigurationManager
                 .getInstance(this).getTypefacePath(ConfigurationConstants.LIGHT_FONT));
 
         mContentImage = (ImageView) findViewById(R.id.content_image);
@@ -176,6 +183,14 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
             callImageLoadSubscription(content.getTitle(),
                     content.getDescription(),
                     content.getBackgroundImageUrl());
+
+            if (!TextUtils.isEmpty(ContentHelper.getEpisodeSubTitle(this, content))){
+                mContentEpisode.setVisibility(View.VISIBLE);
+                mContentEpisode.setText(ContentHelper.getEpisodeSubTitle(this, content));
+            }
+            else{
+                mContentEpisode.setVisibility(View.GONE);
+            }
         }
         else if (item instanceof ContentContainer) {
             ContentContainer contentContainer = (ContentContainer) item;
