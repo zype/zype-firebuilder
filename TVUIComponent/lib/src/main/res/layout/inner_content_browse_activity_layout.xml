@@ -77,7 +77,8 @@ permissions and limitations under the License.
         <LinearLayout
             android:id="@+id/content_details"
             android:layout_width="352dp"
-            android:layout_height="125dp"
+            android:layout_height="wrap_content"
+            android:minHeight="125dp"
             android:layout_below="@id/main_logo"
             android:layout_marginBottom="71dp"
             android:layout_marginLeft="@dimen/lb_browse_padding_start"
@@ -90,7 +91,7 @@ permissions and limitations under the License.
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
                 android:ellipsize="end"
-                android:singleLine="true"
+                android:maxLines="2"
                 android:textSize="@dimen/lb_details_description_title_text_size"/>
 
             <TextView
