@@ -127,7 +127,7 @@ public class DetailsDescriptionPresenter extends Presenter {
         ConfigurationManager config = ConfigurationManager.getInstance(TenFootApp.getInstance());
 
         viewHolder.getTitle().setEllipsize(TextUtils.TruncateAt.END);
-        viewHolder.getTitle().setSingleLine();
+        viewHolder.getTitle().setMaxLines(2);
         viewHolder.getTitle().setText(content.getTitle());
         CalligraphyUtils.applyFontToTextView(TenFootApp.getInstance(), viewHolder.getTitle(),
                                              config.getTypefacePath(ConfigurationConstants
@@ -135,6 +135,7 @@ public class DetailsDescriptionPresenter extends Presenter {
 
         viewHolder.getSubtitle().setText(ContentHelper.getDescriptiveSubtitle(mContext, content));
 
+        viewHolder.getBody().setMaxLines(3);
         viewHolder.getBody().setText(content.getDescription().trim());
         CalligraphyUtils.applyFontToTextView(TenFootApp.getInstance(), viewHolder.getBody(),
                                              config.getTypefacePath(ConfigurationConstants

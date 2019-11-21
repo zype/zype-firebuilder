@@ -28,6 +28,7 @@ public class ZypeSettings {
     public static final boolean SHOW_TITLE = true;
     public static final boolean SHOW_MENU = true;
     public static final boolean SHOW_SEARCH_ICON = true;
+    public static final boolean SETTINGS_PLAYLIST_ENABLED = false;
 
     public static final String TERMS_CONDITION_URL  = "https://www.zype.com/";
 
