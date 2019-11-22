@@ -22,7 +22,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -1027,5 +1029,25 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
     @Override
     public void onRenderedFirstFrame() {
 
+    }
+
+    /* Zype, Evgeny Cherkasov */
+    @Override
+    public void updateSurfaceView() {
+        int videoWidth = getCurrentVideoWidth();
+        int videoHeight = getCurrentVideoHeight();
+
+        DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
+        int screenWidth = displayMetrics.widthPixels;
+        int screenHeight = displayMetrics.heightPixels;
+
+        if (videoHeight < screenHeight && videoWidth < screenWidth) {
+            float ratio = Math.min((float) screenHeight / videoHeight, (float) screenWidth / videoWidth);
+            int newWidth = (int) (1.0 * videoWidth * ratio);
+            int newHeight = (int) (1.0 * videoHeight * ratio);
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(newWidth, newHeight, Gravity.CENTER);
+            mSurfaceView.setLayoutParams(params);
+            mSurfaceView.getHolder().setFixedSize(newWidth, newHeight);
+        }
     }
 }
