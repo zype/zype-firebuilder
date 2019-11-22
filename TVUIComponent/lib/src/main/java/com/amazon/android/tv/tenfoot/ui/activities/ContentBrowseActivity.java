@@ -458,6 +458,7 @@ public class ContentBrowseActivity extends BaseActivity implements
                         return true;
                     }
                 }
+                break;
             case KeyEvent.KEYCODE_BACK: {
                 if (sliderHasFocus()){
                     sliderShown=false;
