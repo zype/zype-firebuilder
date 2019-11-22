@@ -148,7 +148,8 @@ dependencies {
 
     compile project(':TVUIComponent')
     compile project(':UAMP')
-    compile project(':AMZNMediaPlayerComponent')
+//    compile project(':AMZNMediaPlayerComponent')
+    compile project(':ExoPlayer2MediaPlayerComponent')
 //    compile project(':PassThroughAdsComponent')
     compile project(':VastAdsComponent')
     compile project(':AmazonInAppPurchaseComponent')
