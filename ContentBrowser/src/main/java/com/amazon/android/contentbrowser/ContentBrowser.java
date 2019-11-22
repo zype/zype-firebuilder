@@ -1357,7 +1357,6 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      * @return Recommended contents as a content container.
      */
     public ContentContainer getRecommendedListOfAContentAsAContainer(Content content) {
-
         ContentContainer recommendedContentContainer =null;
         if (getContainerForContent(content) != null && !TextUtils.isEmpty(getContainerForContent(content).getName())){
             recommendedContentContainer= new ContentContainer(getContainerForContent(content).getName());
@@ -1365,6 +1364,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         }else{
             recommendedContentContainer= new ContentContainer("");
         }
+
 
         for (Content c : mContentLoader.getRootContentContainer()) {
             if (content.hasSimilarTags(c) && !StringManipulation.areStringsEqual(c.getId(),

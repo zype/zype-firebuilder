@@ -95,6 +95,16 @@ permissions and limitations under the License.
                 android:textSize="@dimen/lb_details_description_title_text_size"/>
 
             <TextView
+                android:id="@+id/content_episode"
+                style="@style/Widget.Leanback.DetailsDescriptionBodyStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:singleLine="true"
+                android:textSize="@dimen/lb_details_description_body_text_size"/>
+
+
+            <TextView
                 android:id="@+id/content_detail_description"
                 style="@style/Widget.Leanback.DetailsDescriptionBodyStyle"
                 android:layout_width="wrap_content"

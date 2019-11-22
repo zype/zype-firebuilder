@@ -31,7 +31,7 @@ public class TermsConditionActivity extends Activity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 view.loadUrl(url);
-                return true;
+                return false;
             }
 
             @Override

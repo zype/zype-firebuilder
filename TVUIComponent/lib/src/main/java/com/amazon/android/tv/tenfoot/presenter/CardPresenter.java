@@ -136,7 +136,7 @@ public class CardPresenter extends Presenter {
 
         if (subtitle != null) {
             subtitle.setMaxLines(2);
-            subtitle.setEllipsize(TextUtils.TruncateAt.END);
+            //subtitle.setEllipsize(TextUtils.TruncateAt.END);
         }
 
         mInfoField = cardView.findViewById(R.id.info_field);
