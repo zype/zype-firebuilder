@@ -81,6 +81,7 @@ import rx.subscriptions.CompositeSubscription;
 
 import static com.amazon.android.contentbrowser.helper.LauncherIntegrationManager
         .getSourceOfContentPlayRequest;
+import static com.zype.fire.api.ZypeSettings.SHOW_MENU_ICON;
 
 /* Zype */
 import com.zype.fire.api.ZypeConfiguration;
@@ -703,7 +704,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 mAppContext.getResources()
                         .getBoolean(R.bool.override_all_contents_subscription_flag);
 
-        if (ZypeSettings.SHOW_SEARCH_ICON){
+        if (ZypeSettings.SHOW_SEARCH_ICON || SHOW_MENU_ICON){
             addWidgetsAction(createSearchAction());
         }
         //addWidgetsAction(createSlideShowAction());
@@ -1305,8 +1306,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      */
     private Action createSearchAction() {
 
-        Action search = new Action(CONTENT_ACTION_SEARCH, SEARCH, R.drawable
-                .lb_ic_in_app_search);
+        Action search = new Action(CONTENT_ACTION_SEARCH, SEARCH, (SHOW_MENU_ICON  ? R.drawable.menu_icon : R.drawable
+                .lb_ic_in_app_search));
         search.setId(ContentBrowser.CONTENT_ACTION_SEARCH);
         search.setAction(SEARCH);
         return search;

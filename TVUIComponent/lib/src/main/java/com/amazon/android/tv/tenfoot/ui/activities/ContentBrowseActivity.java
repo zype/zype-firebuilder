@@ -80,7 +80,7 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
-import static com.zype.fire.api.ZypeSettings.SHOW_MENU;
+import static com.zype.fire.api.ZypeSettings.SHOW_LEFT_MENU;
 
 /**
  * ContentBrowseActivity class that loads the ContentBrowseFragment.
@@ -411,6 +411,13 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         }
     }
 
+    @Override
+    public void showMenuFragment() {
+        if (!isMenuOpened){
+            showMenu();
+        }
+    }
+
     /**
      * Called to process key events.  You can override this to intercept all
      * key events before they are dispatched to the window.  Be sure to call
@@ -427,7 +434,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
 
             case KeyEvent.KEYCODE_MENU:
                 if (event.getAction() == KeyEvent.ACTION_UP) {
-                    if (ZypeSettings.SHOW_MENU) {
+                    if (ZypeSettings.SHOW_LEFT_MENU) {
                         Log.d(TAG, "Menu button pressed");
                         if (!isMenuOpened) {
                             showMenu();
