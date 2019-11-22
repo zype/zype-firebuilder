@@ -82,7 +82,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PlaybackTrailerActivity extends Activity implements
+public class PlaybackTrailerActivity extends BasePlaybackActivity implements
     AMZNMediaPlayer
         .OnStateChangeListener, AMZNMediaPlayer.OnErrorListener, AMZNMediaPlayer.OnInfoListener,
     AudioManager.OnAudioFocusChangeListener,
@@ -480,7 +480,7 @@ public class PlaybackTrailerActivity extends Activity implements
 
     // Request Zype API for player data
     String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
-    HashMap<String, String> params = new HashMap<>();
+    HashMap<String, String> params = getValues();
     if (!TextUtils.isEmpty(accessToken)) {
       params.put(ZypeApi.ACCESS_TOKEN, accessToken);
     } else {

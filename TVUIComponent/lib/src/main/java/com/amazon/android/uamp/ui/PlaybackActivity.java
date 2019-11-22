@@ -131,7 +131,7 @@ import static com.amazon.android.contentbrowser.ContentBrowser.SHOW_PLAYLIST_AUT
 /**
  * PlaybackOverlayActivity for content playback that loads PlaybackOverlayFragment
  */
-public class PlaybackActivity extends Activity implements
+public class PlaybackActivity extends BasePlaybackActivity implements
         PlaybackOverlayFragment.OnPlayPauseClickedListener, AMZNMediaPlayer
         .OnStateChangeListener, AMZNMediaPlayer.OnErrorListener, AMZNMediaPlayer.OnInfoListener,
         AudioManager.OnAudioFocusChangeListener, AMZNMediaPlayer.OnCuesListener,
@@ -1757,7 +1757,7 @@ public class PlaybackActivity extends Activity implements
 
         // Request Zype API for player data
         String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
-        HashMap<String, String> params = new HashMap<>();
+        HashMap<String, String> params = getValues();
         if (!TextUtils.isEmpty(accessToken)) {
             params.put(ZypeApi.ACCESS_TOKEN, accessToken);
         }
