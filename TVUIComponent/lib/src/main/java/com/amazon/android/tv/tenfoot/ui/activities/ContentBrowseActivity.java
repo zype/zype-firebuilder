@@ -394,6 +394,8 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         if (fragment != null) {
             isMenuOpened = true;
             fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.lb_error_background_color_translucent));
+            int paddingTop = (int) getResources().getDimension(R.dimen.lb_browse_padding_top);
+            fragment.getView().setPadding(0, paddingTop, 0, 0);
             getFragmentManager().beginTransaction()
                     .show(fragment)
                     .commit();
