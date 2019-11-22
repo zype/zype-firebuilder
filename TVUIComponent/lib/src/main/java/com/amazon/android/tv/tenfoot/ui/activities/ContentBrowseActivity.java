@@ -275,12 +275,12 @@ public class ContentBrowseActivity extends BaseActivity implements
                 }, 50);
             }
             else if (!sliderShown && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
-            handler.postDelayed(() -> {
-                if (sliderHasFocus()) {
-                    sliderShown=false;
-                    showHeroSlider();
-                }
-            }, 50);
+                handler.postDelayed(() -> {
+                    if (!isMenuOpened && sliderHasFocus()) {
+                        sliderShown=false;
+                        showHeroSlider();
+                    }
+                }, 50);
             }
 //            handler.postDelayed(() -> {
 //                if(sliderHasFocus() || event.getKeyCode()== KeyEvent.KEYCODE_BACK) {
@@ -473,6 +473,20 @@ public class ContentBrowseActivity extends BaseActivity implements
                 }
                 break;
             }
+            case KeyEvent.KEYCODE_DPAD_UP:
+                Log.d(TAG, "Down button pressed");
+                if (isMenuOpened) {
+                    MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+                    if (fragment != null) {
+                        ArrayObjectAdapter menuAdapter = (ArrayObjectAdapter) fragment.getAdapter();
+                        if (fragment.getSelectedMenuItemIndex() == 0) {
+                            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                break;
             case KeyEvent.KEYCODE_DPAD_DOWN:
                 Log.d(TAG, "Down button pressed");
                 if (isMenuOpened) {
