@@ -2360,9 +2360,11 @@ public class PlaybackActivity extends Activity implements
             }
             for (int i = 0; i < mPlayer.getTrackCount(type); i++) {
                 MediaFormat mediaFormat = mPlayer.getTrackFormat(type, i);
-                if (track.equalsIgnoreCase(mediaFormat.mTrackId)) {
-                    result = i;
-                    break;
+                if (mediaFormat != null) {
+                    if (track.equalsIgnoreCase(mediaFormat.mTrackId)) {
+                        result = i;
+                        break;
+                    }
                 }
             }
         }
@@ -2384,7 +2386,9 @@ public class PlaybackActivity extends Activity implements
         List<CharSequence> tracks = new ArrayList<>();
         for (int i = 0; i < mPlayer.getTrackCount(type); i++) {
             MediaFormat mediaFormat = mPlayer.getTrackFormat(type, i);
-            tracks.add(mediaFormat.mTrackId);
+            if (mediaFormat != null) {
+                tracks.add(mediaFormat.mTrackId);
+            }
         }
 
         // Show selection dialog
