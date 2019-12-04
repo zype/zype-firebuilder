@@ -1036,6 +1036,9 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
     public void updateSurfaceView() {
         int videoWidth = getCurrentVideoWidth();
         int videoHeight = getCurrentVideoHeight();
+        if (videoHeight < 0 || videoWidth < 0) {
+            return;
+        }
 
         DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
         int screenWidth = displayMetrics.widthPixels;
