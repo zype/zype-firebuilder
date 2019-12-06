@@ -21,6 +21,7 @@ import com.amazon.android.tv.tenfoot.utils.ContentHelper;
 import com.amazon.android.ui.constants.ConfigurationConstants;
 import com.amazon.android.ui.widget.EllipsizedTextView;
 import com.amazon.android.tv.tenfoot.R;
+import com.zype.fire.api.ZypeSettings;
 
 import android.content.Context;
 import android.support.v17.leanback.widget.Presenter;
@@ -140,10 +141,14 @@ public class DetailsDescriptionPresenter extends Presenter {
                                              config.getTypefacePath(ConfigurationConstants
                                                                             .BOLD_FONT));
 
-        if (!TextUtils.isEmpty(ContentHelper.getEpisodeSubTitle(mContext, content))){
-            viewHolder.getEpisode().setVisibility(View.VISIBLE);
-            viewHolder.getEpisode().setText(ContentHelper.getEpisodeSubTitle(mContext, content));
-        }else{
+        viewHolder.getEpisode().setVisibility(View.GONE);
+        viewHolder.getSubtitle().setVisibility(View.GONE);
+        if (ZypeSettings.SHOW_EPISODE_NUMBER
+            &&!TextUtils.isEmpty(ContentHelper.getEpisodeSubTitle(mContext, content))) {
+                viewHolder.getEpisode().setVisibility(View.VISIBLE);
+                viewHolder.getEpisode().setText(ContentHelper.getEpisodeSubTitle(mContext, content));
+        }
+        else {
             if (!TextUtils.isEmpty(ContentHelper.getDescriptiveSubtitle(mContext, content))) {
                 viewHolder.getSubtitle().setVisibility(View.VISIBLE);
                 viewHolder.getSubtitle().setText(ContentHelper.getDescriptiveSubtitle(mContext, content));
