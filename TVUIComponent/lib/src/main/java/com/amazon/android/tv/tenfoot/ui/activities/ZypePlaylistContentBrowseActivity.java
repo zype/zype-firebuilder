@@ -184,7 +184,8 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
                     content.getDescription(),
                     content.getBackgroundImageUrl());
 
-            if (!TextUtils.isEmpty(ContentHelper.getEpisodeSubTitle(this, content))){
+            if (ZypeSettings.SHOW_EPISODE_NUMBER
+                    && !TextUtils.isEmpty(ContentHelper.getEpisodeSubTitle(this, content))) {
                 mContentEpisode.setVisibility(View.VISIBLE);
                 mContentEpisode.setText(ContentHelper.getEpisodeSubTitle(this, content));
             }
