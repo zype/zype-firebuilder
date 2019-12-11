@@ -1952,10 +1952,10 @@ public class PlaybackActivity extends Activity implements
                 if (mPlaybackOverlayFragment != null) {
                     // TODO: remove this update once we find a way to get duration and cc state
                     // from bright cove before PLAYING state. DEVTECH-4973
-                    if (mPrevState == PlayerState.READY) {
-                        modifyClosedCaptionState(mIsClosedCaptionEnabled);
-                        mPlaybackOverlayFragment.updatePlayback();
-                    }
+//                    if (mPrevState == PlayerState.READY) {
+//                        modifyClosedCaptionState(mIsClosedCaptionEnabled);
+//                        mPlaybackOverlayFragment.updatePlayback();
+//                    }
                     mPlaybackOverlayFragment.togglePlaybackUI(true);
                 }
                 hideProgress();
