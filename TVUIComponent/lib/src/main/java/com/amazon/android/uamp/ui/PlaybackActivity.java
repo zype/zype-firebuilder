@@ -117,6 +117,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
+import static com.amazon.android.contentbrowser.ContentBrowser.SHOW_PLAYLIST_AUTOPLAY;
+
 /**
  * PlaybackOverlayActivity for content playback that loads PlaybackOverlayFragment
  */
@@ -193,6 +195,8 @@ public class PlaybackActivity extends Activity implements
      * Flag for when the activity's onResume is received when the activity is started.
      */
     private boolean mResumeOnStart = false;
+
+    private boolean isAutoPlay=false;
 
     enum AudioFocusState {
         Focused,
@@ -304,6 +308,8 @@ public class PlaybackActivity extends Activity implements
 
         mSelectedContent =
                 (Content) getIntent().getSerializableExtra(Content.class.getSimpleName());
+
+        isAutoPlay= getIntent().getBooleanExtra(SHOW_PLAYLIST_AUTOPLAY,false);
 
         if (mSelectedContent == null || TextUtils.isEmpty(mSelectedContent.getUrl())) {
             AnalyticsHelper.trackError(TAG, "Received an Intent to play content without a " +
@@ -1131,6 +1137,7 @@ public class PlaybackActivity extends Activity implements
         super.onVisibleBehindCanceled();
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -1765,6 +1772,17 @@ public class PlaybackActivity extends Activity implements
             }
         });
     }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        Log.d(TAG, "event=" + event.toString());
+        if (isAutoPlay && event.getKeyCode()== KeyEvent.KEYCODE_BACK) {
+            ContentBrowser.getInstance(PlaybackActivity.this).switchToHomeScreen();
+            finish();
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
 
     private void releasePlayer() {
 
