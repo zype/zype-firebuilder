@@ -30,6 +30,9 @@
 
 package com.amazon.android.uamp.ui;
 
+import com.amazon.android.configuration.ConfigurationManager;
+import com.amazon.android.tv.tenfoot.base.TenFootApp;
+import com.amazon.android.ui.constants.ConfigurationConstants;
 import com.amazon.mediaplayer.tracks.MediaFormat;
 import com.google.android.exoplayer.text.CaptionStyleCompat;
 import com.google.android.exoplayer.text.SubtitleLayout;
@@ -98,6 +101,7 @@ import android.view.accessibility.CaptioningManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -115,7 +119,12 @@ import java.util.concurrent.TimeUnit;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 import static com.amazon.android.contentbrowser.ContentBrowser.SHOW_PLAYLIST_AUTOPLAY;
 
@@ -197,8 +206,10 @@ public class PlaybackActivity extends Activity implements
     private boolean mResumeOnStart = false;
 
     private boolean isAutoPlay=false;
+    private boolean messageAlreadyShow=false;
 
-    enum AudioFocusState {
+
+  enum AudioFocusState {
         Focused,
         NoFocusNoDuck,
         NoFocusCanDuck
@@ -218,6 +229,8 @@ public class PlaybackActivity extends Activity implements
      * Ads implementation reference.
      */
     private IAds mAdsImplementation;
+    private CompositeSubscription mCompositeSubscription = new CompositeSubscription();
+
 
     /**
      * Video position tracking poll time in ms.
@@ -230,6 +243,7 @@ public class PlaybackActivity extends Activity implements
 
     // Closed captions
     private String ccTrack = "";
+    private View messageView;
 
     // Need to setup cookie policy to make ExoPlayer play live streams from Akamai
     private static final CookieManager DEFAULT_COOKIE_MANAGER;
@@ -302,6 +316,14 @@ public class PlaybackActivity extends Activity implements
         mWindow = getWindow();
 
         mProgressBar = (ProgressBar) findViewById(R.id.playback_progress);
+
+        TextView messageTextView= (TextView) findViewById(R.id.autoplayMessage);
+        messageTextView.setText(String.format(getString(R.string.autoplay_message),getString(R.string.app_name)));
+        CalligraphyUtils.applyFontToTextView(TenFootApp.getInstance(), messageTextView,
+            ConfigurationManager
+                .getInstance(this).getTypefacePath(ConfigurationConstants
+                .LIGHT_FONT));
+        messageView= findViewById(R.id.messageView);
         mPlaybackOverlayFragment =
                 (PlaybackOverlayFragment) getFragmentManager()
                         .findFragmentById(R.id.playback_controls_fragment);
@@ -761,6 +783,19 @@ public class PlaybackActivity extends Activity implements
 
         mProgressBar.setVisibility(View.INVISIBLE);
     }
+    private void setupMessageView(){
+        if (!isAutoPlay || messageAlreadyShow)
+            return;
+
+        messageAlreadyShow=true;
+        messageView.setVisibility(View.VISIBLE);
+
+        mCompositeSubscription.add(Observable.timer(5, TimeUnit.SECONDS).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe(aLong -> {
+            messageView.setVisibility(View.GONE);
+        }));
+
+    }
 
     private void play() {
 
@@ -1168,7 +1203,6 @@ public class PlaybackActivity extends Activity implements
      */
     @Override
     public boolean onKeyLongPress(int keyCode, KeyEvent event) {
-
         // If ad is in focus then don't respond to key events.
         if (mAdsView.getVisibility() == View.VISIBLE) {
             return super.onKeyLongPress(keyCode, event);
@@ -1202,7 +1236,6 @@ public class PlaybackActivity extends Activity implements
      */
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-
 
         // If ad is in focus then don't respond to key events.
         if (mAdsView.getVisibility() == View.VISIBLE) {
@@ -1287,6 +1320,14 @@ public class PlaybackActivity extends Activity implements
                         AnalyticsTags.ACTION_PLAYBACK_CONTROL_REWIND, mSelectedContent,
                         getCurrentPosition());
                 return true;
+          case KeyEvent.KEYCODE_BACK:
+          case KeyEvent.KEYCODE_MENU:{
+            if (isAutoPlay) {
+              ContentBrowser.getInstance(PlaybackActivity.this).switchToHomeScreen();
+              finish();
+            }
+            return super.onKeyUp(keyCode, event);
+          }
             default:
                 return super.onKeyUp(keyCode, event);
         }
@@ -1773,16 +1814,6 @@ public class PlaybackActivity extends Activity implements
         });
     }
 
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        Log.d(TAG, "event=" + event.toString());
-        if (isAutoPlay && event.getKeyCode()== KeyEvent.KEYCODE_BACK) {
-            ContentBrowser.getInstance(PlaybackActivity.this).switchToHomeScreen();
-            finish();
-        }
-        return super.dispatchKeyEvent(event);
-    }
-
 
     private void releasePlayer() {
 
@@ -1860,6 +1891,7 @@ public class PlaybackActivity extends Activity implements
                     mPlaybackOverlayFragment.togglePlaybackUI(false);
                 }
                 hideProgress();
+                setupMessageView();
 
                 /* Zype, Evgeny Cherkasov */
                 mPlayer.updateSurfaceView();

@@ -119,4 +119,6 @@ permissions and limitations under the License.
     <string name="ime_action_label_previous">Cancel</string>
     <string name="ime_action_label_search">Search</string>
 
+    <string name="autoplay_message">You can press the menu button in order to return to the %1$s home screen</string>
+
 </resources>
