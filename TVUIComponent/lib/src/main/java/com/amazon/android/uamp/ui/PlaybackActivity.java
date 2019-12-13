@@ -1044,13 +1044,13 @@ public class PlaybackActivity extends Activity implements
 
         // The CC button has been pushed so now we don't want to use global settings for CC state.
         mCaptioningHelper.setUseGlobalSetting(false);
-        /* Zype, Evgeny Cherkasov */
-        if (state) {
-            showClosedCaptionDialog();
-        }
-        else {
+//        /* Zype, Evgeny Cherkasov */
+//        if (state) {
+//            showClosedCaptionDialog();
+//        }
+//        else {
             modifyClosedCaptionState(state);
-        }
+//        }
     }
 
     /**
@@ -1064,30 +1064,31 @@ public class PlaybackActivity extends Activity implements
             if (isClosedCaptionAvailable()) {
 
                 // Enable CC. Prioritizing CLOSED_CAPTION before SUBTITLE if enabled
-//                if (ContentBrowser.getInstance(this).isEnableCEA608() &&
-//                        mPlayer.getTrackCount(TrackType.CLOSED_CAPTION) > 0) {
-//                    mPlayer.enableTextTrack(TrackType.CLOSED_CAPTION, state);
-//                }
-//                else {
-//                    mPlayer.enableTextTrack(TrackType.SUBTITLE, state);
-//                }
-                /* Zype, Evgeny Cherkasov */
-                int ccTrackIndex = -1;
-                if (state) {
-                    ccTrackIndex = getClosedCaptionsTrackIndex(ccTrack);
-                }
-                TrackType type;
-                if (ContentBrowser.getInstance(this).isEnableCEA608()) {
-                    type = TrackType.CLOSED_CAPTION;
+                if (ContentBrowser.getInstance(this).isEnableCEA608() &&
+                        mPlayer.getTrackCount(TrackType.CLOSED_CAPTION) > 0) {
+                    mPlayer.enableTextTrack(TrackType.CLOSED_CAPTION, state);
                 }
                 else {
-                    type = TrackType.SUBTITLE;
+                    mPlayer.enableTextTrack(TrackType.SUBTITLE, state);
                 }
-                mPlayer.setSelectedTrack(type, ccTrackIndex);
+//                /* Zype, Evgeny Cherkasov */
+//                int ccTrackIndex = -1;
+//                if (state) {
+//                    ccTrackIndex = getClosedCaptionsTrackIndex(ccTrack);
+//                }
+//                TrackType type;
+//                if (ContentBrowser.getInstance(this).isEnableCEA608()) {
+//                    type = TrackType.CLOSED_CAPTION;
+//                }
+//                else {
+//                    type = TrackType.SUBTITLE;
+//                }
+//                mPlayer.setSelectedTrack(type, ccTrackIndex);
 
                 // Update internal state.
                 mIsClosedCaptionEnabled = state;
                 mPlaybackOverlayFragment.updateCCButtonState(state, true);
+                mSubtitleLayout.setVisibility(state ? View.VISIBLE : View.INVISIBLE);
                 Log.d(TAG, "Content support CC. Change CC state to " + state);
             }
             else {
@@ -1952,10 +1953,10 @@ public class PlaybackActivity extends Activity implements
                 if (mPlaybackOverlayFragment != null) {
                     // TODO: remove this update once we find a way to get duration and cc state
                     // from bright cove before PLAYING state. DEVTECH-4973
-//                    if (mPrevState == PlayerState.READY) {
-//                        modifyClosedCaptionState(mIsClosedCaptionEnabled);
-//                        mPlaybackOverlayFragment.updatePlayback();
-//                    }
+                    if (mPrevState == PlayerState.READY) {
+                        modifyClosedCaptionState(mIsClosedCaptionEnabled);
+                        mPlaybackOverlayFragment.updatePlayback();
+                    }
                     mPlaybackOverlayFragment.togglePlaybackUI(true);
                 }
                 hideProgress();
