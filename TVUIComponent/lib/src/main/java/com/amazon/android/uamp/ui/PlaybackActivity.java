@@ -318,11 +318,11 @@ public class PlaybackActivity extends Activity implements
         mProgressBar = (ProgressBar) findViewById(R.id.playback_progress);
 
         TextView messageTextView= (TextView) findViewById(R.id.autoplayMessage);
-        messageTextView.setText(String.format(getString(R.string.autoplay_message),getString(R.string.app_name)));
+        messageTextView.setText(getString(R.string.autoplay_message));
         CalligraphyUtils.applyFontToTextView(TenFootApp.getInstance(), messageTextView,
             ConfigurationManager
                 .getInstance(this).getTypefacePath(ConfigurationConstants
-                .LIGHT_FONT));
+                .BOLD_FONT));
         messageView= findViewById(R.id.messageView);
         mPlaybackOverlayFragment =
                 (PlaybackOverlayFragment) getFragmentManager()

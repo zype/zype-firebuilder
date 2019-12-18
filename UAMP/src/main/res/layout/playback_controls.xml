@@ -75,11 +75,8 @@ permissions and limitations under the License.
       android:id="@+id/messageView"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_gravity="center"
-      android:background="#99000000"
-      android:padding="12dp"
-      android:layout_marginLeft="100dp"
-      android:layout_marginRight="100dp"
+      android:layout_gravity="bottom|center"
+      android:layout_marginBottom="10dp"
       android:visibility="gone"
       android:orientation="vertical">
 
@@ -87,7 +84,7 @@ permissions and limitations under the License.
           android:id="@+id/autoplayMessage"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:lineSpacingExtra="3dp"
+          android:lineSpacingExtra="1dp"
           android:layout_gravity="center"
           android:gravity="center"
           style="?attr/detailsDescriptionTitleStyle"/>
