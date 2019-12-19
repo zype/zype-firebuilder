@@ -266,6 +266,17 @@ public class ZypeContentDetailsActivity extends BaseActivity
         }
     }
 
+    @Override
+    public void onItemClicked(Object item) {
+        Content content = (Content) item;
+        ContentBrowser.getInstance(ZypeContentDetailsActivity.this)
+                .actionTriggered(ZypeContentDetailsActivity.this,
+                        content,
+                        ContentBrowser.CONTENT_ACTION_WATCH_NOW,
+                        null,
+                        mActionCompletedListener);
+    }
+
     /**
      * Helper method to subscribe the selected item to the observable that will load the content
      * image into the background. It is okay for the background image URL to be null. A null URL
