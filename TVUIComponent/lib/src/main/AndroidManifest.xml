@@ -95,6 +95,8 @@ permissions and limitations under the License.
         <activity
             android:name="com.amazon.android.tv.tenfoot.ui.Subscription.SubscriptionActivity"
             android:label="@string/subscription_title_choose_plan" />
+        <activity android:name="com.amazon.android.tv.tenfoot.ui.Subscription.SubscriptionSplashActivity" />
+        <activity android:name="com.amazon.android.tv.tenfoot.ui.activities.ZypeContentDetailsActivity" />
 
     </application>
 

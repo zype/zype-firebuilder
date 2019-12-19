@@ -317,7 +317,7 @@ public class EllipsizedTextView extends TextView {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
         } while (getLineCount() > getMaxLines() && getLineCount() > 1);
-        requestFocus();
+//        requestFocus();
     }
 
     /**
@@ -386,7 +386,7 @@ public class EllipsizedTextView extends TextView {
             if (mStateDrawable != null) {
                 mStateDrawable.setBounds(0, 0, mStateDrawable.getIntrinsicWidth(), mStateDrawable
                         .getIntrinsicHeight());
-                mStateDrawable.setState(FOCUSED_STATE_SET);
+                mStateDrawable.setState(EMPTY_STATE_SET);
             }
         }
 

@@ -95,7 +95,7 @@ permissions and limitations under the License.
     <!--<drawable name="action_button_focused">@drawable/btn_generic_focused</drawable>-->
     <drawable name="action_button_focused">@drawable/btn_focused</drawable>
     <!-- Background color for normal state of action button -->
-    <drawable name="action_button_normal">@drawable/btn_normal</drawable>
+    <drawable name="action_button_normal">@drawable/btn_unfocused</drawable>
 
     <!-- End of Button Customization -->
 
