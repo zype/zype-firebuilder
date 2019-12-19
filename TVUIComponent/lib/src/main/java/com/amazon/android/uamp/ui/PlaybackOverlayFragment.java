@@ -85,6 +85,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.amazon.android.contentbrowser.ContentBrowser.SHOW_PLAYLIST_AUTOPLAY;
+
 /**
  * Class for video playback with media control.
  */
@@ -128,6 +130,7 @@ public class PlaybackOverlayFragment extends TenFootPlaybackOverlayFragment
     private boolean mFadeOutComplete;
     private boolean mShowRelatedContent;
     private boolean mHideMoreActions;
+    private boolean isAutoPlay=false;
 
     /**
      * Drawable to show for CC on state.
@@ -219,6 +222,9 @@ public class PlaybackOverlayFragment extends TenFootPlaybackOverlayFragment
         mSelectedContent = (Content) getActivity().getIntent()
                                                   .getSerializableExtra(
                                                           Content.class.getSimpleName());
+
+        isAutoPlay= getActivity().getIntent().getBooleanExtra(SHOW_PLAYLIST_AUTOPLAY,false);
+
         boolean trailerMode = false;
 
         if(mSelectedContent == null) {
@@ -440,9 +446,10 @@ public class PlaybackOverlayFragment extends TenFootPlaybackOverlayFragment
 
         addPlaybackControlsRow();
 
-        if (mShowRelatedContent) {
+        if (mShowRelatedContent && !isAutoPlay) {
             addOtherRows();
         }
+
         Log.d(TAG, "Hide more actions ? " + mHideMoreActions);
         // Checking here ensures that the secondary actions adapter is already be setup.
         if (mHideMoreActions) {

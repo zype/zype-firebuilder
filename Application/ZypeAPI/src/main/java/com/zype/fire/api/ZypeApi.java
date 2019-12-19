@@ -469,6 +469,24 @@ public class ZypeApi {
         }
     }
 
+    public ZobjectTopPlaylistResponse getZobjectAutoPlayHeroLists() {
+        try {
+            HashMap<String, String> params = new HashMap<>();
+            params.put(APP_KEY, ZypeSettings.APP_KEY);
+            Response response = apiImpl.getZobjectsForAutoPlayHero(params).execute();
+            if (response.isSuccessful()) {
+                return (ZobjectTopPlaylistResponse) response.body();
+            }
+            else {
+                return null;
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public List<Channel> loadEpgChannels() {
         try {
             HashMap<String, String> params = new HashMap<>();
