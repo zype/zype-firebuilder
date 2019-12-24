@@ -63,26 +63,12 @@ import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
 import com.amazon.android.tv.tenfoot.presenter.PosterCardPresenter;
-import com.amazon.android.tv.tenfoot.presenter.SettingsCardPresenter;
-import com.amazon.android.tv.tenfoot.presenter.StubItemPresenter;
 import com.amazon.android.ui.fragments.ErrorDialogFragment;
-import com.amazon.android.utils.ErrorUtils;
-import com.amazon.android.utils.Preferences;
-import com.zype.fire.api.ZypeApi;
-import com.zype.fire.api.ZypeConfiguration;
-import com.zype.fire.api.ZypeSettings;
-import com.zype.fire.auth.ZypeAuthentication;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.util.HashMap;
 import java.util.List;
-
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
 
