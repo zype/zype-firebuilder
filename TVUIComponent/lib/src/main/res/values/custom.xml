@@ -172,5 +172,6 @@ permissions and limitations under the License.
     <!-- Drm encryption schema, Allowed options are ENCRYPTION_DEFAULT, ENCRYPTION_PLAYREADY,
     ENCRYPTION_WIDEVINE -->
     <string name="drm_encryption_schema">ENCRYPTION_DEFAULT</string>
+    <color name="background_color_translucent">#CC000000</color>
 
 </resources>
