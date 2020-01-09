@@ -12,6 +12,7 @@ import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.utils.Helpers;
@@ -102,6 +103,15 @@ public class HeroCardPresenter extends Presenter {
       mInfoField.setBackgroundColor(mContext.getResources().getColor(R.color.transparent));
     }
 
+    ImageView imageView = ((ViewHolder) viewHolder).mCardView.getMainImageView();
+
+    if(slider.isSelected()) {
+     imageView.setAlpha(1.0f);
+      imageView.setColorFilter(mContext.getResources().getColor(R.color.transparent));
+    }else {
+     imageView.setAlpha(0.5f);
+     imageView.setColorFilter(mContext.getResources().getColor(R.color.background_hero_slider_image));
+    }
   }
 
   @Override

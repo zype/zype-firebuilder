@@ -128,5 +128,6 @@ permissions and limitations under the License.
     <string translatable="false" name="second_screen_login_instruction_line_2">Visit facebook.com/device</string>
 
     <!-- End of Authentication Customization -->
+    <color name="background_hero_slider_image">#99000000</color>
 
 </resources>

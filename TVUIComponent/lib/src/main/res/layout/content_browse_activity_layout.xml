@@ -124,7 +124,7 @@ permissions and limitations under the License.
             android:name="com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/content_details"
+            android:layout_below="@id/hero_slider_ly"
             tools:layout="@layout/action_widget_container" />
 
         <fragment
