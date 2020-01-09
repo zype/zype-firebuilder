@@ -137,8 +137,10 @@ public class ContentBrowseFragment extends RowsFragment {
         mRowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
 
         BrowseHelper.loadRootContentContainer(getActivity(), mRowsAdapter);
-        mSettingsAdapter = BrowseHelper.addSettingsActionsToRowAdapter(getActivity(), mRowsAdapter);
-        mLoginButtonIndex = BrowseHelper.getLoginButtonIndex(mSettingsAdapter);
+        if (ZypeSettings.SETTINGS_PLAYLIST_ENABLED){
+            mSettingsAdapter = BrowseHelper.addSettingsActionsToRowAdapter(getActivity(), mRowsAdapter);
+            mLoginButtonIndex = BrowseHelper.getLoginButtonIndex(mSettingsAdapter);
+        }
 
         setAdapter(mRowsAdapter);
 

@@ -152,7 +152,7 @@ public class ReadDialogFragment extends DialogFragment {
                                .getDimensionPixelSize(R.dimen.read_dialog_height);
         }
         window.setAttributes(wlp);
-
+        window.setDimAmount(0.5f);
         return dialog;
     }
 

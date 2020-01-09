@@ -71,6 +71,26 @@ permissions and limitations under the License.
             style="?android:attr/progressBarStyleLarge"
             android:indeterminateDrawable="@drawable/custom_progress"/>
 
+    <LinearLayout
+      android:id="@+id/messageView"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="bottom|center"
+      android:layout_marginBottom="10dp"
+      android:visibility="gone"
+      android:orientation="vertical">
+
+        <TextView
+          android:id="@+id/autoplayMessage"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:lineSpacingExtra="1dp"
+          android:layout_gravity="center"
+          android:gravity="center"
+          style="?attr/detailsDescriptionTitleStyle"/>
+
+    </LinearLayout>
+
     <fragment
             android:id="@+id/playback_controls_fragment"
             android:name="com.amazon.android.uamp.ui.PlaybackOverlayFragment"

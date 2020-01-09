@@ -39,6 +39,9 @@ import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.Helpers;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
+import com.zype.fire.api.Model.ZobjectTopPlaylist;
+import com.zype.fire.api.Model.ZobjectTopPlaylistResponse;
+import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeSettings;
 
 import android.app.Activity;
@@ -53,6 +56,14 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.util.Collections;
+import java.util.List;
+
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
+
 /**
  * This is a splash activity to load when the app is initializing and loading its content.
  */
@@ -62,6 +73,7 @@ public class SplashActivity extends BaseActivity implements ICancellableLoad {
     private ImageView mAppLogo;
     private ProgressBar mProgress;
     private boolean isLoadingCancelled = false;
+    private CompositeSubscription mCompositeSubscription = new CompositeSubscription();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,7 +136,7 @@ public class SplashActivity extends BaseActivity implements ICancellableLoad {
 
                         // Notify content browser that the intent is coming from an app launch.
                         splashAct.getIntent().putExtra(ContentBrowser.RESTORE_ACTIVITY, true);
-                        contentBrowser.runGlobalRecipes(splashAct, splashAct);
+
 
                         HeroSlider.getInstance().loadContent().subscribe(s-> {
 
@@ -136,6 +148,8 @@ public class SplashActivity extends BaseActivity implements ICancellableLoad {
                             EPGDataManager.getInstance().setNowPlayingText(getString(com.amazon.android.contentbrowser.R.string.currently_playing));
                             EPGDataManager.getInstance().load();
                         }
+
+                        autoPlayContent();
                     }
                     catch (Exception e) {
                         Log.e(TAG, "Failed to put data in cache for recipe ", e);
@@ -196,6 +210,45 @@ public class SplashActivity extends BaseActivity implements ICancellableLoad {
         super.onPause();
     }
 
+    private void autoPlayContent() {
+      ContentBrowser contentBrowser = ContentBrowser.getInstance(this);
+
+      loadAutoPlayContent().subscribe(autoPlayList-> {
+          boolean found=false;
+          for (ZobjectTopPlaylist model: autoPlayList){
+            if (model.active &&
+                model.zobjectTypeTitle.equalsIgnoreCase("autoplay_hero")){
+              found=true;
+              mCompositeSubscription.add(contentBrowser.getContentById(model.videoid).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                  .subscribe(content -> {
+                    //move the user to the detail screen
+                    contentBrowser.runGlobalRecipes(this, this,content);
+                    //contentBrowser.switchToRendererScreen(content);
+
+                  }, throwable -> {
+                    contentBrowser.runGlobalRecipes(this, this);
+
+                  }));
+              break;
+            }
+          }
+
+          if (!found){
+            contentBrowser.runGlobalRecipes(this, this);
+          }
+
+      }, throwable -> {
+        contentBrowser.runGlobalRecipes(this, this);
+      });
+    }
+
+    public Observable<List<ZobjectTopPlaylist>> loadAutoPlayContent() {
+        return Observable.just(true).subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).flatMap(s -> {
+            ZobjectTopPlaylistResponse response = ZypeApi.getInstance().getZobjectAutoPlayHeroLists();
+
+            return Observable.just(response.zobjectContents);
+        });
+    }
 
 
 }

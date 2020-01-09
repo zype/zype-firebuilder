@@ -48,9 +48,21 @@ permissions and limitations under the License.
             android:id="@+id/details_description_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:layout_marginBottom="@dimen/details_description_subtitle_bottom_margin"
+            android:visibility="gone"
             style="?attr/detailsDescriptionSubtitleStyle"
             />
+
+    <TextView
+        android:id="@+id/details_episode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:visibility="gone"
+        android:layout_marginBottom="@dimen/details_description_subtitle_bottom_margin"
+        style="@style/DetailsDescription"
+        />
 
     <com.amazon.android.ui.widget.EllipsizedTextView
             android:id="@+id/ellipsized_description_text"

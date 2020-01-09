@@ -116,6 +116,9 @@ permissions and limitations under the License.
     <string name="subscription_title_confirm">Confirm Subscription</string>
 
     <string name="action_load_more">Load more…</string>
-    <string name="search">Search</string>
+    <string name="ime_action_label_previous">Cancel</string>
+    <string name="ime_action_label_search">Search</string>
+
+    <string name="autoplay_message">Press the Menu button to exit and return to the Home screen.</string>
 
 </resources>
