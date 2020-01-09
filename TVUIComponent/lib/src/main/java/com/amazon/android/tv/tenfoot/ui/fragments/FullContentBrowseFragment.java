@@ -37,6 +37,7 @@ import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
 import com.amazon.android.tv.tenfoot.ui.activities.ContentDetailsActivity;
 import com.amazon.android.tv.tenfoot.utils.BrowseHelper;
+import com.zype.fire.api.ZypeSettings;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -86,8 +87,10 @@ public class FullContentBrowseFragment extends BrowseFragment {
         EventBus.getDefault().register(this);
         mRowsAdapter = new ArrayObjectAdapter(new CustomListRowPresenter());
         BrowseHelper.loadRootContentContainer(getActivity(), mRowsAdapter);
-        mSettingsAdapter = BrowseHelper.addSettingsActionsToRowAdapter(getActivity(), mRowsAdapter);
-        mLoginButtonIndex = BrowseHelper.getLoginButtonIndex(mSettingsAdapter);
+        if (ZypeSettings.SETTINGS_PLAYLIST_ENABLED){
+            mSettingsAdapter = BrowseHelper.addSettingsActionsToRowAdapter(getActivity(), mRowsAdapter);
+            mLoginButtonIndex = BrowseHelper.getLoginButtonIndex(mSettingsAdapter);
+        }
 
         setAdapter(mRowsAdapter);
 

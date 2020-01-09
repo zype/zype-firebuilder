@@ -18,6 +18,7 @@ import com.amazon.android.adapters.ActionWidgetAdapter;
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.model.Action;
 import com.amazon.android.tv.tenfoot.R;
+import com.zype.fire.api.ZypeSettings;
 
 import android.app.Activity;
 import android.content.Context;
@@ -126,9 +127,18 @@ public abstract class BaseActivity extends Activity {
 
             // Set the on click listener for this widget container.
             actionWidgetContainer.setOnClickListener(
-                    v -> ContentBrowser.getInstance(BaseActivity.this).actionTriggered
-                            (BaseActivity.this, mSelectedAction));
+                    v -> {
+                        if ((((int)mSelectedAction.getId()) == ContentBrowser.CONTENT_ACTION_SEARCH) && ZypeSettings.SHOW_MENU_ICON){
+                            showMenuFragment();
+                            return;
+                        }
+                        ContentBrowser.getInstance(BaseActivity.this).actionTriggered
+                                (BaseActivity.this, mSelectedAction);
+                    });
         }
+    }
+    public void showMenuFragment(){
+
     }
 
     protected void requestActionFocus() {

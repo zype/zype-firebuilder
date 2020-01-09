@@ -26,6 +26,8 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
+import static android.support.v17.leanback.widget.FocusHighlight.ZOOM_FACTOR_MEDIUM;
+
 public class HeroSliderFragment extends RowsFragment {
 
     private static final int WAIT_BEFORE_FOCUS_REQUEST_MS = 500;
@@ -164,7 +166,15 @@ public class HeroSliderFragment extends RowsFragment {
                 selectedIndex = (listRowAdapter.size() / 2 + index) - 1;
                 scrollToNextItem(false);
             }, WAIT_BEFORE_FOCUS_REQUEST_MS);
-
+            setOnItemViewSelectedListener((itemViewHolder, item, rowViewHolder, row) -> {
+              if (item != null) {
+                selectedIndex = ((HeroCardPresenter.ViewHolder) itemViewHolder).getIndex();
+                registerNextScroll();
+                listRowAdapter.reset();
+                ((HeroCardPresenter.ViewHolder) itemViewHolder).getSlider().setSelected(true);
+                listRowAdapter.notifyChanges(selectedIndex);
+              }
+            });
         }
     }
 

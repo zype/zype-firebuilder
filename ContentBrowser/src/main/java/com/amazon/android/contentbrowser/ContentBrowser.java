@@ -81,6 +81,7 @@ import rx.subscriptions.CompositeSubscription;
 
 import static com.amazon.android.contentbrowser.helper.LauncherIntegrationManager
         .getSourceOfContentPlayRequest;
+import static com.zype.fire.api.ZypeSettings.SHOW_MENU_ICON;
 
 /* Zype */
 import com.zype.fire.api.ZypeConfiguration;
@@ -181,6 +182,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public static final String PLAY_TRAILER_SCREEN = "PLAY_TRAILER_SCREEN";
 
     public static final String EPG_SCREEN = "EPG_SCREEN";
+
+    public static final String SHOW_PLAYLIST_AUTOPLAY = "SHOW_PLAYLIST_AUTOPLAY";
+
 
     /**
      * Free content constant.
@@ -703,7 +707,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 mAppContext.getResources()
                         .getBoolean(R.bool.override_all_contents_subscription_flag);
 
-        if (ZypeSettings.SHOW_SEARCH_ICON){
+        if (ZypeSettings.SHOW_SEARCH_ICON || SHOW_MENU_ICON){
             addWidgetsAction(createSearchAction());
         }
         //addWidgetsAction(createSlideShowAction());
@@ -1305,8 +1309,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      */
     private Action createSearchAction() {
 
-        Action search = new Action(CONTENT_ACTION_SEARCH, SEARCH, R.drawable
-                .lb_ic_in_app_search);
+        Action search = new Action(CONTENT_ACTION_SEARCH, SEARCH, (SHOW_MENU_ICON  ? R.drawable.menu_icon : R.drawable
+                .lb_ic_in_app_search));
         search.setId(ContentBrowser.CONTENT_ACTION_SEARCH);
         search.setAction(SEARCH);
         return search;
@@ -1357,9 +1361,14 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      * @return Recommended contents as a content container.
      */
     public ContentContainer getRecommendedListOfAContentAsAContainer(Content content) {
+        ContentContainer recommendedContentContainer =null;
+        if (getContainerForContent(content) != null && !TextUtils.isEmpty(getContainerForContent(content).getName())){
+            recommendedContentContainer= new ContentContainer(getContainerForContent(content).getName());
 
-        ContentContainer recommendedContentContainer =
-                new ContentContainer(mAppContext.getString(R.string.recommended_contents_header));
+        }else{
+            recommendedContentContainer= new ContentContainer("");
+        }
+
 
         for (Content c : mContentLoader.getRootContentContainer()) {
             if (content.hasSimilarTags(c) && !StringManipulation.areStringsEqual(c.getId(),
@@ -2394,6 +2403,13 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         });
     }
 
+    public void switchToRendererAutoPlayScreen(Content content) {
+        switchToScreen(ContentBrowser.CONTENT_RENDERER_SCREEN, content, intent -> {
+            intent.putExtra(Content.class.getSimpleName(), content);
+            intent.putExtra(SHOW_PLAYLIST_AUTOPLAY, true);
+        });
+    }
+
     /**
      * Handle renderer screen switch.
      *
@@ -2654,10 +2670,13 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         }
     }
 
+    public void runGlobalRecipes(Activity activity, ICancellableLoad cancellable) {
+        runGlobalRecipes(activity,cancellable,null);
+    }
     /**
      * Run global recipes.
      */
-    public void runGlobalRecipes(Activity activity, ICancellableLoad cancellable) {
+    public void runGlobalRecipes(Activity activity, ICancellableLoad cancellable,Content autoPlayContent) {
 
         final ContentContainer root = new ContentContainer("Root");
         /* Zype, Evgeny Cherkasov */
@@ -2741,7 +2760,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                     intent.putExtra(REQUEST_FROM_LAUNCHER, true);
                                     intent.putExtra(PreferencesConstants.CONTENT_ID,
                                             content.getId());
-                                    switchToHomeScreen(intent);
+                                    switchHomeOrAutoPlayScreen(intent,autoPlayContent);
 
                                 }
                                 catch (Exception e) {
@@ -2776,7 +2795,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                                                         "exception cancelled");
                                                                 return;
                                                             }
-                                                            switchToHomeScreen();
+                                                            switchHomeOrAutoPlayScreen(null,autoPlayContent);
                                                         }
                                                     });
                                 }
@@ -2802,15 +2821,29 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                                 if (shouldRestoreLastActivity(activity)) {
                                     Log.d(TAG, "Ran global recipes from app launch. Will " +
                                             "add intent extra to resume previous activity");
-                                    switchToHomeScreen(activity.getIntent());
+                                    switchHomeOrAutoPlayScreen(activity.getIntent(),autoPlayContent);
                                 }
                                 else {
-                                    switchToHomeScreen();
+
+                                    switchHomeOrAutoPlayScreen(null,autoPlayContent);
                                 }
                             }
                         });
 
         mCompositeSubscription.add(subscription);
+    }
+
+    private void switchHomeOrAutoPlayScreen(Intent intent,Content content){
+        if(content !=null){
+            switchToRendererAutoPlayScreen(content);
+        }else{
+            if (intent!=null){
+                switchToHomeScreen(intent);
+            }else {
+                switchToHomeScreen();
+            }
+        }
+
     }
 
     /**

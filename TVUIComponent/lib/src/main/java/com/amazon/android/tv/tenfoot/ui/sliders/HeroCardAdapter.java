@@ -1,5 +1,6 @@
 package com.amazon.android.tv.tenfoot.ui.sliders;
 
+import android.os.Handler;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.ObjectAdapter;
 import android.support.v17.leanback.widget.Presenter;
@@ -13,6 +14,7 @@ import java.util.List;
 public class HeroCardAdapter extends ObjectAdapter {
 
   private ArrayList<Slider> mItems = new ArrayList<>();
+  private final Handler handler = new Handler();
 
   /**
    * Constructs an adapter with the given {@link PresenterSelector}.
@@ -182,5 +184,34 @@ public class HeroCardAdapter extends ObjectAdapter {
     return Collections.unmodifiableList((List<E>) mItems);
   }
 
+  public void notifyChanges(int selectedIndex) {
 
+      int startIndex = selectedIndex - 2;
+
+      if(startIndex < 0) {
+          startIndex = 0;
+      }
+
+      int endIndex = selectedIndex + 2;
+
+      if(endIndex >= size()) {
+          endIndex = size();
+      }
+
+
+      final int start = startIndex;
+      final int end = endIndex;
+
+      if (mItems.size() > 0){
+          handler.post(() -> {
+              notifyItemRangeChanged(start, end - start);
+          });
+      }
+  }
+
+  public void reset() {
+    for(Slider slider : mItems) {
+      slider.setSelected(false);
+    }
+  }
 }

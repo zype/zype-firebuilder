@@ -88,7 +88,8 @@ permissions and limitations under the License.
         <LinearLayout
             android:id="@+id/content_details"
             android:layout_width="352dp"
-            android:layout_height="125dp"
+            android:layout_height="wrap_content"
+            android:minHeight="120dp"
             android:layout_below="@id/main_logo"
             android:layout_marginLeft="@dimen/lb_browse_padding_start"
             android:layout_marginBottom="71dp"
@@ -101,8 +102,9 @@ permissions and limitations under the License.
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
                 android:ellipsize="end"
-                android:singleLine="true"
+                android:maxLines="2"
                 android:textSize="@dimen/lb_details_description_title_text_size" />
+
 
             <TextView
                 android:id="@+id/content_detail_description"
@@ -122,7 +124,7 @@ permissions and limitations under the License.
             android:name="com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/content_details"
+            android:layout_below="@id/hero_slider_ly"
             tools:layout="@layout/action_widget_container" />
 
         <fragment

@@ -30,6 +30,16 @@ public class Slider implements Serializable {
   private String url;
   private String name;
 
+  public boolean isSelected() {
+    return selected;
+  }
+
+  public void setSelected(boolean selected) {
+    this.selected = selected;
+  }
+
+  private boolean selected;
+
   public int getPosition() {
     return position;
   }

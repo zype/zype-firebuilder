@@ -347,6 +347,15 @@ public class Content implements Serializable {
 
     public static final String EXTRA_PREVIEW_IDS = "previewIds";
 
+    public String getEpisode() {
+        return mEpisode;
+    }
+
+    public void setEpisode(String mEpisode) {
+        this.mEpisode = mEpisode;
+    }
+
+    private String mEpisode;
 
     /**
      * Creates a {@link Content} with empty values.
@@ -995,6 +1004,12 @@ public class Content implements Serializable {
      * @return True if they have similar tags; false otherwise.
      */
     public boolean hasSimilarTags(Content givenContent) {
+        String contentPlaylistId = getExtraValueAsString(EXTRA_PLAYLIST_ID);
+        String givenPlaylistId = givenContent.getExtraValueAsString(EXTRA_PLAYLIST_ID);
+        if (!TextUtils.isEmpty(contentPlaylistId) && !TextUtils.isEmpty(givenPlaylistId) && contentPlaylistId.equalsIgnoreCase(givenPlaylistId)){
+            return true;
+        }
+
         // Get list of givenContentTags.
         List<String> givenContentTags = givenContent.getTags();
 
@@ -1090,6 +1105,7 @@ public class Content implements Serializable {
                 ", mRecommendations='" + mRecommendations + '\'' +
                 ", mLocale=" + mLocale +
                 ", mExtras=" + mExtras +
+                ", mEpisode=" + mEpisode +
                 '}';
     }
 
