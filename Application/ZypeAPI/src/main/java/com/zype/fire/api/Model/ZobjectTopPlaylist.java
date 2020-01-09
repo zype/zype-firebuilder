@@ -17,6 +17,9 @@ public class ZobjectTopPlaylist {
     @Expose
     public Boolean active;
 
+    @Expose
+    public Boolean autoplay;
+
     @SerializedName("created_at")
     @Expose
     public String createdAt;
