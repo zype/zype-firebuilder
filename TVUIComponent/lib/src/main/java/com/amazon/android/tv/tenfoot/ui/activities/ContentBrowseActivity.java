@@ -80,13 +80,14 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
-import static com.zype.fire.api.ZypeSettings.SHOW_MENU;
+import static com.zype.fire.api.ZypeSettings.SHOW_LEFT_MENU;
 
 /**
  * ContentBrowseActivity class that loads the ContentBrowseFragment.
  */
-public class ContentBrowseActivity extends BaseActivity implements ContentBrowseFragment
-        .OnBrowseRowListener {
+public class ContentBrowseActivity extends BaseActivity implements
+        ContentBrowseFragment.OnBrowseRowListener,
+        MenuFragment.IMenuFragmentListener {
 
     private final String TAG = ContentBrowseActivity.class.getSimpleName();
 
@@ -186,7 +187,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         if(!sliderShown || !slidersPresent()) {
             return;
         }
-
+        mContentImage.setVisibility(View.VISIBLE);
         HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
         fadeInFadeOut(Arrays.asList(findViewById(R.id.content_image), findViewById(R.id.content_details),
             findViewById(R.id.main_logo)), Arrays.asList(fragment.getView()));
@@ -197,7 +198,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         if(sliderShown || !slidersPresent()) {
             return;
         }
-
+        mContentImage.setVisibility(View.GONE);
         HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
         fadeInFadeOut(Arrays.asList(fragment.getView()), Arrays.asList(findViewById(R.id.content_image), findViewById(R.id.content_details),
             findViewById(R.id.main_logo)));
@@ -240,7 +241,6 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-
         if(slidersPresent()) {
             if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
                 if(sliderHasFocus()) {
@@ -249,7 +249,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
                 }
             }
 
-            if(isActionFocus()) {
+            if(isActionFocus() && !isMenuOpened) {
                 if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN) {
                     HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
 
@@ -267,13 +267,42 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
 
         if(slidersPresent()) {
             handler.postDelayed(() -> {
-                if(sliderHasFocus()) {
-                    showHeroSlider();
+              if(sliderHasFocus() || event.getKeyCode()== KeyEvent.KEYCODE_BACK) {
+                  sliderShown=false;
+                  showHeroSlider();
                 }
                 else {
-                    hideHeroSlider();
+                    if (!isMenuOpened){
+                        hideHeroSlider();
+                    }
                 }
             }, 50);
+            if (sliderShown && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN) {
+                handler.postDelayed(() -> {
+                    if (!isMenuOpened){
+                        hideHeroSlider();
+                    }
+                }, 50);
+            }
+            else if (!sliderShown && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
+                handler.postDelayed(() -> {
+                    if (!isMenuOpened && sliderHasFocus()) {
+                        sliderShown=false;
+                        showHeroSlider();
+                    }
+                }, 50);
+            }
+//            handler.postDelayed(() -> {
+//                if(sliderHasFocus() || event.getKeyCode()== KeyEvent.KEYCODE_BACK) {
+//                    sliderShown=false;
+//                    showHeroSlider();
+//                }
+//                else {
+//                    if (!isMenuOpened){
+//                        hideHeroSlider();
+//                    }
+//                }
+//            }, 50);
         }
 
         return processed;
@@ -393,7 +422,11 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
         if (fragment != null) {
             isMenuOpened = true;
-            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.lb_error_background_color_translucent));
+            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.background_color_translucent));
+//            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.lb_error_background_color_translucent));
+//             fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.left_menu_background));
+            int paddingTop = (int) getResources().getDimension(R.dimen.lb_browse_padding_top);
+            fragment.getView().setPadding(0, paddingTop, 0, 0);
             getFragmentManager().beginTransaction()
                     .show(fragment)
                     .commit();
@@ -408,6 +441,13 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
             getFragmentManager().beginTransaction()
                     .hide(fragment)
                     .commit();
+        }
+    }
+
+    @Override
+    public void showMenuFragment() {
+        if (!isMenuOpened){
+            showMenu();
         }
     }
 
@@ -427,7 +467,7 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
 
             case KeyEvent.KEYCODE_MENU:
                 if (event.getAction() == KeyEvent.ACTION_UP) {
-                    if (ZypeSettings.SHOW_MENU) {
+                    if (ZypeSettings.SHOW_LEFT_MENU) {
                         Log.d(TAG, "Menu button pressed");
                         if (!isMenuOpened) {
                             showMenu();
@@ -435,15 +475,36 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
                         return true;
                     }
                 }
-            case KeyEvent.KEYCODE_BACK:
+                break;
+            case KeyEvent.KEYCODE_BACK: {
+                if (sliderHasFocus()){
+                    sliderShown=false;
+                    showHeroSlider();
+                }
+
                 if (event.getAction() == KeyEvent.ACTION_UP) {
                     Log.d(TAG, "Back button pressed");
                     if (isMenuOpened) {
                         hideMenu();
                         return true;
                     }
-                    break;
                 }
+                break;
+            }
+            case KeyEvent.KEYCODE_DPAD_UP:
+                Log.d(TAG, "Down button pressed");
+                if (isMenuOpened) {
+                    MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+                    if (fragment != null) {
+                        ArrayObjectAdapter menuAdapter = (ArrayObjectAdapter) fragment.getAdapter();
+                        if (fragment.getSelectedMenuItemIndex() == 0) {
+                            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                break;
             case KeyEvent.KEYCODE_DPAD_DOWN:
                 Log.d(TAG, "Down button pressed");
                 if (isMenuOpened) {
@@ -462,5 +523,10 @@ public class ContentBrowseActivity extends BaseActivity implements ContentBrowse
         return super.dispatchKeyEvent(event);
     }
 
-
+    @Override
+    public void onItemSelected(Action item) {
+        hideMenu();
+        ContentBrowser.getInstance(this)
+                .settingsActionTriggered(this, item);
+    }
 }

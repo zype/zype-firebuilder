@@ -19,6 +19,7 @@ import com.amazon.android.tv.tenfoot.R;
 import com.amazon.utils.StringManipulation;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 /**
  * A helper class that performs operations using the {@link Content} class that are needed
@@ -35,6 +36,9 @@ public class ContentHelper {
      * A constant to get the episode number from a Content's extras map.
      */
     public static final String EPISODE_NUMBER = "episodeNumber";
+
+    public static final String EPISODE = "mEpisode";
+
 
     /**
      * Gets a string to display as the subtitle on the card image view. We first try to get the
@@ -93,5 +97,13 @@ public class ContentHelper {
         }
 
         return subtitle;
+    }
+
+    public static String getEpisodeSubTitle(Context context,Content content){
+        Integer episode = (Integer) content.getExtraValue(EPISODE);
+        if (episode != null && !TextUtils.isEmpty(String.valueOf(episode))) {
+            return context.getString(R.string.episode)+" "+episode;
+        }
+        return "";
     }
 }

@@ -17,7 +17,8 @@ permissions and limitations under the License.
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/synopsis_modal_bg">
+                android:background="@color/background"
+    >
 
     <RelativeLayout
             android:id="@+id/view_container"

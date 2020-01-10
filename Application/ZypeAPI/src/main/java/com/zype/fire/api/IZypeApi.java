@@ -179,6 +179,10 @@ public interface IZypeApi {
     @GET("/zobjects/?zobject_type=top_playlists")
     Call<ZobjectTopPlaylistResponse> getZobjectsForTopPlaylist(@QueryMap HashMap<String, String> params);
 
+    // ZObjects
+    @GET("/zobjects/?zobject_type=autoplay_hero")
+    Call<ZobjectTopPlaylistResponse> getZobjectsForAutoPlayHero(@QueryMap HashMap<String, String> params);
+
     // EPG Channels
     @GET("/program_guides")
     Call<ChannelResponse> epgChannels(@QueryMap HashMap<String, String> params);

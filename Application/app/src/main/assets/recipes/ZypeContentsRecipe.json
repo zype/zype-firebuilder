@@ -21,7 +21,8 @@
     "thumbnails@mBackgroundImageUrl",
     "videoFavoriteId@VideoFavoriteId",
     "registration_required@RegistrationRequired",
-    "preview_ids@previewIds"
+    "preview_ids@previewIds",
+    "episode@mEpisode"
 
   ]
 }

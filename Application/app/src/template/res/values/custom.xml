@@ -104,6 +104,9 @@ permissions and limitations under the License.
     <!-- Background color of Search screen -->
     <drawable name="search_background">@drawable/bg_gradient_search</drawable>
 
+    <color name="search_edit_text_bg_color">#4DFFFFFF</color>
+    <color name="search_edit_text_bg_color_unfocused">#1AFFFFFF</color>
+
     <!-- End of Search Bar Customization -->
 
     <!-- Authentication Customization -->
@@ -125,6 +128,7 @@ permissions and limitations under the License.
     <string translatable="false" name="second_screen_login_instruction_line_2">Visit facebook.com/device</string>
 
     <!-- End of Authentication Customization -->
+    <color name="background_color_translucent">#CC000000</color>
     <color name="background_hero_slider_image">#99000000</color>
 
     <color name="lock_color">#FF0000</color>
