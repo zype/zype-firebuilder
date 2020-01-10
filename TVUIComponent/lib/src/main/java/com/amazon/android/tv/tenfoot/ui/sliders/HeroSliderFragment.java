@@ -110,12 +110,15 @@ public class HeroSliderFragment extends RowsFragment {
         rowsAdapter.add(listRow);
         setAdapter(rowsAdapter);
 
-        setOnItemViewSelectedListener((itemViewHolder, item, rowViewHolder, row) -> {
-            if (item != null) {
-                selectedIndex = ((HeroCardPresenter.ViewHolder) itemViewHolder).getIndex();
-                registerNextScroll();
-            }
-        });
+    setOnItemViewSelectedListener((itemViewHolder, item, rowViewHolder, row) -> {
+      if (item != null) {
+        selectedIndex = ((HeroCardPresenter.ViewHolder) itemViewHolder).getIndex();
+        registerNextScroll();
+        listRowAdapter.reset();
+        ((HeroCardPresenter.ViewHolder) itemViewHolder).getSlider().setSelected(true);
+        listRowAdapter.notifyChanges(selectedIndex);
+      }
+    });
 
         setOnItemViewClickedListener((itemViewHolder, item, rowViewHolder, row) -> {
 
