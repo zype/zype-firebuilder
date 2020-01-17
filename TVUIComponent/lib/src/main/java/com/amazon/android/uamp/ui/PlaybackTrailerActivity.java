@@ -487,7 +487,10 @@ public class PlaybackTrailerActivity extends BasePlaybackActivity implements
       params.put(ZypeApi.APP_KEY, ZypeSettings.APP_KEY);
     }
 
-    ZypeApi.getInstance().getApi().getPlayer(IZypeApi.HEADER_USER_AGENT, mSelectedContent.getTrailerId(), params).enqueue(new Callback<PlayerResponse>() {
+    ZypeApi.getInstance().getApi()
+            .getPlayer(getUserAgent(PlaybackTrailerActivity.this, getString(R.string.app_name_short)),
+                    mSelectedContent.getTrailerId(), params)
+            .enqueue(new Callback<PlayerResponse>() {
       @Override
       public void onResponse(Call<PlayerResponse> call, Response<PlayerResponse> response) {
         if (response.isSuccessful()) {

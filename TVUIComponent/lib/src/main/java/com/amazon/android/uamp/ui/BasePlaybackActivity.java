@@ -1,9 +1,13 @@
 package com.amazon.android.uamp.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 
+import com.zype.fire.api.IZypeApi;
 import com.zype.fire.api.Util.AdMacrosHelper;
 
 import java.util.HashMap;
@@ -44,4 +48,17 @@ public class BasePlaybackActivity extends Activity {
         params.put(UUID, advertisingID);
         return params;
     }
+
+    public String getUserAgent(Context context, String applicationName) {
+        String versionName;
+        try {
+            String packageName = context.getPackageName();
+            PackageInfo info = context.getPackageManager().getPackageInfo(packageName, 0);
+            versionName = info.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            versionName = "?";
+        }
+        return IZypeApi.HEADER_USER_AGENT + applicationName + "/" + versionName;
+    }
+
 }

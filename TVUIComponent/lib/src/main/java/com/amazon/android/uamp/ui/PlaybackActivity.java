@@ -34,6 +34,7 @@ import com.amazon.android.configuration.ConfigurationManager;
 import com.amazon.android.tv.tenfoot.base.TenFootApp;
 import com.amazon.android.ui.constants.ConfigurationConstants;
 import com.amazon.mediaplayer.tracks.MediaFormat;
+import com.google.android.exoplayer.ExoPlayerLibraryInfo;
 import com.google.android.exoplayer.text.CaptionStyleCompat;
 import com.google.android.exoplayer.text.SubtitleLayout;
 
@@ -60,6 +61,8 @@ import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.Helpers;
 import com.amazon.android.utils.Preferences;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.media.session.PlaybackState;
 
 import com.amazon.mediaplayer.AMZNMediaPlayer;
@@ -84,6 +87,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -1768,7 +1772,10 @@ public class PlaybackActivity extends BasePlaybackActivity implements
         if (!TextUtils.isEmpty(uuid)) {
             params.put(ZypeApi.UUID, uuid);
         }
-        ZypeApi.getInstance().getApi().getPlayer(IZypeApi.HEADER_USER_AGENT, mSelectedContent.getId(), params).enqueue(new Callback<PlayerResponse>() {
+        ZypeApi.getInstance().getApi()
+                .getPlayer(getUserAgent(PlaybackActivity.this, getString(R.string.app_name_short)),
+                                            mSelectedContent.getId(), params)
+                    .enqueue(new Callback<PlayerResponse>() {
             @Override
             public void onResponse(Call<PlayerResponse> call, Response<PlayerResponse> response) {
                 if (response.isSuccessful()) {
