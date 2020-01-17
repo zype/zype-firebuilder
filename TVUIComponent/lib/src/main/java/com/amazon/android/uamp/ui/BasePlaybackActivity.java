@@ -25,7 +25,8 @@ public class BasePlaybackActivity extends Activity {
 
         ApplicationInfo appInfo = getApplication().getApplicationInfo();
         // App data
-        params.put(APP_BUNDLE, appInfo.packageName);
+//        params.put(APP_BUNDLE, appInfo.packageName);
+        params.put(APP_BUNDLE, "B07JZHXT64");
         params.put(APP_DOMAIN, appInfo.packageName);
         params.put(APP_ID, appInfo.packageName);
         params.put(APP_NAME, (appInfo.labelRes == 0) ? appInfo.nonLocalizedLabel.toString() : getString(appInfo.labelRes));
