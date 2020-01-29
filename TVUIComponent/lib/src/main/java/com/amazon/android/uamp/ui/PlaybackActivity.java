@@ -1411,7 +1411,8 @@ public class PlaybackActivity extends BasePlaybackActivity implements
                 mAdsImplementation.init(this, mAdsView, playerExtras);
             }
 
-            mPlayer.setUserAgent(System.getProperty("http.agent"));
+            mPlayer.setUserAgent(getUserAgent(PlaybackActivity.this,
+                    getString(R.string.app_name_short)));
             mPlayer.addStateChangeListener(this);
             mPlayer.addErrorListener(this);
             mPlayer.addInfoListener(this);

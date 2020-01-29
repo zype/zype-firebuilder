@@ -385,7 +385,8 @@ public class PlaybackTrailerActivity extends BasePlaybackActivity implements
       // Init player interface, this is where it is fully created.
       mPlayer.init(this, mVideoView, playerExtras);
 
-      mPlayer.setUserAgent(System.getProperty("http.agent"));
+      mPlayer.setUserAgent(getUserAgent(PlaybackTrailerActivity.this,
+              getString(R.string.app_name_short)));
       mPlayer.addStateChangeListener(this);
       mPlayer.addErrorListener(this);
       mPlayer.addInfoListener(this);
