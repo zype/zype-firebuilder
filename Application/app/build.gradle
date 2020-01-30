@@ -23,6 +23,10 @@ apply from: "../artifacts.gradle"
 repositories {
     // Uncomment when using CrashlyticsComponent
     //maven { url 'https://maven.fabric.io/public' }
+    maven {
+        url 'https://maven.google.com/'
+        name 'Google'
+    }
 }
 
 buildscript {
@@ -30,6 +34,10 @@ buildscript {
         jcenter()
         // Uncomment when using CrashlyticsComponent
         //maven { url 'https://maven.fabric.io/public' }
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
     }
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.2.3'
@@ -154,6 +162,7 @@ dependencies {
     compile project(':VastAdsComponent')
     compile project(':AmazonInAppPurchaseComponent')
     compile project(':AkamaiAnalyticsComponent')
+    compile project(':SegmentAnalyticsComponent')
 //    compile project(':LoggerAnalyticsComponent')
     // Uncomment when using CrashlyticsComponent
     /*compile('com.crashlytics.sdk.android:crashlytics:2.6.1@aar') {
