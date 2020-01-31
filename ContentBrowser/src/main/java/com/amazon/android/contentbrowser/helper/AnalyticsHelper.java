@@ -242,6 +242,23 @@ public class AnalyticsHelper {
     }
 
     /**
+     * Report the current playback state.
+     *
+     * @param content         Content that started/resumed playback.
+     * @param currentPosition The current playback position.
+     */
+    public static void trackPlayback(Content content, long currentPosition) {
+
+        Map<String, Object> attributes = getBasicAnalyticsAttributesForContent(content);
+
+        // Get Content extras
+        attributes.putAll(ExtraContentAttributes.getExtraAttributes(content.getExtras()));
+        attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_DURATION, content.getDuration());
+        attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_CURRENT_POSITION, currentPosition);
+        sendAnalytics(AnalyticsTags.ACTION_PLAYBACK, attributes);
+    }
+
+    /**
      * Tracks that a content's playback finished. This could be that the content was played to
      * completion or that the player was exited.
      *
@@ -254,8 +271,10 @@ public class AnalyticsHelper {
 
         // Get the attributes for the selected movie.
         Map<String, Object> attributes = getBasicAnalyticsAttributesForContent(content);
+        attributes.putAll(ExtraContentAttributes.getExtraAttributes(content.getExtras()));
         attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_SECONDS_WATCHED,
                        currentPosition - startingPosition);
+        attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_DURATION, content.getDuration());
         attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_CURRENT_POSITION, currentPosition);
 
         sendAnalytics(AnalyticsTags.ACTION_PLAYBACK_FINISHED, attributes);

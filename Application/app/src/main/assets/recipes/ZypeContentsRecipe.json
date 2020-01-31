@@ -9,6 +9,7 @@
     "title@mTitle",
     "_id@mId",
     "description@mDescription",
+    "duration@mDuration",
     "images@Images",
     "on_air@live",
     "playerUrl@mUrl",

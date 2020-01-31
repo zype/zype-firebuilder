@@ -51,6 +51,11 @@ public class AnalyticsTags {
     public static final String ACTION_PLAYBACK_STARTED = "ACTION_PLAYBACK_STARTED";
 
     /**
+     * Customizable action for current state of video playback.
+     */
+    public static final String ACTION_PLAYBACK = "ACTION_PLAYBACK";
+
+    /**
      * Customizable action for starting a purchase.
      */
     public static final String ACTION_PURCHASE_INITIATED = "ACTION_PURCHASE_INITIATED";

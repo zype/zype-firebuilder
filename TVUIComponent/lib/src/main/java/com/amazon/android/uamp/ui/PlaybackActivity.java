@@ -274,34 +274,19 @@ public class PlaybackActivity extends Activity implements
         mVideoPositionTrackingRunnable = new Runnable() {
             @Override
             public void run() {
-//                /* Zype, Evgeny Cherkasov */
-//                boolean stopTracking = false;
-
                 try {
                     // If player exists and playing then set video position to ads implementation.
                     if (mPlayer != null && isPlaying()) {
                         if (mAdsImplementation != null) {
                             mAdsImplementation.setCurrentVideoPosition(
                                     mPlayer.getCurrentPosition());
-//                            /* Zype, Evgeny Cherkasov */
-//                            if (mSelectedContent.getAdCuePoints() != null && !mSelectedContent.getAdCuePoints().isEmpty()) {
-//                                int adNumber = mAdsImplementation.getExtra().getInt(IAds.AD_NUMBER);
-//                                if (adNumber >= 0 && mPlayer.getCurrentPosition() >= mSelectedContent.getAdCuePoints().get(adNumber)) {
-//                                    Log.d(TAG, "Start mid-roll ad");
-//                                    stopTracking = true;
-//                                    showMidRollAd();
-//                                }
-//                            }
                         }
                     }
                 }
                 catch (Exception e) {
                     Log.e(TAG, "Video position tracking failed.", e);
                 }
-//                /* Zype, Evgeny Cherkasov */
-//                if (!stopTracking) {
                 mVideoPositionTrackingHandler.postDelayed(this, VIDEO_POSITION_TRACKING_POLL_TIME_MS);
-//                }
             }
         };
 
@@ -433,6 +418,7 @@ public class PlaybackActivity extends Activity implements
 
         if (mMediaSessionController != null) {
             mMediaSessionController.setMediaSessionActive(true);
+            stopPlaybackReportingService();
             //Start the reporting service which reports the playback state every few seconds
             startPlaybackReportingService();
         }
@@ -468,8 +454,10 @@ public class PlaybackActivity extends Activity implements
             public void run() {
 
                 if (!Thread.currentThread().isInterrupted()) {
+                    long position = getCurrentPosition();
                     // Executor has probably asked us to stop
-                    mMediaSessionController.updatePlaybackState(getCurrentPosition());
+                    AnalyticsHelper.trackPlayback(mSelectedContent, position);
+                    mMediaSessionController.updatePlaybackState(position);
                 }
 
             }
@@ -1985,7 +1973,10 @@ public class PlaybackActivity extends Activity implements
                     mMediaSessionController.updatePlaybackState(PlaybackState.STATE_PLAYING,
                             getCurrentPosition());
                 }
-                AnalyticsHelper.trackPlaybackStarted(mSelectedContent, getDuration(),
+//                AnalyticsHelper.trackPlaybackStarted(mSelectedContent, getDuration(),
+//                        mCurrentPlaybackPosition,
+//                        mTotalSegments, currentSegment);
+                AnalyticsHelper.trackPlaybackStarted(mSelectedContent, mSelectedContent.getDuration(),
                         mCurrentPlaybackPosition,
                         mTotalSegments, currentSegment);
                 /* Zype, Evgeny Cherkasov */
