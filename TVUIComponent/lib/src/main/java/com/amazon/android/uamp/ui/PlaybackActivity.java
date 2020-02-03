@@ -147,7 +147,7 @@ public class PlaybackActivity extends Activity implements
     private static final float AUDIO_FOCUS_DUCK_VOLUME = 0.1f;
     private static final float AUDIO_FOCUS_DEFAULT_VOLUME = 1.0f;
     //Reporting interval in seconds for media session
-    private static final int MEDIA_SESSION_REPORTING_INTERVAL = 10;
+    private static final int MEDIA_SESSION_REPORTING_INTERVAL = 5;
 
     private FrameLayout mVideoView;
     private SubtitleLayout mSubtitleLayout;
