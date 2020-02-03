@@ -44,51 +44,11 @@ public class SegmentAnalytics implements IAnalytics {
 
     private CustomAnalyticsTags mCustomTags = new CustomAnalyticsTags();
 
-//    /**
-//     * Akamai analytics plugin
-//     */
-//    private AnalyticsPlugin akamaiPlugin;
-
     /**
      * Shows if the video is playing or not.
      * Updated on ACTION_PLAYBACK_STARTED and ACTION_PLAYBACK_ENDED events.
      */
     private boolean isPlaying = false;
-
-    /**
-     * Shows if the video is seeking.
-     * Turned on by ACTION_PLAYBACK_CONTROL_FF or ACTION_PLAYBACK_CONTROL_REWIND event.
-     */
-    private boolean isSeeking = false;
-
-    /**
-     * This flag is set to true on ACTION_PLAY_VIDEO event. The next video related action handler should
-     * check this flag and perform setup Akamai plugin before processing the event.
-     */
-    private boolean isSetupRequired = true;
-
-//    /**
-//     * Video attributes used in the Akamai plugin
-//     */
-//    private String beacon;
-//    private String consumerId;
-//    private long currentPosition;
-//    private String deviceType;
-//    private boolean isLive;
-//    private String playerId;
-//    private String siteId;
-//    private long videoDuration;
-//    private String videoId;
-//    private String videoUrl;
-//
-//    /**
-//     * Akamai analytics dimensions
-//     */
-//    private static final String DIMENSION_CONSUMER_ID = "consumerId";
-//    private static final String DIMENSION_DEVICE_TYPE = "deviceType";
-//    private static final String DIMENSION_PLAYER_ID = "playerId";
-//    private static final String DIMENSION_SITE_ID = "siteId";
-//    private static final String DIMENSION_VIDEO_ID = "videoId";
 
     private Context context;
 
@@ -105,7 +65,8 @@ public class SegmentAnalytics implements IAnalytics {
         mCustomTags.init(this.context, R.string.segment_analytics_custom_tags);
 
         // Create an analytics client with the given context and Segment write key.
-        Analytics analytics = new Analytics.Builder(this.context, "etP6NsW0ahoGMsH7JnoCuCpdd5lFGUio")
+        Analytics analytics = new Analytics.Builder(this.context,
+                this.context.getString(R.string.segment_analytics_write_key))
                 .trackApplicationLifecycleEvents()
 //                .recordScreenViews()
                 .logLevel(Analytics.LogLevel.VERBOSE)
@@ -126,13 +87,6 @@ public class SegmentAnalytics implements IAnalytics {
      */
     @Override
     public void collectLifeCycleData(Activity activity, boolean active) {
-
-//        if (!active) {
-//            if (akamaiPlugin != null) {
-//                akamaiPlugin.handleEnterBackground();
-//            }
-//        }
-
         Log.d(TAG, "Collecting life cycle data for activity: " + activity.toString() + ", active: "
                 + active);
     }
@@ -153,86 +107,54 @@ public class SegmentAnalytics implements IAnalytics {
         Log.d(TAG, "trackAction(): action=" + mCustomTags.getCustomTag(action));
 //        Log.d(TAG, "trackAction(): attributes=" + String.valueOf(mCustomTags.getCustomTags(attributes)));
 
-//        updateVideoAttributes(attributes);
-
         if (action.equals(AnalyticsTags.ACTION_PLAY_VIDEO)) {
             isPlaying = false;
-//            stopVideoTracking();
         }
-//        else {
-//            if (isSetupRequired) {
-//                if (!TextUtils.isEmpty(beacon)) {
-//                    setupAkamai();
-//                }
-//                else {
-//                    Log.e(TAG, "trackAction(): Can't handle event. Akamai plugin didn't set up");
-//                    return;
-//                }
-//            }
-//            if (isSeeking
-//                    && !action.equals(AnalyticsTags.ACTION_PLAYBACK_CONTROL_FF)
-//                    && !action.equals(AnalyticsTags.ACTION_PLAYBACK_CONTROL_REWIND)) {
-//                isSeeking = false;
-//                akamaiPlugin.handleSeekEnd(currentPosition);
-//            }
-            switch (action) {
-                case AnalyticsTags.ACTION_PLAYBACK_STARTED: {
-                    if (!isPlaying) {
-                        isPlaying = true;
-                        Properties properties = attributesToProperties(attributes);
-                        Analytics.with(context).track("Video Content Started", properties);
-                        Log.d(TAG, "trackAction(): action is tracked");
-                    }
-                    break;
-                }
-                case AnalyticsTags.ACTION_PLAYBACK: {
-                    if (isPlaying) {
-                        Properties properties = attributesToProperties(attributes);
-                        String videoId = properties.getString("videoId");
-                        if (TextUtils.isEmpty(videoId)) {
-                            Log.d(TAG, "trackAction(): action is not tracked");
-                            break;
-                        }
-                        Analytics.with(context).track("Video Content Playing", properties);
-                        Log.d(TAG, "trackAction(): action is tracked");
-                    }
-                    break;
-                }
-                case AnalyticsTags.ACTION_PLAYBACK_FINISHED: {
-                    isPlaying = false;
+        switch (action) {
+            case AnalyticsTags.ACTION_PLAYBACK_STARTED: {
+                if (!isPlaying) {
+                    isPlaying = true;
                     Properties properties = attributesToProperties(attributes);
-                    long duration = properties.getLong("videoContentDuration", 0);
-                    long position = properties.getLong("videoContentPosition", 0) / 1000;
-                    if (duration - position > 1) {
+                    Analytics.with(context).track("Video Content Started", properties);
+                    Log.d(TAG, "trackAction(): action is tracked");
+                }
+                break;
+            }
+            case AnalyticsTags.ACTION_PLAYBACK: {
+                if (isPlaying) {
+                    Properties properties = attributesToProperties(attributes);
+                    String videoId = properties.getString("videoId");
+                    if (TextUtils.isEmpty(videoId)) {
                         Log.d(TAG, "trackAction(): action is not tracked");
                         break;
                     }
-                    Analytics.with(context).track("Video Content Completed", properties);
+                    Analytics.with(context).track("Video Content Playing", properties);
                     Log.d(TAG, "trackAction(): action is tracked");
-//                    stopVideoTracking();
+                }
+                break;
+            }
+            case AnalyticsTags.ACTION_PLAYBACK_FINISHED: {
+                isPlaying = false;
+                Properties properties = attributesToProperties(attributes);
+                long duration = properties.getLong("videoContentDuration", 0);
+                long position = properties.getLong("videoContentPosition", 0) / 1000;
+                if (duration - position > 1) {
+                    Log.d(TAG, "trackAction(): action is not tracked");
                     break;
                 }
-//                case AnalyticsTags.ACTION_PLAYBACK_BUFFER_START:
-//                    isPlaying = false;
-//                    break;
-//                case AnalyticsTags.ACTION_PLAYBACK_BUFFER_END:
-//                    isPlaying = true;
-//                    break;
-                case AnalyticsTags.ACTION_PLAYBACK_CONTROL_PLAY:
-                    isPlaying = true;
-                    break;
-                case AnalyticsTags.ACTION_PLAYBACK_CONTROL_PAUSE:
-                    isPlaying = false;
-                    break;
-//                case AnalyticsTags.ACTION_PLAYBACK_CONTROL_FF:
-//                case AnalyticsTags.ACTION_PLAYBACK_CONTROL_REWIND:
-//                    isSeeking = true;
-//                    akamaiPlugin.handleSeekStart(currentPosition);
-//                    break;
-                case AnalyticsTags.ACTION_ERROR:
-//                    akamaiPlugin.handleError((String) attributes.get(AnalyticsTags.ATTRIBUTE_ERROR_MSG));
-                    break;
+                Analytics.with(context).track("Video Content Completed", properties);
+                Log.d(TAG, "trackAction(): action is tracked");
+                break;
             }
+            case AnalyticsTags.ACTION_PLAYBACK_CONTROL_PLAY:
+                isPlaying = true;
+                break;
+            case AnalyticsTags.ACTION_PLAYBACK_CONTROL_PAUSE:
+                isPlaying = false;
+                break;
+            case AnalyticsTags.ACTION_ERROR:
+                break;
+        }
 //        }
     }
 
@@ -257,12 +179,6 @@ public class SegmentAnalytics implements IAnalytics {
     }
 
 
-    private void stopVideoTracking() {
-        isSetupRequired = true;
-//        akamaiPlugin = null;
-        clearVideoAttributes();
-    }
-
     private Properties attributesToProperties(Map<String, Object> attributes) {
         Properties properties = new Properties();
         properties.putValue("videoId",
@@ -279,128 +195,5 @@ public class SegmentAnalytics implements IAnalytics {
         properties.putValue("videoContentPercentComplete", percent);
         Log.d(TAG, "attributesToProperties(): " + properties.toString());
         return properties;
-    }
-
-    // //////////
-    // Akamai plugin
-    //
-
-//    private void setupAkamai() {
-//        akamaiPlugin = new AnalyticsPlugin(context, beacon);
-////        if (ContentBrowser.getInstance(this).isUserLoggedIn()) {
-////            AnalyticsPlugin.setViewerId(Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_ID));
-////        }
-//        akamaiPlugin.handleSessionInit(new PluginCallBacks() {
-//            @Override
-//            public float streamHeadPosition() {
-//                return currentPosition;
-//            }
-//
-//            @Override
-//            public float streamLength() {
-//                return videoDuration;
-//            }
-//
-//            @Override
-//            public float getFps() {
-//                return 0;
-//            }
-//
-//            @Override
-//            public String streamURL() {
-//                return videoUrl;
-//            }
-//
-//            @Override
-//            public boolean isLive() {
-//                return isLive;
-//            }
-//
-//            @Override
-//            public String videoSize() {
-////                return mPlayer.getCurrentVideoWidth() + "x" + mPlayer.getCurrentVideoHeight();
-//                return "";
-//            }
-//
-//            @Override
-//            public String viewSize() {
-////                return mVideoView.getWidth() + "x" + mVideoView.getHeight();
-//                return "";
-//            }
-//
-//            @Override
-//            public long bytesLoaded() {
-//                return 0;
-//            }
-//
-//            @Override
-//            public int droppedFrames() {
-//                return 0;
-//            }
-//
-//            @Override
-//            public boolean isPlaying() {
-//                return isPlaying;
-//            }
-//        }, false);
-//        akamaiPlugin.setData(DIMENSION_CONSUMER_ID, consumerId);
-//        akamaiPlugin.setData(DIMENSION_DEVICE_TYPE, deviceType);
-//        akamaiPlugin.setData(DIMENSION_PLAYER_ID, playerId);
-//        akamaiPlugin.setData(DIMENSION_SITE_ID, siteId);
-//        akamaiPlugin.setData(DIMENSION_VIDEO_ID, videoId);
-//
-//        isSetupRequired = false;
-//
-//        Log.d(TAG, "setupAkamai(): Completed");
-//    }
-
-    private void clearVideoAttributes() {
-//        beacon = "";
-//        consumerId = "";
-//        currentPosition = 0;
-//        deviceType = "";
-//        isLive = false;
-//        playerId = "";
-//        siteId = "";
-//        videoDuration = 0;
-//        videoId = "";
-//        videoUrl = "";
-    }
-
-    private void updateVideoAttributes(HashMap<String, Object> attributes) {
-        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
-            switch (entry.getKey()) {
-                case AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_BEACON:
-//                    beacon = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_BEACON);
-                    break;
-                case AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_CONSUMER_ID:
-//                    consumerId = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_CONSUMER_ID);
-                    break;
-                case AnalyticsTags.ATTRIBUTE_VIDEO_CURRENT_POSITION:
-//                    currentPosition = (Long) attributes.get(AnalyticsTags.ATTRIBUTE_VIDEO_CURRENT_POSITION);
-                    break;
-                case AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_DEVICE:
-//                    deviceType = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_DEVICE);
-                    break;
-                case AnalyticsTags.ATTRIBUTE_CONTENT_LIVE:
-//                    isLive = (Boolean) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_LIVE);
-                    break;
-                case AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_PLAYER_ID:
-//                    playerId = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_PLAYER_ID);
-                    break;
-                case AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_SITE_ID:
-//                    siteId = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_SITE_ID);
-                    break;
-                case AnalyticsTags.ATTRIBUTE_VIDEO_DURATION:
-//                    videoDuration = (Long) attributes.get(AnalyticsTags.ATTRIBUTE_VIDEO_DURATION);
-                    break;
-                case AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_VIDEO_ID:
-//                    videoId = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_VIDEO_ID);
-                    break;
-                case AnalyticsTags.ATTRIBUTE_CONTENT_VIDEO_URL:
-//                    videoUrl = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_VIDEO_URL);
-                    break;
-            }
-        }
     }
 }
