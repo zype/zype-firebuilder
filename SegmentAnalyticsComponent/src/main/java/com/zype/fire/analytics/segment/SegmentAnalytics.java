@@ -189,9 +189,9 @@ public class SegmentAnalytics implements IAnalytics {
         properties.putValue("videoContentDuration", duration);
         properties.putValue("videoName",
                 attributes.get(AnalyticsTags.ATTRIBUTE_TITLE));
-        long position = (Long) attributes.get(AnalyticsTags.ATTRIBUTE_VIDEO_CURRENT_POSITION);
+        long position = (Long) attributes.get(AnalyticsTags.ATTRIBUTE_VIDEO_CURRENT_POSITION) / 1000;
         properties.putValue("videoContentPosition", position);
-        long percent = (duration != 0) ? (position / 1000) * 100 / duration : 0;
+        long percent = (duration != 0) ? position * 100 / duration : 0;
         properties.putValue("videoContentPercentComplete", percent);
         Log.d(TAG, "attributesToProperties(): " + properties.toString());
         return properties;
