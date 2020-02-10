@@ -98,8 +98,11 @@ public class AnalyticsHelper {
     private static Map<String, Object> getDetailedContentAttributes(Content content) {
 
         Map<String, Object> attributes = new HashMap<>();
-        attributes.put(AnalyticsTags.ATTRIBUTE_PUBLISHER_NAME, content.getStudio());
+//        attributes.put(AnalyticsTags.ATTRIBUTE_PUBLISHER_NAME, content.getStudio());
         attributes.put(AnalyticsTags.ATTRIBUTE_AIRDATE, content.getAvailableDate());
+        attributes.put(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_DESCRIPTION,
+                content.getDescription());
+        attributes.put(AnalyticsTags.ATTRIBUTE_EPISODE_NUMBER, content.getEpisode());
         return attributes;
     }
 

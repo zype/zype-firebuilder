@@ -107,6 +107,8 @@ import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -1756,7 +1758,9 @@ public class PlaybackActivity extends Activity implements
         if (!TextUtils.isEmpty(uuid)) {
             params.put(ZypeApi.UUID, uuid);
         }
-        ZypeApi.getInstance().getApi().getPlayer(IZypeApi.HEADER_USER_AGENT, mSelectedContent.getId(), params).enqueue(new Callback<PlayerResponse>() {
+        ZypeApi.getInstance().getApi()
+                .getPlayer(IZypeApi.HEADER_USER_AGENT, mSelectedContent.getId(), params)
+                .enqueue(new Callback<PlayerResponse>() {
             @Override
             public void onResponse(Call<PlayerResponse> call, Response<PlayerResponse> response) {
                 if (response.isSuccessful()) {
@@ -1976,6 +1980,10 @@ public class PlaybackActivity extends Activity implements
 //                AnalyticsHelper.trackPlaybackStarted(mSelectedContent, getDuration(),
 //                        mCurrentPlaybackPosition,
 //                        mTotalSegments, currentSegment);
+                mSelectedContent.setExtraValue(Content.EXTRA_ANALYTICS_CHANNEL,
+                        getString(R.string.app_name_short));
+                mSelectedContent.setExtraValue(Content.EXTRA_ANALYTICS_SESSION_ID,
+                        AdMacrosHelper.getAdvertisingId(this) + "-" + Calendar.getInstance().getTimeInMillis());
                 AnalyticsHelper.trackPlaybackStarted(mSelectedContent, mSelectedContent.getDuration(),
                         mCurrentPlaybackPosition,
                         mTotalSegments, currentSegment);

@@ -314,9 +314,11 @@ public class Content implements Serializable {
      */
     // Analytics
     public static final String EXTRA_ANALYTICS_BEACON = "AnalyticsBeacon";
+    public static final String EXTRA_ANALYTICS_CHANNEL = "AnalyticsChannel";
     public static final String EXTRA_ANALYTICS_CONSUMER_ID = "AnalyticsConsumerId";
     public static final String EXTRA_ANALYTICS_DEVICE = "AnalyticsDevice";
     public static final String EXTRA_ANALYTICS_PLAYER_ID = "AnalyticsPlayerId";
+    public static final String EXTRA_ANALYTICS_SESSION_ID = "AnalyticsSessionId";
     public static final String EXTRA_ANALYTICS_SITE_ID = "AnalyticsSiteId";
     public static final String EXTRA_ANALYTICS_VIDEO_ID = "AnalyticsVideoId";
 
@@ -336,6 +338,8 @@ public class Content implements Serializable {
     public static final String EXTRA_PURCHASE_REQUIRED = "PurchaseRequired";
     // Rental required flag
     public static final String EXTRA_RENTAL_REQUIRED = "RentalRequired";
+    // Rental required flag
+    public static final String EXTRA_SEASON = "Season";
     // Poster thumbnail url
     public static final String EXTRA_THUMBNAIL_POSTER_URL = "ThumbnailPosterUrl";
     // Poster thumbnail url
