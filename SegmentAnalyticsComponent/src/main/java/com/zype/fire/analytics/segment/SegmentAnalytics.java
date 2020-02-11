@@ -123,7 +123,7 @@ public class SegmentAnalytics implements IAnalytics {
             case AnalyticsTags.ACTION_PLAYBACK: {
                 if (isPlaying) {
                     Properties properties = attributesToProperties(attributes);
-                    String videoId = properties.getString("videoId");
+                    String videoId = properties.getString("asset_id");
                     if (TextUtils.isEmpty(videoId)) {
                         Log.d(TAG, "trackAction(): action is not tracked");
                         break;
@@ -136,8 +136,8 @@ public class SegmentAnalytics implements IAnalytics {
             case AnalyticsTags.ACTION_PLAYBACK_FINISHED: {
                 isPlaying = false;
                 Properties properties = attributesToProperties(attributes);
-                long duration = properties.getLong("videoContentDuration", 0);
-                long position = properties.getLong("videoContentPosition", 0) / 1000;
+                long duration = properties.getLong("total_length", 0);
+                long position = properties.getLong("position", 0);
                 if (duration - position > 1) {
                     Log.d(TAG, "trackAction(): action is not tracked");
                     break;
