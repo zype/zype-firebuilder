@@ -339,7 +339,7 @@ public class AkamaiAnalytics implements IAnalytics {
                     siteId = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_SITE_ID);
                     break;
                 case AnalyticsTags.ATTRIBUTE_VIDEO_DURATION:
-                    videoDuration = (Long) attributes.get(AnalyticsTags.ATTRIBUTE_VIDEO_DURATION);
+                    videoDuration = ((Long) attributes.get(AnalyticsTags.ATTRIBUTE_VIDEO_DURATION)) * 1000;
                     break;
                 case AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_VIDEO_ID:
                     videoId = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_VIDEO_ID);
