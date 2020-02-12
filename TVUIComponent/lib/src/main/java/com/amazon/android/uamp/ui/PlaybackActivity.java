@@ -30,6 +30,7 @@
 
 package com.amazon.android.uamp.ui;
 
+import com.amazon.analytics.AnalyticsManager;
 import com.amazon.android.configuration.ConfigurationManager;
 import com.amazon.android.model.event.ContentUpdateEvent;
 import com.amazon.android.tv.tenfoot.base.TenFootApp;
@@ -2042,7 +2043,7 @@ public class PlaybackActivity extends BasePlaybackActivity implements
                 mSelectedContent.setExtraValue(Content.EXTRA_ANALYTICS_CHANNEL,
                         getString(R.string.app_name_short));
                 mSelectedContent.setExtraValue(Content.EXTRA_ANALYTICS_SESSION_ID,
-                        AdMacrosHelper.getAdvertisingId(this) + "-" + Calendar.getInstance().getTimeInMillis());
+                        AnalyticsManager.getInstance(this).getSessionId());
                 AnalyticsHelper.trackPlaybackStarted(mSelectedContent, mSelectedContent.getDuration(),
                         mCurrentPlaybackPosition,
                         mTotalSegments, currentSegment);

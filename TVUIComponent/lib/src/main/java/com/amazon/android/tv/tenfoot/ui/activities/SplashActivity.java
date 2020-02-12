@@ -29,6 +29,7 @@
 package com.amazon.android.tv.tenfoot.ui.activities;
 
 
+import com.amazon.analytics.AnalyticsManager;
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.helper.ErrorHelper;
 import com.amazon.android.interfaces.ICancellableLoad;
@@ -41,6 +42,7 @@ import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.zype.fire.api.Model.ZobjectTopPlaylist;
 import com.zype.fire.api.Model.ZobjectTopPlaylistResponse;
+import com.zype.fire.api.Util.AdMacrosHelper;
 import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeSettings;
 
@@ -56,6 +58,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -104,6 +107,11 @@ public class SplashActivity extends BaseActivity implements ICancellableLoad {
         else {
             mProgressText.setText(R.string.feed_reloading);
         }
+        String sessionId = AdMacrosHelper.getAdvertisingId(this) + "-" +
+                Calendar.getInstance().getTimeInMillis();
+        Log.d(TAG, "onCreate(): sessionId=" + sessionId);
+        AnalyticsManager.getInstance(this).setSessionId(sessionId);
+
     }
 
     @Override

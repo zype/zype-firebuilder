@@ -77,6 +77,8 @@ public class AnalyticsManager implements Application.ActivityLifecycleCallbacks 
 
     private Set<IAnalytics> analyticsSet = new HashSet<>();
 
+    private String sessionId;
+
     /**
      * Local broadcast receiver.
      */
@@ -318,5 +320,13 @@ public class AnalyticsManager implements Application.ActivityLifecycleCallbacks 
     void reset() {
 
         sInstance = null;
+    }
+
+    public void setSessionId(String value) {
+        sessionId = value;
+    }
+
+    public String getSessionId() {
+        return sessionId;
     }
 }
