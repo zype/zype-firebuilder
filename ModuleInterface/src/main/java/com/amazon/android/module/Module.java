@@ -69,6 +69,7 @@ public class Module<I> {
             mImplCreator = implCreator;
         }
         mImplCreators.put(name, implCreator);
+
     }
 
     /**
@@ -111,6 +112,12 @@ public class Module<I> {
     public I createImpl(String name) {
 
         return (I) mImplCreators.get(name).createImpl();
+    }
+
+    public void createImpls() {
+        for (Map.Entry<String, IImplCreator> creator : mImplCreators.entrySet()) {
+            mImpls.put(creator.getKey(), (I) creator.getValue().createImpl());
+        }
     }
 
     /**
