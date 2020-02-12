@@ -260,6 +260,8 @@ public class AnalyticsHelper {
     public static void trackPlayback(Content content, long currentPosition) {
 
         Map<String, Object> attributes = getBasicAnalyticsAttributesForContent(content);
+        attributes.putAll(getDetailedContentAttributes(content));
+        attributes.putAll(getClassificationTypeAttributes(content));
 
         // Get Content extras
         attributes.putAll(ExtraContentAttributes.getExtraAttributes(content.getExtras()));
@@ -281,6 +283,8 @@ public class AnalyticsHelper {
 
         // Get the attributes for the selected movie.
         Map<String, Object> attributes = getBasicAnalyticsAttributesForContent(content);
+        attributes.putAll(getDetailedContentAttributes(content));
+        attributes.putAll(getClassificationTypeAttributes(content));
         attributes.putAll(ExtraContentAttributes.getExtraAttributes(content.getExtras()));
         attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_SECONDS_WATCHED,
                        currentPosition - startingPosition);
