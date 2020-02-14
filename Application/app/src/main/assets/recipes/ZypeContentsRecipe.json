@@ -8,6 +8,7 @@
   "matchList": [
     "title@mTitle",
     "_id@mId",
+    "created_at@mAvailableDate",
     "description@mDescription",
     "duration@mDuration",
     "images@Images",
@@ -23,6 +24,7 @@
     "subscription_required@mSubscriptionRequired",
     "thumbnails@mCardImageUrl",
     "thumbnails@mBackgroundImageUrl",
+    "updated_at@UpdatedAt",
     "videoFavoriteId@VideoFavoriteId",
     "registration_required@RegistrationRequired",
     "preview_ids@previewIds",

@@ -104,6 +104,8 @@ public class AnalyticsHelper {
         attributes.put(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_DESCRIPTION,
                 content.getDescription());
         attributes.put(AnalyticsTags.ATTRIBUTE_EPISODE_NUMBER, content.getEpisode());
+        attributes.put(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_THUMBNAIL,
+                content.getCardImageUrl());
         return attributes;
     }
 

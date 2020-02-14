@@ -182,59 +182,96 @@ public class SegmentAnalytics implements IAnalytics {
     private Properties attributesToProperties(Map<String, Object> attributes) {
         Properties properties = new Properties();
 
-        String sessionId = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_SESSION_ID);
-        properties.putValue("session_id", sessionId);
+//        String sessionId = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_SESSION_ID);
+//        properties.putValue("session_id", sessionId);
 
-        String videoId = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_VIDEO_ID);
-        properties.putValue("asset_id", videoId);
+        String contentCmsCategory = null;
+        properties.putValue("contentCmsCategory", contentCmsCategory);
 
-        String title = (String) attributes.get(AnalyticsTags.ATTRIBUTE_TITLE);
-        properties.putValue("title", title);
+        String adType = null;
+        properties.putValue("Ad Type", adType);
 
-        String description = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_DESCRIPTION);
-        properties.putValue("description", description);
+        String contentShownOnPlatform = "ott";
+        properties.putValue("contentShownOnPlatform", contentShownOnPlatform);
 
-        String season = (String) attributes.get(AnalyticsTags.ATTRIBUTE_SEASON_NUMBER);
-        properties.putValue("season", season);
+        String streamingDevice = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_DEVICE);
+        properties.putValue("streaming_device", streamingDevice);
 
-        String episode = (String) attributes.get(AnalyticsTags.ATTRIBUTE_EPISODE_NUMBER);
-        properties.putValue("episode", episode);
+        String videoAccountId = "416418724";
+        properties.putValue("videoAccountId", videoAccountId);
 
-        String publisher = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_CHANNEL);
-        properties.putValue("publisher", publisher);
+        String videoAccountName = "People";
+        properties.putValue("videoAccountName", videoAccountName);
 
-        long position = (Long) attributes.get(AnalyticsTags.ATTRIBUTE_VIDEO_CURRENT_POSITION) / 1000;
-        properties.putValue("position", position);
+        String videoAdDuration = null;
+        properties.putValue("videoAdDuration", videoAdDuration);
 
+        String videoAdVolume = null;
+        properties.putValue("videoAdVolume", videoAdVolume);
+
+        // total_length
         long duration = (Long) attributes.get(AnalyticsTags.ATTRIBUTE_VIDEO_DURATION);
-        properties.putValue("total_length", duration);
+        properties.putValue("videoContentDuration", duration);
 
-        properties.putValue("channel", publisher);
+        // position
+        long position = (Long) attributes.get(AnalyticsTags.ATTRIBUTE_VIDEO_CURRENT_POSITION) / 1000;
+        properties.putValue("videoContentPosition", position);
 
-        Boolean livestream = (Boolean) attributes.get(AnalyticsTags.ATTRIBUTE_LIVE_FEED);
-        properties.putValue("livestream", livestream);
+        long percent = (duration != 0) ? position * 100 / duration : 0;
+        properties.putValue("videoContentPercentComplete", percent);
 
+        String videoCreatedAt = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_CREATED_AT);
+        properties.putValue("videoCreatedAt", videoCreatedAt);
+
+        String videoFranchise  = null;
+        properties.putValue("videoFranchise ", videoFranchise );
+
+        // asset_id
+        String videoId = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_VIDEO_ID);
+        properties.putValue("videoId", videoId);
+
+        // title
+        String title = (String) attributes.get(AnalyticsTags.ATTRIBUTE_TITLE);
+        properties.putValue("videoName", title);
+
+        // airdate
         String airdate = (String) attributes.get(AnalyticsTags.ATTRIBUTE_AIRDATE);
-        properties.putValue("airdate", airdate);
+        properties.putValue("videoPublishedAt", airdate);
 
-        int bitrate = 0;
-        properties.putValue("bitrate", bitrate);
+        String videoSyndicate = null;
+        properties.putValue("videoSyndicate", videoSyndicate);
 
-        double framerate = 0;
-        properties.putValue("framerate", framerate);
+        String videoTags = null;
+        properties.putValue("videoTags", videoTags);
 
-//        properties.putValue("videoId",
-//                attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_VIDEO_ID));
-//        properties.putValue("contentShownOnPlatform",
-//                attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_DEVICE));
-//        long duration = (Long) attributes.get(AnalyticsTags.ATTRIBUTE_VIDEO_DURATION);
-//        properties.putValue("videoContentDuration", duration);
-//        properties.putValue("videoName",
-//                attributes.get(AnalyticsTags.ATTRIBUTE_TITLE));
-//        long position = (Long) attributes.get(AnalyticsTags.ATTRIBUTE_VIDEO_CURRENT_POSITION) / 1000;
-//        properties.putValue("videoContentPosition", position);
-//        long percent = (duration != 0) ? position * 100 / duration : 0;
-//        properties.putValue("videoContentPercentComplete", percent);
+        String videoThumbnail = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_THUMBNAIL);
+        properties.putValue("videoThumbnail", videoThumbnail);
+
+        String videoUpdatedAt = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_UPDATED_AT);
+        properties.putValue("videoUpdatedAt", videoUpdatedAt);
+
+//        String description = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_DESCRIPTION);
+//        properties.putValue("description", description);
+//
+//        String season = (String) attributes.get(AnalyticsTags.ATTRIBUTE_SEASON_NUMBER);
+//        properties.putValue("season", season);
+//
+//        String episode = (String) attributes.get(AnalyticsTags.ATTRIBUTE_EPISODE_NUMBER);
+//        properties.putValue("episode", episode);
+//
+//        String publisher = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_CHANNEL);
+//        properties.putValue("publisher", publisher);
+//
+//        properties.putValue("channel", publisher);
+//
+//        Boolean livestream = (Boolean) attributes.get(AnalyticsTags.ATTRIBUTE_LIVE_FEED);
+//        properties.putValue("livestream", livestream);
+//
+//        int bitrate = 0;
+//        properties.putValue("bitrate", bitrate);
+//
+//        double framerate = 0;
+//        properties.putValue("framerate", framerate);
 
         Log.d(TAG, "attributesToProperties(): " + properties.toString());
         return properties;

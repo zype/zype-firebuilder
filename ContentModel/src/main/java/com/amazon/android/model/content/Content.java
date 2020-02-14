@@ -324,6 +324,8 @@ public class Content implements Serializable {
 
     // Ad tag list
     public static final String EXTRA_AD_TAGS = "AdTags";
+
+    public static final String EXTRA_CREATED_AT = "CreatedAt";
     // Entitled flag
     public static final String EXTRA_ENTITLED = "Entitled";
     // Poster image url
@@ -347,6 +349,9 @@ public class Content implements Serializable {
 
     public static final String EXTRA_THUMBNAIL_SQUARE_URL = "ThumbnailSquareUrl";
     // Poster thumbnail url
+
+    public static final String EXTRA_UPDATED_AT = "UpdatedAt";
+
     public static final String EXTRA_VIDEO_FAVORITE_ID = "VideoFavoriteId";
     // Video player url
     public static final String EXTRA_VIDEO_URL = "VideoFavoriteId";
