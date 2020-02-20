@@ -8,7 +8,7 @@
   "matchList": [
     "title@mTitle",
     "_id@mId",
-    "created_at@mAvailableDate",
+    "created_at@CreatedAt",
     "description@mDescription",
     "duration@mDuration",
     "images@Images",

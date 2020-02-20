@@ -29,6 +29,8 @@ import com.amazon.analytics.IAnalytics;
 import com.segment.analytics.Analytics;
 import com.segment.analytics.Properties;
 
+import org.w3c.dom.Text;
+
 /**
  * An implementation of the Segment analytics
  *
@@ -123,7 +125,7 @@ public class SegmentAnalytics implements IAnalytics {
             case AnalyticsTags.ACTION_PLAYBACK: {
                 if (isPlaying) {
                     Properties properties = attributesToProperties(attributes);
-                    String videoId = properties.getString("asset_id");
+                    String videoId = properties.getString("videoId");
                     if (TextUtils.isEmpty(videoId)) {
                         Log.d(TAG, "trackAction(): action is not tracked");
                         break;
@@ -136,8 +138,8 @@ public class SegmentAnalytics implements IAnalytics {
             case AnalyticsTags.ACTION_PLAYBACK_FINISHED: {
                 isPlaying = false;
                 Properties properties = attributesToProperties(attributes);
-                long duration = properties.getLong("total_length", 0);
-                long position = properties.getLong("position", 0);
+                long duration = properties.getLong("videoContentDuration", 0);
+                long position = properties.getLong("videoContentPosition", 0);
                 if (duration - position > 1) {
                     Log.d(TAG, "trackAction(): action is not tracked");
                     break;
@@ -236,6 +238,9 @@ public class SegmentAnalytics implements IAnalytics {
 
         // airdate
         String airdate = (String) attributes.get(AnalyticsTags.ATTRIBUTE_AIRDATE);
+        if (TextUtils.isEmpty(airdate)) {
+            airdate = null;
+        }
         properties.putValue("videoPublishedAt", airdate);
 
         String videoSyndicate = null;
