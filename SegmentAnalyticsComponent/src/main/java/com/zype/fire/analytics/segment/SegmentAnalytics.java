@@ -17,6 +17,7 @@ package com.zype.fire.analytics.segment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -196,7 +197,8 @@ public class SegmentAnalytics implements IAnalytics {
         String contentShownOnPlatform = "ott";
         properties.putValue("contentShownOnPlatform", contentShownOnPlatform);
 
-        String streamingDevice = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_DEVICE);
+//        String streamingDevice = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_DEVICE);
+        String streamingDevice = Build.MANUFACTURER + " " + Build.;
         properties.putValue("streaming_device", streamingDevice);
 
         String videoAccountId = "416418724";
