@@ -198,7 +198,7 @@ public class SegmentAnalytics implements IAnalytics {
         properties.putValue("contentShownOnPlatform", contentShownOnPlatform);
 
 //        String streamingDevice = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_DEVICE);
-        String streamingDevice = Build.MANUFACTURER + " " + Build.;
+        String streamingDevice = Build.MANUFACTURER + " " + Build.MODEL;
         properties.putValue("streaming_device", streamingDevice);
 
         String videoAccountId = "416418724";
