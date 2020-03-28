@@ -34,6 +34,7 @@ import com.amazon.purchase.PurchaseManagerListener;
 import com.amazon.purchase.model.Product;
 import com.amazon.purchase.model.Response;
 import com.zype.fire.api.MarketplaceGateway;
+import com.zype.fire.api.ZypeConfiguration;
 
 import org.greenrobot.eventbus.EventBus;
 import org.w3c.dom.Text;
@@ -658,6 +659,54 @@ public class PurchaseHelper {
     public void setPurchaseExtras(Bundle extras) {
         this.purchaseExtras = extras;
     }
+
+    public boolean isVideoPaywalled(Content content) {
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(mContext)
+                || ZypeConfiguration.isUniversalSubscriptionEnabled(mContext)) {
+            if (content.isSubscriptionRequired()) {
+                return true;
+            }
+        }
+        if (ZypeConfiguration.isNativeTVODEnabled(mContext)
+                || ZypeConfiguration.isUniversalTVODEnabled(mContext)) {
+            boolean purchaseRequired = content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED);
+            ContentContainer playlist = mContentBrowser.getRootContentContainer()
+                    .findContentContainerById(content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+            boolean playlistPurchaseRequired = (playlist != null)
+                    && playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED);
+            if (purchaseRequired || playlistPurchaseRequired) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isVideoLocked(Content content) {
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(mContext)
+            || ZypeConfiguration.isUniversalSubscriptionEnabled(mContext)) {
+            if (content.isSubscriptionRequired()) {
+                if (!mContentBrowser.isUserSubscribed()) {
+                    return true;
+                }
+            }
+        }
+        if (ZypeConfiguration.isNativeTVODEnabled(mContext)
+            || ZypeConfiguration.isUniversalTVODEnabled(mContext)) {
+            boolean purchaseRequired = content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED);
+            ContentContainer playlist = mContentBrowser.getRootContentContainer()
+                    .findContentContainerById(content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+            boolean playlistPurchaseRequired = (playlist != null)
+                    && playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED);
+            if (purchaseRequired || playlistPurchaseRequired) {
+                boolean entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
+                if (!entitled) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /* Zype
      * end */
 }

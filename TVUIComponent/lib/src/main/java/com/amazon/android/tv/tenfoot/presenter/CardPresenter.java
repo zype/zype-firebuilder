@@ -210,27 +210,25 @@ public class CardPresenter extends Presenter {
                 }
 
                 /* Zype, Evgeny Cherkasov */
-                // Display lock icon for subscription video
+                // Display lock icon for paywalled video
                 ImageView mBadgeImage = (ImageView) cardView.findViewById(R.id.extra_badge);
-
-                if (content.isSubscriptionRequired()) {
-                    mBadgeImage.setVisibility(View.VISIBLE);
-                    if (contentBrowser.isUserSubscribed()) {
-                        if (!ZypeSettings.UNLOCK_TRANSPARENT){
-                            mBadgeImage.setBackgroundColor(mContext.getResources().getColor(R.color.unlock_color));
-                        }
-                        mBadgeImage.setImageResource(R.drawable.unlocked);
-                        //cardView.setBadgeImage(imageUnlocked);
-                    }
-                    else {
+                if (contentBrowser.getPurchaseHelper().isVideoPaywalled(content)) {
+                    if (contentBrowser.getPurchaseHelper().isVideoLocked(content)) {
+                        mBadgeImage.setVisibility(View.VISIBLE);
                         mBadgeImage.setBackgroundColor(mContext.getResources().getColor(R.color.lock_color));
                         mBadgeImage.setImageResource(R.drawable.locked);
-                        //cardView.setBadgeImage(imageLocked);
+                    } else {
+                        if (ZypeSettings.UNLOCK_TRANSPARENT) {
+                            mBadgeImage.setVisibility(View.GONE);
+                        } else {
+                            mBadgeImage.setVisibility(View.VISIBLE);
+                            mBadgeImage.setBackgroundColor(mContext.getResources().getColor(R.color.unlock_color));
+                            mBadgeImage.setImageResource(R.drawable.unlocked);
+                        }
                     }
                 }
                 else {
                     mBadgeImage.setVisibility(View.GONE);
-                    //cardView.setBadgeImage(null);
                 }
             }
         }
