@@ -84,15 +84,13 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
                 case Content.URL_FIELD_NAME:
                     model.setUrl(value.toString());
                     break;
-                case Content.CARD_IMAGE_URL_FIELD_NAME: {
+                case Content.CARD_IMAGE_URL_FIELD_NAME:
                     model.setCardImageUrl(findThumbnailUrl(field, value));
                     model.setExtraValue(Content.EXTRA_THUMBNAIL_POSTER_URL, findThumbnailUrl(Content.EXTRA_THUMBNAIL_POSTER_URL, value));
                     break;
-                }
-                case Content.BACKGROUND_IMAGE_URL_FIELD_NAME: {
+                case Content.BACKGROUND_IMAGE_URL_FIELD_NAME:
                     model.setBackgroundImageUrl(findThumbnailUrl(field, value));
                     break;
-                }
                 case Content.TAGS_FIELD_NAME:
                     // Expecting value to be a list.
                     model.setTags(value.toString());
