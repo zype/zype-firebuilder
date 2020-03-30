@@ -1,4 +1,4 @@
-package com.amazon.android.tv.tenfoot.ui.Subscription;
+package com.amazon.android.tv.tenfoot.ui.purchase;
 
 
 import android.app.Activity;
@@ -23,7 +23,7 @@ import com.amazon.android.model.event.ProductsUpdateEvent;
 import com.amazon.android.model.event.ProgressOverlayDismissEvent;
 import com.amazon.android.model.event.PurchaseEvent;
 import com.amazon.android.tv.tenfoot.R;
-import com.amazon.android.tv.tenfoot.ui.Subscription.Model.Consumer;
+import com.amazon.android.tv.tenfoot.ui.purchase.Model.Consumer;
 import com.amazon.android.ui.fragments.ErrorDialogFragment;
 import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.NetworkUtils;
@@ -145,10 +145,18 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
         else {
             // Buy video
             mode = MODE_VIDEO;
-            sku = "com.zumba.zumbaathome.singleVideo";
-            skuSet = new HashSet<>();
-            skuSet.add(sku);
-            ContentBrowser.getInstance(this).getPurchaseHelper().handleProductsChain(this, skuSet);
+//            sku = "com.zumba.zumbaathome.singleVideo";
+//            skuSet = new HashSet<>();
+//            skuSet.add(sku);
+//            ContentBrowser.getInstance(this).getPurchaseHelper().handleProductsChain(this, skuSet);
+            try {
+                Content video = ContentBrowser.getInstance(this).getLastSelectedContent();
+                skuSet = ContentBrowser.getInstance(this).getPurchaseHelper().getVideoSku(video);
+                ContentBrowser.getInstance(this).getPurchaseHelper().handleProductsChain(this, skuSet);
+            }
+            catch (Exception e) {
+                // TODO: Handle error
+            }
         }
 
         updateViews();
@@ -413,19 +421,21 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
     public void onProductsUpdateEvent(ProductsUpdateEvent event) {
         ArrayList<HashMap<String, String>> products = (ArrayList<HashMap<String, String>>) event.getExtras().getSerializable(PurchaseHelper.RESULT_PRODUCTS);
         if (products != null && !products.isEmpty()) {
-            if (mode == MODE_VIDEO) {
-                for (HashMap<String, String> product : products) {
-                    if (product.get("SKU").equals(sku)) {
-                        price = products.get(0).get("Price");
-                        // TODO: Check if the product already purchased and update action button - Buy ot Restore
-                        break;
-                    }
-                }
-            }
-            else if (mode == MODE_PLAYLIST) {
-                sku = products.get(0).get("SKU");
-                price = products.get(0).get("Price");
-            }
+            sku = products.get(0).get("SKU");
+            price = products.get(0).get("Price");
+//            if (mode == MODE_VIDEO) {
+//                for (HashMap<String, String> product : products) {
+//                    if (product.get("SKU").equals(sku)) {
+//                        price = products.get(0).get("Price");
+//                        // TODO: Check if the product already purchased and update action button - Buy ot Restore
+//                        break;
+//                    }
+//                }
+//            }
+//            else if (mode == MODE_PLAYLIST) {
+//                sku = products.get(0).get("SKU");
+//                price = products.get(0).get("Price");
+//            }
             updateViews();
         }
         else {

@@ -19,10 +19,10 @@
       "id": "rent"
     },
     {
-      "sku": "com.zype.aftv.demo.buy",
+      "sku": "com.zype.aftv.demo.buyVideo",
       "productType": "BUY",
-      "purchaseSku": "com.zype.aftv.demo.buy",
-      "id": "com.zype.aftv.demo.buy"
+      "purchaseSku": "com.zype.aftv.demo.buyVideo",
+      "id": "BuyVideo"
     },
     {
       "sku": "com.zype.aftv.demo.buyPlaylist",
@@ -34,7 +34,7 @@
   "actions": {
     "CONTENT_ACTION_DAILY_PASS": "RentUnPurchased",
     "CONTENT_ACTION_SUBSCRIPTION": "com.zype.aftv.demo.month",
-    "CONTENT_ACTION_BUY_VIDEO": "com.zype.aftv.demo.buy",
+    "CONTENT_ACTION_BUY_VIDEO": "com.zype.aftv.demo.buyVideo",
     "CONTENT_ACTION_BUY_PLAYLIST": "com.zype.aftv.demo.buyPlaylist"
   }
 }

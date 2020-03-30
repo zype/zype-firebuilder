@@ -1,4 +1,4 @@
-package com.amazon.android.tv.tenfoot.ui.Subscription;
+package com.amazon.android.tv.tenfoot.ui.purchase;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,7 +18,7 @@ import com.amazon.android.contentbrowser.helper.PurchaseHelper;
 import com.amazon.android.model.event.ProductsUpdateEvent;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
 import com.amazon.android.tv.tenfoot.presenter.SubscriptionCardPresenter;
-import com.amazon.android.tv.tenfoot.ui.Subscription.Model.SubscriptionItem;
+import com.amazon.android.tv.tenfoot.ui.purchase.Model.SubscriptionItem;
 import com.zype.fire.api.MarketplaceGateway;
 import com.zype.fire.api.Model.PlanData;
 

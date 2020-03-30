@@ -1,4 +1,4 @@
-package com.amazon.android.tv.tenfoot.ui.Subscription;
+package com.amazon.android.tv.tenfoot.ui.purchase;
 
 
 import android.app.Activity;
@@ -18,8 +18,8 @@ import com.amazon.android.contentbrowser.helper.PurchaseHelper;
 import com.amazon.android.model.event.ProgressOverlayDismissEvent;
 import com.amazon.android.model.event.PurchaseEvent;
 import com.amazon.android.tv.tenfoot.R;
-import com.amazon.android.tv.tenfoot.ui.Subscription.Model.Consumer;
-import com.amazon.android.tv.tenfoot.ui.Subscription.Model.SubscriptionItem;
+import com.amazon.android.tv.tenfoot.ui.purchase.Model.Consumer;
+import com.amazon.android.tv.tenfoot.ui.purchase.Model.SubscriptionItem;
 import com.amazon.android.ui.fragments.ErrorDialogFragment;
 import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.NetworkUtils;
