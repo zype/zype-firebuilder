@@ -60,7 +60,7 @@ permissions and limitations under the License.
         <LinearLayout
             android:id="@+id/hero_slider_ly"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="292dp"
             android:layout_alignParentTop="true"
             android:alpha="0" >
 
@@ -124,6 +124,7 @@ permissions and limitations under the License.
             android:name="com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="0dp"
             android:layout_below="@id/hero_slider_ly"
             tools:layout="@layout/action_widget_container" />
 

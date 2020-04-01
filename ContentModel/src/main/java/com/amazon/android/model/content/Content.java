@@ -326,6 +326,8 @@ public class Content implements Serializable {
     public static final String EXTRA_ENTITLED = "Entitled";
     // Poster image url
     public static final String EXTRA_IMAGE_POSTER_URL = "ImagePosterUrl";
+    // Marketplace id
+    public static final String EXTRA_MARKETPLACE_ID = "marketplaceId";
     // Pass required flag
     public static final String EXTRA_PASS_REQUIRED = "PassRequired";
     // Playlist id

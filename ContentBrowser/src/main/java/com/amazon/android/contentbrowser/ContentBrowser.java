@@ -1703,12 +1703,14 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
             }
 
-            ContentContainer playlist = getRootContentContainer()
-                    .findContentContainerById(content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
-            if (playlist != null) {
-                playlistPurchaseRequired = playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED);
-                if (!entitled && playlistPurchaseRequired && content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
-                    entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
+            if (ZypeSettings.PLAYLIST_PURCHASE_ENABLED) {
+                ContentContainer playlist = getRootContentContainer()
+                        .findContentContainerById(content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+                if (playlist != null) {
+                    playlistPurchaseRequired = playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED);
+                    if (!entitled && playlistPurchaseRequired && content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
+                        entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
+                    }
                 }
             }
         }

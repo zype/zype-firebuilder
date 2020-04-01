@@ -46,7 +46,7 @@
             android:layout_marginBottom="24dp"
             android:layout_gravity="center_horizontal"
             android:id="@+id/fragmentSubscriptions"
-            android:name="com.amazon.android.tv.tenfoot.ui.Subscription.SubscriptionFragment"
+            android:name="com.amazon.android.tv.tenfoot.ui.purchase.SubscriptionFragment"
             tools:layout="@layout/action_widget_container"
             />
         <LinearLayout

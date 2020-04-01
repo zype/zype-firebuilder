@@ -1,4 +1,4 @@
-package com.amazon.android.tv.tenfoot.ui.Subscription;
+package com.amazon.android.tv.tenfoot.ui.purchase;
 
 
 import android.app.Activity;
@@ -19,12 +19,11 @@ import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.ui.fragments.ErrorDialogFragment;
 import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.NetworkUtils;
-import com.amazon.android.utils.Preferences;
 import com.amazon.auth.AuthenticationConstants;
 import com.zype.fire.api.Model.ConsumerResponse;
 import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeSettings;
-import com.amazon.android.tv.tenfoot.ui.Subscription.Model.Consumer;
+import com.amazon.android.tv.tenfoot.ui.purchase.Model.Consumer;
 import com.zype.fire.auth.ZypeAuthentication;
 
 import org.greenrobot.eventbus.EventBus;

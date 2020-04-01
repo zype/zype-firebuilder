@@ -21,7 +21,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.amazon.android.tv.tenfoot.R;
-import com.amazon.android.tv.tenfoot.ui.Subscription.Model.SubscriptionItem;
+import com.amazon.android.tv.tenfoot.ui.purchase.Model.SubscriptionItem;
 
 /**
  * A CardPresenter used to generate Views and bind SettingsItems to them on demand.
