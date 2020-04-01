@@ -85,7 +85,7 @@ public class ContentLoader {
     /**
      * Debug recipe chain flag.
      */
-    private static final boolean DEBUG_RECIPE_CHAIN = false;
+    private static final boolean DEBUG_RECIPE_CHAIN = true;
 
     /**
      * Cause a feed error flag for debugging.
@@ -378,7 +378,7 @@ public class ContentLoader {
                 Content content = (Content) contentAsObject;
                 if (content != null) {
                     //check if this content has already been parsed for some other container
-                    content = checkForParsedContent(parsedContent, content);
+//                    content = checkForParsedContent(parsedContent, content);
                     //Add information of free content available with container
                     if (contentContainer.getExtraStringValue(Recipe.CONTENT_TYPE_TAG) != null) {
                         content.setExtraValue(Recipe.CONTENT_TYPE_TAG, contentContainer
@@ -770,7 +770,8 @@ public class ContentLoader {
     public Observable<Pair> getVideosFeedObservable(Object contentContainerAsObject, List<String> videoIds) {
         ContentContainer contentContainer = (ContentContainer) contentContainerAsObject;
 
-        ZypeDataDownloaderHelper.VideosResult videosResult = ZypeDataDownloaderHelper.loadVideos(videoIds, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+        ZypeDataDownloaderHelper.VideosResult videosResult = ZypeDataDownloaderHelper
+                .loadVideos(videoIds, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
         if (videosResult != null) {
             contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, videosResult.nextPage);
 
