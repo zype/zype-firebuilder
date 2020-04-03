@@ -97,6 +97,7 @@ permissions and limitations under the License.
     <!-- Background color for normal state of action button -->
     <drawable name="action_button_normal">@drawable/btn_normal</drawable>
 
+    <color name="action_button_background">#666666</color>
     <!-- End of Button Customization -->
 
     <!-- Playback Overlay Customization -->

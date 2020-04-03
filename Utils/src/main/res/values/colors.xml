@@ -30,6 +30,8 @@ permissions and limitations under the License.
     <color name="action_button_text_color">@color/primary_text</color>
     <!-- Text color for focused action button -->
     <color name="action_button_text_color_focused">@color/primary_text</color>
+
+    <color name="action_button_background">#666666</color>
     <!-- Action widget background color -->
     <color name="search_orb">@color/accent</color>
 </resources>
