@@ -117,7 +117,8 @@ public class ZypeReceiptVerificationService extends AReceiptVerifier {
             body.playlistId = receipt.getExtras().getString("PlaylistId");
             body.siteId = ZypeConfiguration.getSiteId(context);
             body.transactionType = "purchase";
-            body.videoId = receipt.getExtras().getString("VideoId");;
+            body.productId = receipt.getExtras().getString("VideoId");
+            body.videoId = receipt.getExtras().getString("VideoId");
             MarketplaceConnectBodyData bodyData = new MarketplaceConnectBodyData();
             bodyData.receiptId = receipt.getReceiptId();
             bodyData.userId = userData.getUserId();
