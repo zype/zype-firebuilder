@@ -326,6 +326,8 @@ public class Content implements Serializable {
     public static final String EXTRA_ENTITLED = "Entitled";
     // Poster image url
     public static final String EXTRA_IMAGE_POSTER_URL = "ImagePosterUrl";
+    // Marketplace id
+    public static final String EXTRA_MARKETPLACE_ID = "marketplaceId";
     // Pass required flag
     public static final String EXTRA_PASS_REQUIRED = "PassRequired";
     // Playlist id
@@ -1004,6 +1006,12 @@ public class Content implements Serializable {
      * @return True if they have similar tags; false otherwise.
      */
     public boolean hasSimilarTags(Content givenContent) {
+        String contentPlaylistId = getExtraValueAsString(EXTRA_PLAYLIST_ID);
+        String givenPlaylistId = givenContent.getExtraValueAsString(EXTRA_PLAYLIST_ID);
+        if (!TextUtils.isEmpty(contentPlaylistId) && !TextUtils.isEmpty(givenPlaylistId) && contentPlaylistId.equalsIgnoreCase(givenPlaylistId)){
+            return true;
+        }
+
         // Get list of givenContentTags.
         List<String> givenContentTags = givenContent.getTags();
 

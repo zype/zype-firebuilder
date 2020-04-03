@@ -10,6 +10,7 @@
     "_id@mId",
     "description@mDescription",
     "images@Images",
+    "marketplace_ids/amazon_fire_tv@marketplaceId",
     "on_air@live",
     "playerUrl@mUrl",
     "pass_required@PassRequired",

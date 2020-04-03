@@ -644,12 +644,14 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
     }
 
     private void checkVideoEntitlement() {
-        if (ZypeConfiguration.isUniversalTVODEnabled(getActivity())) {
-            ContentContainer playlist = ContentBrowser.getInstance(getActivity())
-                    .getRootContentContainer()
-                    .findContentContainerById(mSelectedContent.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
-            if (mSelectedContent.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED)
-                || (playlist != null && playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED))) {
+        if (ContentBrowser.getInstance(getActivity()).getPurchaseHelper()
+                .isVideoPaywalled(mSelectedContent)) {
+//        if (ZypeConfiguration.isUniversalTVODEnabled(getActivity())) {
+//            ContentContainer playlist = ContentBrowser.getInstance(getActivity())
+//                    .getRootContentContainer()
+//                    .findContentContainerById(mSelectedContent.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+//            if (mSelectedContent.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED)
+//                || (playlist != null && playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED))) {
                 String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
                 HashMap<String, String> params = new HashMap<>();
                 params.put(ZypeApi.ACCESS_TOKEN, accessToken);
@@ -671,8 +673,7 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
                         Log.e(TAG, "checkVideoEntitlement(): failed");
                     }
                 });
-            }
+//            }
         }
-
     }
 }

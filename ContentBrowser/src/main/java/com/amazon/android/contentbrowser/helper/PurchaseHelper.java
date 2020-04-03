@@ -34,6 +34,8 @@ import com.amazon.purchase.PurchaseManagerListener;
 import com.amazon.purchase.model.Product;
 import com.amazon.purchase.model.Response;
 import com.zype.fire.api.MarketplaceGateway;
+import com.zype.fire.api.ZypeConfiguration;
+import com.zype.fire.api.ZypeSettings;
 
 import org.greenrobot.eventbus.EventBus;
 import org.w3c.dom.Text;
@@ -651,6 +653,37 @@ public class PurchaseHelper {
         return result;
     }
 
+    /**
+     * If 'video' parameter is not empty, returns marketplace id extra attribute
+     * of specified video
+     *
+     * Otherwise, search in configuration file the SKU that is used for 'Buy Video' action.
+     * Returns first found SKU with `BuyVideo` id
+     */
+    public Set<String> getVideoSku(Content video) throws IOException {
+        Set<String> result = new HashSet<>();
+        String sku = null;
+
+        if (video != null) {
+            sku = video.getExtraValueAsString(Content.EXTRA_MARKETPLACE_ID);
+        }
+        if (TextUtils.isEmpty(sku)) {
+            Recipe recipe = Recipe.newInstance(FileHelper.readFile(mContext, mContext.getString(R.string.skus_file)));
+            List<Map<String, String>> skuList = (List<Map<String, String>>) recipe.getMap().get(SKUS_LIST);
+            for (Map<String, String> item : skuList) {
+                if (item.containsKey("id") && item.get("id").equals("BuyVideo")) {
+                    sku = item.get("sku");
+                    break;
+                }
+            }
+        }
+        Log.i(TAG, "getVideoSku(): sku=" + sku);
+        result.add(sku);
+        mBuyVideoSKU = sku;
+
+        return result;
+    }
+
 //    public void setVideoId(String videoId) {
 //        this.videoId = videoId;
 //    }
@@ -658,6 +691,56 @@ public class PurchaseHelper {
     public void setPurchaseExtras(Bundle extras) {
         this.purchaseExtras = extras;
     }
+
+    public boolean isVideoPaywalled(Content content) {
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(mContext)
+                || ZypeConfiguration.isUniversalSubscriptionEnabled(mContext)) {
+            if (content.isSubscriptionRequired()) {
+                return true;
+            }
+        }
+        if (ZypeConfiguration.isNativeTVODEnabled(mContext)
+                || ZypeConfiguration.isUniversalTVODEnabled(mContext)) {
+            boolean purchaseRequired = content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED);
+            ContentContainer playlist = mContentBrowser.getRootContentContainer()
+                    .findContentContainerById(content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+            boolean playlistPurchaseRequired = (playlist != null)
+                    && playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED)
+                    && ZypeSettings.PLAYLIST_PURCHASE_ENABLED;
+            if (purchaseRequired || playlistPurchaseRequired) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isVideoLocked(Content content) {
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(mContext)
+            || ZypeConfiguration.isUniversalSubscriptionEnabled(mContext)) {
+            if (content.isSubscriptionRequired()) {
+                if (!mContentBrowser.isUserSubscribed()) {
+                    return true;
+                }
+            }
+        }
+        if (ZypeConfiguration.isNativeTVODEnabled(mContext)
+            || ZypeConfiguration.isUniversalTVODEnabled(mContext)) {
+            boolean purchaseRequired = content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED);
+            ContentContainer playlist = mContentBrowser.getRootContentContainer()
+                    .findContentContainerById(content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+            boolean playlistPurchaseRequired = (playlist != null)
+                    && playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED)
+                    && ZypeSettings.PLAYLIST_PURCHASE_ENABLED;
+            if (purchaseRequired || playlistPurchaseRequired) {
+                boolean entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
+                if (!entitled) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /* Zype
      * end */
 }

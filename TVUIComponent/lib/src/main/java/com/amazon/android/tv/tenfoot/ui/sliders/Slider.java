@@ -30,6 +30,16 @@ public class Slider implements Serializable {
   private String url;
   private String name;
 
+  public boolean isSelected() {
+    return selected;
+  }
+
+  public void setSelected(boolean selected) {
+    this.selected = selected;
+  }
+
+  private boolean selected;
+
   public int getPosition() {
     return position;
   }
@@ -40,13 +50,17 @@ public class Slider implements Serializable {
 
   private int position;
 
-  public static Slider create(String id, String videoId, String playListId, String url, String name) {
+  public Boolean autoplay;
+
+  public static Slider create(String id, String videoId, String playListId,
+                              String url, String name, Boolean autoplay) {
     Slider slider = new Slider();
     slider.id = id;
     slider.name = name;
     slider.videoId = videoId;
     slider.playListId = playListId;
     slider.url = url;
+    slider.autoplay = autoplay;
     return slider;
   }
 }

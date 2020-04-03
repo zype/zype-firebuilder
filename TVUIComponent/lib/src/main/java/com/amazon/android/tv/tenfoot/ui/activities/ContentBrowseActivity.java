@@ -241,7 +241,6 @@ public class ContentBrowseActivity extends BaseActivity implements
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-
         if(slidersPresent()) {
             if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
                 if(sliderHasFocus()) {
@@ -267,6 +266,17 @@ public class ContentBrowseActivity extends BaseActivity implements
         boolean processed =  super.onKeyDown(keyCode, event);
 
         if(slidersPresent()) {
+            handler.postDelayed(() -> {
+              if(sliderHasFocus() || event.getKeyCode()== KeyEvent.KEYCODE_BACK) {
+                  sliderShown=false;
+                  showHeroSlider();
+                }
+                else {
+                    if (!isMenuOpened){
+                        hideHeroSlider();
+                    }
+                }
+            }, 50);
             if (sliderShown && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN) {
                 handler.postDelayed(() -> {
                     if (!isMenuOpened){

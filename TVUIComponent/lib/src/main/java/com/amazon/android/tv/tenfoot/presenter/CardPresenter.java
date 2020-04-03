@@ -42,6 +42,7 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.zype.fire.api.AppConfiguration;
 import com.zype.fire.api.ZypeConfiguration;
+import com.zype.fire.api.ZypeSettings;
 
 import android.app.Activity;
 import android.content.Context;
@@ -173,7 +174,7 @@ public class CardPresenter extends Presenter {
                     }
 
                     cardView.setTitleText(title);
-                    cardView.setContentText(content.getTitle());
+                    cardView.setContentText(content.getTitle()+ "\n ");
                 }
                 else {
                     cardView.setContentText("");
@@ -209,17 +210,25 @@ public class CardPresenter extends Presenter {
                 }
 
                 /* Zype, Evgeny Cherkasov */
-                // Display lock icon for subscription video
-                if (content.isSubscriptionRequired()) {
-                    if (contentBrowser.isUserSubscribed()) {
-                        cardView.setBadgeImage(imageUnlocked);
-                    }
-                    else {
-                        cardView.setBadgeImage(imageLocked);
+                // Display lock icon for paywalled video
+                ImageView mBadgeImage = (ImageView) cardView.findViewById(R.id.extra_badge);
+                if (contentBrowser.getPurchaseHelper().isVideoPaywalled(content)) {
+                    if (contentBrowser.getPurchaseHelper().isVideoLocked(content)) {
+                        mBadgeImage.setVisibility(View.VISIBLE);
+                        mBadgeImage.setBackgroundColor(mContext.getResources().getColor(R.color.lock_color));
+                        mBadgeImage.setImageResource(R.drawable.locked);
+                    } else {
+                        if (ZypeSettings.UNLOCK_TRANSPARENT) {
+                            mBadgeImage.setVisibility(View.GONE);
+                        } else {
+                            mBadgeImage.setVisibility(View.VISIBLE);
+                            mBadgeImage.setBackgroundColor(mContext.getResources().getColor(R.color.unlock_color));
+                            mBadgeImage.setImageResource(R.drawable.unlocked);
+                        }
                     }
                 }
                 else {
-                    cardView.setBadgeImage(null);
+                    mBadgeImage.setVisibility(View.GONE);
                 }
             }
         }
@@ -230,7 +239,7 @@ public class CardPresenter extends Presenter {
             }
 
             if (SHOW_TITLE) {
-                cardView.setContentText(contentContainer.getName());
+                cardView.setContentText(contentContainer.getName()+ "\n ");
             }
             else {
                 cardView.setContentText("");

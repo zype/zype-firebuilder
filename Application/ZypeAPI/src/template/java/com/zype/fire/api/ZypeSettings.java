@@ -11,7 +11,6 @@ public class ZypeSettings {
     public static final String APP_KEY = "<APP_KEY>";
     // OAuth credentials
     public static final String CLIENT_ID = "<CLIENT_ID>";
-//    public static final String CLIENT_SECRET = "<CLIENT_SECRET>";
     // Playlist
     public static final String ROOT_PLAYLIST_ID = "<ROOT_PLAYLIST_ID>";
 
@@ -32,6 +31,7 @@ public class ZypeSettings {
     public static final boolean SHOW_SEARCH_ICON = true;
     public static final boolean SETTINGS_PLAYLIST_ENABLED = true;
     public static final boolean SHOW_MENU_ICON = true;
+    public static final boolean UNLOCK_TRANSPARENT = false;
 
     public static final String TERMS_CONDITION_URL = "https://www.zype.com/";
 
@@ -44,6 +44,7 @@ public class ZypeSettings {
     public static final boolean MARKETPLACE_CONNECT_SVOD = Boolean.valueOf("<NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED>");
     public static final boolean NATIVE_SUBSCRIPTION_ENABLED = Boolean.valueOf("<NATIVE_SUBSCRIPTION_ENABLED>");
     public static final boolean NATIVE_TVOD = Boolean.valueOf("<NATIVE_TVOD_ENABLED>");;
+    public static final boolean PLAYLIST_PURCHASE_ENABLED = true;
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = Boolean.valueOf("<SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED>");
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = Boolean.valueOf("<UNIVERSAL_SUBSCRIPTION_ENABLED>");
     public static final boolean UNIVERSAL_TVOD = Boolean.valueOf("<UNIVERSAL_TVOD>");

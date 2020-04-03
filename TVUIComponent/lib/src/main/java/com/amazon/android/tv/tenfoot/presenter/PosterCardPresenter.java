@@ -58,6 +58,7 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.zype.fire.api.AppConfiguration;
 import com.zype.fire.api.ZypeConfiguration;
+import com.zype.fire.api.ZypeSettings;
 
 import static com.zype.fire.api.ZypeSettings.SHOW_TITLE;
 
@@ -202,16 +203,24 @@ public class PosterCardPresenter extends Presenter {
                 }
 
                 // Display lock icon for subscription video
-                if (content.isSubscriptionRequired()) {
-                    if (contentBrowser.isUserSubscribed()) {
-                        cardView.setBadgeImage(imageUnlocked);
-                    }
-                    else {
-                        cardView.setBadgeImage(imageLocked);
+                ImageView mBadgeImage = (ImageView) cardView.findViewById(R.id.extra_badge);
+                if (contentBrowser.getPurchaseHelper().isVideoPaywalled(content)) {
+                    if (contentBrowser.getPurchaseHelper().isVideoLocked(content)) {
+                        mBadgeImage.setVisibility(View.VISIBLE);
+                        mBadgeImage.setBackgroundColor(mContext.getResources().getColor(R.color.lock_color));
+                        mBadgeImage.setImageResource(R.drawable.locked);
+                    } else {
+                        if (ZypeSettings.UNLOCK_TRANSPARENT) {
+                            mBadgeImage.setVisibility(View.GONE);
+                        } else {
+                            mBadgeImage.setVisibility(View.VISIBLE);
+                            mBadgeImage.setBackgroundColor(mContext.getResources().getColor(R.color.unlock_color));
+                            mBadgeImage.setImageResource(R.drawable.unlocked);
+                        }
                     }
                 }
                 else {
-                    cardView.setBadgeImage(null);
+                    mBadgeImage.setVisibility(View.GONE);
                 }
             }
         }
