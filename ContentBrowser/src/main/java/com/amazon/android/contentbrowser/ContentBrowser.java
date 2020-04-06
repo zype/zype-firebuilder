@@ -21,6 +21,7 @@ import com.amazon.android.contentbrowser.database.records.RecentRecord;
 import com.amazon.android.contentbrowser.database.records.VideoFavoriteRecord;
 import com.amazon.android.contentbrowser.helper.AnalyticsHelper;
 import com.amazon.android.contentbrowser.helper.AuthHelper;
+import com.amazon.android.contentbrowser.helper.EntitlementsManager;
 import com.amazon.android.contentbrowser.helper.ErrorHelper;
 import com.amazon.android.contentbrowser.helper.FontManager;
 import com.amazon.android.contentbrowser.Favorites.FavoritesManager;
@@ -490,6 +491,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     private FavoritesManager favoritesManager;
     private boolean favoritesLoaded = false;
 
+    private EntitlementsManager entitlementsManager;
+
     /**
      * Returns AuthHelper instance.
      *
@@ -870,7 +873,6 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         // TODO: Consider other way to get subscription count preference to avoid dependency of ZypeAuthComponent
         userLoggedIn = authenticationStatusUpdateEvent.isUserAuthenticated();
         updateUserSubscribed();
-
         updateLoginAction();
 
         if(authenticationStatusUpdateEvent.isRegistration()) {
@@ -930,6 +932,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         /* Zype, Evgeny Cherkasov */
         favoritesManager = new FavoritesManager(mAppContext, this);
+        entitlementsManager = new EntitlementsManager(mAppContext, this);
 
         // The app successfully loaded its modules so clear out the crash number.
         Preferences.setLong(ModularApplication.APP_CRASHES_KEY, 0);
@@ -1575,6 +1578,13 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     else {
                         settingsAction.setState(LogoutSettingsFragment.TYPE_LOGIN);
                         mAuthHelper.authenticateWithActivity().subscribe(resultBundle -> {
+                            if (resultBundle != null) {
+                                if (resultBundle.getBoolean(AuthHelper.RESULT)) {
+                                    if (entitlementsManager != null) {
+                                        entitlementsManager.loadVideoEntitlements(mAppContext);
+                                    }
+                                }
+                            }
                             if (resultBundle != null &&
                                     !resultBundle.getBoolean(AuthHelper.RESULT)) {
                                 getNavigator().runOnUpcomingActivity(() -> mAuthHelper
