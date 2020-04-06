@@ -1578,11 +1578,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     else {
                         settingsAction.setState(LogoutSettingsFragment.TYPE_LOGIN);
                         mAuthHelper.authenticateWithActivity().subscribe(resultBundle -> {
-                            if (resultBundle != null) {
-                                if (resultBundle.getBoolean(AuthHelper.RESULT)) {
-                                    if (entitlementsManager != null) {
-                                        entitlementsManager.loadVideoEntitlements(mAppContext);
-                                    }
+                            if (entitlementsManager != null) {
+                                entitlementsManager.clearVideoEntitlements();
+                                if (resultBundle != null && resultBundle.getBoolean(AuthHelper.RESULT)) {
+                                    entitlementsManager.loadVideoEntitlements(mAppContext);
                                 }
                             }
                             if (resultBundle != null &&
@@ -1705,22 +1704,22 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         boolean subscriptionRequired = content.isSubscriptionRequired();
         boolean purchaseRequired = false;
         boolean playlistPurchaseRequired = false;
-        boolean entitled = false;
+        boolean entitled = entitlementsManager.isVideoEntitled(content);
 
         if (ZypeConfiguration.isUniversalTVODEnabled(mAppContext)) {
             purchaseRequired = content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED);
-            if (purchaseRequired && content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
-                entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
-            }
+//            if (purchaseRequired && content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
+//                entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
+//            }
 
             if (ZypeSettings.PLAYLIST_PURCHASE_ENABLED) {
                 ContentContainer playlist = getRootContentContainer()
                         .findContentContainerById(content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
                 if (playlist != null) {
                     playlistPurchaseRequired = playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED);
-                    if (!entitled && playlistPurchaseRequired && content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
-                        entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
-                    }
+//                    if (!entitled && playlistPurchaseRequired && content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
+//                        entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
+//                    }
                 }
             }
         }
@@ -1808,7 +1807,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
                 // Add "Resume" button if content playback is not complete.
                 if (record != null && !record.isPlaybackComplete()) {
-                    contentActionList.add(createActionButton(CONTENT_ACTION_RESUME,
+                    contentActionList.add(createActionButton(1, CONTENT_ACTION_RESUME,
                             R.string.resume_1, R.string.resume_2));
                     // Add "Watch From Beginning" button to start content over.
                     contentActionList.add(createActionButton(CONTENT_ACTION_WATCH_FROM_BEGINNING,
@@ -1816,7 +1815,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 }
                 // If the content has not been played yet, add the "Watch Now" button.
                 else {
-                    contentActionList.add(createActionButton(CONTENT_ACTION_WATCH_NOW,
+                    contentActionList.add(createActionButton(1, CONTENT_ACTION_WATCH_NOW,
                             R.string.watch_now_1, R.string.watch_now_2));
                 }
                 if (isWatchlistRowEnabled()) {
@@ -1824,13 +1823,13 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 }
             }
             else {
-                contentActionList.add(createActionButton(CONTENT_ACTION_WATCH_NOW,
+                contentActionList.add(createActionButton(1, CONTENT_ACTION_WATCH_NOW,
                         R.string.watch_now_1, R.string.watch_now_2));
             }
         }
 
         if(registrationRequired) {
-            contentActionList.add(createActionButton(CONTENT_REGISTRATION_REQUIRED,
+            contentActionList.add(createActionButton(2, CONTENT_REGISTRATION_REQUIRED,
                 R.string.action_signup_to_watch1, R.string.action_signup_to_watch2));
 
             if (content.hasTrailer()) {
@@ -1841,11 +1840,11 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         }
 
         if (showSubscribe) {
-            contentActionList.add(createActionButton(CONTENT_ACTION_CHOOSE_PLAN,
+            contentActionList.add(createActionButton(3, CONTENT_ACTION_CHOOSE_PLAN,
                     R.string.action_subscription_1, R.string.action_subscription_2));
         }
         if (showPurchase) {
-            contentActionList.add(createActionButton(CONTENT_ACTION_CONFIRM_PURCHASE,
+            contentActionList.add(createActionButton(4, CONTENT_ACTION_CONFIRM_PURCHASE,
                     R.string.action_buy_video_1, R.string.action_buy_video_2));
         }
         if (showPurchasePlaylist) {
@@ -1854,10 +1853,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             if (playlist != null) {
                 String purchasePrice = playlist.getExtraStringValue(ContentContainer.EXTRA_PURCHASE_PRICE);
                 int itemCount = playlist.getExtraValueAsInt(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT);
-                Action action = createActionButton(CONTENT_ACTION_CONFIRM_PURCHASE_PLAYLIST,
+                Action action = createActionButton(5, CONTENT_ACTION_CONFIRM_PURCHASE_PLAYLIST,
                         R.string.action_buy_playlist_1, R.string.action_buy_playlist_2);
-                action.setLabel1(String.format(mAppContext.getResources().getString(R.string.action_buy_playlist_1), String.valueOf(itemCount)));
-                action.setLabel2(String.format(mAppContext.getResources().getString(R.string.action_buy_playlist_2), purchasePrice));
+                action.setLabel1(5, String.format(mAppContext.getResources().getString(R.string.action_buy_playlist_1), String.valueOf(itemCount)));
+                action.setLabel2(5, String.format(mAppContext.getResources().getString(R.string.action_buy_playlist_2), purchasePrice));
                 contentActionList.add(action);
             }
         }
@@ -1923,11 +1922,16 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      * @param stringId2       The id of the string to be displayed on the second line of text.
      * @return The action.
      */
-    private Action createActionButton(int contentActionId, int stringId1, int stringId2) {
+    private Action createActionButton(int state, int contentActionId, int stringId1, int stringId2) {
 
         return new Action().setId(contentActionId)
-                .setLabel1(mAppContext.getResources().getString(stringId1))
-                .setLabel2(mAppContext.getResources().getString(stringId2));
+                .setState(state)
+                .setLabel1(state, mAppContext.getResources().getString(stringId1))
+                .setLabel2(state, mAppContext.getResources().getString(stringId2));
+    }
+
+    private Action createActionButton(int contentActionId, int stringId1, int stringId2) {
+        return createActionButton(0, contentActionId, stringId1, stringId2);
     }
 
     /**
@@ -3461,6 +3465,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
     public PurchaseHelper getPurchaseHelper() {
         return mPurchaseHelper;
+    }
+
+    public EntitlementsManager getEntitlementsManager() {
+        return entitlementsManager;
     }
 
     public boolean isCreateAccountTermsOfServiceRequired() {

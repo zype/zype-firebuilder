@@ -22,6 +22,7 @@ import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.ContentLoader;
 import com.amazon.android.contentbrowser.database.helpers.VideoEntitlementsHelper;
 import com.amazon.android.contentbrowser.database.helpers.VideoFavoritesHelper;
+import com.amazon.android.contentbrowser.database.records.VideoEntitlementRecord;
 import com.amazon.android.contentbrowser.database.records.VideoFavoriteRecord;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
@@ -59,27 +60,18 @@ public class EntitlementsManager {
     private final ContentLoader contentLoader;
 
     private CompositeSubscription compositeSubscription = new CompositeSubscription();
-    private EventBus eventBus;
 
-    /**
-     * Constructor. Initializes member variables and configures the purchase system.
-     *
-     * @param context        The context.
-     */
     public EntitlementsManager(Context context, ContentBrowser contentBrowser) {
         this.context = context;
         this.contentBrowser = contentBrowser;
         this.contentLoader = ContentLoader.getInstance(context);
-
-        eventBus = EventBus.getDefault();
     }
 
-
-    // //////////
-    //
-    //
-    public void loadVideoEntitlements(Context context) {
+    public void clearVideoEntitlements() {
         VideoEntitlementsHelper.getInstance().clearDatabase(context);
+    }
+
+    public void loadVideoEntitlements(Context context) {
         CompositeSubscription compositeSubscription = new CompositeSubscription();
         compositeSubscription.add(loadEntitlementsSubscription(1, compositeSubscription));
     }
@@ -110,109 +102,8 @@ public class EntitlementsManager {
                 );
     }
 
-    // //////////
-    // Actions
-    //
-    public void handleAddAction(Content content) {
-        if (ZypeConfiguration.isFavoritesViaApiEnabled(context)) {
-            contentLoader
-                    .addVideoFavorite(content)
-                    .subscribe(resultContent -> {
-                        if (!TextUtils.isEmpty(resultContent.getExtraValueAsString(Content.EXTRA_VIDEO_FAVORITE_ID))) {
-                            addLocalFavorite(resultContent);
-                        }
-                        else {
-                            // TODO: Handke error
-                        }
-                    });
-        }
-        else {
-            addLocalFavorite(content);
-        }
-    }
-
-    public void handleRemoveAction(Content content) {
-        if (ZypeConfiguration.isFavoritesViaApiEnabled(context)) {
-//            ContentContainer favoritesContainer = contentLoader.getRootContentContainer()
-//                    .findContentContainerById(ZypeSettings.FAVORITES_PLAYLIST_ID);
-//            if (favoritesContainer == null) {
-//                return;
-//            }
-//            Content favoriteVideo = favoritesContainer.findContentById(content.getId());
-//            if (favoriteVideo == null) {
-//                return;
-//            }
-//            String videoFavoriteId = favoriteVideo.getExtraValueAsString(Content.EXTRA_VIDEO_FAVORITE_ID);
-            VideoFavoriteRecord videoFavorite = getVideoFavorite(content);
-            String videoFavoriteId = videoFavorite.getVideoFavoriteId();
-            contentLoader
-                    .removeVideoFavorite(content, videoFavoriteId)
-                    .subscribe(resultContent -> {
-                        if (TextUtils.isEmpty(resultContent.getExtraValueAsString(Content.EXTRA_VIDEO_FAVORITE_ID))) {
-                            deleteLocalFavorite(resultContent);
-                        }
-                        else {
-                            // TODO: Handke error
-                        }
-                    });
-        }
-        else {
-            deleteLocalFavorite(content);
-        }
-    }
-
-    // //////////
-    //
-    //
-    public void addVideoToFavoritesContentContainer(Content content) {
-        ContentContainer favoritesContainer = contentLoader.getRootContentContainer()
-                .findContentContainerById(ZypeSettings.FAVORITES_PLAYLIST_ID);
-        if (favoritesContainer != null) {
-            Gson gson = new Gson();
-            String jsonFavoriteVideo = gson.toJson(content);
-            Content favoriteVideo = gson.fromJson(jsonFavoriteVideo, content.getClass());
-            favoriteVideo.setExtraValue(Content.EXTRA_PLAYLIST_ID, ZypeSettings.FAVORITES_PLAYLIST_ID);
-            favoritesContainer.getContents().add(0, favoriteVideo);
-        }
-    }
-
-    public void removeVideoFromFavoritesContentContainer(Content content) {
-        ContentContainer favoritesContainer = contentLoader.getRootContentContainer()
-                .findContentContainerById(ZypeSettings.FAVORITES_PLAYLIST_ID);
-        if (favoritesContainer != null) {
-            Content favoriteVideo = favoritesContainer.findContentById(content.getId());
-            if (favoriteVideo == null) {
-                return;
-            }
-
-            favoritesContainer.getContents().remove(favoriteVideo);
-        }
-    }
-
-    // //////////
-    // CRUD operations in local database for video favorites
-    //
-    public List<VideoFavoriteRecord> getVideoFavorites() {
-        return VideoFavoritesHelper.getInstance().getVideoFavorites(context);
-    }
-
-    private VideoFavoriteRecord getVideoFavorite(Content content) {
-        return (VideoFavoriteRecord) VideoFavoritesHelper.getInstance().getRecord(context, content.getId());
-    }
-
-    private void addLocalFavorite(Content content) {
-        VideoFavoritesHelper videoFavoritesHelper = VideoFavoritesHelper.getInstance();
-        if (!videoFavoritesHelper.recordExists(context, content.getId())) {
-            String videoFavoriteId = content.getExtraValueAsString(Content.EXTRA_VIDEO_FAVORITE_ID);
-            videoFavoritesHelper.addVideoFavorite(context, content.getId(), videoFavoriteId);
-        }
-        addVideoToFavoritesContentContainer(content);
-        contentBrowser.updateContentActions();
-    }
-
-    public void deleteLocalFavorite(Content content) {
-        VideoFavoritesHelper.getInstance().deleteRecord(context, content.getId());
-        removeVideoFromFavoritesContentContainer(content);
-        contentBrowser.updateContentActions();
+    public boolean isVideoEntitled(Content content) {
+        return VideoEntitlementsHelper.getInstance()
+                .getRecord(context, content.getId()) != null;
     }
 }

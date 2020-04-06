@@ -635,7 +635,10 @@ public class AuthHelper {
         mIAuthentication.logout(context, new IAuthentication.ResponseHandler() {
             @Override
             public void onSuccess(Bundle extras) {
-
+                EntitlementsManager entitlementsManager = mContentBrowser.getEntitlementsManager();
+                if (entitlementsManager != null) {
+                    entitlementsManager.clearVideoEntitlements();
+                }
                 AnalyticsHelper.trackLogOutResultSuccess();
                 broadcastAuthenticationStatus(false);
                 Log.d(TAG, "Account logout success");

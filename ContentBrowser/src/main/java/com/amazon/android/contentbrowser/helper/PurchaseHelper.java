@@ -732,7 +732,9 @@ public class PurchaseHelper {
                     && playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED)
                     && ZypeSettings.PLAYLIST_PURCHASE_ENABLED;
             if (purchaseRequired || playlistPurchaseRequired) {
-                boolean entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
+//                boolean entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
+                boolean entitled = mContentBrowser.getEntitlementsManager()
+                    .isVideoEntitled(content);
                 if (!entitled) {
                     return true;
                 }
