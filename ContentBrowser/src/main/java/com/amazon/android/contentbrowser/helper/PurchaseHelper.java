@@ -677,6 +677,9 @@ public class PurchaseHelper {
                 }
             }
         }
+        if (sku == null) {
+            sku = "";
+        }
         Log.i(TAG, "getVideoSku(): sku=" + sku);
         result.add(sku);
         mBuyVideoSKU = sku;

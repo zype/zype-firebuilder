@@ -1578,12 +1578,6 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                     else {
                         settingsAction.setState(LogoutSettingsFragment.TYPE_LOGIN);
                         mAuthHelper.authenticateWithActivity().subscribe(resultBundle -> {
-                            if (entitlementsManager != null) {
-                                entitlementsManager.clearVideoEntitlements();
-                                if (resultBundle != null && resultBundle.getBoolean(AuthHelper.RESULT)) {
-                                    entitlementsManager.loadVideoEntitlements(mAppContext);
-                                }
-                            }
                             if (resultBundle != null &&
                                     !resultBundle.getBoolean(AuthHelper.RESULT)) {
                                 getNavigator().runOnUpcomingActivity(() -> mAuthHelper

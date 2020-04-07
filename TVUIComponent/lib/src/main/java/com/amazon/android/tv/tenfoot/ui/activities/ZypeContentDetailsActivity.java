@@ -221,6 +221,9 @@ public class ZypeContentDetailsActivity extends BaseActivity
         if (item instanceof Content) {
             Content content = (Content) item;
             mSelectedContent = content;
+            if (ContentBrowser.getInstance(this).getLastSelectedContent().getId() != content.getId()) {
+                ContentBrowser.getInstance(this).setLastSelectedContent(content);
+            }
             callImageLoadSubscription(content.getTitle(),
                     content.getDescription(),
                     content.getBackgroundImageUrl());

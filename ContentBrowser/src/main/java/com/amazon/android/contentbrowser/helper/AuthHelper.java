@@ -481,6 +481,11 @@ public class AuthHelper {
                               handleAuthenticationActivityResultBundle(resultBundle);
 
                               if (resultBundle != null) {
+                                  if (mContentBrowser.getEntitlementsManager() != null) {
+                                      mContentBrowser.getEntitlementsManager().clearVideoEntitlements();
+                                      mContentBrowser.getEntitlementsManager().loadVideoEntitlements(mAppContext);
+                                  }
+
                                   resultBundle.putBoolean(RESULT, activityResult.isOk());
                                   broadcastAuthenticationStatus(activityResult.isOk());
                                   resultBundle.putBoolean(RESULT_FROM_ACTIVITY, true);
