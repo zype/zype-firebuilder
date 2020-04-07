@@ -188,10 +188,10 @@ public class SegmentAnalytics implements IAnalytics {
 //        String sessionId = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_SESSION_ID);
 //        properties.putValue("session_id", sessionId);
 
-        String contentCmsCategory = null;
+        String contentCmsCategory = "null";
         properties.putValue("contentCmsCategory", contentCmsCategory);
 
-        String adType = null;
+        String adType = "null";
         properties.putValue("Ad Type", adType);
 
         String contentShownOnPlatform = "ott";
@@ -207,10 +207,10 @@ public class SegmentAnalytics implements IAnalytics {
         String videoAccountName = "People";
         properties.putValue("videoAccountName", videoAccountName);
 
-        String videoAdDuration = null;
+        String videoAdDuration = "null";
         properties.putValue("videoAdDuration", videoAdDuration);
 
-        String videoAdVolume = null;
+        String videoAdVolume = "null";
         properties.putValue("videoAdVolume", videoAdVolume);
 
         // total_length
@@ -227,7 +227,7 @@ public class SegmentAnalytics implements IAnalytics {
         String videoCreatedAt = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_CREATED_AT);
         properties.putValue("videoCreatedAt", videoCreatedAt);
 
-        String videoFranchise  = null;
+        String videoFranchise  = "null";
         properties.putValue("videoFranchise", videoFranchise );
 
         // asset_id
@@ -241,14 +241,14 @@ public class SegmentAnalytics implements IAnalytics {
         // airdate
         String airdate = (String) attributes.get(AnalyticsTags.ATTRIBUTE_AIRDATE);
         if (TextUtils.isEmpty(airdate)) {
-            airdate = null;
+            airdate = "null";
         }
         properties.putValue("videoPublishedAt", airdate);
 
-        String videoSyndicate = null;
+        String videoSyndicate = "null";
         properties.putValue("videoSyndicate", videoSyndicate);
 
-        String videoTags = null;
+        String videoTags = "null";
         properties.putValue("videoTags", videoTags);
 
         String videoThumbnail = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_THUMBNAIL);
