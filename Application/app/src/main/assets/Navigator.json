@@ -42,7 +42,7 @@
       "verifyNetworkConnection": true,
       "onAction": "CONTENT_SUBMENU_SCREEN"
     },
-    "com.amazon.android.tv.tenfoot.ui.activities.ContentDetailsActivity": {
+    "com.amazon.android.tv.tenfoot.ui.activities.ZypeContentDetailsActivity": {
       "verifyScreenAccess": false,
       "verifyNetworkConnection": true,
       "onAction": "CONTENT_DETAILS_SCREEN"

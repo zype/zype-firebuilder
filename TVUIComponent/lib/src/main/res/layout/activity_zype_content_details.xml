@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    <RelativeLayout
+        android:id="@+id/main_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+        <ImageView
+            android:id="@+id/main_logo"
+            android:layout_width="116dp"
+            android:layout_height="46dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginLeft="@dimen/lb_browse_padding_start"
+            android:layout_marginTop="@dimen/lb_browse_padding_top"
+            android:scaleType="centerInside"
+            android:src="@drawable/company_logo"/>
+        <LinearLayout
+            android:id="@+id/content_details"
+            android:layout_width="352dp"
+            android:layout_height="196dp"
+            android:layout_below="@id/main_logo"
+            android:layout_marginBottom="18dp"
+            android:layout_marginLeft="@dimen/lb_browse_padding_start"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:id="@+id/content_detail_title"
+                style="@style/Widget.Leanback.DetailsDescriptionTitleStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textSize="@dimen/lb_details_description_title_text_size"/>
+
+            <TextView
+                android:id="@+id/content_episode"
+                style="@style/Widget.Leanback.DetailsDescriptionBodyStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:visibility="gone"
+                android:singleLine="true"
+                android:textSize="@dimen/lb_details_description_body_text_size"/>
+
+<!--
+            <TextView
+                android:id="@+id/content_detail_description"
+                style="@style/Widget.Leanback.DetailsDescriptionBodyStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="3"
+                android:textSize="@dimen/lb_details_description_body_text_size"/>
+-->
+            <com.amazon.android.ui.widget.EllipsizedTextView
+                android:id="@+id/content_detail_description"
+                style="@style/DetailsDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="3"
+                android:clickable="true"
+                android:focusable="true"
+                />
+            <android.support.v17.leanback.widget.HorizontalGridView
+                android:id="@+id/listActions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                />
+        </LinearLayout>
+
+        <fragment
+            android:id="@+id/full_content_browse_fragment"
+            android:name="com.amazon.android.tv.tenfoot.ui.fragments.ZypeContentDetailsPlaylistFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/content_details"
+            tools:layout="@layout/action_widget_container"/>
+
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/feed_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_centerInParent="true"
+        android:indeterminateDrawable="@drawable/custom_progress"/>
+
+<!--    <include layout="@layout/action_widget_container"/>-->
+
+    <LinearLayout
+        android:layout_width="520dp"
+        android:layout_height="310dp"
+        android:layout_alignParentTop="true"
+        android:gravity="top"
+        android:layout_alignParentRight="true">
+
+        <ImageView
+            android:id="@+id/content_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:layout_gravity="top"
+            android:background="@color/accent"
+            android:scaleType="fitCenter" />
+    </LinearLayout>
+</RelativeLayout>

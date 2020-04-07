@@ -25,6 +25,7 @@ public class ZypeSettings {
     
     public static final boolean EPG_ENABLED = false;
     public static final boolean DETAIL_BACKGROUND_IMAGE = false;
+    public static final boolean SHOW_EPISODE_NUMBER = false;
     public static final boolean SHOW_TITLE = false;
     public static final boolean SHOW_LEFT_MENU = false;
     public static final boolean SHOW_SEARCH_ICON = true;
