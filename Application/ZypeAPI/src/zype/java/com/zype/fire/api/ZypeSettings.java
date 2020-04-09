@@ -23,15 +23,15 @@ public class ZypeSettings {
     // Template version
     public static final String TEMPLATE_VERSION = "1.8.0";
 
-    public static final boolean EPG_ENABLED = true;
+    public static final boolean EPG_ENABLED = false;
     public static final boolean DETAIL_BACKGROUND_IMAGE = false;
     public static final boolean SHOW_EPISODE_NUMBER = false;
     public static final boolean SHOW_TITLE = true;
     public static final boolean SHOW_LEFT_MENU = true;
     public static final boolean SHOW_SEARCH_ICON = true;
-    public static final boolean SETTINGS_PLAYLIST_ENABLED = false;
-    public static final boolean SHOW_MENU_ICON = false;
-    public static final boolean UNLOCK_TRANSPARENT = true;
+    public static final boolean SETTINGS_PLAYLIST_ENABLED = true;
+    public static final boolean SHOW_MENU_ICON = true;
+    public static final boolean UNLOCK_TRANSPARENT = false;
 
     public static final String TERMS_CONDITION_URL  = "https://www.zype.com/";
 
@@ -39,6 +39,7 @@ public class ZypeSettings {
     public static final boolean ACCOUNT_CREATION_TOS = false;
     public static final boolean DEVICE_LINKING = false;
     public static final boolean FAVORITES_VIA_API = false;
+    public static final boolean LIBRARY_ENABLED = true;
 
     // Monetization
     public static final boolean MARKETPLACE_CONNECT_SVOD = false;

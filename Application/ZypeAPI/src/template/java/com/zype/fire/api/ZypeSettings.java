@@ -36,9 +36,10 @@ public class ZypeSettings {
     public static final String TERMS_CONDITION_URL = "https://www.zype.com/";
 
     // Features
+    public static final boolean ACCOUNT_CREATION_TOS = false;
     public static final boolean DEVICE_LINKING = Boolean.valueOf("<DEVICE_LINKING>");
     public static final boolean FAVORITES_VIA_API = Boolean.valueOf("<FAVORITES_VIA_API>");
-    public static final boolean ACCOUNT_CREATION_TOS = false;
+    public static final boolean LIBRARY_ENABLED = false;
 
     // Monetization
     public static final boolean MARKETPLACE_CONNECT_SVOD = Boolean.valueOf("<NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED>");

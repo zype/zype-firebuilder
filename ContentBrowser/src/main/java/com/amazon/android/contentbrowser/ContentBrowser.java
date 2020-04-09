@@ -566,8 +566,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     private void setupMyLibraryAction() {
-        if (ZypeConfiguration.isUniversalTVODEnabled(mAppContext)) {
-            addSettingsAction(createMyLibrarySettingsAction());
+        if (ZypeSettings.LIBRARY_ENABLED) {
+            Action libraryAction = createMyLibrarySettingsAction();
+            addSettingsAction(libraryAction);
+            addSettingsHomeAction(libraryAction);
         }
     }
 
@@ -721,11 +723,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         if(ZypeSettings.EPG_ENABLED) {
             setupEpgAction();
         }
+        setupMyLibraryAction();
         setupFavoritesAction();
         //if (!TextUtils.isEmpty(Preferences.getString("ZypeTerms")))
         addSettingsAction(createTermsOfUseSettingsAction());
-      //  setupMyLibraryAction();
-
 
         mSearchManager.addSearchAlgo(DEFAULT_SEARCH_ALGO_NAME, new ISearchAlgo<Content>() {
             @Override
@@ -1290,7 +1291,6 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      */
     private Action createMyLibrarySettingsAction() {
         return new Action().setAction(MY_LIBRARY)
-                // TODO: Change action icon
                 .setIconResourceId(R.drawable.ic_video_library_white_48dp)
                 .setLabel1(mAppContext.getString(R.string.my_library_label));
     }
@@ -2964,6 +2964,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                             }
                         }, throwable -> {
                             Log.e(TAG, "Recipe chain failed:", throwable);
+                            LocalBroadcastManager.getInstance(mNavigator.getActiveActivity())
+                                    .sendBroadcast(new Intent(BROADCAST_DATA_LOADED));
                             ErrorHelper.injectErrorFragment(
                                     mNavigator.getActiveActivity(),
                                     ErrorUtils.ERROR_CATEGORY.FEED_ERROR,

@@ -116,7 +116,9 @@ public class ZypeDataDownloader extends ADataDownloader {
         List<PlaylistData> playlists = loadPlaylists();
         Log.d(TAG, "fetchData(): Playlists loaded");
         addFavoritesPlaylist(playlists);
-        addMyLibraryPlaylists(playlists);
+        if (ZypeSettings.LIBRARY_ENABLED) {
+            addMyLibraryPlaylists(playlists);
+        }
 
         // Result data
         JSONArray jsonCategories = new JSONArray();
@@ -263,7 +265,7 @@ public class ZypeDataDownloader extends ADataDownloader {
         item.parentId = ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID;
         item.playlistItemCount = 1;
         item.thumbnailLayout = "landscape";
-        item.title = "My library";
+        item.title = "Library";
         playlists.add(item);
     }
 

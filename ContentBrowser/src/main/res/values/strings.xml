@@ -75,7 +75,7 @@ permissions and limitations under the License.
     <string name="action_subscription_1">Subscribe</string>
     <string name="action_subscription_2">to Watch</string>
     <string name="favorites_label">Favorites</string>
-    <string name="my_library_label">My Library</string>
+    <string name="my_library_label">Library</string>
     <string name="subscription_alert_title">Subscription</string>
     <string name="subscription_alert_message">You must have a subscription to play this video</string>
 

@@ -167,9 +167,9 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                     updateContents();
                 }
                 else {
+                    isDataLoaded = true;
                     loadRootContentContainer(mRowsAdapter);
                 }
-                isDataLoaded = true;
             }
         };
 
