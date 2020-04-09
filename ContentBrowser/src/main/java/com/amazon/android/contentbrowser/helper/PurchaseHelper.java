@@ -707,11 +707,14 @@ public class PurchaseHelper {
             boolean purchaseRequired = content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED);
             ContentContainer playlist = mContentBrowser.getRootContentContainer()
                     .findContentContainerById(content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
-            boolean playlistPurchaseRequired = (playlist != null)
-                    && playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED)
-                    && ZypeSettings.PLAYLIST_PURCHASE_ENABLED;
-            if (purchaseRequired || playlistPurchaseRequired) {
-                return true;
+            if (!playlist.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG)
+                    .equals(ZypeSettings.MY_LIBRARY_PLAYLIST_ID)) {
+                boolean playlistPurchaseRequired = (playlist != null)
+                        && playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED)
+                        && ZypeSettings.PLAYLIST_PURCHASE_ENABLED;
+                if (purchaseRequired || playlistPurchaseRequired) {
+                    return true;
+                }
             }
         }
         return false;
