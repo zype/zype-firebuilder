@@ -221,6 +221,9 @@ public class ZypeContentDetailsActivity extends BaseActivity
         if (item instanceof Content) {
             Content content = (Content) item;
             mSelectedContent = content;
+            if (ContentBrowser.getInstance(this).getLastSelectedContent().getId() != content.getId()) {
+                ContentBrowser.getInstance(this).setLastSelectedContent(content);
+            }
             callImageLoadSubscription(content.getTitle(),
                     content.getDescription(),
                     content.getBackgroundImageUrl());
@@ -272,7 +275,7 @@ public class ZypeContentDetailsActivity extends BaseActivity
         ContentBrowser.getInstance(ZypeContentDetailsActivity.this)
                 .actionTriggered(ZypeContentDetailsActivity.this,
                         content,
-                        ContentBrowser.CONTENT_ACTION_WATCH_NOW,
+                        (int) findDefaultAction().getId(),
                         null,
                         mActionCompletedListener);
     }
@@ -419,6 +422,24 @@ public class ZypeContentDetailsActivity extends BaseActivity
                 mActionInProgress = false;
             }
         });
+    }
+
+    private Action findDefaultAction() {
+        Action result = null;
+        for (int i = 0; i < mActionAdapter.getItemCount(); i++) {
+            Action action = mActionAdapter.getAction(i);
+            if (result == null) {
+                result = action;
+            }
+            else {
+                if (action.getState() != 0) {
+                    if (action.getState() < result.getState()) {
+                        result = action;
+                    }
+                 }
+            }
+        }
+        return result;
     }
 
     @Subscribe

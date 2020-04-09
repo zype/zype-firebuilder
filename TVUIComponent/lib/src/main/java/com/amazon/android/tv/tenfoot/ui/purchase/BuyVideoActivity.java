@@ -460,6 +460,7 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
             Log.i(TAG, "onPurchaseEvent(): " + validity);
             if (validity) {
                 isVideoPurchased = true;
+                contentBrowser.getEntitlementsManager().loadVideoEntitlements(getApplicationContext());
                 closeScreen();
                 contentBrowser.actionTriggered(this,
                         contentBrowser.getLastSelectedContent(),

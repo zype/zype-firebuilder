@@ -677,6 +677,9 @@ public class PurchaseHelper {
                 }
             }
         }
+        if (sku == null) {
+            sku = "";
+        }
         Log.i(TAG, "getVideoSku(): sku=" + sku);
         result.add(sku);
         mBuyVideoSKU = sku;
@@ -704,11 +707,14 @@ public class PurchaseHelper {
             boolean purchaseRequired = content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED);
             ContentContainer playlist = mContentBrowser.getRootContentContainer()
                     .findContentContainerById(content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
-            boolean playlistPurchaseRequired = (playlist != null)
-                    && playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED)
-                    && ZypeSettings.PLAYLIST_PURCHASE_ENABLED;
-            if (purchaseRequired || playlistPurchaseRequired) {
-                return true;
+            if (!playlist.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG)
+                    .equals(ZypeSettings.MY_LIBRARY_PLAYLIST_ID)) {
+                boolean playlistPurchaseRequired = (playlist != null)
+                        && playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED)
+                        && ZypeSettings.PLAYLIST_PURCHASE_ENABLED;
+                if (purchaseRequired || playlistPurchaseRequired) {
+                    return true;
+                }
             }
         }
         return false;
@@ -732,7 +738,9 @@ public class PurchaseHelper {
                     && playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED)
                     && ZypeSettings.PLAYLIST_PURCHASE_ENABLED;
             if (purchaseRequired || playlistPurchaseRequired) {
-                boolean entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
+//                boolean entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
+                boolean entitled = mContentBrowser.getEntitlementsManager()
+                    .isVideoEntitled(content);
                 if (!entitled) {
                     return true;
                 }

@@ -289,49 +289,52 @@ public class ContentBrowseFragment extends RowsFragment {
                 Log.d(TAG, "Content with title " + content.getTitle() + " was clicked");
 
                 /* Zype, Evgeny Cherkasov */
-                // Get video entitlement for purchase required videos
-                if (ZypeConfiguration.isUniversalTVODEnabled(getActivity())) {
-                    if (content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED)
-                            && !content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
-                        String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
-                        HashMap<String, String> params = new HashMap<>();
-                        params.put(ZypeApi.ACCESS_TOKEN, accessToken);
-                        ZypeApi.getInstance().getApi().checkVideoEntitlement(content.getId(), params).enqueue(new Callback<ResponseBody>() {
-                            @Override
-                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                Log.e(TAG, "onItemClicked(): check video entitlement: code=" + response.code());
-                                if (response.isSuccessful()) {
-                                    content.setExtraValue(Content.EXTRA_ENTITLED, true);
-                                }
-                                else {
-                                    content.setExtraValue(Content.EXTRA_ENTITLED, false);
-                                }
-                                ContentBrowser.getInstance(getActivity())
-                                        .setLastSelectedContent(content)
-                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
-                            }
-
-                            @Override
-                            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                Log.e(TAG, "onItemClicked(): check video entitlement: failed");
-                                content.setExtraValue(Content.EXTRA_ENTITLED, false);
-                                ContentBrowser.getInstance(getActivity())
-                                        .setLastSelectedContent(content)
-                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
-                            }
-                        });
-                    }
-                    else {
-                        ContentBrowser.getInstance(getActivity())
-                                .setLastSelectedContent(content)
-                                .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
-                    }
-                }
-                else {
-                    ContentBrowser.getInstance(getActivity())
-                            .setLastSelectedContent(content)
-                            .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
-                }
+//                // Get video entitlement for purchase required videos
+//                if (ZypeConfiguration.isUniversalTVODEnabled(getActivity())) {
+//                    if (content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED)
+//                            && !content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
+//                        String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
+//                        HashMap<String, String> params = new HashMap<>();
+//                        params.put(ZypeApi.ACCESS_TOKEN, accessToken);
+//                        ZypeApi.getInstance().getApi().checkVideoEntitlement(content.getId(), params).enqueue(new Callback<ResponseBody>() {
+//                            @Override
+//                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                                Log.e(TAG, "onItemClicked(): check video entitlement: code=" + response.code());
+//                                if (response.isSuccessful()) {
+//                                    content.setExtraValue(Content.EXTRA_ENTITLED, true);
+//                                }
+//                                else {
+//                                    content.setExtraValue(Content.EXTRA_ENTITLED, false);
+//                                }
+//                                ContentBrowser.getInstance(getActivity())
+//                                        .setLastSelectedContent(content)
+//                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
+//                            }
+//
+//                            @Override
+//                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                                Log.e(TAG, "onItemClicked(): check video entitlement: failed");
+//                                content.setExtraValue(Content.EXTRA_ENTITLED, false);
+//                                ContentBrowser.getInstance(getActivity())
+//                                        .setLastSelectedContent(content)
+//                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
+//                            }
+//                        });
+//                    }
+//                    else {
+//                        ContentBrowser.getInstance(getActivity())
+//                                .setLastSelectedContent(content)
+//                                .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
+//                    }
+//                }
+//                else {
+//                    ContentBrowser.getInstance(getActivity())
+//                            .setLastSelectedContent(content)
+//                            .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
+//                }
+                ContentBrowser.getInstance(getActivity())
+                        .setLastSelectedContent(content)
+                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
             }
             else if (item instanceof ContentContainer) {
                 ContentContainer contentContainer = (ContentContainer) item;

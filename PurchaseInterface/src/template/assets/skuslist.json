@@ -1,5 +1,11 @@
 {
   "skusList": [
+    {
+      "sku": "com.zype.aftv.demo.buyVideo",
+      "productType": "BUY",
+      "purchaseSku": "com.zype.aftv.demo.buyVideo",
+      "id": "BuyVideo"
+    }
   ],
   "actions": {
     "CONTENT_ACTION_DAILY_PASS": "",
