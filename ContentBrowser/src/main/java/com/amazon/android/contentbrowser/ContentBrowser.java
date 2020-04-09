@@ -1664,8 +1664,19 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                             switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
                         }
                         else {
-                            mAuthHelper.handleAuthChain(extra -> mNavigator.startActivity(CONTENT_HOME_SCREEN, intent -> {
-                            }));
+                            mAuthHelper.handleAuthChain(extra -> {
+                                ContentLoader.ILoadContentForContentContainer listener = new ContentLoader.ILoadContentForContentContainer() {
+                                    @Override
+                                    public void onContentsLoaded() {
+                                    }
+                                };
+                                mContentLoader.loadContentForMyLibraryContentContainer(contentContainer, activity, listener);
+
+                                setLastSelectedContentContainer(contentContainer);
+                                switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
+
+//                                mNavigator.startActivity(CONTENT_HOME_SCREEN, intent -> {})
+                            });
                         }
                     });
         }
