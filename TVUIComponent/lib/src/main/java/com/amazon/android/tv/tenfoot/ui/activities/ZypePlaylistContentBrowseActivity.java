@@ -41,11 +41,13 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -61,6 +63,7 @@ import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentDetailsFragment;
+import com.amazon.android.tv.tenfoot.ui.fragments.MenuFragment;
 import com.amazon.android.tv.tenfoot.ui.fragments.ZypePlaylistContentBrowseFragment;
 import com.amazon.android.tv.tenfoot.utils.BrowseHelper;
 import com.amazon.android.tv.tenfoot.utils.ContentHelper;
@@ -71,6 +74,7 @@ import com.amazon.android.ui.utils.BackgroundImageUtils;
 import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.GlideHelper;
 import com.amazon.android.utils.Helpers;
+import com.zype.fire.api.ZypeSettings;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -91,7 +95,8 @@ import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LO
  */
 public class ZypePlaylistContentBrowseActivity extends BaseActivity
         implements ZypePlaylistContentBrowseFragment.OnBrowseRowListener,
-                    ErrorDialogFragment.ErrorDialogFragmentListener {
+                    ErrorDialogFragment.ErrorDialogFragmentListener,
+                    MenuFragment.IMenuFragmentListener {
 
     private final String TAG = ZypePlaylistContentBrowseActivity.class.getSimpleName();
 
@@ -109,6 +114,8 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
     // View that contains the background
     private View mMainFrame;
     private Drawable mBackgroundWithPreview;
+
+    private boolean isMenuOpened = false;
 
     private BroadcastReceiver receiver;
 
@@ -157,6 +164,8 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
         // Set the background
         mMainFrame = findViewById(R.id.main_frame);
         mMainFrame.setBackground(mBackgroundWithPreview);
+
+        hideMenu();
 
         progressBar = (ProgressBar) findViewById(R.id.feed_progress);
         progressBar.setVisibility(View.VISIBLE);
@@ -342,6 +351,104 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
     public void onFavoritesLoadEvent(FavoritesLoadEvent event) {
         ((ZypePlaylistContentBrowseFragment) getFragmentManager()
                 .findFragmentById(R.id.full_content_browse_fragment)).updateContents();
+    }
+
+    private void showMenu() {
+        MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+        if (fragment != null) {
+            isMenuOpened = true;
+            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.lb_error_background_color_translucent));
+//             fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.left_menu_background));
+            int paddingTop = (int) getResources().getDimension(R.dimen.lb_browse_padding_top);
+            fragment.getView().setPadding(0, paddingTop, 0, 0);
+            getFragmentManager().beginTransaction()
+                    .show(fragment)
+                    .commit();
+            fragment.getView().requestFocus();
+        }
+    }
+
+    private void hideMenu() {
+        MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+        if (fragment != null) {
+            isMenuOpened = false;
+            getFragmentManager().beginTransaction()
+                    .hide(fragment)
+                    .commit();
+        }
+    }
+
+    @Override
+    public void showMenuFragment() {
+        if (!isMenuOpened){
+            showMenu();
+        }
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        Log.d(TAG, "event=" + event.toString());
+
+        switch (event.getKeyCode()) {
+
+            case KeyEvent.KEYCODE_MENU:
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    if (ZypeSettings.SHOW_LEFT_MENU) {
+                        Log.d(TAG, "Menu button pressed");
+                        if (!isMenuOpened) {
+                            showMenu();
+                        }
+                        return true;
+                    }
+                }
+                break;
+            case KeyEvent.KEYCODE_BACK: {
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    Log.d(TAG, "Back button pressed");
+                    if (isMenuOpened) {
+                        hideMenu();
+                        return true;
+                    }
+                }
+                break;
+            }
+            case KeyEvent.KEYCODE_DPAD_UP:
+                Log.d(TAG, "Up button pressed");
+                if (isMenuOpened) {
+                    MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+                    if (fragment != null) {
+                        ArrayObjectAdapter menuAdapter = (ArrayObjectAdapter) fragment.getAdapter();
+                        if (fragment.getSelectedMenuItemIndex() == 0) {
+                            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                break;
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+                Log.d(TAG, "Down button pressed");
+                if (isMenuOpened) {
+                    MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+                    if (fragment != null) {
+                        ArrayObjectAdapter menuAdapter = (ArrayObjectAdapter) fragment.getAdapter();
+                        if (fragment.getSelectedMenuItemIndex() + 1 >= menuAdapter.size()) {
+                            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                break;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public void onItemSelected(Action item) {
+        hideMenu();
+        ContentBrowser.getInstance(this)
+                .settingsActionTriggered(this, item);
     }
 
 }

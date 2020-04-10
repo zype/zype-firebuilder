@@ -491,7 +491,7 @@ public class ContentBrowseActivity extends BaseActivity implements
                 break;
             }
             case KeyEvent.KEYCODE_DPAD_UP:
-                Log.d(TAG, "Down button pressed");
+                Log.d(TAG, "Up button pressed");
                 if (isMenuOpened) {
                     MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
                     if (fragment != null) {
