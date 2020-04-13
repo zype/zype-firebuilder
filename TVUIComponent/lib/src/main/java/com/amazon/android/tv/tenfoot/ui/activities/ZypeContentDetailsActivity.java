@@ -43,6 +43,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.HorizontalGridView;
+import android.support.v17.leanback.widget.ListRow;
+import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
 import android.support.v17.leanback.widget.TenFootActionPresenterSelector;
 import android.support.v4.content.ContextCompat;
@@ -152,7 +154,9 @@ public class ZypeContentDetailsActivity extends BaseActivity
             };
 
 
-    private Object lastSelectedItem = null;
+    private Row lastSelectedRow = null;
+    private boolean lastSelectedRowChanged = false;
+    private int lastSelectedItemIndex = -1;
 
     private BroadcastReceiver receiver;
 
@@ -227,8 +231,15 @@ public class ZypeContentDetailsActivity extends BaseActivity
      * title, description, and image.
      */
     @Override
-    public void onItemSelected(Object item, int rowIndex, int rowsNumber) {
-        lastSelectedItem = item;
+    public void onItemSelected(Object item, Row row, int rowIndex, int rowsNumber) {
+        if (row != lastSelectedRow && item != null) {
+            lastSelectedRow = row;
+            lastSelectedRowChanged = true;
+        }
+        else {
+            lastSelectedRowChanged = false;
+        }
+        lastSelectedItemIndex = ((ArrayObjectAdapter) ((ListRow) row).getAdapter()).indexOf(item);
 
         if (item instanceof Content) {
             Content content = (Content) item;
@@ -553,10 +564,13 @@ public class ZypeContentDetailsActivity extends BaseActivity
                 Log.d(TAG, "Left button pressed");
                 if (event.getAction() == KeyEvent.ACTION_UP) {
                     if (!isMenuOpened) {
-                        if (lastSelectedItem != null) {
-                            lastSelectedItem = null;
+                        if (lastSelectedItemIndex == 0) {
+                            lastSelectedItemIndex = -1;
+                            if (lastSelectedRowChanged) {
+                                showMenu();
+                            }
                         }
-                        else {
+                        else if (lastSelectedItemIndex == -1 ){
                             showMenu();
                         }
                     }
