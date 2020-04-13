@@ -152,6 +152,8 @@ public class ZypeContentDetailsActivity extends BaseActivity
             };
 
 
+    private Object lastSelectedItem = null;
+
     private BroadcastReceiver receiver;
 
     @Override
@@ -226,6 +228,8 @@ public class ZypeContentDetailsActivity extends BaseActivity
      */
     @Override
     public void onItemSelected(Object item, int rowIndex, int rowsNumber) {
+        lastSelectedItem = item;
+
         if (item instanceof Content) {
             Content content = (Content) item;
             mSelectedContent = content;
@@ -533,6 +537,27 @@ public class ZypeContentDetailsActivity extends BaseActivity
                             if (event.getAction() == KeyEvent.ACTION_DOWN) {
                                 return true;
                             }
+                        }
+                    }
+                }
+                break;
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                Log.d(TAG, "Right button pressed");
+                if (isMenuOpened) {
+                    hideMenu();
+                    findViewById(R.id.full_content_browse_fragment).requestFocus();
+                    return true;
+                }
+                break;
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                Log.d(TAG, "Left button pressed");
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    if (!isMenuOpened) {
+                        if (lastSelectedItem != null) {
+                            lastSelectedItem = null;
+                        }
+                        else {
+                            showMenu();
                         }
                     }
                 }
