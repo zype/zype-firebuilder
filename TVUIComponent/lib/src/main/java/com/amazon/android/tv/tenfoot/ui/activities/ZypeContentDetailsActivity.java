@@ -530,6 +530,12 @@ public class ZypeContentDetailsActivity extends BaseActivity
                     Log.d(TAG, "Back button pressed");
                     if (isMenuOpened) {
                         hideMenu();
+                        if (restoreActionsFocus) {
+                            mActionsRow.requestFocus();
+                        }
+                        else {
+                            findViewById(R.id.full_content_browse_fragment).requestFocus();
+                        }
                         return true;
                     }
                 }
