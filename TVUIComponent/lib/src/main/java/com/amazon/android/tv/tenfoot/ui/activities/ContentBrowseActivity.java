@@ -498,6 +498,7 @@ public class ContentBrowseActivity extends BaseActivity implements
                     Log.d(TAG, "Back button pressed");
                     if (isMenuOpened) {
                         hideMenu();
+                        findViewById(R.id.full_content_browse_fragment).requestFocus();
                         return true;
                     }
                 }
