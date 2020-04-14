@@ -106,7 +106,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
     // Container Activity must implement this interface.
     public interface OnBrowseRowListener {
 
-        void onItemSelected(Object item);
+        void onItemSelected(Object item, Row row);
     }
 
     @Override
@@ -494,7 +494,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
         public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
                                    RowPresenter.ViewHolder rowViewHolder, Row row) {
 
-            mCallback.onItemSelected(item);
+            mCallback.onItemSelected(item, row);
         }
     }
 }

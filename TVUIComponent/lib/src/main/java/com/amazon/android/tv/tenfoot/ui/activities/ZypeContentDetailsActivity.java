@@ -41,7 +41,10 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.HorizontalGridView;
+import android.support.v17.leanback.widget.ListRow;
+import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
 import android.support.v17.leanback.widget.TenFootActionPresenterSelector;
 import android.support.v4.content.ContextCompat;
@@ -71,6 +74,7 @@ import com.amazon.android.model.event.FavoritesLoadEvent;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment;
+import com.amazon.android.tv.tenfoot.ui.fragments.MenuFragment;
 import com.amazon.android.tv.tenfoot.ui.fragments.ZypeContentDetailsPlaylistFragment;
 import com.amazon.android.tv.tenfoot.ui.fragments.ZypePlaylistContentBrowseFragment;
 import com.amazon.android.tv.tenfoot.utils.BrowseHelper;
@@ -107,7 +111,9 @@ import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LO
  */
 public class ZypeContentDetailsActivity extends BaseActivity
         implements ZypeContentDetailsPlaylistFragment.OnBrowseRowListener,
-                    ErrorDialogFragment.ErrorDialogFragmentListener {
+                    ErrorDialogFragment.ErrorDialogFragmentListener,
+                    MenuFragment.IMenuFragmentListener {
+
 
     private final String TAG = ZypeContentDetailsActivity.class.getSimpleName();
 
@@ -127,6 +133,8 @@ public class ZypeContentDetailsActivity extends BaseActivity
     private View mMainFrame;
     private Drawable mBackgroundWithPreview;
 
+    private boolean isMenuOpened = false;
+
     private boolean lastRowSelected = false;
 
     Content mSelectedContent;
@@ -145,6 +153,12 @@ public class ZypeContentDetailsActivity extends BaseActivity
                 }
             };
 
+
+    private Row lastSelectedRow = null;
+    private boolean lastSelectedRowChanged = false;
+    private int lastSelectedItemIndex = -1;
+    private int lastSelectedActionIndex = -1;
+    private boolean restoreActionsFocus = false;
 
     private BroadcastReceiver receiver;
 
@@ -199,6 +213,8 @@ public class ZypeContentDetailsActivity extends BaseActivity
         mMainFrame = findViewById(R.id.main_frame);
         mMainFrame.setBackground(mBackgroundWithPreview);
 
+        hideMenu();
+
         progressBar = (ProgressBar) findViewById(R.id.feed_progress);
         progressBar.setVisibility(View.VISIBLE);
 
@@ -217,7 +233,16 @@ public class ZypeContentDetailsActivity extends BaseActivity
      * title, description, and image.
      */
     @Override
-    public void onItemSelected(Object item, int rowIndex, int rowsNumber) {
+    public void onItemSelected(Object item, Row row, int rowIndex, int rowsNumber) {
+        if (row != lastSelectedRow && item != null) {
+            lastSelectedRow = row;
+            lastSelectedRowChanged = true;
+        }
+        else {
+            lastSelectedRowChanged = false;
+        }
+        lastSelectedItemIndex = ((ArrayObjectAdapter) ((ListRow) row).getAdapter()).indexOf(item);
+
         if (item instanceof Content) {
             Content content = (Content) item;
             mSelectedContent = content;
@@ -400,28 +425,37 @@ public class ZypeContentDetailsActivity extends BaseActivity
 
         mActionAdapter.removeActions();
         mActionAdapter.addActions(contentActionList);
-        mActionAdapter.setListener(action -> {
-            try {
-                if (mActionInProgress) {
-                    return;
+        ContentActionWidgetAdapter.IContentActionWidgetAdapterListener actionListener = new ContentActionWidgetAdapter.IContentActionWidgetAdapterListener() {
+            @Override
+            public void onActionClicked(Action action) {
+                try {
+                    if (mActionInProgress) {
+                        return;
+                    }
+                    mActionInProgress = true;
+
+                    int actionId = (int) action.getId();
+                    Log.v(TAG, "onActionClicked():" + actionId);
+
+                    ContentBrowser.getInstance(ZypeContentDetailsActivity.this)
+                            .actionTriggered(ZypeContentDetailsActivity.this,
+                                    mSelectedContent,
+                                    actionId,
+                                    null,
+                                    mActionCompletedListener);
                 }
-                mActionInProgress = true;
-
-                int actionId = (int) action.getId();
-                Log.v(TAG, "onActionClicked():" + actionId);
-
-                ContentBrowser.getInstance(ZypeContentDetailsActivity.this)
-                        .actionTriggered(ZypeContentDetailsActivity.this,
-                            mSelectedContent,
-                            actionId,
-                            null,
-                            mActionCompletedListener);
+                catch (Exception e) {
+                    Log.e(TAG, "caught exception while clicking action", e);
+                    mActionInProgress = false;
+                }
             }
-            catch (Exception e) {
-                Log.e(TAG, "caught exception while clicking action", e);
-                mActionInProgress = false;
+
+            @Override
+            public void onActionSelected(int position) {
+                lastSelectedActionIndex = position;
             }
-        });
+        };
+        mActionAdapter.setListener(actionListener);
     }
 
     private Action findDefaultAction() {
@@ -440,6 +474,150 @@ public class ZypeContentDetailsActivity extends BaseActivity
             }
         }
         return result;
+    }
+
+    private void showMenu() {
+        MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+        if (fragment != null) {
+            isMenuOpened = true;
+            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.lb_error_background_color_translucent));
+//             fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.left_menu_background));
+            int paddingTop = (int) getResources().getDimension(R.dimen.lb_browse_padding_top);
+            fragment.getView().setPadding(0, paddingTop, 0, 0);
+            getFragmentManager().beginTransaction()
+                    .show(fragment)
+                    .commit();
+            fragment.getView().requestFocus();
+        }
+    }
+
+    private void hideMenu() {
+        MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+        if (fragment != null) {
+            isMenuOpened = false;
+            getFragmentManager().beginTransaction()
+                    .hide(fragment)
+                    .commit();
+        }
+    }
+
+    @Override
+    public void showMenuFragment() {
+        if (!isMenuOpened){
+            showMenu();
+        }
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        Log.d(TAG, "event=" + event.toString());
+
+        switch (event.getKeyCode()) {
+
+            case KeyEvent.KEYCODE_MENU:
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    if (ZypeSettings.SHOW_LEFT_MENU) {
+                        Log.d(TAG, "Menu button pressed");
+                        if (!isMenuOpened) {
+                            showMenu();
+                        }
+                        return true;
+                    }
+                }
+                break;
+            case KeyEvent.KEYCODE_BACK: {
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    Log.d(TAG, "Back button pressed");
+                    if (isMenuOpened) {
+                        hideMenu();
+                        if (restoreActionsFocus) {
+                            mActionsRow.requestFocus();
+                        }
+                        else {
+                            findViewById(R.id.full_content_browse_fragment).requestFocus();
+                        }
+                        return true;
+                    }
+                }
+                break;
+            }
+            case KeyEvent.KEYCODE_DPAD_UP:
+                Log.d(TAG, "Up button pressed");
+                if (isMenuOpened) {
+                    MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+                    if (fragment != null) {
+                        ArrayObjectAdapter menuAdapter = (ArrayObjectAdapter) fragment.getAdapter();
+                        if (fragment.getSelectedMenuItemIndex() == 0) {
+                            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                break;
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+                Log.d(TAG, "Down button pressed");
+                if (isMenuOpened) {
+                    MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+                    if (fragment != null) {
+                        ArrayObjectAdapter menuAdapter = (ArrayObjectAdapter) fragment.getAdapter();
+                        if (fragment.getSelectedMenuItemIndex() + 1 >= menuAdapter.size()) {
+                            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                break;
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                Log.d(TAG, "Right button pressed");
+                if (isMenuOpened) {
+                    hideMenu();
+                    if (restoreActionsFocus) {
+                        mActionsRow.requestFocus();
+                    }
+                    else {
+                        findViewById(R.id.full_content_browse_fragment).requestFocus();
+                    }
+                    return true;
+                }
+                break;
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                Log.d(TAG, "Left button pressed");
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    if (!isMenuOpened) {
+                        if (mActionsRow.hasFocus()) {
+                            if (lastSelectedActionIndex == 0) {
+                                lastSelectedActionIndex = -1;
+                            } else if (lastSelectedActionIndex == -1) {
+                                restoreActionsFocus = true;
+                                showMenu();
+                            }
+                        }
+                        else {
+                            if (lastSelectedItemIndex == 0) {
+                                lastSelectedItemIndex = -1;
+                                if (lastSelectedRowChanged) {
+                                    restoreActionsFocus = false;
+                                    showMenu();
+                                }
+                            } else if (lastSelectedItemIndex == -1) {
+                                restoreActionsFocus = false;
+                                showMenu();
+                            }
+                        }
+                    }
+                }
+                break;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public void onItemSelected(Action item) {
+        hideMenu();
+        ContentBrowser.getInstance(this)
+                .settingsActionTriggered(this, item);
     }
 
     @Subscribe

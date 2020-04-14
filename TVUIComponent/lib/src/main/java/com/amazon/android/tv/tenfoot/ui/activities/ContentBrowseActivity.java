@@ -62,6 +62,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
+import android.support.v17.leanback.widget.ListRow;
+import android.support.v17.leanback.widget.Row;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Display;
@@ -108,6 +110,10 @@ public class ContentBrowseActivity extends BaseActivity implements
     private boolean isMenuOpened = false;
 
     private boolean sliderShown = false;
+
+    private Row lastSelectedRow = null;
+    private boolean lastSelectedRowChanged = false;
+    private int lastSelectedItemIndex = -1;
 
     private final Handler handler = new Handler();
 
@@ -267,7 +273,8 @@ public class ContentBrowseActivity extends BaseActivity implements
 
         if(slidersPresent()) {
             handler.postDelayed(() -> {
-              if(sliderHasFocus() || event.getKeyCode()== KeyEvent.KEYCODE_BACK) {
+              if(sliderHasFocus()
+                      || (event.getKeyCode()== KeyEvent.KEYCODE_BACK && sliderShown)) {
                   sliderShown=false;
                   showHeroSlider();
                 }
@@ -314,8 +321,15 @@ public class ContentBrowseActivity extends BaseActivity implements
      * title, description, and image.
      */
     @Override
-    public void onItemSelected(Object item) {
-
+    public void onItemSelected(Object item, Row row) {
+        if (row != lastSelectedRow && item != null) {
+            lastSelectedRow = row;
+            lastSelectedRowChanged = true;
+        }
+        else {
+            lastSelectedRowChanged = false;
+        }
+        lastSelectedItemIndex = ((ArrayObjectAdapter) ((ListRow) row).getAdapter()).indexOf(item);
         if (item instanceof Content) {
             Content content = (Content) item;
             callImageLoadSubscription(content.getTitle(),
@@ -485,13 +499,17 @@ public class ContentBrowseActivity extends BaseActivity implements
                     Log.d(TAG, "Back button pressed");
                     if (isMenuOpened) {
                         hideMenu();
+                        findViewById(R.id.full_content_browse_fragment).requestFocus();
+                        Object item = ((ListRow) lastSelectedRow).getAdapter()
+                                .get(lastSelectedItemIndex == -1 ? 0 : lastSelectedItemIndex);
+                        onItemSelected(item, lastSelectedRow);
                         return true;
                     }
                 }
                 break;
             }
             case KeyEvent.KEYCODE_DPAD_UP:
-                Log.d(TAG, "Down button pressed");
+                Log.d(TAG, "Up button pressed");
                 if (isMenuOpened) {
                     MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
                     if (fragment != null) {
@@ -514,6 +532,30 @@ public class ContentBrowseActivity extends BaseActivity implements
                             if (event.getAction() == KeyEvent.ACTION_DOWN) {
                                 return true;
                             }
+                        }
+                    }
+                }
+                break;
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                Log.d(TAG, "Right button pressed");
+                if (isMenuOpened) {
+                    hideMenu();
+                    findViewById(R.id.full_content_browse_fragment).requestFocus();
+                    return true;
+                }
+                break;
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                Log.d(TAG, "Left button pressed");
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    if (!isMenuOpened && !sliderHasFocus()) {
+                        if (lastSelectedItemIndex == 0) {
+                            lastSelectedItemIndex = -1;
+                            if (lastSelectedRowChanged) {
+                                showMenu();
+                            }
+                        }
+                        else if (lastSelectedItemIndex == -1 ){
+                            showMenu();
                         }
                     }
                 }
