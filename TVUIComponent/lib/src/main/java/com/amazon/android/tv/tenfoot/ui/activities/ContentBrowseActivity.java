@@ -500,7 +500,8 @@ public class ContentBrowseActivity extends BaseActivity implements
                     if (isMenuOpened) {
                         hideMenu();
                         findViewById(R.id.full_content_browse_fragment).requestFocus();
-                        Object item = ((ListRow) lastSelectedRow).getAdapter().get(0);
+                        Object item = ((ListRow) lastSelectedRow).getAdapter()
+                                .get(lastSelectedItemIndex == -1 ? 0 : lastSelectedItemIndex);
                         onItemSelected(item, lastSelectedRow);
                         return true;
                     }
