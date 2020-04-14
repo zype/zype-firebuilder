@@ -273,7 +273,8 @@ public class ContentBrowseActivity extends BaseActivity implements
 
         if(slidersPresent()) {
             handler.postDelayed(() -> {
-              if(sliderHasFocus() || event.getKeyCode()== KeyEvent.KEYCODE_BACK) {
+              if(sliderHasFocus()
+                      || (event.getKeyCode()== KeyEvent.KEYCODE_BACK && sliderShown)) {
                   sliderShown=false;
                   showHeroSlider();
                 }
@@ -499,6 +500,8 @@ public class ContentBrowseActivity extends BaseActivity implements
                     if (isMenuOpened) {
                         hideMenu();
                         findViewById(R.id.full_content_browse_fragment).requestFocus();
+                        Object item = ((ListRow) lastSelectedRow).getAdapter().get(0);
+                        onItemSelected(item, lastSelectedRow);
                         return true;
                     }
                 }
