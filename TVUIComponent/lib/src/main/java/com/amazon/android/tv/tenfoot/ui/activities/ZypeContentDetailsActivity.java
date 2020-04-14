@@ -157,6 +157,8 @@ public class ZypeContentDetailsActivity extends BaseActivity
     private Row lastSelectedRow = null;
     private boolean lastSelectedRowChanged = false;
     private int lastSelectedItemIndex = -1;
+    private int lastSelectedActionIndex = -1;
+    private boolean restoreActionsFocus = false;
 
     private BroadcastReceiver receiver;
 
@@ -423,28 +425,37 @@ public class ZypeContentDetailsActivity extends BaseActivity
 
         mActionAdapter.removeActions();
         mActionAdapter.addActions(contentActionList);
-        mActionAdapter.setListener(action -> {
-            try {
-                if (mActionInProgress) {
-                    return;
+        ContentActionWidgetAdapter.IContentActionWidgetAdapterListener actionListener = new ContentActionWidgetAdapter.IContentActionWidgetAdapterListener() {
+            @Override
+            public void onActionClicked(Action action) {
+                try {
+                    if (mActionInProgress) {
+                        return;
+                    }
+                    mActionInProgress = true;
+
+                    int actionId = (int) action.getId();
+                    Log.v(TAG, "onActionClicked():" + actionId);
+
+                    ContentBrowser.getInstance(ZypeContentDetailsActivity.this)
+                            .actionTriggered(ZypeContentDetailsActivity.this,
+                                    mSelectedContent,
+                                    actionId,
+                                    null,
+                                    mActionCompletedListener);
                 }
-                mActionInProgress = true;
-
-                int actionId = (int) action.getId();
-                Log.v(TAG, "onActionClicked():" + actionId);
-
-                ContentBrowser.getInstance(ZypeContentDetailsActivity.this)
-                        .actionTriggered(ZypeContentDetailsActivity.this,
-                            mSelectedContent,
-                            actionId,
-                            null,
-                            mActionCompletedListener);
+                catch (Exception e) {
+                    Log.e(TAG, "caught exception while clicking action", e);
+                    mActionInProgress = false;
+                }
             }
-            catch (Exception e) {
-                Log.e(TAG, "caught exception while clicking action", e);
-                mActionInProgress = false;
+
+            @Override
+            public void onActionSelected(int position) {
+                lastSelectedActionIndex = position;
             }
-        });
+        };
+        mActionAdapter.setListener(actionListener);
     }
 
     private Action findDefaultAction() {
@@ -556,7 +567,12 @@ public class ZypeContentDetailsActivity extends BaseActivity
                 Log.d(TAG, "Right button pressed");
                 if (isMenuOpened) {
                     hideMenu();
-                    findViewById(R.id.full_content_browse_fragment).requestFocus();
+                    if (restoreActionsFocus) {
+                        mActionsRow.requestFocus();
+                    }
+                    else {
+                        findViewById(R.id.full_content_browse_fragment).requestFocus();
+                    }
                     return true;
                 }
                 break;
@@ -564,14 +580,25 @@ public class ZypeContentDetailsActivity extends BaseActivity
                 Log.d(TAG, "Left button pressed");
                 if (event.getAction() == KeyEvent.ACTION_UP) {
                     if (!isMenuOpened) {
-                        if (lastSelectedItemIndex == 0) {
-                            lastSelectedItemIndex = -1;
-                            if (lastSelectedRowChanged) {
+                        if (mActionsRow.hasFocus()) {
+                            if (lastSelectedActionIndex == 0) {
+                                lastSelectedActionIndex = -1;
+                            } else if (lastSelectedActionIndex == -1) {
+                                restoreActionsFocus = true;
                                 showMenu();
                             }
                         }
-                        else if (lastSelectedItemIndex == -1 ){
-                            showMenu();
+                        else {
+                            if (lastSelectedItemIndex == 0) {
+                                lastSelectedItemIndex = -1;
+                                if (lastSelectedRowChanged) {
+                                    restoreActionsFocus = false;
+                                    showMenu();
+                                }
+                            } else if (lastSelectedItemIndex == -1) {
+                                restoreActionsFocus = false;
+                                showMenu();
+                            }
                         }
                     }
                 }
