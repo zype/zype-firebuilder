@@ -57,6 +57,7 @@ public class ContentActionWidgetAdapter extends RecyclerView.Adapter {
 
     public interface IContentActionWidgetAdapterListener {
         void onActionClicked(Action action);
+        void onActionSelected(int position);
     }
 
     /**
@@ -250,7 +251,10 @@ public class ContentActionWidgetAdapter extends RecyclerView.Adapter {
             }
         });
 
-//        holder.actionButton.setOnFocusChangeListener((v, hasFocus) -> {
+        holder.actionButton.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                listener.onActionSelected(position);
+            }
 //            if (hasFocus) {
 //                // TODO: Fix up app theme and custom.xml colors. DEVTECH-3009
 //                int color = v.getContext().getResources().getColor(R.color.search_orb);
@@ -262,7 +266,7 @@ public class ContentActionWidgetAdapter extends RecyclerView.Adapter {
 //                v.getBackground().clearColorFilter();
 //                v.invalidate();
 //            }
-//        });
+        });
     }
 
     /**

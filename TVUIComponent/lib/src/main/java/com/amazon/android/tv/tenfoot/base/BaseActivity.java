@@ -137,9 +137,8 @@ public abstract class BaseActivity extends Activity {
                     });
         }
     }
-    public void showMenuFragment(){
 
-    }
+    public void showMenuFragment() {}
 
     protected void requestActionFocus() {
         HorizontalGridView actionWidgetContainer =

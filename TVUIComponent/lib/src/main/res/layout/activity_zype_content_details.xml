@@ -83,6 +83,12 @@
             android:layout_height="match_parent"
             android:layout_below="@id/content_details"
             tools:layout="@layout/action_widget_container"/>
+        <fragment
+            android:id="@+id/fragmentMenu"
+            android:name="com.amazon.android.tv.tenfoot.ui.fragments.MenuFragment"
+            android:layout_width="380dp"
+            android:layout_height="match_parent"
+            tools:layout="@layout/action_widget_container" />
 
     </RelativeLayout>
 
@@ -93,8 +99,6 @@
         android:layout_height="48dp"
         android:layout_centerInParent="true"
         android:indeterminateDrawable="@drawable/custom_progress"/>
-
-<!--    <include layout="@layout/action_widget_container"/>-->
 
     <LinearLayout
         android:layout_width="520dp"
@@ -112,4 +116,5 @@
             android:background="@color/accent"
             android:scaleType="fitCenter" />
     </LinearLayout>
+    <include layout="@layout/action_widget_container"/>
 </RelativeLayout>
