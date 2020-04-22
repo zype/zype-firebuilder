@@ -36,7 +36,7 @@ permissions and limitations under the License.
 
     <LinearLayout
         android:layout_width="560dp"
-        android:layout_height="400dp"
+        android:layout_height="292dp"
         android:layout_alignParentTop="true"
         android:gravity="top"
         android:layout_alignParentRight="true">
@@ -68,19 +68,18 @@ permissions and limitations under the License.
         <ImageView
             android:id="@+id/main_logo"
             android:layout_width="116dp"
-            android:layout_height="46dp"
-            android:layout_marginBottom="24dp"
-            android:layout_marginLeft="@dimen/lb_browse_padding_start"
+            android:layout_height="50dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginLeft="24dp"
             android:layout_marginTop="@dimen/lb_browse_padding_top"
             android:scaleType="centerInside"
             android:src="@drawable/company_logo"/>
         <LinearLayout
             android:id="@+id/content_details"
             android:layout_width="352dp"
-            android:layout_height="wrap_content"
-            android:minHeight="125dp"
+            android:layout_height="195dp"
             android:layout_below="@id/main_logo"
-            android:layout_marginBottom="71dp"
+            android:layout_marginBottom="0dp"
             android:layout_marginLeft="@dimen/lb_browse_padding_start"
             android:orientation="vertical">
 
@@ -122,6 +121,7 @@ permissions and limitations under the License.
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/content_details"
+            android:layout_marginTop="0dp"
             tools:layout="@layout/action_widget_container"/>
         <fragment
             android:id="@+id/fragmentMenu"

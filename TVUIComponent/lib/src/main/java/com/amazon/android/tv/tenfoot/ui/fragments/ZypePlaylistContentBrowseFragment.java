@@ -63,6 +63,8 @@ import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
 import com.amazon.android.tv.tenfoot.presenter.PosterCardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.SettingsCardPresenter;
+import com.amazon.android.tv.tenfoot.presenter.StubItemPresenter;
+import com.amazon.android.ui.fragments.AlertDialogFragment;
 import com.amazon.android.ui.fragments.ErrorDialogFragment;
 import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.Preferences;
@@ -102,11 +104,11 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
     private BroadcastReceiver receiver;
 
     private boolean isDataLoaded = false;
+    private boolean isEmptyFavoritesShown = false;
 
     // Container Activity must implement this interface.
     public interface OnBrowseRowListener {
-
-        void onItemSelected(Object item, Row row);
+        void onItemSelected(Object item, Row row, boolean isLastContentRow);
     }
 
     @Override
@@ -167,9 +169,9 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                     updateContents();
                 }
                 else {
-                    isDataLoaded = true;
                     loadRootContentContainer(mRowsAdapter);
                 }
+                isDataLoaded = true;
             }
         };
 
@@ -218,6 +220,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
 
         ContentContainer rootContentContainer = ContentBrowser.getInstance(getActivity()).getLastSelectedContentContainer();
         boolean isMyLibrary = rootContentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID);
+        boolean isFavorites = rootContentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID);
 
         CardPresenter cardPresenter = new CardPresenter();
         PosterCardPresenter posterCardPresenter = new PosterCardPresenter();
@@ -229,6 +232,12 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                         ErrorUtils.ERROR_CATEGORY.ZYPE_MY_LIBRARY_ERROR_EMPTY,
                         (ErrorDialogFragment.ErrorDialogFragmentListener) getActivity());
                 dialogError.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
+            }
+
+            if (isFavorites && contentContainer.getContents().isEmpty()
+                    && ContentBrowser.getInstance(getActivity()).isFavoritesLoaded()) {
+                showEmptyFavorites();
+                break;
             }
 
             HeaderItem header = new HeaderItem(0, contentContainer.getName());
@@ -270,6 +279,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
 
 //        addSettingsActionsToRowAdapter(rowsAdapter);
 //        isDataLoaded = false;
+        addStubRow(rowsAdapter);
     }
 
     /* Zype, Evgeny Cherkasov */
@@ -336,10 +346,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
 
             // Display message if the Favorites list is empty
             if (isFavorites && contentContainer.getContents().isEmpty()) {
-                dialogError = ErrorDialogFragment.newInstance(getActivity(),
-                        ErrorUtils.ERROR_CATEGORY.ZYPE_FAVORITES_ERROR_EMPTY,
-                        (ErrorDialogFragment.ErrorDialogFragmentListener) getActivity());
-                dialogError.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
+                showEmptyFavorites();
             }
 
             index++;
@@ -493,8 +500,34 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
         @Override
         public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
                                    RowPresenter.ViewHolder rowViewHolder, Row row) {
-
-            mCallback.onItemSelected(item, row);
+            boolean isLastContentRow = false;
+            if (mRowsAdapter.indexOf(row) == mRowsAdapter.size() - 2) {
+                isLastContentRow = true;
+            }
+            else {
+                isLastContentRow = false;
+            }
+            mCallback.onItemSelected(item, row, isLastContentRow);
         }
+    }
+
+    private void showEmptyFavorites() {
+        if (!isEmptyFavoritesShown) {
+            isEmptyFavoritesShown = true;
+            dialogError = ErrorDialogFragment.newInstance(getActivity(),
+                    ErrorUtils.ERROR_CATEGORY.ZYPE_CUSTOM,
+                    "It looks like you haven't added any videos to Favorites yet.",
+                    "You can save your favorite videos in this section by selecting “Add to Favorites” for any individual video.",
+                    false,
+                    (ErrorDialogFragment.ErrorDialogFragmentListener) getActivity());
+            dialogError.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
+        }
+    }
+
+    private void addStubRow(ArrayObjectAdapter rowsAdapter) {
+        StubItemPresenter presenter = new StubItemPresenter();
+        ArrayObjectAdapter adapter = new ArrayObjectAdapter(presenter);
+        adapter.add("Item 1");
+        rowsAdapter.add(new ListRow(null, adapter));
     }
 }
