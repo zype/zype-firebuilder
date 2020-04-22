@@ -70,6 +70,7 @@ import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -105,6 +106,8 @@ public class ContentBrowseActivity extends BaseActivity implements
     // View that contains the background
     private View mMainFrame;
     private Drawable mBackgroundWithPreview;
+    private View layoutContentDetails;
+    private View imageLogo;
 
     /* Zype, Evgeny Cherkasov */
     private boolean isMenuOpened = false;
@@ -136,8 +139,10 @@ public class ContentBrowseActivity extends BaseActivity implements
                 .getInstance(this).getTypefacePath(ConfigurationConstants.LIGHT_FONT));
 
         mContentImage = (ImageView) findViewById(R.id.content_image);
-
         mContentImage.setImageURI(Uri.EMPTY);
+
+        layoutContentDetails = (LinearLayout) findViewById(R.id.content_details);
+        imageLogo = findViewById(R.id.main_logo);
 
         // Get display/background size
         Display display = getWindowManager().getDefaultDisplay();
@@ -194,6 +199,8 @@ public class ContentBrowseActivity extends BaseActivity implements
             return;
         }
         mContentImage.setVisibility(View.VISIBLE);
+        layoutContentDetails.setVisibility(View.VISIBLE);
+        imageLogo.setVisibility(View.VISIBLE);
         HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
         fadeInFadeOut(Arrays.asList(findViewById(R.id.content_image), findViewById(R.id.content_details),
             findViewById(R.id.main_logo)), Arrays.asList(fragment.getView()));
@@ -205,6 +212,8 @@ public class ContentBrowseActivity extends BaseActivity implements
             return;
         }
         mContentImage.setVisibility(View.GONE);
+        layoutContentDetails.setVisibility(View.GONE);
+        imageLogo.setVisibility(View.GONE);
         HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
         fadeInFadeOut(Arrays.asList(fragment.getView()), Arrays.asList(findViewById(R.id.content_image), findViewById(R.id.content_details),
             findViewById(R.id.main_logo)));
@@ -273,7 +282,7 @@ public class ContentBrowseActivity extends BaseActivity implements
 
         if(slidersPresent()) {
             handler.postDelayed(() -> {
-              if(sliderHasFocus()
+                if(sliderHasFocus()
                       || (event.getKeyCode()== KeyEvent.KEYCODE_BACK && sliderShown)) {
                   sliderShown=false;
                   showHeroSlider();
