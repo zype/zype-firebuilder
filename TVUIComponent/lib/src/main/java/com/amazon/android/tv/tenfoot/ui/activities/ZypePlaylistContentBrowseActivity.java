@@ -97,8 +97,8 @@ import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LO
  */
 public class ZypePlaylistContentBrowseActivity extends BaseActivity
         implements ZypePlaylistContentBrowseFragment.OnBrowseRowListener,
-                    ErrorDialogFragment.ErrorDialogFragmentListener,
-                    MenuFragment.IMenuFragmentListener {
+        ErrorDialogFragment.ErrorDialogFragmentListener,
+        MenuFragment.IMenuFragmentListener {
 
     private final String TAG = ZypePlaylistContentBrowseActivity.class.getSimpleName();
 
@@ -108,9 +108,9 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
 
     private TextView mContentTitle;
     private TextView mContentDescription;
+    private TextView mContentEpisode;
     private ImageView mContentImage;
     private ProgressBar progressBar;
-    private TextView mContentEpisode;
     private Subscription mContentImageLoadSubscription;
 
     // View that contains the background
@@ -119,6 +119,9 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
 
     private boolean isMenuOpened = false;
 
+    private boolean lastRowSelected = false;
+
+    private Object lastSelectedItem = null;
     private Row lastSelectedRow = null;
     private boolean lastSelectedRowChanged = false;
     private int lastSelectedItemIndex = -1;
@@ -191,7 +194,8 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
      * title, description, and image.
      */
     @Override
-    public void onItemSelected(Object item, Row row) {
+    public void onItemSelected(Object item, Row row, boolean isLastContentRow) {
+        lastRowSelected = isLastContentRow;
         if (row != lastSelectedRow && item != null) {
             lastSelectedRow = row;
             lastSelectedRowChanged = true;
@@ -206,7 +210,8 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
                     content.getDescription(),
                     content.getBackgroundImageUrl());
 
-            if (!TextUtils.isEmpty(ContentHelper.getEpisodeSubTitle(this, content))){
+            if (ZypeSettings.SHOW_EPISODE_NUMBER
+                    && !TextUtils.isEmpty(ContentHelper.getEpisodeSubTitle(this, content))) {
                 mContentEpisode.setVisibility(View.VISIBLE);
                 mContentEpisode.setText(ContentHelper.getEpisodeSubTitle(this, content));
             }
@@ -362,6 +367,7 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
     //
     @Subscribe
     public void onFavoritesLoadEvent(FavoritesLoadEvent event) {
+        Log.d(TAG, "onFavoritesLoadEvent()");
         ((ZypePlaylistContentBrowseFragment) getFragmentManager()
                 .findFragmentById(R.id.full_content_browse_fragment)).updateContents();
     }
@@ -370,7 +376,8 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
         MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
         if (fragment != null) {
             isMenuOpened = true;
-            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.lb_error_background_color_translucent));
+            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.background_color_translucent));
+//            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.lb_error_background_color_translucent));
 //             fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.left_menu_background));
             int paddingTop = (int) getResources().getDimension(R.dimen.lb_browse_padding_top);
             fragment.getView().setPadding(0, paddingTop, 0, 0);
@@ -451,6 +458,9 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
                             }
                         }
                     }
+                }
+                else {
+                    if (lastRowSelected) return true;
                 }
                 break;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
