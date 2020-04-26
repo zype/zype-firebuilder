@@ -14,6 +14,10 @@ public class ZypeSettings {
     // Playlist
     public static final String ROOT_PLAYLIST_ID = "5c91b0d2be3b9e14f51c450e";
 
+//    public static final String APP_KEY = "xATov2vkEYc-Hsonw8Bdgr-pWeVJeaUhtWWBXSHoyzJc20oSOJVohorOkUu36BWJ";
+//    public static final String CLIENT_ID = "f946ff530b3d7b7877e2b116bc2906e6fdfcf1003630454203072ad00e192b7d";
+//    public static final String ROOT_PLAYLIST_ID = "5e5fe2898f19300001ff41fd";
+
     public static final String FAVORITES_PLAYLIST_ID = "Favorites";
     public static final String MY_LIBRARY_PLAYLIST_ID = "MyLibrary";
     public static final String ROOT_FAVORITES_PLAYLIST_ID = "RootFavorites";
@@ -38,7 +42,7 @@ public class ZypeSettings {
     // Features
     public static final boolean ACCOUNT_CREATION_TOS = false;
     public static final boolean DEVICE_LINKING = false;
-    public static final boolean FAVORITES_VIA_API = false;
+    public static final boolean FAVORITES_VIA_API = true;
     public static final boolean LIBRARY_ENABLED = true;
 
     // Monetization

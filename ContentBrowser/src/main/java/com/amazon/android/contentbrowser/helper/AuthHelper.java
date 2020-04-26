@@ -16,6 +16,7 @@
 package com.amazon.android.contentbrowser.helper;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
+import com.amazon.android.contentbrowser.Favorites.FavoritesManager;
 import com.amazon.android.contentbrowser.R;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.module.ModuleManager;
@@ -643,6 +644,10 @@ public class AuthHelper {
                 EntitlementsManager entitlementsManager = mContentBrowser.getEntitlementsManager();
                 if (entitlementsManager != null) {
                     entitlementsManager.clearVideoEntitlements();
+                }
+                FavoritesManager favoritesManager = mContentBrowser.getFavoritesManager();
+                if (favoritesManager != null) {
+                    favoritesManager.clearVideoFavorites();
                 }
                 AnalyticsHelper.trackLogOutResultSuccess();
                 broadcastAuthenticationStatus(false);

@@ -763,7 +763,20 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 else {
                     if (screenName != null) {
                         if (screenName.equals(CONTENT_SUBMENU_SCREEN)) {
-                            runGlobalRecipesForLastSelected(activity, ContentBrowser.this);
+                            if (getLastSelectedContentContainer().getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG)
+                                    .equals(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID)) {
+//                                if (isFavoritesLoaded()) {
+//                                    mEventBus.post(new FavoritesLoadEvent(true));
+//                                }
+//                                else {
+//                                    runGlobalRecipesForLastSelected(activity, ContentBrowser.this);
+//                                }
+                                loadFavoritesVideos(getLastSelectedContentContainer());
+                            }
+                            else {
+                                runGlobalRecipesForLastSelected(activity, ContentBrowser.this);
+                            }
+//                            runGlobalRecipesForLastSelected(activity, ContentBrowser.this);
                         }
                     }
                 }
@@ -1604,12 +1617,15 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                             boolean result = isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT);
                             if (result) {
                                 setLastSelectedContentContainer(contentContainer);
+//                                loadFavoritesVideos(contentContainer);
                                 switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
                             }
                             else {
-                                // TODO: Switch to Favorites screen after successful login
-                                mAuthHelper.handleAuthChain(extra -> mNavigator.startActivity(CONTENT_HOME_SCREEN, intent -> {
-                                }));
+                                mAuthHelper.handleAuthChain(extra -> {
+                                    setLastSelectedContentContainer(contentContainer);
+//                                    loadFavoritesVideos(contentContainer);
+                                    switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
+                                });
                             }
                         });
             }
@@ -3152,8 +3168,14 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 //                                switchToHomeScreen();
                                 // TODO: Consider to use event bus instead of broadcast
                                 // This broadcast is handled in ZypePlaylistContentBrowseFragment to update content
-                                LocalBroadcastManager.getInstance(mNavigator.getActiveActivity())
-                                        .sendBroadcast(new Intent(BROADCAST_DATA_LOADED));
+                                if (root.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID)) {
+                                    setFavoritesLoaded(true);
+                                    mEventBus.post(new FavoritesLoadEvent(isFavoritesLoaded()));
+                                }
+                                else {
+                                    LocalBroadcastManager.getInstance(mNavigator.getActiveActivity())
+                                            .sendBroadcast(new Intent(BROADCAST_DATA_LOADED));
+                                }
                             }
                         });
 
@@ -3206,7 +3228,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     public void loadFavoritesVideos(ContentContainer contentContainer) {
+        setFavoritesLoaded(false);
         ContentContainer favoritesContentContainer = contentContainer.getContentContainers().get(0);
+        favoritesContentContainer.getContents().clear();
 
         Observable<Object> observable = Observable.just(favoritesContentContainer);
         Recipe recipeDynamicParserVideos = Recipe.newInstance(mAppContext, "recipes/ZypeSearchContentsRecipe.json");
@@ -3476,6 +3500,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
     public EntitlementsManager getEntitlementsManager() {
         return entitlementsManager;
+    }
+
+    public FavoritesManager getFavoritesManager() {
+        return favoritesManager;
     }
 
     public boolean isCreateAccountTermsOfServiceRequired() {

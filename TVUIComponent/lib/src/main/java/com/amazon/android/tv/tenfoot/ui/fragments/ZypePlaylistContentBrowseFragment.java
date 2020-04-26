@@ -169,9 +169,9 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                     updateContents();
                 }
                 else {
+                    isDataLoaded = true;
                     loadRootContentContainer(mRowsAdapter);
                 }
-                isDataLoaded = true;
             }
         };
 
@@ -232,12 +232,15 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                         ErrorUtils.ERROR_CATEGORY.ZYPE_MY_LIBRARY_ERROR_EMPTY,
                         (ErrorDialogFragment.ErrorDialogFragmentListener) getActivity());
                 dialogError.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
+                break;
             }
 
-            if (isFavorites && contentContainer.getContents().isEmpty()
+            if (isFavorites) {
+                if (contentContainer.getContents().isEmpty()
                     && ContentBrowser.getInstance(getActivity()).isFavoritesLoaded()) {
-                showEmptyFavorites();
-                break;
+                        showEmptyFavorites();
+                        break;
+                }
             }
 
             HeaderItem header = new HeaderItem(0, contentContainer.getName());
@@ -345,7 +348,8 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
             }
 
             // Display message if the Favorites list is empty
-            if (isFavorites && contentContainer.getContents().isEmpty()) {
+            if (isFavorites && contentContainer.getContents().isEmpty()
+                    && ContentBrowser.getInstance(getActivity()).isFavoritesLoaded()) {
                 showEmptyFavorites();
             }
 
