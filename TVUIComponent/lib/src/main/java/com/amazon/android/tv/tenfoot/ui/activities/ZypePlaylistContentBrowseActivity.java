@@ -368,6 +368,7 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
     @Subscribe
     public void onFavoritesLoadEvent(FavoritesLoadEvent event) {
         Log.d(TAG, "onFavoritesLoadEvent()");
+        progressBar.setVisibility(View.INVISIBLE);
         ((ZypePlaylistContentBrowseFragment) getFragmentManager()
                 .findFragmentById(R.id.full_content_browse_fragment)).updateContents();
     }

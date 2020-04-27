@@ -90,7 +90,7 @@ public class EntitlementsManager {
                                 VideoEntitlementsHelper.getInstance()
                                         .addVideoEntitlement(context, data.videoId, data.createdAt);
                             }
-                            if (response.pagination.current != response.pagination.pages) {
+                            if (response.pagination.current < response.pagination.pages) {
                                 compositeSubscription
                                         .add(loadEntitlementsSubscription(response.pagination.next,
                                                 compositeSubscription));
