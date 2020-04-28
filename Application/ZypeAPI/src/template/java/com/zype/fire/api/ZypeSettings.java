@@ -25,6 +25,13 @@ public class ZypeSettings {
     
     public static final boolean EPG_ENABLED = false;
     public static final boolean DETAIL_BACKGROUND_IMAGE = false;
+    /* Define the app theme
+     *
+     * The default theme is dark. To make the app theme light, set this flag to 'true'.
+     * This flag controls the following:
+     * - Text color on Terms and Privacy Policy screen
+     */
+    public static final boolean LIGHT_THEME = false;
     public static final boolean SHOW_EPISODE_NUMBER = false;
     public static final boolean SHOW_TITLE = false;
     public static final boolean SHOW_LEFT_MENU = false;
