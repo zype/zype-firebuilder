@@ -124,8 +124,11 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
                     model.setFormat(value.toString());
                     break;
                 case Content.FIELD_IMAGES:
-                    model.setExtraValue(Content.EXTRA_IMAGE_POSTER_URL, findImagePosterUrl(value));
+                    model.setExtraValue(Content.EXTRA_IMAGE_POSTER_URL,
+                            findImageByLayout(value, "poster"));
                     model.setFeaturedImageUrl(findFeaturedImageUrl(value));
+                    model.setExtraValue(Content.EXTRA_THUMBNAIL_SQUARE_URL,
+                            findImageByLayout(value, "square"));
                     break;
                 default:
                     model.setExtraValue(field, value);
@@ -203,7 +206,7 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
                     jsonImage = jsonObject;
                 }
                 else {
-                    if (Math.abs(jsonObject.getInt("height") - requiredImageHeight) < Math.abs(jsonImage.getInt("height") - requiredImageHeight)) {
+                    if (Math.abs(jsonObject.getInt("height") - requiredImageHeight) <= Math.abs(jsonImage.getInt("height") - requiredImageHeight)) {
                         jsonImage = jsonObject;
                     }
                 }
@@ -240,14 +243,14 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
     }
 
 
-    private String findImagePosterUrl(Object value) {
+    private String findImageByLayout(Object value, String layout) {
         String result = "null";
         try {
             JSONArray jsonValue = new JSONArray(value.toString());
             JSONObject jsonImage = null;
             for (int i = 0; i < jsonValue.length(); i++) {
                 JSONObject jsonObject = jsonValue.getJSONObject(i);
-                if (jsonObject.getString("layout").equals("poster")) {
+                if (jsonObject.getString("layout").equals(layout)) {
                     jsonImage = jsonObject;
                     break;
                 }

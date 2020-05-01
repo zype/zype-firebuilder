@@ -33,6 +33,7 @@ package com.amazon.android.uamp.ui;
 import com.amazon.android.configuration.ConfigurationManager;
 import com.amazon.android.tv.tenfoot.base.TenFootApp;
 import com.amazon.android.ui.constants.ConfigurationConstants;
+import com.amazon.android.utils.GlideHelper;
 import com.amazon.mediaplayer.tracks.MediaFormat;
 import com.google.android.exoplayer.text.CaptionStyleCompat;
 import com.google.android.exoplayer.text.SubtitleLayout;
@@ -151,6 +152,7 @@ public class PlaybackActivity extends Activity implements
 
     private FrameLayout mVideoView;
     private SubtitleLayout mSubtitleLayout;
+    private FrameLayout mAudioView;
     private FrameLayout mAdsView;
     private UAMP mPlayer;
     private Content mSelectedContent;
@@ -207,6 +209,8 @@ public class PlaybackActivity extends Activity implements
 
     private boolean isAutoPlay=false;
     private boolean messageAlreadyShow=false;
+
+    private boolean isAudio = false;
 
 
   enum AudioFocusState {
@@ -1044,13 +1048,13 @@ public class PlaybackActivity extends Activity implements
 
         // The CC button has been pushed so now we don't want to use global settings for CC state.
         mCaptioningHelper.setUseGlobalSetting(false);
-        /* Zype, Evgeny Cherkasov */
-        if (state) {
-            showClosedCaptionDialog();
-        }
-        else {
+//        /* Zype, Evgeny Cherkasov */
+//        if (state) {
+//            showClosedCaptionDialog();
+//        }
+//        else {
             modifyClosedCaptionState(state);
-        }
+//        }
     }
 
     /**
@@ -1064,30 +1068,31 @@ public class PlaybackActivity extends Activity implements
             if (isClosedCaptionAvailable()) {
 
                 // Enable CC. Prioritizing CLOSED_CAPTION before SUBTITLE if enabled
-//                if (ContentBrowser.getInstance(this).isEnableCEA608() &&
-//                        mPlayer.getTrackCount(TrackType.CLOSED_CAPTION) > 0) {
-//                    mPlayer.enableTextTrack(TrackType.CLOSED_CAPTION, state);
-//                }
-//                else {
-//                    mPlayer.enableTextTrack(TrackType.SUBTITLE, state);
-//                }
-                /* Zype, Evgeny Cherkasov */
-                int ccTrackIndex = -1;
-                if (state) {
-                    ccTrackIndex = getClosedCaptionsTrackIndex(ccTrack);
-                }
-                TrackType type;
-                if (ContentBrowser.getInstance(this).isEnableCEA608()) {
-                    type = TrackType.CLOSED_CAPTION;
+                if (ContentBrowser.getInstance(this).isEnableCEA608() &&
+                        mPlayer.getTrackCount(TrackType.CLOSED_CAPTION) > 0) {
+                    mPlayer.enableTextTrack(TrackType.CLOSED_CAPTION, state);
                 }
                 else {
-                    type = TrackType.SUBTITLE;
+                    mPlayer.enableTextTrack(TrackType.SUBTITLE, state);
                 }
-                mPlayer.setSelectedTrack(type, ccTrackIndex);
+//                /* Zype, Evgeny Cherkasov */
+//                int ccTrackIndex = -1;
+//                if (state) {
+//                    ccTrackIndex = getClosedCaptionsTrackIndex(ccTrack);
+//                }
+//                TrackType type;
+//                if (ContentBrowser.getInstance(this).isEnableCEA608()) {
+//                    type = TrackType.CLOSED_CAPTION;
+//                }
+//                else {
+//                    type = TrackType.SUBTITLE;
+//                }
+//                mPlayer.setSelectedTrack(type, ccTrackIndex);
 
                 // Update internal state.
                 mIsClosedCaptionEnabled = state;
                 mPlaybackOverlayFragment.updateCCButtonState(state, true);
+                mSubtitleLayout.setVisibility(state ? View.VISIBLE : View.INVISIBLE);
                 Log.d(TAG, "Content support CC. Change CC state to " + state);
             }
             else {
@@ -1108,6 +1113,8 @@ public class PlaybackActivity extends Activity implements
         mVideoView.setClickable(false);
 
         mSubtitleLayout = (SubtitleLayout) findViewById(R.id.subtitles);
+
+        mAudioView = (FrameLayout) findViewById(R.id.audioView);
 
         mAdsView = (FrameLayout) findViewById(R.id.adsView);
         // Avoid focus stealing.
@@ -1145,11 +1152,46 @@ public class PlaybackActivity extends Activity implements
         }
     }
 
+    private void switchToContentView() {
+        if (isAudio) {
+            switchToAudioView();
+        }
+        else {
+            switchToVideoView();
+        }
+    }
+
     private void switchToVideoView() {
         // Show Video view.
         setVisibilityOfViewGroupWithInnerSurfaceView(mVideoView, View.VISIBLE);
         // Show Subtitle view.
         mSubtitleLayout.setVisibility(View.VISIBLE);
+        // Hide Audio view
+        setVisibilityOfViewGroupWithInnerSurfaceView(mAudioView, View.GONE);
+        // Hide Ads view.
+        setVisibilityOfViewGroupWithInnerSurfaceView(mAdsView, View.GONE);
+    }
+
+    private void switchToAudioView() {
+        Log.d(TAG, "switchToAudioView()");
+        // Show Audio view
+        setVisibilityOfViewGroupWithInnerSurfaceView(mAudioView, View.VISIBLE);
+        ImageView imageThumbnail = (ImageView) mAudioView.findViewById(R.id.imageThumbnail);
+        String thumbnailUrl = mSelectedContent.getExtraValueAsString(Content.EXTRA_THUMBNAIL_SQUARE_URL);
+        if (TextUtils.isEmpty(thumbnailUrl) || thumbnailUrl.equals("null")) {
+            thumbnailUrl = mSelectedContent.getBackgroundImageUrl();
+        }
+        if (!TextUtils.isEmpty(thumbnailUrl) && !thumbnailUrl.equals("null")) {
+            GlideHelper.loadImageWithCrossFadeTransition(this,
+                    imageThumbnail,
+                    thumbnailUrl,
+                    1000,
+                    R.color.browse_background_color);
+        }
+        // Hide Video view.
+        setVisibilityOfViewGroupWithInnerSurfaceView(mVideoView, View.GONE);
+        // Hide Subtitle view.
+        mSubtitleLayout.setVisibility(View.GONE);
         // Hide Ads view.
         setVisibilityOfViewGroupWithInnerSurfaceView(mAdsView, View.GONE);
     }
@@ -1161,6 +1203,8 @@ public class PlaybackActivity extends Activity implements
         setVisibilityOfViewGroupWithInnerSurfaceView(mVideoView, View.GONE);
         // Hide Subtitle view.
         mSubtitleLayout.setVisibility(View.GONE);
+        // Hide Audio view
+        setVisibilityOfViewGroupWithInnerSurfaceView(mAudioView, View.GONE);
     }
 
     /**
@@ -1529,7 +1573,7 @@ public class PlaybackActivity extends Activity implements
             // We only want to show the video view if the group of ads has finished playing.
             if (adPodComplete) {
                 showProgress();
-                switchToVideoView();
+                switchToContentView();
                 enableMediaSession();
             }
 
@@ -2235,8 +2279,10 @@ public class PlaybackActivity extends Activity implements
     private Content updateContentWithPlayerData(Content content, PlayerData playerData) {
         if (playerData != null) {
             // Url
-            content.setUrl(playerData.body.files.get(0).url);
+            String url = playerData.body.files.get(0).url;
+            content.setUrl(url);
             content.setExtraValue(Content.EXTRA_VIDEO_URL, content.getUrl());
+            checkIsAudio(url);
             // Ads
             if (playerData.body.advertising != null && playerData.body.advertising.schedule.size() > 0) {
                 content.setAdCuePoints(new ArrayList<>());
@@ -2282,6 +2328,15 @@ public class PlaybackActivity extends Activity implements
         return content;
     }
 
+    private void checkIsAudio(String url) {
+        String urlLower = url.toLowerCase();
+        isAudio = urlLower.contains(".mp3")
+                || urlLower.contains(".m4a")
+                || urlLower.contains(".wav")
+                || urlLower.contains(".wma")
+                || urlLower.contains(".aiff")
+                || urlLower.contains(".ac3");
+    }
 //    private void setupAkamai() {
 //        akamaiPlugin = new AnalyticsPlugin(getApplicationContext(), getAkamaiConfigUrl());
 //        if (ContentBrowser.getInstance(this).isUserLoggedIn()) {
@@ -2360,9 +2415,11 @@ public class PlaybackActivity extends Activity implements
             }
             for (int i = 0; i < mPlayer.getTrackCount(type); i++) {
                 MediaFormat mediaFormat = mPlayer.getTrackFormat(type, i);
-                if (track.equalsIgnoreCase(mediaFormat.mTrackId)) {
-                    result = i;
-                    break;
+                if (mediaFormat != null) {
+                    if (track.equalsIgnoreCase(mediaFormat.mTrackId)) {
+                        result = i;
+                        break;
+                    }
                 }
             }
         }
@@ -2384,7 +2441,9 @@ public class PlaybackActivity extends Activity implements
         List<CharSequence> tracks = new ArrayList<>();
         for (int i = 0; i < mPlayer.getTrackCount(type); i++) {
             MediaFormat mediaFormat = mPlayer.getTrackFormat(type, i);
-            tracks.add(mediaFormat.mTrackId);
+            if (mediaFormat != null) {
+                tracks.add(mediaFormat.mTrackId);
+            }
         }
 
         // Show selection dialog

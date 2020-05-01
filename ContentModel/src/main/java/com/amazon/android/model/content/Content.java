@@ -340,6 +340,8 @@ public class Content implements Serializable {
     public static final String EXTRA_RENTAL_REQUIRED = "RentalRequired";
     // Poster thumbnail url
     public static final String EXTRA_THUMBNAIL_POSTER_URL = "ThumbnailPosterUrl";
+
+    public static final String EXTRA_THUMBNAIL_SQUARE_URL = "ThumbnailSquareUrl";
     // Poster thumbnail url
     public static final String EXTRA_VIDEO_FAVORITE_ID = "VideoFavoriteId";
     // Video player url
