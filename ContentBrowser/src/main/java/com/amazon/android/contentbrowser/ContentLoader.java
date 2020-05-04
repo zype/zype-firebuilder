@@ -70,6 +70,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
+import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_VIDEO_DETAIL_DATA_LOADED;
 
 /**
  * Class that initializes the content for the app. This includes running the recipes that download
@@ -689,7 +690,9 @@ public class ContentLoader {
                     }
                     else {
                         LocalBroadcastManager.getInstance(mContext)
-                                .sendBroadcast(new Intent(BROADCAST_DATA_LOADED));
+                                .sendBroadcast(new Intent(BROADCAST_VIDEO_DETAIL_DATA_LOADED));
+//                        LocalBroadcastManager.getInstance(mContext)
+//                                .sendBroadcast(new Intent(BROADCAST_DATA_LOADED));
 
                         // Loading playlist videos
                         return getPlaylistVideosFeedObservable(contentContainerAsObject);

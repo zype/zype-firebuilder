@@ -71,6 +71,7 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.List;
 
 import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
+import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_VIDEO_DETAIL_DATA_LOADED;
 
 /* Zype, Evgeny Cherkasov */
 
@@ -102,7 +103,7 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
         super.onResume();
         if (receiver != null) {
             LocalBroadcastManager.getInstance(getActivity())
-                    .registerReceiver(receiver, new IntentFilter(BROADCAST_DATA_LOADED));
+                    .registerReceiver(receiver, new IntentFilter(BROADCAST_VIDEO_DETAIL_DATA_LOADED));
         }
 //        updateContents();
     }
@@ -209,6 +210,8 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
         ContentContainer playlist = ContentBrowser.getInstance(getActivity()).getPlayList(playlistId);
 
         if (playlist == null) {
+            isDataLoaded = true;
+            mCallback.onItemSelected(video, null, -1, 0);
             return;
         }
 
@@ -248,6 +251,8 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
         ContentContainer playlist = ContentBrowser.getInstance(getActivity()).getPlayList(playlistId);
 
         if (playlist == null) {
+            isDataLoaded = true;
+            mCallback.onItemSelected(video, null, -1, 0);
             return;
         }
 

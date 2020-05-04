@@ -341,6 +341,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     /* Zype, Evgeny Cherkasov
      * begin */
     public static final String BROADCAST_DATA_LOADED = "DataLoaded";
+
+    public static final String BROADCAST_VIDEO_DETAIL_DATA_LOADED = "VideoDetailDataLoaded";
     /* Zype, end */
 
     /**

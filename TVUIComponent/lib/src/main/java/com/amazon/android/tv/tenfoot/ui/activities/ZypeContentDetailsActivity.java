@@ -241,7 +241,9 @@ public class ZypeContentDetailsActivity extends BaseActivity
         else {
             lastSelectedRowChanged = false;
         }
-        lastSelectedItemIndex = ((ArrayObjectAdapter) ((ListRow) row).getAdapter()).indexOf(item);
+        if (row != null) {
+            lastSelectedItemIndex = ((ArrayObjectAdapter) ((ListRow) row).getAdapter()).indexOf(item);
+        }
 
         if (item instanceof Content) {
             Content content = (Content) item;
