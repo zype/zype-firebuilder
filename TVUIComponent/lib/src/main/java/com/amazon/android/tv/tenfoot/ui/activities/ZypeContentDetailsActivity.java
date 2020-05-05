@@ -191,6 +191,7 @@ public class ZypeContentDetailsActivity extends BaseActivity
         mActionAdapter = new ContentActionWidgetAdapter(mActionsRow);
         mSelectedContent = ContentBrowser.getInstance(this).getLastSelectedContent();
         updateActions(mSelectedContent);
+        mActionsRow.requestFocus();
 
         // Get display/background size
         Display display = getWindowManager().getDefaultDisplay();

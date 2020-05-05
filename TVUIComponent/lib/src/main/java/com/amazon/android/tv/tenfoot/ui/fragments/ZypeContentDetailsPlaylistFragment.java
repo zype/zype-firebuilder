@@ -38,17 +38,19 @@ import android.os.Looper;
 import android.support.v17.leanback.app.RowsFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.HeaderItem;
+import android.support.v17.leanback.widget.ItemBridgeAdapter;
 import android.support.v17.leanback.widget.ListRow;
+import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.OnItemViewClickedListener;
 import android.support.v17.leanback.widget.OnItemViewSelectedListener;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowHeaderPresenter;
 import android.support.v17.leanback.widget.RowPresenter;
-import android.support.v17.leanback.widget.VerticalGridView;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.ContentLoader;
@@ -92,6 +94,8 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
     private boolean isDataLoaded = false;
     private boolean isEmptyFavoritesShown = false;
 
+    CustomListRowPresenter customListRowPresenter;
+
     // Container Activity must implement this interface.
     public interface OnBrowseRowListener {
         void onItemSelected(Object item, Row row, int rowIndex, int rowsNumber);
@@ -124,7 +128,7 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
                     "OnBrowseRowListener: " + e);
         }
 
-        CustomListRowPresenter customListRowPresenter = new CustomListRowPresenter();
+        customListRowPresenter = new CustomListRowPresenter();
         customListRowPresenter.setHeaderPresenter(new RowHeaderPresenter());
         // Uncomment this code to remove shadow from the cards
         //customListRowPresenter.setShadowEnabled(false);
@@ -139,15 +143,15 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
         setOnItemViewSelectedListener(new ItemViewSelectedListener());
 
         // Wait for WAIT_BEFORE_FOCUS_REQUEST_MS for the data to load before requesting focus.
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(() -> {
-            if (getView() != null) {
-                VerticalGridView verticalGridView = findGridViewFromRoot(getView());
-                if (verticalGridView != null) {
-                    verticalGridView.requestFocus();
-                }
-            }
-        }, WAIT_BEFORE_FOCUS_REQUEST_MS);
+//        Handler handler = new Handler(Looper.getMainLooper());
+//        handler.postDelayed(() -> {
+//            if (getView() != null) {
+//                VerticalGridView verticalGridView = findGridViewFromRoot(getView());
+//                if (verticalGridView != null) {
+//                    verticalGridView.requestFocus();
+//                }
+//            }
+//        }, WAIT_BEFORE_FOCUS_REQUEST_MS);
 
         receiver = new BroadcastReceiver() {
             @Override
@@ -224,8 +228,12 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
             listRowAdapter = new ArrayObjectAdapter(posterCardPresenter);
         }
 
+        int videoIndex = 0;
         for (Content content : playlist.getContents()) {
             listRowAdapter.add(content);
+            if (content.getId().equals(video.getId())) {
+                videoIndex = listRowAdapter.indexOf(content);
+            }
         }
 
         if (playlist.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
