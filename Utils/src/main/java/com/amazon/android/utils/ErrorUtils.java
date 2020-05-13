@@ -49,6 +49,7 @@ public class ErrorUtils {
         ZYPE_CUSTOM,
         ZYPE_FAVORITES_ERROR_EMPTY,
         ZYPE_MY_LIBRARY_ERROR_EMPTY,
+        ZYPE_NO_VIDEOS,
         ZYPE_VERIFY_SUBSCRIPTION_ERROR
     }
 
@@ -116,6 +117,9 @@ public class ErrorUtils {
             case ZYPE_MY_LIBRARY_ERROR_EMPTY:
                 errorMessage = context.getResources().getString(R.string.my_library_error_empty);
                 break;
+            case ZYPE_NO_VIDEOS:
+                errorMessage = context.getResources().getString(R.string.error_no_videos);
+                break;
             case ZYPE_VERIFY_SUBSCRIPTION_ERROR:
                 errorMessage = context.getResources().getString(R.string.verify_subscription_error);
                 break;
@@ -172,6 +176,7 @@ public class ErrorUtils {
                 buttonLabelsList.add(context.getResources().getString(R.string.dismiss_label));
                 break;
             case ZYPE_MY_LIBRARY_ERROR_EMPTY:
+            case ZYPE_NO_VIDEOS:
                 buttonLabelsList.add(context.getResources().getString(R.string.dismiss_label));
                 break;
             case ZYPE_VERIFY_SUBSCRIPTION_ERROR:
