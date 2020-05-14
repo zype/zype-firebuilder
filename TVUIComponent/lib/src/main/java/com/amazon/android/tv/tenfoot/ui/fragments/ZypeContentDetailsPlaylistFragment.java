@@ -108,6 +108,8 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
         if (receiver != null) {
             LocalBroadcastManager.getInstance(getActivity())
                     .registerReceiver(receiver, new IntentFilter(BROADCAST_VIDEO_DETAIL_DATA_LOADED));
+            LocalBroadcastManager.getInstance(getActivity())
+                    .registerReceiver(receiver, new IntentFilter(BROADCAST_DATA_LOADED));
         }
 //        updateContents();
     }
@@ -205,7 +207,7 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
     }
 
     private void loadContentContainer(ArrayObjectAdapter rowsAdapter) {
-        Log.d(TAG, "loadRootContentContainer()");
+        Log.d(TAG, "loadContentContainer()");
 
         rowsAdapter.clear();
 
@@ -236,13 +238,15 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
             }
         }
 
-        if (playlist.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
-            PlaylistAction action = new PlaylistAction();
-            action.setAction(ContentBrowser.NEXT_PAGE)
-                    .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
-                    .setLabel1(getString(R.string.action_load_more));
-            action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, playlist.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
-            listRowAdapter.add(action);
+        if (playlist.getContents().size() < playlist.getExtraValueAsInt(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT)) {
+            if (playlist.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
+                PlaylistAction action = new PlaylistAction();
+                action.setAction(ContentBrowser.NEXT_PAGE)
+                        .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
+                        .setLabel1(getString(R.string.action_load_more));
+                action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, playlist.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+                listRowAdapter.add(action);
+            }
         }
 
         rowsAdapter.add(new ListRow(header, listRowAdapter));
