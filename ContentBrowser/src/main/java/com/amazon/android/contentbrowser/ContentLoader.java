@@ -778,6 +778,7 @@ public class ContentLoader {
             GsonBuilder builder = new GsonBuilder();
             Gson gson = builder.create();
             String feed = gson.toJson(videosResult.videos);
+            Log.d(TAG, "getVideosFeedObservable(): size=" + videosResult.videos.size());
             return Observable.just(Pair.create(contentContainerAsObject, feed));
         }
         else {
