@@ -2995,16 +2995,24 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                             Log.e(TAG, "Recipe chain failed:", throwable);
                             LocalBroadcastManager.getInstance(mNavigator.getActiveActivity())
                                     .sendBroadcast(new Intent(BROADCAST_DATA_LOADED));
+//                            ErrorHelper.injectErrorFragment(
+//                                    mNavigator.getActiveActivity(),
+//                                    ErrorUtils.ERROR_CATEGORY.FEED_ERROR,
+//                                    (errorDialogFragment, errorButtonType,
+//                                     errorCategory) -> {
+//                                        if (errorButtonType ==
+//                                                ErrorUtils.ERROR_BUTTON_TYPE.EXIT_APP) {
+//                                            mNavigator.getActiveActivity().finishAffinity();
+//                                        }
+//                                    });
                             ErrorHelper.injectErrorFragment(
-                                    mNavigator.getActiveActivity(),
-                                    ErrorUtils.ERROR_CATEGORY.FEED_ERROR,
-                                    (errorDialogFragment, errorButtonType,
-                                     errorCategory) -> {
-                                        if (errorButtonType ==
-                                                ErrorUtils.ERROR_BUTTON_TYPE.EXIT_APP) {
-                                            mNavigator.getActiveActivity().finishAffinity();
-                                        }
-                                    });
+                                mNavigator.getActiveActivity(),
+                                ErrorUtils.ERROR_CATEGORY.ZYPE_NO_VIDEOS,
+                                (errorDialogFragment, errorButtonType, errorCategory) -> {
+                                    errorDialogFragment.dismiss();
+                                    mNavigator.getActiveActivity().finish();
+                                }
+                            );
 
                         }, () -> {
                             Log.v(TAG, "Recipe chain completed");
