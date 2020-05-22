@@ -768,11 +768,14 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                         if (screenName.equals(CONTENT_SUBMENU_SCREEN)) {
                             if (getLastSelectedContentContainer().getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG)
                                     .equals(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID)) {
-                                if (isFavoritesLoaded()) {
+                                int favoritesSize = getLastSelectedContentContainer().getContentContainers().get(0).getContents().size();
+                                Log.d(TAG, "onScreenCreate(): favoritesLoaded=" + isFavoritesLoaded() + ", size=" + favoritesSize);
+                                if (isFavoritesLoaded() && favoritesSize > 0) {
                                     Handler handler = new Handler();
                                     handler.post(() -> mEventBus.post(new FavoritesLoadEvent(isFavoritesLoaded())));
                                 }
                                 else {
+                                    setFavoritesLoaded(false);
                                     if (ZypeConfiguration.isFavoritesViaApiEnabled(mAppContext)) {
                                         loadFavoritesVideos(getLastSelectedContentContainer());
                                     }
