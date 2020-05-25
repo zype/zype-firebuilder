@@ -71,5 +71,6 @@ permissions and limitations under the License.
         Once purchased, your library of content will appear in this section.</string>
     <!-- Subscription -->
     <string name="verify_subscription_error">Error verifying subscription.</string>
+    <string name="error_no_videos">No videos available.</string>
 
 </resources>
