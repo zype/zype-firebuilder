@@ -61,6 +61,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
 import android.text.TextUtils;
@@ -767,13 +768,21 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                         if (screenName.equals(CONTENT_SUBMENU_SCREEN)) {
                             if (getLastSelectedContentContainer().getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG)
                                     .equals(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID)) {
-//                                if (isFavoritesLoaded()) {
-//                                    mEventBus.post(new FavoritesLoadEvent(true));
-//                                }
-//                                else {
-//                                    runGlobalRecipesForLastSelected(activity, ContentBrowser.this);
-//                                }
-                                loadFavoritesVideos(getLastSelectedContentContainer());
+                                int favoritesSize = getLastSelectedContentContainer().getContentContainers().get(0).getContents().size();
+                                Log.d(TAG, "onScreenCreate(): favoritesLoaded=" + isFavoritesLoaded() + ", size=" + favoritesSize);
+                                if (isFavoritesLoaded() && favoritesSize > 0) {
+                                    Handler handler = new Handler();
+                                    handler.post(() -> mEventBus.post(new FavoritesLoadEvent(isFavoritesLoaded())));
+                                }
+                                else {
+                                    setFavoritesLoaded(false);
+                                    if (ZypeConfiguration.isFavoritesViaApiEnabled(mAppContext)) {
+                                        loadFavoritesVideos(getLastSelectedContentContainer());
+                                    }
+                                    else {
+                                        loadLocalFavoritesVideos(getLastSelectedContentContainer());
+                                    }
+                                }
                             }
                             else {
                                 runGlobalRecipesForLastSelected(activity, ContentBrowser.this);
@@ -1634,7 +1643,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             else {
                 setLastSelectedContentContainer(contentContainer);
                 switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
-                loadLocalFavoritesVideos(contentContainer);
+//                loadLocalFavoritesVideos(contentContainer);
             }
         }
     }

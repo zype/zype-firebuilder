@@ -691,9 +691,6 @@ public class ContentLoader {
                     else {
                         LocalBroadcastManager.getInstance(mContext)
                                 .sendBroadcast(new Intent(BROADCAST_VIDEO_DETAIL_DATA_LOADED));
-//                        LocalBroadcastManager.getInstance(mContext)
-//                                .sendBroadcast(new Intent(BROADCAST_DATA_LOADED));
-
                         // Loading playlist videos
                         return getPlaylistVideosFeedObservable(contentContainerAsObject);
                     }
@@ -781,6 +778,7 @@ public class ContentLoader {
             GsonBuilder builder = new GsonBuilder();
             Gson gson = builder.create();
             String feed = gson.toJson(videosResult.videos);
+            Log.d(TAG, "getVideosFeedObservable(): size=" + videosResult.videos.size());
             return Observable.just(Pair.create(contentContainerAsObject, feed));
         }
         else {
@@ -1052,6 +1050,11 @@ public class ContentLoader {
         void onContentsLoaded();
     }
 
+    // TODO: Move 'loadPlaylistVideos()' from 'ContentBrowser' to here,
+    // - update definition of 'loadPlaylistVideos' to use listener
+    // - update all calls of 'loadPlaylistVideos' with listeners instead of listening to broadcast receivers
+    // for updating content with result of this function
+    // - replace all calls of 'loadContentForContentContainer' function with 'loadPlaylistVideos'
     public void loadContentForContentContainer(ContentContainer contentContainer, Context context, ILoadContentForContentContainer callback) {
 //        NavigatorModel.GlobalRecipes recipe = mNavigator.getNavigatorModel().getGlobalRecipes().get(0);
 //        Recipe dataLoaderRecipeForContents = recipe.getContents().dataLoaderRecipe;
@@ -1064,6 +1067,13 @@ public class ContentLoader {
             @Override
             public void onResponse(Call<VideosResponse> call, Response<VideosResponse> response) {
                 if (response.isSuccessful()) {
+                    if (response.body().pagination.current == response.body().pagination.pages) {
+                        contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, -1);
+                    }
+                    else {
+                        contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, response.body().pagination.next);
+                    }
+
                     if (!response.body().videoData.isEmpty()) {
                         Log.d(TAG, "loadContentForContentContainer(): onResponse(): size=" + response.body().videoData.size());
                         for (VideoData videoData : response.body().videoData) {

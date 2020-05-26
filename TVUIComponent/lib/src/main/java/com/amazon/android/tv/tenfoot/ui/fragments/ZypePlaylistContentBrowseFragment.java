@@ -266,6 +266,8 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                     listRowAdapter.add(action);
                 }
             }
+            else if (isFavorites) {
+            }
             else {
                 if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
                     PlaylistAction action = new PlaylistAction();
@@ -335,6 +337,8 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
                             .setLabel1(getString(R.string.action_load_more));
                     listRowAdapter.add(action);
                 }
+            }
+            else if (isFavorites) {
             }
             else {
                 if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {

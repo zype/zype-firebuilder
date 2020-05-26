@@ -33,7 +33,7 @@ public class ZypeSettings {
     */
     public static final boolean LIGHT_THEME = false;
     public static final boolean SHOW_EPISODE_NUMBER = false;
-    public static final boolean SHOW_TITLE = true;
+    public static final boolean SHOW_TITLE = false;
     public static final boolean SHOW_LEFT_MENU = true;
     public static final boolean SHOW_SEARCH_ICON = true;
     public static final boolean SETTINGS_PLAYLIST_ENABLED = true;
@@ -45,17 +45,17 @@ public class ZypeSettings {
     // Features
     public static final boolean ACCOUNT_CREATION_TOS = false;
     public static final boolean DEVICE_LINKING = false;
-    public static final boolean FAVORITES_VIA_API = true;
-    public static final boolean LIBRARY_ENABLED = true;
+    public static final boolean FAVORITES_VIA_API = false;
+    public static final boolean LIBRARY_ENABLED = false;
 
     // Monetization
     public static final boolean MARKETPLACE_CONNECT_SVOD = false;
     public static final boolean NATIVE_SUBSCRIPTION_ENABLED = false;
-    public static final boolean NATIVE_TVOD = true;
-    public static final boolean PLAYLIST_PURCHASE_ENABLED = true;
+    public static final boolean NATIVE_TVOD = false;
+    public static final boolean PLAYLIST_PURCHASE_ENABLED = false;
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = false;
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = false;
-    public static final boolean UNIVERSAL_TVOD = true;
+    public static final boolean UNIVERSAL_TVOD = false;
 
     /**
      * Amazon shared key is required for native subscription feature. It is used in request to Zype Bifrost

@@ -162,24 +162,21 @@ public class CardPresenter extends Presenter {
 
 
                 if (SHOW_TITLE) {
-
                     String title = ContentHelper.getCardViewSubtitle(mContext, content);
-
-                    if(titleText != null) {
-                        if(TextUtils.isEmpty(title)) {
+                    if (titleText != null) {
+                        if (TextUtils.isEmpty(title)) {
                             titleText.setVisibility(View.GONE);
                         }
                         else {
                             titleText.setVisibility(View.VISIBLE);
                         }
                     }
-
                     cardView.setTitleText(title);
                     cardView.setContentText(content.getTitle()+ "\n ");
                 }
                 else {
-                    cardView.setContentText("");
                     cardView.setTitleText("");
+                    cardView.setContentText("");
                 }
                 cardView.setMainImageDimensions(mCardWidthDp, mCardHeightDp);
                 /* Zype, Evgeny Cherkasov */
@@ -235,14 +232,31 @@ public class CardPresenter extends Presenter {
         }
         else if (item instanceof ContentContainer) {
             ContentContainer contentContainer = (ContentContainer) item;
-            if(titleText != null) {
-                titleText.setVisibility(View.GONE);
-            }
-
+//            if(titleText != null) {
+//                titleText.setVisibility(View.GONE);
+//            }
+//
+//            if (SHOW_TITLE) {
+//                cardView.setContentText(contentContainer.getName()+ "\n ");
+//            }
+//            else {
+//                cardView.setContentText("");
+//            }
             if (SHOW_TITLE) {
+                String title = "";
+                if (titleText != null) {
+                    if (TextUtils.isEmpty(title)) {
+                        titleText.setVisibility(View.GONE);
+                    }
+                    else {
+                        titleText.setVisibility(View.VISIBLE);
+                    }
+                }
+                cardView.setTitleText(title);
                 cardView.setContentText(contentContainer.getName()+ "\n ");
             }
             else {
+                cardView.setTitleText("");
                 cardView.setContentText("");
             }
 
@@ -265,6 +279,8 @@ public class CardPresenter extends Presenter {
             else {
                 cardView.getMainImageView().setImageDrawable(mDefaultCardImage);
             }
+            cardView.setInfoAreaBackground(sFocusedFadeMask);
+
         }
         /* Zype, Evgeny CHerkasov */
         else if (item instanceof Action) {
