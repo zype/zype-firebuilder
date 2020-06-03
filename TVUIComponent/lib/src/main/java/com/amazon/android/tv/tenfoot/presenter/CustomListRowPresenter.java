@@ -23,11 +23,16 @@ import android.view.ViewGroup;
  */
 public class CustomListRowPresenter extends ListRowPresenter {
 
+    private int initialSelectedPosition;
+
+    public CustomListRowPresenter(int position) {
+        super();
+        this.initialSelectedPosition = position;
+    }
     /**
      * Constructor.
      */
     public CustomListRowPresenter() {
-
         super();
     }
 
@@ -39,4 +44,13 @@ public class CustomListRowPresenter extends ListRowPresenter {
         return viewHolder;
     }
 
+    @Override
+    protected void onBindRowViewHolder(RowPresenter.ViewHolder holder, Object item) {
+        super.onBindRowViewHolder(holder, item);
+
+        if (initialSelectedPosition != -1) {
+            ViewHolder vh = (ListRowPresenter.ViewHolder) holder;
+            vh.getGridView().setSelectedPosition(initialSelectedPosition);
+        }
+    }
 }
