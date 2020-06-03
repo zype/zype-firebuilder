@@ -130,7 +130,8 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
                     "OnBrowseRowListener: " + e);
         }
 
-        customListRowPresenter = new CustomListRowPresenter();
+        int position = getVideoPositionInPlaylist();
+        customListRowPresenter = new CustomListRowPresenter(position);
         customListRowPresenter.setHeaderPresenter(new RowHeaderPresenter());
         // Uncomment this code to remove shadow from the cards
         //customListRowPresenter.setShadowEnabled(false);
@@ -204,6 +205,18 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
         }
         if (mRowsAdapter != null) {
             mRowsAdapter.notifyArrayItemRangeChanged(0, mRowsAdapter.size());
+        }
+    }
+
+    private int getVideoPositionInPlaylist() {
+        Content video = ContentBrowser.getInstance(getActivity()).getLastSelectedContent();
+        String playlistId = video.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID);
+        ContentContainer playlist = ContentBrowser.getInstance(getActivity()).getPlayList(playlistId);
+        if (playlist == null) {
+            return -1;
+        }
+        else {
+            return playlist.getContents().indexOf(video);
         }
     }
 
