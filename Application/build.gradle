@@ -16,7 +16,7 @@
 
 buildscript {
     repositories {
-        mavenCentral()
+//        mavenCentral()
         jcenter()
         google()
 //        maven {
@@ -37,12 +37,13 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
-        mavenCentral()
-        if (rootProject.hasProperty('mavenUrl')) {
-            maven { url rootProject.mavenUrl }
-        }
+//        mavenCentral()
+//        if (rootProject.hasProperty('mavenUrl')) {
+//            maven { url rootProject.mavenUrl }
+//        }
 //        maven {
 //            url 'https://maven.google.com'
 //        }
+        google()
     }
 }

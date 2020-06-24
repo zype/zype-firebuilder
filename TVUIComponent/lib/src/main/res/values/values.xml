@@ -21,6 +21,7 @@ permissions and limitations under the License.
     <integer name="details_overview_image_corner_radius">5</integer>
     <integer name="num_of_search_elements_in_row">5</integer>
 
+    <dimen name="lb_browse_title_text_width">584dp</dimen>
     <!-- Global Search -->
     <!-- The action label for global search -->
     <string name="global_search">GLOBALSEARCH</string>

@@ -31,6 +31,7 @@ package android.support.v17.leanback.app;
 
 import com.amazon.android.configuration.ConfigurationManager;
 import com.amazon.android.tv.tenfoot.R;
+import com.amazon.android.uamp.ui.PlaybackOverlayFragment;
 import com.amazon.android.ui.constants.ConfigurationConstants;
 
 import android.animation.Animator;
