@@ -37,7 +37,7 @@ import com.amazon.mediaplayer.playback.SeekRange;
 import com.amazon.mediaplayer.playback.config.BaseContentPlaybackBufferConfig;
 import com.amazon.mediaplayer.tracks.MediaFormat;
 import com.amazon.mediaplayer.tracks.TrackType;
-import com.google.android.exoplayer.smoothstreaming.SmoothStreamingChunkSource;
+//import com.google.android.exoplayer.smoothstreaming.SmoothStreamingChunkSource;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -618,6 +618,7 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
         MediaSource mediaSource;
         DataSource.Factory manifestDataSourceFactory =
                 new DefaultHttpDataSourceFactory(mUserAgent);
+        mDataSourceFactory = buildDataSourceFactory(true);
 
         switch (mediaSourceType) {
             case C.TYPE_DASH:
