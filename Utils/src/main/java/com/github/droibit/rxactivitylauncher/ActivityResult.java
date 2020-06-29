@@ -32,7 +32,7 @@ package com.github.droibit.rxactivitylauncher;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 /**
  * This class holds the data received by {@link Activity#onActivityResult(int, int, Intent)}.

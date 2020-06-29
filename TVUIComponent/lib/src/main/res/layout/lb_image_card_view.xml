@@ -39,11 +39,11 @@ permissions and limitations under the License.
             android:layout_height="172dp"
             style="@style/Widget.Leanback.ImageCardView.ImageStyle"/>
 
-    <android.support.v17.leanback.widget.NonOverlappingRelativeLayout
+    <androidx.leanback.widget.NonOverlappingRelativeLayout
             android:id="@+id/info_field"
             style="@style/Widget.Leanback.ImageCardView.InfoAreaStyle"
             android:layout_height="match_parent"
             android:layout_width="wrap_content">
-    </android.support.v17.leanback.widget.NonOverlappingRelativeLayout>
+    </androidx.leanback.widget.NonOverlappingRelativeLayout>
 
 </merge>

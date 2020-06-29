@@ -35,10 +35,10 @@ import android.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.CheckResult;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.CheckResult;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -103,13 +103,13 @@ public class RxLauncher {
     }
 
     /**
-     * Set the launch source component({@link android.support.v4.app.Fragment}) of other activity.
+     * Set the launch source component({@link androidx.fragment.app.Fragment}) of other activity.
      *
      * @param source The source fragment.
      * @return {@link Launchable} instance.
      */
     @CheckResult
-    public Launchable from(android.support.v4.app.Fragment source) {
+    public Launchable from(androidx.fragment.app.Fragment source) {
 
         return new Launchers.SourceSupportFragment(this, source);
     }
@@ -172,7 +172,7 @@ public class RxLauncher {
      * @param data        The data intent.
      * @see Activity#onActivityResult(int, int, Intent)
      * @see Fragment#onActivityResult(int, int, Intent)
-     * @see android.support.v4.app.Fragment#onActivityResult(int, int, Intent)
+     * @see androidx.fragment.app.Fragment#onActivityResult(int, int, Intent)
      */
     public void activityResult(int requestCode, int resultCode, @Nullable Intent data) {
 

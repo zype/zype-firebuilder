@@ -14,8 +14,8 @@
  */
 package com.amazon.android.tv.tenfoot.presenter;
 
-import android.support.v17.leanback.widget.ListRowPresenter;
-import android.support.v17.leanback.widget.RowPresenter;
+import androidx.leanback.widget.ListRowPresenter;
+import androidx.leanback.widget.RowPresenter;
 import android.view.ViewGroup;
 
 /**

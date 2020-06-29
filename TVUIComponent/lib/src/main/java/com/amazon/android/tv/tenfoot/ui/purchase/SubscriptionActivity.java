@@ -5,7 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,8 +18,8 @@ import com.amazon.android.contentbrowser.helper.PurchaseHelper;
 import com.amazon.android.model.event.ProgressOverlayDismissEvent;
 import com.amazon.android.model.event.PurchaseEvent;
 import com.amazon.android.tv.tenfoot.R;
-import com.amazon.android.tv.tenfoot.ui.purchase.Model.Consumer;
-import com.amazon.android.tv.tenfoot.ui.purchase.Model.SubscriptionItem;
+import com.amazon.android.tv.tenfoot.ui.Subscription.Model.Consumer;
+import com.amazon.android.tv.tenfoot.ui.Subscription.Model.SubscriptionItem;
 import com.amazon.android.ui.fragments.ErrorDialogFragment;
 import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.NetworkUtils;
@@ -107,6 +107,9 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
             }
         });
 
+        Button buttonCancelSelectPlan = (Button) findViewById(R.id.buttonCancelSelectPlan);
+        buttonCancelSelectPlan.setOnClickListener(v -> closeScreen());
+
         updateViews();
         bindViews();
     }
@@ -186,6 +189,30 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
         finish();
     }
 
+    private void showSubscriptionSuccessDialog() {
+        dialogError = ErrorDialogFragment.newInstance(this,
+                ErrorUtils.ERROR_CATEGORY.ZYPE_CUSTOM,
+                getString(R.string.subscription_dialog_success_title),
+                String.format(getString(R.string.subscription_dialog_success_message), selectedSubscription.title),
+                false,
+                (errorDialogFragment, errorButtonType, errorCategory) -> {
+                    if (errorDialogFragment != null) {
+                        errorDialogFragment.dismiss();
+                    }
+                    if (ZypeConfiguration.isNativeSubscriptionEnabled(SubscriptionActivity.this)) {
+                        closeScreen();
+                    }
+                    else {
+                        // Relogin required after successful purchase validation with Marketplace connect
+                        Consumer consumer = new Consumer();
+                        consumer.email = Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_EMAIL);
+                        consumer.password = Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_PASSWORD);
+                        login(consumer);
+                    }
+                });
+        dialogError.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
+    }
+
     // //////////
     // Actions
     //
@@ -254,15 +281,16 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
     @Override
     public void onSubscriptionSelected(SubscriptionItem item) {
         selectedSubscription = item;
-        if (ZypeConfiguration.isUniversalSubscriptionEnabled(SubscriptionActivity.this)
-            || ZypeConfiguration.marketplaceConnectSvodEnabled(SubscriptionActivity.this)) {
-            if (!contentBrowser.isUserLoggedIn()) {
-                Intent intent = new Intent(SubscriptionActivity.this, CreateLoginActivity.class);
-                startActivityForResult(intent, REQUEST_CREATE_LOGIN);
-                return;
-            }
-        }
-        showConfirm();
+        onConfirm();
+//        if (ZypeConfiguration.isUniversalSubscriptionEnabled(SubscriptionActivity.this)
+//            || ZypeConfiguration.marketplaceConnectSvodEnabled(SubscriptionActivity.this)) {
+//            if (!contentBrowser.isUserLoggedIn()) {
+//                Intent intent = new Intent(SubscriptionActivity.this, CreateLoginActivity.class);
+//                startActivityForResult(intent, REQUEST_CREATE_LOGIN);
+//                return;
+//            }
+//        }
+//        showConfirm();
     }
 
     //
@@ -301,21 +329,22 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
      */
     @Subscribe
     public void onSubscriptionPurchaseEvent(PurchaseEvent event) {
-        if (event.getExtras().getBoolean(PurchaseHelper.RESULT_VALIDITY)) {
-            if (ZypeConfiguration.isNativeSubscriptionEnabled(SubscriptionActivity.this)) {
-                closeScreen();
+        if (event.getExtras().getBoolean(PurchaseHelper.RESULT)) {
+            if (event.getExtras().getBoolean(PurchaseHelper.RESULT_VALIDITY)) {
+                showSubscriptionSuccessDialog();
+//                if (ZypeConfiguration.isNativeSubscriptionEnabled(SubscriptionActivity.this)) {
+//                    closeScreen();
+//                } else {
+//                    // Relogin required after successful purchase validation with Marketplace connect
+//                    Consumer consumer = new Consumer();
+//                    consumer.email = Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_EMAIL);
+//                    consumer.password = Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_PASSWORD);
+//                    login(consumer);
+//                }
+            } else {
+                dialogError = ErrorDialogFragment.newInstance(SubscriptionActivity.this, ErrorUtils.ERROR_CATEGORY.ZYPE_VERIFY_SUBSCRIPTION_ERROR, SubscriptionActivity.this);
+                dialogError.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
             }
-            else {
-                // Relogin required after successful purchase validation with Marketplace connect
-                Consumer consumer = new Consumer();
-                consumer.email = Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_EMAIL);
-                consumer.password = Preferences.getString(ZypeAuthentication.PREFERENCE_CONSUMER_PASSWORD);
-                login(consumer);
-            }
-        }
-        else {
-            dialogError = ErrorDialogFragment.newInstance(SubscriptionActivity.this, ErrorUtils.ERROR_CATEGORY.ZYPE_VERIFY_SUBSCRIPTION_ERROR, SubscriptionActivity.this);
-            dialogError.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
         }
     }
 

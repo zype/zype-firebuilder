@@ -1,4 +1,4 @@
-package android.support.v17.leanback.widget;
+package androidx.leanback.widget;
 /**
  * This file was modified by Amazon:
  * Copyright 2015-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.

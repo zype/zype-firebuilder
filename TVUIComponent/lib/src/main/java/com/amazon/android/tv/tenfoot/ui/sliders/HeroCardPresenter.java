@@ -3,10 +3,9 @@ package com.amazon.android.tv.tenfoot.ui.sliders;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
-import android.support.v17.leanback.widget.ImageCardView;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.ColorUtils;
+import androidx.leanback.widget.ImageCardView;
+import androidx.leanback.widget.Presenter;
+import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
@@ -19,7 +18,7 @@ import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.utils.Helpers;
 import com.bumptech.glide.Glide;
 
-import static android.support.v17.leanback.widget.ImageCardView.CARD_TYPE_FLAG_IMAGE_ONLY;
+import static androidx.leanback.widget.ImageCardView.CARD_TYPE_FLAG_IMAGE_ONLY;
 
 public class HeroCardPresenter extends Presenter {
   private static final String TAG = "HeroCardPresenter";

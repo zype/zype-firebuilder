@@ -18,7 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import java.io.IOException;
 

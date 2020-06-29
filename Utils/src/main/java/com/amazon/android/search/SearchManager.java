@@ -15,8 +15,8 @@
 package com.amazon.android.search;
 
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

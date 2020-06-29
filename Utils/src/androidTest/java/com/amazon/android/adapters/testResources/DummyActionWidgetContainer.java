@@ -28,9 +28,9 @@
  */
 package com.amazon.android.adapters.testResources;
 
-import android.support.annotation.VisibleForTesting;
-import android.support.v17.leanback.widget.HorizontalGridView;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.VisibleForTesting;
+import androidx.leanback.widget.HorizontalGridView;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 

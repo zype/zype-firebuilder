@@ -26,7 +26,7 @@ import com.amazon.utils.model.Data;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.VisibleForTesting;
 import android.util.Log;
 
 import java.io.IOException;

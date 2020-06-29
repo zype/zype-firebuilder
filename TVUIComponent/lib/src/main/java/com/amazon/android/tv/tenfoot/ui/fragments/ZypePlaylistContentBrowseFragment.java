@@ -35,18 +35,18 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v17.leanback.app.RowsFragment;
-import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.HeaderItem;
-import android.support.v17.leanback.widget.ListRow;
-import android.support.v17.leanback.widget.OnItemViewClickedListener;
-import android.support.v17.leanback.widget.OnItemViewSelectedListener;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v17.leanback.widget.Row;
-import android.support.v17.leanback.widget.RowHeaderPresenter;
-import android.support.v17.leanback.widget.RowPresenter;
-import android.support.v17.leanback.widget.VerticalGridView;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.leanback.app.RowsFragment;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.HeaderItem;
+import androidx.leanback.widget.ListRow;
+import androidx.leanback.widget.OnItemViewClickedListener;
+import androidx.leanback.widget.OnItemViewSelectedListener;
+import androidx.leanback.widget.Presenter;
+import androidx.leanback.widget.Row;
+import androidx.leanback.widget.RowHeaderPresenter;
+import androidx.leanback.widget.RowPresenter;
+import androidx.leanback.widget.VerticalGridView;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
@@ -65,25 +65,14 @@ import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
 import com.amazon.android.tv.tenfoot.presenter.PosterCardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.SettingsCardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.StubItemPresenter;
-import com.amazon.android.ui.fragments.AlertDialogFragment;
 import com.amazon.android.ui.fragments.ErrorDialogFragment;
 import com.amazon.android.utils.ErrorUtils;
-import com.amazon.android.utils.Preferences;
-import com.zype.fire.api.ZypeApi;
-import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
-import com.zype.fire.auth.ZypeAuthentication;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.util.HashMap;
 import java.util.List;
-
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
 

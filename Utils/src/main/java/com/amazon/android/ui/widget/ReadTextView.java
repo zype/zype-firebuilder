@@ -19,7 +19,7 @@ import com.amazon.utils.R;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.text.Layout;
 import android.util.AttributeSet;
 import android.widget.TextView;

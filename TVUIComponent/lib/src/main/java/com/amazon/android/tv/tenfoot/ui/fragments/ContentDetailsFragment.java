@@ -35,6 +35,7 @@ import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.model.content.constants.ExtraKeys;
 import com.amazon.android.recipe.Recipe;
+import com.amazon.android.tv.tenfoot.presenter.CustomDetailsOverviewRowPresenter;
 import com.amazon.android.utils.GlideHelper;
 import com.amazon.android.utils.Helpers;
 import com.amazon.android.tv.tenfoot.R;
@@ -51,43 +52,39 @@ import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
 
 import android.app.Activity;
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v17.leanback.app.BackgroundManager;
-import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.ClassPresenterSelector;
-import android.support.v17.leanback.widget.DetailsOverviewRow;
-import android.support.v17.leanback.widget.DetailsOverviewRowPresenter;
-import android.support.v17.leanback.widget.HeaderItem;
-import android.support.v17.leanback.widget.HorizontalGridView;
-import android.support.v17.leanback.widget.ImageCardView;
-import android.support.v17.leanback.widget.ListRow;
-import android.support.v17.leanback.widget.ListRowPresenter;
-import android.support.v17.leanback.widget.RowHeaderPresenter;
-import android.support.v17.leanback.widget.TenFootActionPresenterSelector;
-import android.support.v17.leanback.widget.OnItemViewClickedListener;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v17.leanback.widget.Row;
-import android.support.v17.leanback.widget.RowPresenter;
-import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.leanback.app.BackgroundManager;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.ClassPresenterSelector;
+import androidx.leanback.widget.DetailsOverviewRow;
+import androidx.leanback.widget.DetailsOverviewRowPresenter;
+import androidx.leanback.widget.FullWidthDetailsOverviewRowPresenter;
+import androidx.leanback.widget.HeaderItem;
+import androidx.leanback.widget.HorizontalGridView;
+import androidx.leanback.widget.ImageCardView;
+import androidx.leanback.widget.ListRow;
+import androidx.leanback.widget.ListRowPresenter;
+import androidx.leanback.widget.OnItemViewSelectedListener;
+import androidx.leanback.widget.RowHeaderPresenter;
+import androidx.leanback.widget.TenFootActionPresenterSelector;
+import androidx.leanback.widget.OnItemViewClickedListener;
+import androidx.leanback.widget.Presenter;
+import androidx.leanback.widget.Row;
+import androidx.leanback.widget.RowPresenter;
+import androidx.leanback.widget.SparseArrayObjectAdapter;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -114,7 +111,7 @@ import static com.zype.fire.api.ZypeSettings.DETAIL_BACKGROUND_IMAGE;
  * content_details_activity_layout screens.
  * It shows a detailed view of video and its meta plus related videos.
  */
-public class ContentDetailsFragment extends android.support.v17.leanback.app.DetailsFragment {
+public class ContentDetailsFragment extends androidx.leanback.app.DetailsFragment {
 
     private static final String TAG = ContentDetailsFragment.class.getSimpleName();
 
@@ -165,10 +162,10 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
         Log.d(TAG, "onCreate DetailsFragment");
         super.onCreate(savedInstanceState);
 
-        prepareBackgroundManager();
-
-        mSelectedContent = ContentBrowser.getInstance(getActivity()).getLastSelectedContent();
-        mShowRelatedContent = ContentBrowser.getInstance(getActivity()).isShowRelatedContent();
+//        prepareBackgroundManager();
+//
+//        mSelectedContent = ContentBrowser.getInstance(getActivity()).getLastSelectedContent();
+//        mShowRelatedContent = ContentBrowser.getInstance(getActivity()).isShowRelatedContent();
 
         /* Zype, Evgeny Cherkasov */
         receiver = new BroadcastReceiver() {
@@ -185,6 +182,12 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
 
         Log.v(TAG, "onStart called.");
         super.onStart();
+
+        prepareBackgroundManager();
+
+        mSelectedContent = ContentBrowser.getInstance(getActivity()).getLastSelectedContent();
+        mShowRelatedContent = ContentBrowser.getInstance(getActivity()).isShowRelatedContent();
+
         if (mSelectedContent != null || checkGlobalSearchIntent()) {
 
             setupAdapter();
@@ -199,11 +202,30 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
                 updateBackground(mSelectedContent.getBackgroundImageUrl());
             }
             setOnItemViewClickedListener(new ItemViewClickedListener());
+            setOnItemViewSelectedListener(new ItemViewSelectedListener());
         }
         else {
             Log.v(TAG, "Start CONTENT_HOME_SCREEN.");
             ContentBrowser.getInstance(getActivity())
                           .switchToScreen(ContentBrowser.CONTENT_HOME_SCREEN);
+        }
+    }
+
+    private final class ItemViewSelectedListener implements OnItemViewSelectedListener {
+
+        @Override
+        public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
+                                   RowPresenter.ViewHolder rowViewHolder, Row row) {
+            if (item != null) {
+                if (item instanceof Content) {
+                    Content content = (Content) item;
+                    if (!content.getId().equals(ContentBrowser.getInstance(getActivity()).getLastSelectedContent().getId())) {
+                        ContentBrowser.getInstance(getActivity()).setLastSelectedContent(content);
+                        mSelectedContent = ContentBrowser.getInstance(getActivity()).getLastSelectedContent();
+                        updateDetailsOverviewRow();
+                    }
+                }
+            }
         }
     }
 
@@ -411,30 +433,112 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
         mAdapter.add(row);
     }
 
+    private void updateDetailsOverviewRow() {
+        final DetailsOverviewRow row = (DetailsOverviewRow) mAdapter.get(0);
+        row.setItem(mSelectedContent);
+        row.setActionsAdapter(new ArrayObjectAdapter(new TenFootActionPresenterSelector()));
+        row.setImageDrawable(ContextCompat.getDrawable(getActivity(),
+                android.R.color.transparent));
+        int width = Helpers.convertDpToPixel(getActivity().getApplicationContext(),
+                DETAIL_THUMB_WIDTH);
+        int height = Helpers.convertDpToPixel(getActivity().getApplicationContext(),
+                DETAIL_THUMB_HEIGHT);
+
+        long timeRemaining = ContentBrowser.getInstance(getActivity())
+                .getContentTimeRemaining(mSelectedContent);
+        double playbackPercentage = ContentBrowser.getInstance(getActivity())
+                .getContentPlaybackPositionPercentage
+                        (mSelectedContent);
+
+        Log.d(TAG, "Time Remaining: " + timeRemaining);
+        Log.d(TAG, "Playback Percentage: " + playbackPercentage);
+
+        SimpleTarget<Bitmap> bitmapTarget = new SimpleTarget<Bitmap>(width, height) {
+            @Override
+            public void onResourceReady(Bitmap resource,
+                                        GlideAnimation<? super Bitmap> glideAnimation) {
+
+                Log.d(TAG,
+                        "content_details_activity_layout overview card image url ready: " + resource);
+
+                int cornerRadius =
+                        getResources().getInteger(R.integer.details_overview_image_corner_radius);
+
+                Bitmap bitmap = Helpers.roundCornerImage(getActivity(), resource, cornerRadius);
+
+                if (playbackPercentage > 0) {
+                    bitmap = Helpers.addProgress(getActivity(), bitmap, playbackPercentage);
+                }
+
+                long secondsRemaining = timeRemaining / MILLISECONDS_IN_SECOND;
+
+                if (secondsRemaining > 0) {
+
+                    long hours = 0;
+                    long minutes = 0;
+                    long seconds = 0;
+
+                    if (secondsRemaining >= SECONDS_IN_HOUR) {
+                        hours = secondsRemaining / SECONDS_IN_HOUR;
+                        secondsRemaining -= hours * SECONDS_IN_HOUR;
+                    }
+
+                    if (secondsRemaining >= SECONDS_IN_MINUTE) {
+                        minutes = secondsRemaining / SECONDS_IN_MINUTE;
+                        secondsRemaining -= minutes * SECONDS_IN_MINUTE;
+                    }
+
+                    seconds = secondsRemaining;
+
+                    Resources res = getResources();
+
+                    String durationText = res.getString(R.string.duration, hours, minutes, seconds);
+                    String timeRemainingText = res.getString(R.string.time_remaining, durationText);
+
+                    bitmap = Helpers.addTimeRemaining(getActivity(), bitmap, timeRemainingText);
+
+                }
+
+                row.setImageBitmap(getActivity(), bitmap);
+            }
+        };
+
+        GlideHelper.loadImageDetailIntoSimpleTargetBitmap(getActivity(),
+                mSelectedContent.getCardImageUrl(),
+                new GlideHelper.LoggingListener<>(),
+                android.R.color.transparent,
+                bitmapTarget);
+
+        updateActions();
+        row.setActionsAdapter(mActionAdapter);
+    }
+
     private void setupDetailsOverviewRowPresenter() {
 
         DetailsDescriptionPresenter detailsDescPresenter = new DetailsDescriptionPresenter();
 
         // Set detail background and style.
-        DetailsOverviewRowPresenter detailsPresenter =
-                new DetailsOverviewRowPresenter(detailsDescPresenter) {
-                    @Override
-                    protected void initializeRowViewHolder(RowPresenter.ViewHolder vh) {
-
-                        super.initializeRowViewHolder(vh);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            vh.view.findViewById(R.id.details_overview_image)
-                                   .setTransitionName(ContentDetailsActivity.SHARED_ELEMENT_NAME);
-                        }
-                    }
-                };
+        CustomDetailsOverviewRowPresenter detailsPresenter = new CustomDetailsOverviewRowPresenter(detailsDescPresenter);
+//        DetailsOverviewRowPresenter detailsPresenter =
+//                new DetailsOverviewRowPresenter(detailsDescPresenter) {
+//                    @Override
+//                    protected void initializeRowViewHolder(RowPresenter.ViewHolder vh) {
+//
+//                        super.initializeRowViewHolder(vh);
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                            vh.view.findViewById(R.id.details_overview_image)
+//                                   .setTransitionName(ContentDetailsActivity.SHARED_ELEMENT_NAME);
+//                        }
+//                    }
+//                };
         detailsPresenter.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-        detailsPresenter.setStyleLarge(true);
+        detailsPresenter.setActionsBackgroundColor(getResources().getColor(android.R.color.transparent));
+//        detailsPresenter.setStyleLarge(true);
 
-        // Hook up transition element.
-        detailsPresenter.setSharedElementEnterTransition(getActivity(),
-                                                         ContentDetailsActivity
-                                                                 .SHARED_ELEMENT_NAME);
+//        // Hook up transition element.
+//        detailsPresenter.setSharedElementEnterTransition(getActivity(),
+//                                                         ContentDetailsActivity
+//                                                                 .SHARED_ELEMENT_NAME);
 
         detailsPresenter.setOnActionClickedListener(action -> {
             try {
@@ -505,6 +609,7 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
     private void setupContentListRowPresenter() {
 
         ListRowPresenter presenter = new ListRowPresenter();
+        presenter.setSelectEffectEnabled(false);
         presenter.setHeaderPresenter(new RowHeaderPresenter());
         mPresenterSelector.addClassPresenter(ListRow.class, presenter);
     }
@@ -673,7 +778,15 @@ public class ContentDetailsFragment extends android.support.v17.leanback.app.Det
                         Log.e(TAG, "checkVideoEntitlement(): failed");
                     }
                 });
-//            }
+            }
+        }
+
+    }
+
+    @Override
+    protected void onSetRowStatus(RowPresenter presenter, RowPresenter.ViewHolder viewHolder, int adapterPosition, int selectedPosition, int selectedSubPosition) {
+        if (selectedPosition == 0) {
+            updateActionsProperties();
         }
     }
 }

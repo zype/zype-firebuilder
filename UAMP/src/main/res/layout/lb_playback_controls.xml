@@ -45,7 +45,7 @@ permissions and limitations under the License.
             android:layoutDirection="ltr"
             android:progressDrawable="@drawable/lb_playback_progress_bar"/>
 
-    <android.support.v17.leanback.widget.PersistentFocusWrapper
+    <androidx.leanback.widget.PersistentFocusWrapper
             android:id="@+id/controls_container_focus_wrapper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -96,6 +96,6 @@ permissions and limitations under the License.
                     style="?attr/playbackControlsTimeStyle"/>
 
         </FrameLayout>
-    </android.support.v17.leanback.widget.PersistentFocusWrapper>
+    </androidx.leanback.widget.PersistentFocusWrapper>
 
 </LinearLayout>

@@ -30,14 +30,13 @@
 
 package com.amazon.android.uamp.ui;
 
-import android.app.Activity;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v17.leanback.app.TenFootPlaybackOverlayFragment;
+import androidx.leanback.app.TenFootPlaybackOverlayFragment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -63,7 +62,6 @@ import com.amazon.android.utils.Helpers;
 import com.amazon.android.utils.Preferences;
 import com.amazon.mediaplayer.AMZNMediaPlayer;
 import com.amazon.mediaplayer.AMZNMediaPlayer.PlayerState;
-import com.zype.fire.api.IZypeApi;
 import com.zype.fire.api.Model.ErrorBody;
 import com.zype.fire.api.Model.PlayerData;
 import com.zype.fire.api.Model.PlayerResponse;

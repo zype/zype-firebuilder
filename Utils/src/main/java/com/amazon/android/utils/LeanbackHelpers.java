@@ -28,7 +28,7 @@ public class LeanbackHelpers {
      * @return Amazon Action object.
      */
     public static Action translateLeanBackActionToAction(
-            android.support.v17.leanback.widget.Action leanbackAction) {
+            androidx.leanback.widget.Action leanbackAction) {
 
         Action action = new Action();
         action.setId(leanbackAction.getId())
@@ -45,11 +45,11 @@ public class LeanbackHelpers {
      * @param action Amazon Action object.
      * @return LeanBack action object.
      */
-    public static android.support.v17.leanback.widget.Action translateActionToLeanBackAction(
+    public static androidx.leanback.widget.Action translateActionToLeanBackAction(
             Action action) {
 
-        android.support.v17.leanback.widget.Action leanbackAction =
-                new android.support.v17.leanback.widget.Action(action.getId(),
+        androidx.leanback.widget.Action leanbackAction =
+                new androidx.leanback.widget.Action(action.getId(),
                                                                action.getLabel1(),
                                                                action.getLabel2());
 
@@ -64,8 +64,7 @@ public class LeanbackHelpers {
      */
     public static Action translateActionAdapterObjectToAction(Object actionObject) {
 
-        android.support.v17.leanback.widget.Action leanbackAction = (android.support.v17.leanback
-                .widget.Action) actionObject;
+        androidx.leanback.widget.Action leanbackAction = (androidx.leanback.widget.Action) actionObject;
 
         return translateLeanBackActionToAction(leanbackAction);
     }

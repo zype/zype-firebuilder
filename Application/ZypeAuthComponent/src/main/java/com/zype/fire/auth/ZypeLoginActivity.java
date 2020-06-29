@@ -2,34 +2,23 @@ package com.zype.fire.auth;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputLayout;
-import android.util.Log;
+import androidx.annotation.Nullable;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.amazon.android.module.*;
-import com.amazon.android.module.BuildConfig;
 import com.amazon.android.utils.NetworkUtils;
-import com.amazon.android.utils.Preferences;
 import com.amazon.auth.AuthenticationConstants;
-import com.amazon.auth.IAuthentication;
-import com.zype.fire.api.Model.AccessTokenInfoResponse;
-import com.zype.fire.api.Model.AccessTokenResponse;
-import com.zype.fire.api.Model.ConsumerResponse;
-import com.zype.fire.api.Model.DevicePinData;
 import com.zype.fire.api.Model.DevicePinResponse;
 import com.zype.fire.api.Util.AdMacrosHelper;
 import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeConfiguration;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -112,6 +101,13 @@ public class ZypeLoginActivity extends Activity {
                 getAccessToken();
             }
         });
+        Button buttonSignUp = (Button) findViewById(R.id.buttonSignUp);
+        buttonSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onSignUp();
+            }
+        });
 
         initParameters(savedInstanceState);
         bindViews();
@@ -136,11 +132,20 @@ public class ZypeLoginActivity extends Activity {
         }
     }
 
+    // Actions
+
+    private void onSignUp() {
+        Intent data = new Intent();
+        data.putExtra("SignUp", true);
+        setResult(RESULT_CANCELED, data);
+        finish();
+    }
+
     // //////////
     // UI
     //
     private void bindViews() {
-        textMessage.setText(message);
+        textMessage.setText(getString(R.string.sign_in_message));
         textPin.setText(pin);
 
         updateViews();

@@ -21,7 +21,7 @@ import com.amazon.purchase.model.Receipt;
 import com.amazon.purchase.model.SkuData;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import java.io.IOException;

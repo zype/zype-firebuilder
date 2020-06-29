@@ -1,10 +1,10 @@
 package com.amazon.android.tv.tenfoot.ui.sliders;
 
 import android.os.Handler;
-import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.ObjectAdapter;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v17.leanback.widget.PresenterSelector;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.ObjectAdapter;
+import androidx.leanback.widget.Presenter;
+import androidx.leanback.widget.PresenterSelector;
 
 import java.util.ArrayList;
 import java.util.Collection;

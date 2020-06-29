@@ -25,7 +25,7 @@ import com.amazon.android.tv.tenfoot.ui.activities.FullContentBrowseActivity;
 import com.amazon.android.tv.tenfoot.ui.activities.SplashActivity;
 
 import android.content.res.Resources;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.util.Log;
 
 import com.amazon.android.uamp.ui.PlaybackActivity;

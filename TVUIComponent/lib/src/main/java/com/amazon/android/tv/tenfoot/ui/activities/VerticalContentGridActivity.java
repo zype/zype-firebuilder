@@ -33,7 +33,7 @@ import com.amazon.android.tv.tenfoot.R;
 import android.app.Activity;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 
 /**
  * A class to display content in a vertical grid.

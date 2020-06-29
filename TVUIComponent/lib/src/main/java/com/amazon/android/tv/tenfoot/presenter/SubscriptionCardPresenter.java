@@ -14,14 +14,18 @@
  */
 package com.amazon.android.tv.tenfoot.presenter;
 
-import android.support.v17.leanback.widget.Presenter;
+import androidx.leanback.widget.Presenter;
+import androidx.core.content.ContextCompat;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.amazon.android.tv.tenfoot.R;
-import com.amazon.android.tv.tenfoot.ui.purchase.Model.SubscriptionItem;
+import com.amazon.android.tv.tenfoot.ui.Subscription.Model.SubscriptionItem;
 
 /**
  * A CardPresenter used to generate Views and bind SettingsItems to them on demand.

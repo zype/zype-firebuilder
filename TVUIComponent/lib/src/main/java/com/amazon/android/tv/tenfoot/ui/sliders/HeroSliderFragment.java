@@ -3,11 +3,12 @@ package com.amazon.android.tv.tenfoot.ui.sliders;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v17.leanback.app.RowsFragment;
-import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.ItemBridgeAdapter;
-import android.support.v17.leanback.widget.ListRow;
-import android.support.v17.leanback.widget.VerticalGridView;
+import androidx.leanback.app.RowsFragment;
+import androidx.leanback.app.RowsSupportFragment;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.ItemBridgeAdapter;
+import androidx.leanback.widget.ListRow;
+import androidx.leanback.widget.VerticalGridView;
 import android.text.TextUtils;
 import android.view.View;
 
