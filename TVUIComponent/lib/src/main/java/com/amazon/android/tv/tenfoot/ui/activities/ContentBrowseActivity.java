@@ -205,7 +205,7 @@ public class ContentBrowseActivity extends BaseActivity implements
     }
 
     private void showHeroSlider() {
-        if(sliderShown || !slidersPresent()) {
+        if (sliderShown || !slidersPresent()) {
             return;
         }
         mContentImage.setVisibility(View.GONE);

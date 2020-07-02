@@ -67,6 +67,7 @@ android {
         versionName "2.1.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
+//        multiDexKeepProguard file('multidex-config.pro')
         multiDexKeepFile file('multidex-config.txt')
     }
     buildTypes {
@@ -82,6 +83,7 @@ android {
         debug {
             setVersionNameSuffix(".${currentCodeVersion} DEBUG [${date}]")
             testCoverageEnabled = true
+//            multiDexKeepProguard file('multidex-config.pro')
             multiDexKeepFile file('multidex-config.txt')
         }
     }
@@ -115,6 +117,8 @@ android {
         exclude 'META-INF/services/com.fasterxml.jackson.core.JsonFactory'
         exclude 'META-INF/services/com.fasterxml.jackson.core.ObjectCodec'
         exclude 'META-INF/rxjava.properties'
+    }
+    dexOptions {
     }
     lintOptions {
         abortOnError false
