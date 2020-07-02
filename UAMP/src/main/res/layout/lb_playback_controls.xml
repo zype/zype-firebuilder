@@ -55,7 +55,7 @@ permissions and limitations under the License.
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-            <android.support.v17.leanback.widget.PersistentFocusWrapper
+            <androidx.leanback.widget.PersistentFocusWrapper
                     android:id="@+id/control_bar_focus_wrapper"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -63,13 +63,13 @@ permissions and limitations under the License.
                     android:layout_marginLeft="@dimen/playback_control_left_margin"
                     >
 
-                <android.support.v17.leanback.widget.TenFootControlBar
+                <androidx.leanback.widget.TenFootControlBar
                         android:id="@+id/control_bar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layoutDirection="ltr"
                         android:orientation="horizontal"/>
-            </android.support.v17.leanback.widget.PersistentFocusWrapper>
+            </androidx.leanback.widget.PersistentFocusWrapper>
 
             <FrameLayout
                     android:id="@+id/more_actions_dock"

@@ -56,7 +56,7 @@ jacoco {
 }
 
 dependencies {
-    api fileTree(dir: 'libs', include: ['*.jar'])
+//    api fileTree(dir: 'libs', include: ['*.jar'])
     api 'androidx.recyclerview:recyclerview:1.0.0'
     api 'androidx.leanback:leanback:1.0.0'
     api 'androidx.appcompat:appcompat:1.0.0'
