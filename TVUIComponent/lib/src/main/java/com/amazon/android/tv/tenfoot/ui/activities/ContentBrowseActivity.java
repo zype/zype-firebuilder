@@ -35,6 +35,7 @@ import com.amazon.android.model.Action;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.tv.tenfoot.ui.fragments.MenuFragment;
+import com.amazon.android.tv.tenfoot.ui.menu.TopMenuFragment;
 import com.amazon.android.tv.tenfoot.ui.sliders.HeroSlider;
 import com.amazon.android.tv.tenfoot.ui.sliders.HeroSliderFragment;
 import com.amazon.android.tv.tenfoot.utils.BrowseHelper;
@@ -472,6 +473,20 @@ public class ContentBrowseActivity extends BaseActivity implements
         }
     }
 
+    private void showTopMenu() {
+        TopMenuFragment fragment = (TopMenuFragment) getFragmentManager().findFragmentById(R.id.fragmentTopMenu);
+        if (fragment != null) {
+            isMenuOpened = true;
+            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.top_menu_background));
+//            int paddingTop = (int) getResources().getDimension(R.dimen.lb_browse_padding_top);
+//            fragment.getView().setPadding(0, paddingTop, 0, 0);
+            getFragmentManager().beginTransaction()
+                    .show(fragment)
+                    .commit();
+            fragment.getView().requestFocus();
+        }
+    }
+
     /**
      * Called to process key events.  You can override this to intercept all
      * key events before they are dispatched to the window.  Be sure to call
@@ -488,6 +503,13 @@ public class ContentBrowseActivity extends BaseActivity implements
 
             case KeyEvent.KEYCODE_MENU:
                 if (event.getAction() == KeyEvent.ACTION_UP) {
+                    if (ZypeSettings.SHOW_TOP_MENU) {
+                        Log.d(TAG, "Menu button pressed");
+                        if (!isMenuOpened) {
+                            showTopMenu();
+                        }
+                        return true;
+                    }
                     if (ZypeSettings.SHOW_LEFT_MENU) {
                         Log.d(TAG, "Menu button pressed");
                         if (!isMenuOpened) {
@@ -518,7 +540,7 @@ public class ContentBrowseActivity extends BaseActivity implements
             }
             case KeyEvent.KEYCODE_DPAD_UP:
                 Log.d(TAG, "Up button pressed");
-                if (isMenuOpened) {
+                if (isMenuOpened && ZypeSettings.SHOW_LEFT_MENU) {
                     MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
                     if (fragment != null) {
                         ArrayObjectAdapter menuAdapter = (ArrayObjectAdapter) fragment.getAdapter();
@@ -529,10 +551,14 @@ public class ContentBrowseActivity extends BaseActivity implements
                         }
                     }
                 }
+                if (!isMenuOpened && ZypeSettings.SHOW_TOP_MENU) {
+                    showTopMenu();
+                    return true;
+                }
                 break;
             case KeyEvent.KEYCODE_DPAD_DOWN:
                 Log.d(TAG, "Down button pressed");
-                if (isMenuOpened) {
+                if (isMenuOpened && ZypeSettings.SHOW_LEFT_MENU) {
                     MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
                     if (fragment != null) {
                         ArrayObjectAdapter menuAdapter = (ArrayObjectAdapter) fragment.getAdapter();
@@ -549,7 +575,7 @@ public class ContentBrowseActivity extends BaseActivity implements
                 break;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
                 Log.d(TAG, "Right button pressed");
-                if (isMenuOpened) {
+                if (isMenuOpened && ZypeSettings.SHOW_LEFT_MENU) {
                     hideMenu();
                     findViewById(R.id.full_content_browse_fragment).requestFocus();
                     return true;
@@ -558,7 +584,7 @@ public class ContentBrowseActivity extends BaseActivity implements
             case KeyEvent.KEYCODE_DPAD_LEFT:
                 Log.d(TAG, "Left button pressed");
                 if (event.getAction() == KeyEvent.ACTION_UP) {
-                    if (!isMenuOpened && !sliderHasFocus()) {
+                    if (!isMenuOpened && !sliderHasFocus() && ZypeSettings.SHOW_LEFT_MENU) {
                         if (lastSelectedItemIndex == 0) {
                             lastSelectedItemIndex = -1;
                             if (lastSelectedRowChanged) {
