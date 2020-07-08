@@ -109,6 +109,7 @@ public class ContentBrowseActivity extends BaseActivity implements
 
     /* Zype, Evgeny Cherkasov */
     private boolean isMenuOpened = false;
+    private boolean autoCloseTopMenu = true;
 
     private boolean sliderShown = false;
     private boolean lastRowSelected = false;
@@ -166,7 +167,17 @@ public class ContentBrowseActivity extends BaseActivity implements
 
         /*Zype, Evgeny Cherkasov */
         hideMenu();
-        hideTopMenu();
+        if (ZypeSettings.SHOW_TOP_MENU) {
+            showTopMenu();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (autoCloseTopMenu) {
+                        hideTopMenu();
+                    }
+                }
+            }, 3000L);
+        }
 
         HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
 
@@ -617,10 +628,20 @@ public class ContentBrowseActivity extends BaseActivity implements
                         findViewById(R.id.full_content_browse_fragment).requestFocus();
                         return true;
                     }
+                    else {
+                        if (ZypeSettings.SHOW_TOP_MENU) {
+                            autoCloseTopMenu = false;
+                        }
+                    }
                 }
                 break;
             case KeyEvent.KEYCODE_DPAD_LEFT:
                 Log.d(TAG, "Left button pressed");
+                if (isMenuOpened) {
+                    if (ZypeSettings.SHOW_TOP_MENU) {
+                        autoCloseTopMenu = false;
+                    }
+                }
                 if (event.getAction() == KeyEvent.ACTION_UP) {
                     if (!isMenuOpened && !sliderHasFocus() && ZypeSettings.SHOW_LEFT_MENU) {
                         if (lastSelectedItemIndex == 0) {

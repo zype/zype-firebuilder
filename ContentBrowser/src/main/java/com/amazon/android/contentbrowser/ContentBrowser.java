@@ -221,6 +221,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
     /* Zype, Evgeny Cherkasov */
     public static final String FAVORITES = "Favorites";
+    public static final String HOME = "Home";
     public static final String MY_LIBRARY = "MyLibrary";
     public static final String NEXT_PAGE = "NextPage";
     public static final String EPG = "EPG";
@@ -721,20 +722,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         }
         //addWidgetsAction(createSlideShowAction());
 
-        //addSettingsAction(createSlideShowSettingAction());
-        setupSearchAction();
-        if (ZypeConfiguration.displayAccountNavigationButton()) {
-            setupLoginAction();
-        }
-        if(ZypeSettings.EPG_ENABLED) {
-            setupEpgAction();
-        }
-        setupMyLibraryAction();
-        setupFavoritesAction();
-        //if (!TextUtils.isEmpty(Preferences.getString("ZypeTerms")))
-        if (ZypeConfiguration.displayTermsNavigationButton()) {
-            addSettingsAction(createTermsOfUseSettingsAction());
-        }
+        setupSettingsActions();
 
         mSearchManager.addSearchAlgo(DEFAULT_SEARCH_ALGO_NAME, new ISearchAlgo<Content>() {
             @Override
@@ -1214,6 +1202,30 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     public void addPoweredByLogoUrlByName(String name, String url) {
 
         mPoweredByLogoUrlMap.put(name, url);
+    }
+
+    private void setupSettingsActions() {
+        if (ZypeSettings.SHOW_TOP_MENU) {
+            addSettingsAction(new Action().setAction(HOME)
+                .setLabel1(mAppContext.getString(R.string.menu_home)));
+            setupLogoutAction();
+            setupSearchAction();
+            setupFavoritesAction();
+            addSettingsAction(createTermsOfUseSettingsAction());
+        }
+        else {
+            //addSettingsAction(createSlideShowSettingAction());
+            setupSearchAction();
+            setupLogoutAction();
+            if(ZypeSettings.EPG_ENABLED) {
+                setupEpgAction();
+            }
+            setupFavoritesAction();
+            //if (!TextUtils.isEmpty(Preferences.getString("ZypeTerms")))
+            addSettingsAction(createTermsOfUseSettingsAction());
+            //  setupMyLibraryAction();
+            // setupLogoutAction();
+        }
     }
 
     /**
