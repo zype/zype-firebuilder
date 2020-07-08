@@ -27,6 +27,7 @@ import androidx.leanback.widget.HorizontalGridView;
 import androidx.leanback.widget.OnChildViewHolderSelectedListener;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -160,6 +161,17 @@ public abstract class BaseActivity extends Activity {
         return false;
     }
 
+    protected void showActions(boolean value) {
+        HorizontalGridView actionWidgetContainer = findViewById(R.id.widget_grid_view);
+        if (actionWidgetContainer != null) {
+            if (value) {
+                actionWidgetContainer.setVisibility(View.VISIBLE);
+            }
+            else {
+                actionWidgetContainer.setVisibility(View.GONE);
+            }
+        }
+    }
     @Override
     protected void onResume() {
 

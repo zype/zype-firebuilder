@@ -87,7 +87,8 @@ import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
  */
 public class ContentBrowseActivity extends BaseActivity implements
         ContentBrowseFragment.OnBrowseRowListener,
-        MenuFragment.IMenuFragmentListener {
+        MenuFragment.IMenuFragmentListener,
+        TopMenuFragment.ITopMenuListener {
 
     private final String TAG = ContentBrowseActivity.class.getSimpleName();
 
@@ -165,6 +166,7 @@ public class ContentBrowseActivity extends BaseActivity implements
 
         /*Zype, Evgeny Cherkasov */
         hideMenu();
+        hideTopMenu();
 
         HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
 
@@ -254,6 +256,12 @@ public class ContentBrowseActivity extends BaseActivity implements
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN) {
+            if (isMenuOpened && ZypeSettings.SHOW_TOP_MENU) {
+                requestActionFocus();
+                return true;
+            }
+        }
         if(slidersPresent()) {
             if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
                 if(sliderHasFocus()) {
@@ -262,16 +270,20 @@ public class ContentBrowseActivity extends BaseActivity implements
                 }
             }
 
-            if(isActionFocus() && !isMenuOpened) {
-                if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN) {
-                    HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
-
-                    if(fragment != null) {
-                        fragment.requestFocus();
+            if (isActionFocus() && !isMenuOpened) {
+                if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
+                    if (ZypeSettings.SHOW_TOP_MENU) {
+                        showTopMenu();
+                        return true;
                     }
                 }
-
-                return true;
+                if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN) {
+                    HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
+                    if (fragment != null) {
+                        fragment.requestFocus();
+                        return true;
+                    }
+                }
             }
         }
 
@@ -468,23 +480,45 @@ public class ContentBrowseActivity extends BaseActivity implements
 
     @Override
     public void showMenuFragment() {
-        if (!isMenuOpened){
-            showMenu();
+        if (!isMenuOpened) {
+            if (ZypeSettings.SHOW_LEFT_MENU) {
+                showMenu();
+            }
+            else if (ZypeSettings.SHOW_TOP_MENU) {
+                showTopMenu();
+            }
         }
     }
 
     private void showTopMenu() {
         TopMenuFragment fragment = (TopMenuFragment) getFragmentManager().findFragmentById(R.id.fragmentTopMenu);
         if (fragment != null) {
+            showActions(false);
             isMenuOpened = true;
             fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.top_menu_background));
-//            int paddingTop = (int) getResources().getDimension(R.dimen.lb_browse_padding_top);
-//            fragment.getView().setPadding(0, paddingTop, 0, 0);
             getFragmentManager().beginTransaction()
                     .show(fragment)
                     .commit();
             fragment.getView().requestFocus();
         }
+    }
+
+    private void hideTopMenu() {
+        TopMenuFragment fragment = (TopMenuFragment) getFragmentManager().findFragmentById(R.id.fragmentTopMenu);
+        if (fragment != null) {
+            isMenuOpened = false;
+            getFragmentManager().beginTransaction()
+                    .hide(fragment)
+                    .commit();
+            showActions(true);
+        }
+    }
+
+    @Override
+    public void onTopMenuItemSelected(Action item) {
+        hideTopMenu();
+        ContentBrowser.getInstance(this)
+                .settingsActionTriggered(this, item);
     }
 
     /**
@@ -551,22 +585,24 @@ public class ContentBrowseActivity extends BaseActivity implements
                         }
                     }
                 }
-                if (!isMenuOpened && ZypeSettings.SHOW_TOP_MENU) {
-                    showTopMenu();
-                    return true;
-                }
                 break;
             case KeyEvent.KEYCODE_DPAD_DOWN:
                 Log.d(TAG, "Down button pressed");
-                if (isMenuOpened && ZypeSettings.SHOW_LEFT_MENU) {
-                    MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
-                    if (fragment != null) {
-                        ArrayObjectAdapter menuAdapter = (ArrayObjectAdapter) fragment.getAdapter();
-                        if (fragment.getSelectedMenuItemIndex() + 1 >= menuAdapter.size()) {
-                            if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                                return true;
+                if (isMenuOpened) {
+                    if (ZypeSettings.SHOW_LEFT_MENU) {
+                        MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+                        if (fragment != null) {
+                            ArrayObjectAdapter menuAdapter = (ArrayObjectAdapter) fragment.getAdapter();
+                            if (fragment.getSelectedMenuItemIndex() + 1 >= menuAdapter.size()) {
+                                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                                    return true;
+                                }
                             }
                         }
+                    }
+                    else if (ZypeSettings.SHOW_TOP_MENU) {
+                        hideTopMenu();
+                        return true;
                     }
                 }
                 if (!ZypeSettings.SETTINGS_PLAYLIST_ENABLED) {
@@ -575,10 +611,12 @@ public class ContentBrowseActivity extends BaseActivity implements
                 break;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
                 Log.d(TAG, "Right button pressed");
-                if (isMenuOpened && ZypeSettings.SHOW_LEFT_MENU) {
-                    hideMenu();
-                    findViewById(R.id.full_content_browse_fragment).requestFocus();
-                    return true;
+                if (isMenuOpened) {
+                    if (ZypeSettings.SHOW_LEFT_MENU){
+                        hideMenu();
+                        findViewById(R.id.full_content_browse_fragment).requestFocus();
+                        return true;
+                    }
                 }
                 break;
             case KeyEvent.KEYCODE_DPAD_LEFT:

@@ -24,39 +24,38 @@ import androidx.leanback.widget.Presenter;
 import com.amazon.android.model.Action;
 import com.amazon.android.tv.tenfoot.R;
 
-/**
- * Zype, Evgeny Cherkasov
- *
- * A MenuItemPresenter used to generate Views and bind menu items to them on demand.
- */
 public class TopMenuItemPresenter extends Presenter {
     private static final String TAG = TopMenuItemPresenter.class.getSimpleName();
 
-    /**
-     * {@inheritDoc}
-     */
+    private final TopMenuFragment.ITopMenuListener listener;
+
+    public TopMenuItemPresenter(TopMenuFragment.ITopMenuListener listener) {
+        super();
+        this.listener = listener;
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.menu_list_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.top_menu_item, parent, false);
         view.setFocusable(true);
         view.setFocusableInTouchMode(true);
         return new TopMenuItemPresenter.ViewHolder(view);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
 
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.item = (Action) item;
         holder.textTitle.setText(holder.item.getLabel1());
+        setOnClickListener(holder, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onTopMenuItemSelected(holder.item);
+            }
+        });
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {
     }
@@ -69,7 +68,7 @@ public class TopMenuItemPresenter extends Presenter {
         public ViewHolder(View view) {
             super(view);
             this.view = view;
-            textTitle = (TextView) view.findViewById(R.id.textTitle);
+            textTitle = view.findViewById(R.id.textTitle);
         }
     }
 
