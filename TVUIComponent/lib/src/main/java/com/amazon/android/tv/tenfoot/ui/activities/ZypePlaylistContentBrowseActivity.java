@@ -115,12 +115,13 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
     private View mMainFrame;
     private Drawable mBackgroundWithPreview;
 
-    private boolean isMenuOpened = false;
+//    private boolean isMenuOpened = false;
 
     private boolean lastRowSelected = false;
 
     private Object lastSelectedItem = null;
     private Row lastSelectedRow = null;
+    private int selectedRowIndex = -1;
     private boolean lastSelectedRowChanged = false;
     private int lastSelectedItemIndex = -1;
 
@@ -173,6 +174,10 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
         mMainFrame.setBackground(mBackgroundWithPreview);
 
         hideMenu();
+        if (ZypeSettings.SHOW_TOP_MENU) {
+            hideTopMenu();
+            showActions(false);
+        }
 
         progressBar = (ProgressBar) findViewById(R.id.feed_progress);
         progressBar.setVisibility(View.VISIBLE);
@@ -192,8 +197,9 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
      * title, description, and image.
      */
     @Override
-    public void onItemSelected(Object item, Row row, boolean isLastContentRow) {
+    public void onItemSelected(Object item, Row row, boolean isLastContentRow, int rowIndex) {
         lastRowSelected = isLastContentRow;
+        selectedRowIndex = rowIndex;
         if (row != lastSelectedRow && item != null) {
             lastSelectedRow = row;
             lastSelectedRowChanged = true;
@@ -412,12 +418,15 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
 
             case KeyEvent.KEYCODE_MENU:
                 if (event.getAction() == KeyEvent.ACTION_UP) {
-                    if (ZypeSettings.SHOW_LEFT_MENU) {
-                        Log.d(TAG, "Menu button pressed");
-                        if (!isMenuOpened) {
+                    if (!isMenuOpened) {
+                        if (ZypeSettings.SHOW_LEFT_MENU) {
                             showMenu();
+                            return true;
                         }
-                        return true;
+                        else if (ZypeSettings.SHOW_TOP_MENU) {
+                            showTopMenu();
+                            return true;
+                        }
                     }
                 }
                 break;
@@ -425,15 +434,21 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
                 if (event.getAction() == KeyEvent.ACTION_UP) {
                     Log.d(TAG, "Back button pressed");
                     if (isMenuOpened) {
-                        hideMenu();
-                        return true;
+                        if (ZypeSettings.SHOW_LEFT_MENU) {
+                            hideMenu();
+                            return true;
+                        }
+                        else if (ZypeSettings.SHOW_TOP_MENU) {
+                            hideTopMenu();
+                            return true;
+                        }
                     }
                 }
                 break;
             }
             case KeyEvent.KEYCODE_DPAD_UP:
                 Log.d(TAG, "Up button pressed");
-                if (isMenuOpened) {
+                if (isMenuOpened && ZypeSettings.SHOW_LEFT_MENU) {
                     MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
                     if (fragment != null) {
                         ArrayObjectAdapter menuAdapter = (ArrayObjectAdapter) fragment.getAdapter();
@@ -444,18 +459,32 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
                         }
                     }
                 }
+                if (!isMenuOpened && ZypeSettings.SHOW_TOP_MENU) {
+                    if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                        if (selectedRowIndex == 0) {
+                            showTopMenu();
+                            return true;
+                        }
+                    }
+                }
                 break;
             case KeyEvent.KEYCODE_DPAD_DOWN:
                 Log.d(TAG, "Down button pressed");
                 if (isMenuOpened) {
-                    MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
-                    if (fragment != null) {
-                        ArrayObjectAdapter menuAdapter = (ArrayObjectAdapter) fragment.getAdapter();
-                        if (fragment.getSelectedMenuItemIndex() + 1 >= menuAdapter.size()) {
-                            if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                                return true;
+                    if (ZypeSettings.SHOW_LEFT_MENU) {
+                        MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+                        if (fragment != null) {
+                            ArrayObjectAdapter menuAdapter = (ArrayObjectAdapter) fragment.getAdapter();
+                            if (fragment.getSelectedMenuItemIndex() + 1 >= menuAdapter.size()) {
+                                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                                    return true;
+                                }
                             }
                         }
+                    }
+                    else if (ZypeSettings.SHOW_TOP_MENU) {
+                        hideTopMenu();
+                        return true;
                     }
                 }
                 else {
@@ -464,7 +493,7 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
                 break;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
                 Log.d(TAG, "Right button pressed");
-                if (isMenuOpened) {
+                if (isMenuOpened && ZypeSettings.SHOW_LEFT_MENU) {
                     hideMenu();
                     findViewById(R.id.full_content_browse_fragment).requestFocus();
                     return true;
@@ -473,7 +502,7 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
             case KeyEvent.KEYCODE_DPAD_LEFT:
                 Log.d(TAG, "Left button pressed");
                 if (event.getAction() == KeyEvent.ACTION_UP) {
-                    if (!isMenuOpened) {
+                    if (!isMenuOpened && ZypeSettings.SHOW_LEFT_MENU) {
                         if (lastSelectedItemIndex == 0) {
                             lastSelectedItemIndex = -1;
                             if (lastSelectedRowChanged) {

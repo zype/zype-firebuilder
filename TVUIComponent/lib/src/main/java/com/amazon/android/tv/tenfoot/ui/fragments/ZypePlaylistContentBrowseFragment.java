@@ -98,7 +98,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
 
     // Container Activity must implement this interface.
     public interface OnBrowseRowListener {
-        void onItemSelected(Object item, Row row, boolean isLastContentRow);
+        void onItemSelected(Object item, Row row, boolean isLastContentRow, int rowIndex);
     }
 
     @Override
@@ -520,7 +520,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
             else {
                 isLastContentRow = false;
             }
-            mCallback.onItemSelected(item, row, isLastContentRow);
+            mCallback.onItemSelected(item, row, isLastContentRow, mRowsAdapter.indexOf(row));
         }
     }
 
