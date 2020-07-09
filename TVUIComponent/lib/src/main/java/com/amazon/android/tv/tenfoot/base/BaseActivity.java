@@ -18,11 +18,14 @@ import com.amazon.android.adapters.ActionWidgetAdapter;
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.model.Action;
 import com.amazon.android.tv.tenfoot.R;
+import com.amazon.android.tv.tenfoot.ui.menu.TopMenuFragment;
 import com.zype.fire.api.ZypeSettings;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+
+import androidx.core.content.ContextCompat;
 import androidx.leanback.widget.HorizontalGridView;
 import androidx.leanback.widget.OnChildViewHolderSelectedListener;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,7 +37,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 /**
  * BaseActivity class that handles common actions such as setting the font.
  */
-public abstract class BaseActivity extends Activity {
+public abstract class BaseActivity extends Activity implements TopMenuFragment.ITopMenuListener {
 
     /**
      * Debug TAG.
@@ -48,6 +51,8 @@ public abstract class BaseActivity extends Activity {
      * Action widget adapter.
      */
     private ActionWidgetAdapter mActionWidgetAdapter;
+
+    protected boolean isMenuOpened = false;
 
     /**
      * {@inheritDoc}
@@ -187,5 +192,41 @@ public abstract class BaseActivity extends Activity {
      * restored when the app launches.
      */
     public abstract void setRestoreActivityValues();
+
+    // Top menu
+
+    protected void showTopMenu() {
+        TopMenuFragment fragment = (TopMenuFragment) getFragmentManager().findFragmentById(R.id.fragmentTopMenu);
+        if (fragment != null) {
+            showActions(false);
+            isMenuOpened = true;
+            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.top_menu_background));
+            getFragmentManager().beginTransaction()
+                    .setCustomAnimations(R.animator.slide_in_top, R.animator.slide_out_top)
+                    .show(fragment)
+                    .commit();
+            fragment.getView().requestFocus();
+        }
+    }
+
+    protected void hideTopMenu() {
+        TopMenuFragment fragment = (TopMenuFragment) getFragmentManager().findFragmentById(R.id.fragmentTopMenu);
+        if (fragment != null) {
+            isMenuOpened = false;
+            getFragmentManager().beginTransaction()
+                    .setCustomAnimations(R.animator.slide_in_top, R.animator.slide_out_top)
+                    .hide(fragment)
+                    .commit();
+        }
+    }
+
+    @Override
+    public void onTopMenuItemSelected(Action item) {
+        hideTopMenu();
+        ContentBrowser.getInstance(this)
+                .settingsActionTriggered(this, item);
+    }
+
+
 }
 

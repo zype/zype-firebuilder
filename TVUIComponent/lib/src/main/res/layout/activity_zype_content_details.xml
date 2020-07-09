@@ -116,5 +116,12 @@
             android:background="@color/accent"
             android:scaleType="fitCenter" />
     </LinearLayout>
+    <fragment
+        android:id="@+id/fragmentTopMenu"
+        android:name="com.amazon.android.tv.tenfoot.ui.menu.TopMenuFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:layout="@layout/fragment_top_menu"
+        />
     <include layout="@layout/action_widget_container"/>
 </RelativeLayout>

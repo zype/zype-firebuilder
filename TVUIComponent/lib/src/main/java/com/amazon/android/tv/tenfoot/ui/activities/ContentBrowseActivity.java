@@ -91,8 +91,9 @@ import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
  */
 public class ContentBrowseActivity extends BaseActivity implements
         ContentBrowseFragment.OnBrowseRowListener,
-        MenuFragment.IMenuFragmentListener,
-        TopMenuFragment.ITopMenuListener {
+        MenuFragment.IMenuFragmentListener
+//        TopMenuFragment.ITopMenuListener
+{
 
     private final String TAG = ContentBrowseActivity.class.getSimpleName();
 
@@ -112,7 +113,6 @@ public class ContentBrowseActivity extends BaseActivity implements
     private View imageLogo;
 
     /* Zype, Evgeny Cherkasov */
-    private boolean isMenuOpened = false;
     private boolean autoCloseTopMenu = true;
 
     private boolean sliderShown = false;
@@ -506,38 +506,6 @@ public class ContentBrowseActivity extends BaseActivity implements
         }
     }
 
-    private void showTopMenu() {
-        TopMenuFragment fragment = (TopMenuFragment) getFragmentManager().findFragmentById(R.id.fragmentTopMenu);
-        if (fragment != null) {
-            showActions(false);
-            isMenuOpened = true;
-            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.top_menu_background));
-            getFragmentManager().beginTransaction()
-                    .setCustomAnimations(R.animator.slide_in_top, R.animator.slide_out_top)
-                    .show(fragment)
-                    .commit();
-            fragment.getView().requestFocus();
-        }
-    }
-
-    private void hideTopMenu() {
-        TopMenuFragment fragment = (TopMenuFragment) getFragmentManager().findFragmentById(R.id.fragmentTopMenu);
-        if (fragment != null) {
-            isMenuOpened = false;
-            getFragmentManager().beginTransaction()
-                    .setCustomAnimations(R.animator.slide_in_top, R.animator.slide_out_top)
-                    .hide(fragment)
-                    .commit();
-        }
-    }
-
-    @Override
-    public void onTopMenuItemSelected(Action item) {
-        hideTopMenu();
-        ContentBrowser.getInstance(this)
-                .settingsActionTriggered(this, item);
-    }
-
     /**
      * Called to process key events.  You can override this to intercept all
      * key events before they are dispatched to the window.  Be sure to call
@@ -579,12 +547,22 @@ public class ContentBrowseActivity extends BaseActivity implements
                 if (event.getAction() == KeyEvent.ACTION_UP) {
                     Log.d(TAG, "Back button pressed");
                     if (isMenuOpened) {
-                        hideMenu();
-                        findViewById(R.id.full_content_browse_fragment).requestFocus();
-                        Object item = ((ListRow) lastSelectedRow).getAdapter()
-                                .get(lastSelectedItemIndex == -1 ? 0 : lastSelectedItemIndex);
-                        onItemSelected(item, lastSelectedRow, lastRowSelected);
-                        return true;
+                        if (ZypeSettings.SHOW_LEFT_MENU) {
+                            hideMenu();
+                            findViewById(R.id.full_content_browse_fragment).requestFocus();
+                            Object item = ((ListRow) lastSelectedRow).getAdapter()
+                                    .get(lastSelectedItemIndex == -1 ? 0 : lastSelectedItemIndex);
+                            onItemSelected(item, lastSelectedRow, lastRowSelected);
+                            return true;
+                        }
+                        if (ZypeSettings.SHOW_TOP_MENU) {
+                            hideTopMenu();
+                            findViewById(R.id.full_content_browse_fragment).requestFocus();
+                            Object item = ((ListRow) lastSelectedRow).getAdapter()
+                                    .get(lastSelectedItemIndex == -1 ? 0 : lastSelectedItemIndex);
+                            onItemSelected(item, lastSelectedRow, lastRowSelected);
+                            return true;
+                        }
                     }
                 }
                 break;
