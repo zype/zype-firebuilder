@@ -64,8 +64,12 @@ import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.ListRow;
 import androidx.leanback.widget.Row;
 import androidx.core.content.ContextCompat;
+
+import android.transition.Slide;
+import android.transition.Transition;
 import android.util.Log;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -509,6 +513,7 @@ public class ContentBrowseActivity extends BaseActivity implements
             isMenuOpened = true;
             fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.top_menu_background));
             getFragmentManager().beginTransaction()
+                    .setCustomAnimations(R.animator.slide_in_top, R.animator.slide_out_top)
                     .show(fragment)
                     .commit();
             fragment.getView().requestFocus();
@@ -520,6 +525,7 @@ public class ContentBrowseActivity extends BaseActivity implements
         if (fragment != null) {
             isMenuOpened = false;
             getFragmentManager().beginTransaction()
+                    .setCustomAnimations(R.animator.slide_in_top, R.animator.slide_out_top)
                     .hide(fragment)
                     .commit();
         }
