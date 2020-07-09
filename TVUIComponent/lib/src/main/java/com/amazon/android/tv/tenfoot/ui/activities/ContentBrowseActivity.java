@@ -168,6 +168,7 @@ public class ContentBrowseActivity extends BaseActivity implements
         /*Zype, Evgeny Cherkasov */
         hideMenu();
         if (ZypeSettings.SHOW_TOP_MENU) {
+            showActions(false);
             showTopMenu();
             handler.postDelayed(new Runnable() {
                 @Override
@@ -275,19 +276,19 @@ public class ContentBrowseActivity extends BaseActivity implements
         }
         if(slidersPresent()) {
             if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
-                if(sliderHasFocus()) {
+                if (sliderHasFocus()) {
+                    if (ZypeSettings.SHOW_TOP_MENU) {
+                        if (!isMenuOpened) {
+                            showTopMenu();
+                            return true;
+                        }
+                    }
                     requestActionFocus();
                     return true;
                 }
             }
 
             if (isActionFocus() && !isMenuOpened) {
-                if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
-                    if (ZypeSettings.SHOW_TOP_MENU) {
-                        showTopMenu();
-                        return true;
-                    }
-                }
                 if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN) {
                     HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
                     if (fragment != null) {
@@ -521,7 +522,6 @@ public class ContentBrowseActivity extends BaseActivity implements
             getFragmentManager().beginTransaction()
                     .hide(fragment)
                     .commit();
-            showActions(true);
         }
     }
 
