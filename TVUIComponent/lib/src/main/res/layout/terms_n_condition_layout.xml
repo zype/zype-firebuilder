@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/browse_background_color"
     android:orientation="vertical">
 
@@ -36,6 +37,14 @@
             android:layout_gravity="center"
             android:indeterminateDrawable="@drawable/progress_view"
             android:visibility="visible" />
+
+        <fragment
+            android:id="@+id/fragmentTopMenu"
+            android:name="com.amazon.android.tv.tenfoot.ui.menu.TopMenuFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:layout="@layout/fragment_top_menu"
+            />
     </RelativeLayout>
 
 </LinearLayout>

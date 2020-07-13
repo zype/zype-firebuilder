@@ -9,13 +9,14 @@ import android.webkit.WebViewClient;
 import androidx.core.content.ContextCompat;
 
 import com.amazon.android.tv.tenfoot.R;
+import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.utils.Preferences;
 import com.zype.fire.api.ZypeSettings;
 
 /**
  * A class to display content in a vertical grid.
  */
-public class TermsConditionActivity extends Activity {
+public class TermsConditionActivity extends BaseActivity {
 
     private static final String PREFERENCE_TERMS = "ZypeTerms";
 
@@ -55,6 +56,10 @@ public class TermsConditionActivity extends Activity {
                 findViewById(R.id.progress).setVisibility(View.GONE);
             }
         });
+
+        if (ZypeSettings.SHOW_TOP_MENU) {
+            hideTopMenu();
+        }
 
     }
 }
