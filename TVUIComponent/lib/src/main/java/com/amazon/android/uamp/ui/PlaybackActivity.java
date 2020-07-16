@@ -962,6 +962,7 @@ public class PlaybackActivity extends Activity implements
                 // exists for this content and playback is not complete.
                 if (record != null && !record.isPlaybackComplete()) {
                     mCurrentPlaybackPosition = record.getPlaybackLocation();
+                    Log.d(TAG, "loadContentPlaybackState(): restored position " + mCurrentPlaybackPosition);
                 }
             }
         }
@@ -1004,6 +1005,7 @@ public class PlaybackActivity extends Activity implements
                     mPlayer.getCurrentPosition(), isFinished,
                     DateAndTimeHelper.getCurrentDate().getTime(),
                     mPlayer.getDuration());
+            Log.d(TAG, "storeContentPlaybackState(): saved position " + mPlayer.getCurrentPosition());
         }
         else {
             Log.e(TAG, "Cannot update recent content playback state. Database is null");

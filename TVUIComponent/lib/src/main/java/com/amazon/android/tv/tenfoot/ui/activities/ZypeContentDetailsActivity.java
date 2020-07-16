@@ -355,6 +355,8 @@ public class ZypeContentDetailsActivity extends BaseActivity
                     .loadPoweredByLogo(this, (ImageView) findViewById(R.id.mvpd_logo));
         }
 
+        updateActions(mSelectedContent);
+
         reportFullyDrawn();
     }
 
