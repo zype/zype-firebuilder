@@ -722,7 +722,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         //addSettingsAction(createSlideShowSettingAction());
         setupSearchAction();
-        setupLoginAction();
+        if (ZypeConfiguration.displayAccountNavigationButton()) {
+            setupLoginAction();
+        }
         if(ZypeSettings.EPG_ENABLED) {
             setupEpgAction();
         }

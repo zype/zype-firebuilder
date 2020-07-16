@@ -161,9 +161,14 @@ public class ZypeConfiguration {
         return true;
     }
 
+    // Navigation
+
     public static boolean displayLeftMenu() {
-        // Return `true` to enable the left menu
-        return false;
+        return ZypeSettings.SHOW_LEFT_MENU;
+    }
+
+    public static boolean displayAccountNavigationButton() {
+        return ZypeSettings.ACCOUNT_NAV_BUTTON_DISPLAY;
     }
 
     public static boolean isCreateAccountTermsOfServiceRequired() {
