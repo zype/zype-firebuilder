@@ -171,6 +171,10 @@ public class ZypeConfiguration {
         return ZypeSettings.ACCOUNT_NAV_BUTTON_DISPLAY;
     }
 
+    public static boolean displayTermsNavigationButton() {
+        return ZypeSettings.TERMS_NAV_BUTTON_DISPLAY;
+    }
+
     public static boolean isCreateAccountTermsOfServiceRequired() {
         return ZypeSettings.ACCOUNT_CREATION_TOS;
     }

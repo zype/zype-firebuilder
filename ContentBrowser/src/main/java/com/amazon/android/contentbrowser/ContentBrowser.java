@@ -731,7 +731,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         setupMyLibraryAction();
         setupFavoritesAction();
         //if (!TextUtils.isEmpty(Preferences.getString("ZypeTerms")))
-        addSettingsAction(createTermsOfUseSettingsAction());
+        if (ZypeConfiguration.displayTermsNavigationButton()) {
+            addSettingsAction(createTermsOfUseSettingsAction());
+        }
 
         mSearchManager.addSearchAlgo(DEFAULT_SEARCH_ALGO_NAME, new ISearchAlgo<Content>() {
             @Override
