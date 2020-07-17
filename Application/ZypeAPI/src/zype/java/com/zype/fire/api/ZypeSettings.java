@@ -23,7 +23,7 @@ public class ZypeSettings {
     // Template version
     public static final String TEMPLATE_VERSION = "1.8.0";
 
-    public static final boolean ACCOUNT_NAV_BUTTON_DISPLAY = false;
+    public static final boolean ACCOUNT_NAV_BUTTON_DISPLAY = true;
     public static final boolean EPG_ENABLED = false;
     public static final boolean DETAIL_BACKGROUND_IMAGE = false;
     /* Define the app theme
