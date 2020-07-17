@@ -31,6 +31,7 @@
 package com.amazon.android.uamp.ui;
 
 import com.amazon.android.configuration.ConfigurationManager;
+import com.amazon.android.model.event.ContentUpdateEvent;
 import com.amazon.android.tv.tenfoot.base.TenFootApp;
 import com.amazon.android.ui.constants.ConfigurationConstants;
 import com.amazon.android.utils.GlideHelper;
@@ -75,6 +76,7 @@ import com.zype.fire.api.Model.PlayerResponse;
 import com.zype.fire.api.Util.AdMacrosHelper;
 import com.zype.fire.api.Util.ErrorHelper;
 import com.zype.fire.api.ZypeApi;
+import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
 import com.amazon.utils.DateAndTimeHelper;
@@ -103,6 +105,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -1005,6 +1009,11 @@ public class PlaybackActivity extends Activity implements
                     mPlayer.getCurrentPosition(), isFinished,
                     DateAndTimeHelper.getCurrentDate().getTime(),
                     mPlayer.getDuration());
+
+            if (ZypeConfiguration.displayWatchedBarOnVideoThumbnails()) {
+                EventBus.getDefault().post(new ContentUpdateEvent(mSelectedContent.getId()));
+            }
+
             Log.d(TAG, "storeContentPlaybackState(): saved position " + mPlayer.getCurrentPosition());
         }
         else {
