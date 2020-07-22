@@ -112,7 +112,8 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
                     model.setChannelId(value.toString());
                     break;
                 case Content.DURATION_FIELD_NAME:
-                    model.setDuration(Long.valueOf((String) value));
+//                    model.setDuration(Long.valueOf((String) value));
+                    model.setDuration(Long.valueOf(value.toString()));
                     break;
                 case Content.AD_CUE_POINTS_FIELD_NAME:
                     model.setAdCuePoints((List) value);

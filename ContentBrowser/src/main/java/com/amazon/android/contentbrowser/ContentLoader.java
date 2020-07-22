@@ -714,6 +714,10 @@ public class ContentLoader {
                                     Content content = (Content) contentAsObject;
                                     if (content != null) {
                                         contentContainer.addContent(content);
+                                        if (ZypeConfiguration.displayWatchedBarOnVideoThumbnails()) {
+                                            content.setExtraValue(Content.EXTRA_PLAYBACK_POSITION_PERCENTAGE,
+                                                    getContentPlaybackPositionPercentage(content));
+                                        }
                                     }
                                     return Pair.create(contentContainer, contentAsObject);
                                 });
