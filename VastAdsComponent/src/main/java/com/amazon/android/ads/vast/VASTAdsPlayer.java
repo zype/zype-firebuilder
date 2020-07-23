@@ -639,7 +639,7 @@ public class VASTAdsPlayer implements IAds,
 
     private void loadMidRollAds(final long positionInSeconds) {
 
-        Log.d(TAG, "loadVastResponseForAdBreaks()");
+        Log.d(TAG, "loadMidRollAds()");
 
         final List<AdBreak> adBreaks = mMidRollAds.get(positionInSeconds);
         if (NetworkTools.connectedToInternet(mContext)) {
