@@ -177,6 +177,26 @@ public class VmapResponse {
         return vmapResponse;
     }
 
+    public static VmapResponse addVastAdTag(VmapResponse vmapResponse, String uri, int timeOffset) {
+
+        AdBreak adBreak = new AdBreak();
+        // Create an Ad Break to store the mid-roll ad.
+        adBreak.setBreakId(IAds.MID_ROLL_AD);
+        adBreak.setTimeOffset(DateAndTimeHelper.formatTime(timeOffset));
+        adBreak.setBreakType(AdBreak.BREAK_TYPE_LINEAR);
+
+        // Create an Ad Source to store the VAST ad.
+        AdSource adSource = new AdSource();
+        AdTagURI adTagUri = new AdTagURI();
+        adTagUri.setUri(uri);
+        adSource.setAdTagURI(adTagUri);
+
+        adBreak.setAdSource(adSource);
+
+        vmapResponse.addAdBreak(adBreak);
+
+        return vmapResponse;
+    }
 
     /**
      * Get the vmap version.

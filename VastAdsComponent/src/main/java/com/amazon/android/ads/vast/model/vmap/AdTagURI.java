@@ -37,6 +37,8 @@ public class AdTagURI {
      */
     private String mTemplateType;
 
+    public AdTagURI() {}
+
     /**
      * Constructor.
      *
