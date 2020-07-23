@@ -54,12 +54,15 @@ import android.view.View;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.ContentLoader;
+import com.amazon.android.contentbrowser.database.helpers.RecentDatabaseHelper;
+import com.amazon.android.contentbrowser.database.records.RecentRecord;
 import com.amazon.android.contentbrowser.helper.AuthHelper;
 import com.amazon.android.model.Action;
 import com.amazon.android.model.PlaylistAction;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.model.content.constants.ExtraKeys;
+import com.amazon.android.model.event.ContentUpdateEvent;
 import com.amazon.android.recipe.Recipe;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
@@ -205,6 +208,19 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
         }
         if (mRowsAdapter != null) {
             mRowsAdapter.notifyArrayItemRangeChanged(0, mRowsAdapter.size());
+        }
+    }
+
+    @Subscribe
+    public void onContentUpdateEvent(ContentUpdateEvent event) {
+        ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter) ((ListRow) mRowsAdapter.get(0)).getAdapter();
+        for (int i = 0; i < rowAdapter.size(); i++) {
+            Content content = (Content) rowAdapter.get(i);
+            if (content.getId().equals(event.videoId)) {
+                content.setExtraValue(Content.EXTRA_PLAYBACK_POSITION_PERCENTAGE,
+                        ContentBrowser.getInstance(getActivity()).getContentLoader().getContentPlaybackPositionPercentage(content));
+                rowAdapter.notifyArrayItemRangeChanged(i, i + 1);
+            }
         }
     }
 
