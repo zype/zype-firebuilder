@@ -179,7 +179,9 @@ public class AdTagProcessor {
 //                new ProcessAsync(adTag, offset).execute();
             }
         }
-
+        if (result == null) {
+            result = AdTagType.vast;
+        }
         return result;
     }
 
