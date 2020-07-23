@@ -57,6 +57,7 @@ import com.amazon.android.model.PlaylistAction;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.model.content.constants.ExtraKeys;
+import com.amazon.android.model.event.ContentUpdateEvent;
 import com.amazon.android.recipe.Recipe;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
@@ -210,6 +211,21 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
         }
         if (mRowsAdapter != null) {
             mRowsAdapter.notifyArrayItemRangeChanged(0, mRowsAdapter.size());
+        }
+    }
+
+    @Subscribe
+    public void onContentUpdateEvent(ContentUpdateEvent event) {
+        for (int rowIndex = 0; rowIndex < mRowsAdapter.size(); rowIndex++) {
+            ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter) ((ListRow) mRowsAdapter.get(rowIndex)).getAdapter();
+            for (int i = 0; i < rowAdapter.size(); i++) {
+                Content content = (Content) rowAdapter.get(i);
+                if (content.getId().equals(event.videoId)) {
+                    content.setExtraValue(Content.EXTRA_PLAYBACK_POSITION_PERCENTAGE,
+                            ContentBrowser.getInstance(getActivity()).getContentLoader().getContentPlaybackPositionPercentage(content));
+                }
+                rowAdapter.notifyArrayItemRangeChanged(i, i + 1);
+            }
         }
     }
 

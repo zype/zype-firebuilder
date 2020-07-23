@@ -9,6 +9,7 @@
     "title@mTitle",
     "_id@mId",
     "description@mDescription",
+    "duration@mDuration",
     "images@Images",
     "marketplace_ids/amazon_fire_tv@marketplaceId",
     "on_air@live",
