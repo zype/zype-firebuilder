@@ -274,7 +274,8 @@ public class VASTAdsPlayer implements IAds,
                 mCurrentAdType = IAds.MID_ROLL_AD;
                 mPlayedMidRollAds.put(positionInSeconds, true);
 
-                // TODD: Check if ad break has no VAST response yet, then load it from the ad tag uri, update ad break with that response and call startAdPod()
+                // Load VAST response from the ad tag uri if it is not ready yet,
+                // update ad break with that response and call startAdPod().
                 if (!isMidRollReady(positionInSeconds)) {
                     loadMidRollAds(positionInSeconds);
                 }
