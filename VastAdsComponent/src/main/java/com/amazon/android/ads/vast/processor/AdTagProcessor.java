@@ -62,6 +62,11 @@ public class AdTagProcessor {
     private VmapResponse mVmapResponse;
 
     /**
+     * The VAST response instance
+     */
+    private VastResponse mVastResponse;
+
+    /**
      * The media file picker.
      */
     private MediaPicker mMediaPicker;
@@ -85,8 +90,8 @@ public class AdTagProcessor {
      * error value.
      */
     /* Zype, Evgeny Cherkasov */
-    //public AdTagType process(String urlString) {
-    public AdTagType process(String urlString, int timeOffset) {
+    public AdTagType process(String urlString) {
+//    public AdTagType process(String urlString, int timeOffset) {
 
         Log.d(TAG, "Processing ad url string");
         String xmlData;
@@ -123,13 +128,13 @@ public class AdTagProcessor {
                         }
                         else {
                             Log.d(TAG, "Converting VAST response into VMAP response");
-                            VastResponse vastResponse = VastResponse.createInstance(xmlMap);
+                            mVastResponse = VastResponse.createInstance(xmlMap);
                             /* Zype, Evgeny Cherkasov */
                             // mVmapResponse = VmapResponse.createInstanceWithVast(vastResponse);
                             if (mVmapResponse == null) {
                                 mVmapResponse = new VmapResponse();
                             }
-                            VmapResponse.addVastResponse(mVmapResponse, vastResponse, timeOffset);
+//                            VmapResponse.addVastResponse(mVmapResponse, vastResponse, timeOffset);
                             type = AdTagType.vast;
                         }
                         return type;
@@ -155,31 +160,45 @@ public class AdTagProcessor {
         for (int i = 0; i < timeOffsets.length; i++) {
             int offset = timeOffsets[i];
             String adTag = adTags.get(i);
-            if (i == 0) {
-                result = process(adTag, offset);
+            if (offset == 0) {
+                // Process pre-roll ad tag
+                result = process(adTag);
+                if (result == AdTagType.vast) {
+                    if (mVmapResponse == null) {
+                        mVmapResponse = new VmapResponse();
+                    }
+                    VmapResponse.addVastResponse(mVmapResponse, mVastResponse, offset);
+                }
             }
             else {
-                new ProcessAsync(adTag, offset).execute();
+                // Add mid-roll ad tags to the list. They will be processed on corresponding time offset
+                if (mVmapResponse == null) {
+                    mVmapResponse = new VmapResponse();
+                }
+                VmapResponse.addVastAdTag(mVmapResponse, adTag, offset);
+//                new ProcessAsync(adTag, offset).execute();
             }
         }
-
+        if (result == null) {
+            result = AdTagType.vast;
+        }
         return result;
     }
 
-    private class ProcessAsync extends AsyncTask<Void, Void, AdTagType> {
-        private String adTag;
-        private int offset;
-
-        public ProcessAsync(String adTag, int offset) {
-            this.adTag = adTag;
-            this.offset = offset;
-        }
-
-        @Override
-        protected AdTagType doInBackground(Void... params) {
-            return process(adTag, offset);
-        }
-    }
+//    private class ProcessAsync extends AsyncTask<Void, Void, AdTagType> {
+//        private String adTag;
+//        private int offset;
+//
+//        public ProcessAsync(String adTag, int offset) {
+//            this.adTag = adTag;
+//            this.offset = offset;
+//        }
+//
+//        @Override
+//        protected AdTagType doInBackground(Void... params) {
+//            return process(adTag, offset);
+//        }
+//    }
     /* Zype
     * end */
 
@@ -193,4 +212,7 @@ public class AdTagProcessor {
         return mVmapResponse;
     }
 
+    public VastResponse getVastResponse() {
+        return mVastResponse;
+    }
 }
