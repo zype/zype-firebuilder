@@ -47,7 +47,8 @@ import retrofit2.http.QueryMap;
  */
 
 public interface IZypeApi {
-    String HEADER_USER_AGENT = "AmazonWebAppPlatform";
+//    String HEADER_USER_AGENT = "AmazonWebAppPlatform";
+    String HEADER_USER_AGENT = System.getProperty("http.agent") + " AmazonWebAppPlatform ";
 
     String PARAM_PAGE = "page";
 

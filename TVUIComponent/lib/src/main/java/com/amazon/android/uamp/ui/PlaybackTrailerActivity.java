@@ -82,7 +82,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PlaybackTrailerActivity extends Activity implements
+public class PlaybackTrailerActivity extends BasePlaybackActivity implements
     AMZNMediaPlayer
         .OnStateChangeListener, AMZNMediaPlayer.OnErrorListener, AMZNMediaPlayer.OnInfoListener,
     AudioManager.OnAudioFocusChangeListener,
@@ -385,7 +385,8 @@ public class PlaybackTrailerActivity extends Activity implements
       // Init player interface, this is where it is fully created.
       mPlayer.init(this, mVideoView, playerExtras);
 
-      mPlayer.setUserAgent(System.getProperty("http.agent"));
+      mPlayer.setUserAgent(getUserAgent(PlaybackTrailerActivity.this,
+              getString(R.string.app_name_short)));
       mPlayer.addStateChangeListener(this);
       mPlayer.addErrorListener(this);
       mPlayer.addInfoListener(this);
@@ -480,14 +481,17 @@ public class PlaybackTrailerActivity extends Activity implements
 
     // Request Zype API for player data
     String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
-    HashMap<String, String> params = new HashMap<>();
+    HashMap<String, String> params = getValues();
     if (!TextUtils.isEmpty(accessToken)) {
       params.put(ZypeApi.ACCESS_TOKEN, accessToken);
     } else {
       params.put(ZypeApi.APP_KEY, ZypeSettings.APP_KEY);
     }
 
-    ZypeApi.getInstance().getApi().getPlayer(IZypeApi.HEADER_USER_AGENT, mSelectedContent.getTrailerId(), params).enqueue(new Callback<PlayerResponse>() {
+    ZypeApi.getInstance().getApi()
+            .getPlayer(getUserAgent(PlaybackTrailerActivity.this, getString(R.string.app_name_short)),
+                    mSelectedContent.getTrailerId(), params)
+            .enqueue(new Callback<PlayerResponse>() {
       @Override
       public void onResponse(Call<PlayerResponse> call, Response<PlayerResponse> response) {
         if (response.isSuccessful()) {
