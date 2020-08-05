@@ -31,10 +31,12 @@
 package com.amazon.android.uamp.ui;
 
 import com.amazon.android.configuration.ConfigurationManager;
+import com.amazon.android.model.event.ContentUpdateEvent;
 import com.amazon.android.tv.tenfoot.base.TenFootApp;
 import com.amazon.android.ui.constants.ConfigurationConstants;
 import com.amazon.android.utils.GlideHelper;
 import com.amazon.mediaplayer.tracks.MediaFormat;
+import com.google.android.exoplayer.ExoPlayerLibraryInfo;
 import com.google.android.exoplayer.text.CaptionStyleCompat;
 import com.google.android.exoplayer.text.SubtitleLayout;
 
@@ -61,6 +63,8 @@ import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.Helpers;
 import com.amazon.android.utils.Preferences;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.media.session.PlaybackState;
 
 import com.amazon.mediaplayer.AMZNMediaPlayer;
@@ -75,6 +79,7 @@ import com.zype.fire.api.Model.PlayerResponse;
 import com.zype.fire.api.Util.AdMacrosHelper;
 import com.zype.fire.api.Util.ErrorHelper;
 import com.zype.fire.api.ZypeApi;
+import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
 import com.amazon.utils.DateAndTimeHelper;
@@ -85,6 +90,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -103,6 +109,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -132,7 +140,7 @@ import static com.amazon.android.contentbrowser.ContentBrowser.SHOW_PLAYLIST_AUT
 /**
  * PlaybackOverlayActivity for content playback that loads PlaybackOverlayFragment
  */
-public class PlaybackActivity extends Activity implements
+public class PlaybackActivity extends BasePlaybackActivity implements
         PlaybackOverlayFragment.OnPlayPauseClickedListener, AMZNMediaPlayer
         .OnStateChangeListener, AMZNMediaPlayer.OnErrorListener, AMZNMediaPlayer.OnInfoListener,
         AudioManager.OnAudioFocusChangeListener, AMZNMediaPlayer.OnCuesListener,
@@ -962,6 +970,7 @@ public class PlaybackActivity extends Activity implements
                 // exists for this content and playback is not complete.
                 if (record != null && !record.isPlaybackComplete()) {
                     mCurrentPlaybackPosition = record.getPlaybackLocation();
+                    Log.d(TAG, "loadContentPlaybackState(): restored position " + mCurrentPlaybackPosition);
                 }
             }
         }
@@ -1004,6 +1013,12 @@ public class PlaybackActivity extends Activity implements
                     mPlayer.getCurrentPosition(), isFinished,
                     DateAndTimeHelper.getCurrentDate().getTime(),
                     mPlayer.getDuration());
+
+            if (ZypeConfiguration.displayWatchedBarOnVideoThumbnails()) {
+                EventBus.getDefault().post(new ContentUpdateEvent(mSelectedContent.getId()));
+            }
+
+            Log.d(TAG, "storeContentPlaybackState(): saved position " + mPlayer.getCurrentPosition());
         }
         else {
             Log.e(TAG, "Cannot update recent content playback state. Database is null");
@@ -1451,7 +1466,8 @@ public class PlaybackActivity extends Activity implements
                 mAdsImplementation.init(this, mAdsView, playerExtras);
             }
 
-            mPlayer.setUserAgent(System.getProperty("http.agent"));
+            mPlayer.setUserAgent(getUserAgent(PlaybackActivity.this,
+                    getString(R.string.app_name_short)));
             mPlayer.addStateChangeListener(this);
             mPlayer.addErrorListener(this);
             mPlayer.addInfoListener(this);
@@ -1801,7 +1817,7 @@ public class PlaybackActivity extends Activity implements
 
         // Request Zype API for player data
         String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
-        HashMap<String, String> params = new HashMap<>();
+        HashMap<String, String> params = getValues();
         if (!TextUtils.isEmpty(accessToken)) {
             params.put(ZypeApi.ACCESS_TOKEN, accessToken);
         }
@@ -1812,7 +1828,10 @@ public class PlaybackActivity extends Activity implements
         if (!TextUtils.isEmpty(uuid)) {
             params.put(ZypeApi.UUID, uuid);
         }
-        ZypeApi.getInstance().getApi().getPlayer(IZypeApi.HEADER_USER_AGENT, mSelectedContent.getId(), params).enqueue(new Callback<PlayerResponse>() {
+        ZypeApi.getInstance().getApi()
+                .getPlayer(getUserAgent(PlaybackActivity.this, getString(R.string.app_name_short)),
+                                            mSelectedContent.getId(), params)
+                    .enqueue(new Callback<PlayerResponse>() {
             @Override
             public void onResponse(Call<PlayerResponse> call, Response<PlayerResponse> response) {
                 if (response.isSuccessful()) {
@@ -1996,7 +2015,7 @@ public class PlaybackActivity extends Activity implements
                 if (mPlaybackOverlayFragment != null) {
                     // TODO: remove this update once we find a way to get duration and cc state
                     // from bright cove before PLAYING state. DEVTECH-4973
-                    if (mPrevState == PlayerState.READY) {
+                    if (mPrevState == PlayerState.READY || mPrevState == PlayerState.SEEKING) {
                         modifyClosedCaptionState(mIsClosedCaptionEnabled);
                         mPlaybackOverlayFragment.updatePlayback();
                     }

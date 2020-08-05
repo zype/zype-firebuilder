@@ -29,6 +29,11 @@ public interface VastAdListener {
     void adsReady();
 
     /**
+     * Indicates that VAST responses for mid-roll ad breaks are loaded and ads ready to be played
+     */
+    void midrollAdsReady(long positionInSeconds);
+
+    /**
      * To be called on the start of an ad pod, or chuck of ads to be played together.
      *
      * @param adIdx  The index of the ad to start at.
