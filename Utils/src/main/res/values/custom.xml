@@ -41,7 +41,7 @@ permissions and limitations under the License.
     <string name="default_bold_font">Roboto Bold</string>
     <!-- A default regular device font used for buttons and subtitles -->
     <string name="default_regular_font">Roboto Regular</string>
-    <color name="background_hero_slider_image">#99000000</color>
+    <color name="hero_slider_overlay_color">#99000000</color>
 
     <!-- Action button text size -->
     <dimen name="action_text">14sp</dimen>

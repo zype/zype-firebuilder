@@ -6,6 +6,7 @@ import android.graphics.Point;
 import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.ColorUtils;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
@@ -105,13 +106,11 @@ public class HeroCardPresenter extends Presenter {
 
     ImageView imageView = ((ViewHolder) viewHolder).mCardView.getMainImageView();
 
-    if(slider.isSelected()) {
-     imageView.setAlpha(1.0f);
-      imageView.setColorFilter(mContext.getResources().getColor(R.color.transparent));
-    }else {
-     imageView.setAlpha(0.5f);
-     imageView.setColorFilter(mContext.getResources().getColor(R.color.background_hero_slider_image));
-    }
+    int color = slider.isSelected() ? mContext.getResources().getColor(R.color.transparent)
+                  : mContext.getResources().getColor(R.color.hero_slider_overlay_color);
+    float alpha = slider.isSelected() ? 1.0f : (color >> 24) / -255f;
+    imageView.setAlpha(alpha);
+    imageView.setColorFilter(color);
   }
 
   @Override

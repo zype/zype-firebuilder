@@ -36,7 +36,7 @@ permissions and limitations under the License.
 
     <color name="transparent">#00FFFFFF</color>
 
-    <color name="background_hero_slider_image">#99000000</color>
+    <color name="hero_slider_overlay_color">#99000000</color>
 
     <!-- End of App Colors -->
 
