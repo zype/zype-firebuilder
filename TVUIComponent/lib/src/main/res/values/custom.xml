@@ -178,7 +178,7 @@ permissions and limitations under the License.
 
     <color name="background_color_translucent">#CC000000</color>
     <color name="menu_item_text_color">#FFFFFF</color>
-    <color name="top_menu_background">#BF040460</color>
+    <color name="top_menu_background">@android:color/transparent</color>
 
     <drawable name="subscription_background">@color/background</drawable>
 
