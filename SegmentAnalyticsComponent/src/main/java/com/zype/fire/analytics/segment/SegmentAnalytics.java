@@ -170,6 +170,9 @@ public class SegmentAnalytics implements IAnalytics {
                 Log.d(TAG, "trackAction(): action is tracked");
                 break;
             }
+            case AnalyticsTags.ACTION_AUTOPLAY_FINISHED:
+                Analytics.with(context).track("Exiting Initial Stream to Homepage", properties);
+                break;
             case AnalyticsTags.ACTION_PLAYBACK_CONTROL_PLAY:
                 isPlaying = true;
                 Analytics.with(context).track("Video Playback Resumed", properties);

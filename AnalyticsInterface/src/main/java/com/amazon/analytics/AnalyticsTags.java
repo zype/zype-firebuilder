@@ -122,6 +122,8 @@ public class AnalyticsTags {
      */
     public static final String ACTION_PLAYBACK_FINISHED = "ACTION_PLAYBACK_FINISHED";
 
+    public static final String ACTION_AUTOPLAY_FINISHED = "ACTION_AUTOPLAY_FINISHED";
+
     /**
      * Customizable action for starting a buffer event.
      */
