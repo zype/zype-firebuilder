@@ -2272,7 +2272,9 @@ public class PlaybackActivity extends BasePlaybackActivity implements
         }
 
         // Set Ads video extras.
-        mAdsImplementation.getExtra().putBundle(IAds.VIDEO_EXTRAS, videoExtras);
+        if (mAdsImplementation.getExtra() != null) {
+            mAdsImplementation.getExtra().putBundle(IAds.VIDEO_EXTRAS, videoExtras);
+        }
 
         mAdsImplementation.showAds();
     }
