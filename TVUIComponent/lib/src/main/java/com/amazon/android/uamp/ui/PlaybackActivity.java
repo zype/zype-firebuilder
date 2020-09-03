@@ -30,67 +30,12 @@
 
 package com.amazon.android.uamp.ui;
 
-import com.amazon.android.configuration.ConfigurationManager;
-import com.amazon.android.model.event.ContentUpdateEvent;
-import com.amazon.android.tv.tenfoot.base.TenFootApp;
-import com.amazon.android.ui.constants.ConfigurationConstants;
-import com.amazon.android.utils.GlideHelper;
-import com.amazon.mediaplayer.tracks.MediaFormat;
-import com.google.android.exoplayer.ExoPlayerLibraryInfo;
-import com.google.android.exoplayer.text.CaptionStyleCompat;
-import com.google.android.exoplayer.text.SubtitleLayout;
-
-import com.amazon.ads.IAds;
-import com.amazon.ads.AdMetaData;
-import com.amazon.analytics.AnalyticsTags;
-import com.amazon.android.contentbrowser.ContentBrowser;
-import com.amazon.android.contentbrowser.database.helpers.RecentDatabaseHelper;
-import com.amazon.android.contentbrowser.database.helpers.RecommendationDatabaseHelper;
-import com.amazon.android.contentbrowser.database.records.RecentRecord;
-import com.amazon.android.contentbrowser.helper.AnalyticsHelper;
-import com.amazon.android.model.content.Content;
-import com.amazon.android.module.ModuleManager;
-
-import com.amazon.android.recipe.Recipe;
-import com.amazon.android.tv.tenfoot.R;
-import com.amazon.android.uamp.DrmProvider;
-import com.amazon.android.uamp.UAMP;
-import com.amazon.android.uamp.mediaSession.MediaSessionController;
-import com.amazon.android.uamp.constants.PreferencesConstants;
-import com.amazon.android.uamp.helper.CaptioningHelper;
-import com.amazon.android.ui.fragments.ErrorDialogFragment;
-import com.amazon.android.utils.ErrorUtils;
-import com.amazon.android.utils.Helpers;
-import com.amazon.android.utils.Preferences;
-
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.media.session.PlaybackState;
-
-import com.amazon.mediaplayer.AMZNMediaPlayer;
-import com.amazon.mediaplayer.AMZNMediaPlayer.PlayerState;
-import com.amazon.mediaplayer.playback.text.Cue;
-import com.amazon.mediaplayer.tracks.TrackType;
-import com.zype.fire.api.IZypeApi;
-import com.zype.fire.api.Model.AdvertisingSchedule;
-import com.zype.fire.api.Model.ErrorBody;
-import com.zype.fire.api.Model.PlayerData;
-import com.zype.fire.api.Model.PlayerResponse;
-import com.zype.fire.api.Util.AdMacrosHelper;
-import com.zype.fire.api.Util.ErrorHelper;
-import com.zype.fire.api.ZypeApi;
-import com.zype.fire.api.ZypeConfiguration;
-import com.zype.fire.api.ZypeSettings;
-import com.zype.fire.auth.ZypeAuthentication;
-import com.amazon.utils.DateAndTimeHelper;
-
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
-import android.os.Build;
+import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -110,6 +55,51 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.amazon.ads.AdMetaData;
+import com.amazon.ads.IAds;
+import com.amazon.analytics.AnalyticsTags;
+import com.amazon.android.configuration.ConfigurationManager;
+import com.amazon.android.contentbrowser.ContentBrowser;
+import com.amazon.android.contentbrowser.database.helpers.RecentDatabaseHelper;
+import com.amazon.android.contentbrowser.database.helpers.RecommendationDatabaseHelper;
+import com.amazon.android.contentbrowser.database.records.RecentRecord;
+import com.amazon.android.contentbrowser.helper.AnalyticsHelper;
+import com.amazon.android.model.content.Content;
+import com.amazon.android.model.event.ContentUpdateEvent;
+import com.amazon.android.module.ModuleManager;
+import com.amazon.android.recipe.Recipe;
+import com.amazon.android.tv.tenfoot.R;
+import com.amazon.android.tv.tenfoot.base.TenFootApp;
+import com.amazon.android.uamp.DrmProvider;
+import com.amazon.android.uamp.UAMP;
+import com.amazon.android.uamp.constants.PreferencesConstants;
+import com.amazon.android.uamp.helper.CaptioningHelper;
+import com.amazon.android.uamp.mediaSession.MediaSessionController;
+import com.amazon.android.ui.constants.ConfigurationConstants;
+import com.amazon.android.ui.fragments.ErrorDialogFragment;
+import com.amazon.android.utils.ErrorUtils;
+import com.amazon.android.utils.GlideHelper;
+import com.amazon.android.utils.Helpers;
+import com.amazon.android.utils.Preferences;
+import com.amazon.mediaplayer.AMZNMediaPlayer;
+import com.amazon.mediaplayer.AMZNMediaPlayer.PlayerState;
+import com.amazon.mediaplayer.playback.text.Cue;
+import com.amazon.mediaplayer.tracks.MediaFormat;
+import com.amazon.mediaplayer.tracks.TrackType;
+import com.amazon.utils.DateAndTimeHelper;
+import com.google.android.exoplayer.text.CaptionStyleCompat;
+import com.google.android.exoplayer.text.SubtitleLayout;
+import com.zype.fire.api.Model.AdvertisingSchedule;
+import com.zype.fire.api.Model.ErrorBody;
+import com.zype.fire.api.Model.PlayerData;
+import com.zype.fire.api.Model.PlayerResponse;
+import com.zype.fire.api.Util.AdMacrosHelper;
+import com.zype.fire.api.Util.ErrorHelper;
+import com.zype.fire.api.ZypeApi;
+import com.zype.fire.api.ZypeConfiguration;
+import com.zype.fire.api.ZypeSettings;
+import com.zype.fire.auth.ZypeAuthentication;
+
 import org.greenrobot.eventbus.EventBus;
 
 import java.net.CookieHandler;
@@ -122,8 +112,6 @@ import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -2269,10 +2257,15 @@ public class PlaybackActivity extends BasePlaybackActivity implements
         // We need to pass id, duration and adCuePoints to player interface.
         // Usually required for ads support.
         // The player interface doesn't know about the video model so we are using Bundles.
-        mPlayer.getExtra().putBundle(IAds.VIDEO_EXTRAS, videoExtras);
+
+        if(mPlayer.getExtra() != null) {
+            mPlayer.getExtra().putBundle(IAds.VIDEO_EXTRAS, videoExtras);
+        }
 
         // Set Ads video extras.
-        mAdsImplementation.getExtra().putBundle(IAds.VIDEO_EXTRAS, videoExtras);
+        if(mAdsImplementation.getExtra() != null) {
+            mAdsImplementation.getExtra().putBundle(IAds.VIDEO_EXTRAS, videoExtras);
+        }
 
         mAdsImplementation.showAds();
     }
