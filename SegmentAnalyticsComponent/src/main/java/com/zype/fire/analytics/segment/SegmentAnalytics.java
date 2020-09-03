@@ -53,6 +53,8 @@ public class SegmentAnalytics implements IAnalytics {
      */
     private boolean isPlaying = false;
 
+    private long previousPlaybackPosition = -1;
+
     private Context context;
 
     /**
@@ -110,6 +112,8 @@ public class SegmentAnalytics implements IAnalytics {
         Log.d(TAG, "trackAction(): action=" + mCustomTags.getCustomTag(action));
 //        Log.d(TAG, "trackAction(): attributes=" + String.valueOf(mCustomTags.getCustomTags(attributes)));
 
+        Properties properties = attributesToProperties(attributes);
+
         if (action.equals(AnalyticsTags.ACTION_PLAY_VIDEO)) {
             isPlaying = false;
         }
@@ -117,28 +121,44 @@ public class SegmentAnalytics implements IAnalytics {
             case AnalyticsTags.ACTION_PLAYBACK_STARTED: {
                 if (!isPlaying) {
                     isPlaying = true;
-                    Properties properties = attributesToProperties(attributes);
+//                    Properties properties = attributesToProperties(attributes);
                     Analytics.with(context).track("Video Content Started", properties);
+                    Analytics.with(context).track("Video Playback Started", properties);
                     Log.d(TAG, "trackAction(): action is tracked");
                 }
                 break;
             }
             case AnalyticsTags.ACTION_PLAYBACK: {
                 if (isPlaying) {
-                    Properties properties = attributesToProperties(attributes);
+//                    Properties properties = attributesToProperties(attributes);
                     String videoId = properties.getString("videoId");
                     if (TextUtils.isEmpty(videoId)) {
                         Log.d(TAG, "trackAction(): action is not tracked");
                         break;
                     }
                     Analytics.with(context).track("Video Content Playing", properties);
+
+                    long duration = properties.getLong("videoContentDuration", 0);
+                    long position = properties.getLong("videoContentPosition", 0);
+                    if (previousPlaybackPosition < 3 && position >=3) {
+                        Analytics.with(context).track("Video Content Started (after 3 seconds)", properties);
+                    }
+                    else if (previousPlaybackPosition < duration * 0.25 && position >= duration * 0.25) {
+                        Analytics.with(context).track("Video Content Completed 25 percent", properties);
+                    }
+                    else if (previousPlaybackPosition < duration * 0.5 && position >= duration * 0.5) {
+                        Analytics.with(context).track("Video Content Completed 50 percent", properties);
+                    }
+                    else if (previousPlaybackPosition < duration * 0.75 && position >= duration * 0.75) {
+                        Analytics.with(context).track("Video Content Completed 75 percent", properties);
+                    }
                     Log.d(TAG, "trackAction(): action is tracked");
                 }
                 break;
             }
             case AnalyticsTags.ACTION_PLAYBACK_FINISHED: {
                 isPlaying = false;
-                Properties properties = attributesToProperties(attributes);
+//                Properties properties = attributesToProperties(attributes);
                 long duration = properties.getLong("videoContentDuration", 0);
                 long position = properties.getLong("videoContentPosition", 0);
                 if (duration - position > 1) {
@@ -146,16 +166,25 @@ public class SegmentAnalytics implements IAnalytics {
                     break;
                 }
                 Analytics.with(context).track("Video Content Completed", properties);
+                Analytics.with(context).track("Video Playback Completed", properties);
                 Log.d(TAG, "trackAction(): action is tracked");
                 break;
             }
             case AnalyticsTags.ACTION_PLAYBACK_CONTROL_PLAY:
                 isPlaying = true;
+                Analytics.with(context).track("Video Playback Resumed", properties);
                 break;
             case AnalyticsTags.ACTION_PLAYBACK_CONTROL_PAUSE:
                 isPlaying = false;
+                Analytics.with(context).track("Video Playback Paused", properties);
+                break;
+            case AnalyticsTags.ACTION_PLAYBACK_CONTROL_FF:
+            case AnalyticsTags.ACTION_PLAYBACK_CONTROL_REWIND:
+                Analytics.with(context).track("Video Playback Seek Started", properties);
+                Analytics.with(context).track("Video Playback Seek Completed", properties);
                 break;
             case AnalyticsTags.ACTION_ERROR:
+                Analytics.with(context).track("Video Player Error", properties);
                 break;
         }
 //        }
