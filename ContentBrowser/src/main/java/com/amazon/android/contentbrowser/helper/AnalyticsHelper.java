@@ -296,6 +296,19 @@ public class AnalyticsHelper {
         sendAnalytics(AnalyticsTags.ACTION_PLAYBACK_FINISHED, attributes);
     }
 
+    public static void trackAutoplayFinished(Content content, long currentPosition) {
+
+        // Get the attributes for the selected movie.
+        Map<String, Object> attributes = getBasicAnalyticsAttributesForContent(content);
+        attributes.putAll(getDetailedContentAttributes(content));
+        attributes.putAll(getClassificationTypeAttributes(content));
+        attributes.putAll(ExtraContentAttributes.getExtraAttributes(content.getExtras()));
+        attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_DURATION, content.getDuration());
+        attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_CURRENT_POSITION, currentPosition);
+
+        sendAnalytics(AnalyticsTags.ACTION_AUTOPLAY_FINISHED, attributes);
+    }
+
     /**
      * Tracks purchase action result.
      *
@@ -439,7 +452,15 @@ public class AnalyticsHelper {
                                                   long currentPosition) {
 
         // Get the attributes for the selected content.
+//        Map<String, Object> attributes = getBasicAnalyticsAttributesForContent(content);
+//        attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_CURRENT_POSITION, currentPosition);
         Map<String, Object> attributes = getBasicAnalyticsAttributesForContent(content);
+        attributes.putAll(getDetailedContentAttributes(content));
+        attributes.putAll(getClassificationTypeAttributes(content));
+
+        // Get Content extras
+        attributes.putAll(ExtraContentAttributes.getExtraAttributes(content.getExtras()));
+        attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_DURATION, content.getDuration());
         attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_CURRENT_POSITION, currentPosition);
 
         sendAnalytics(action, attributes);

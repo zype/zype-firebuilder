@@ -1371,9 +1371,7 @@ public class PlaybackActivity extends BasePlaybackActivity implements
           case KeyEvent.KEYCODE_BACK:
           case KeyEvent.KEYCODE_MENU:{
             if (isAutoPlay) {
-                AnalyticsHelper.trackPlaybackControlAction(
-                        AnalyticsTags.ACTION_AUTOPLAY_FINISHED, mSelectedContent,
-                        getCurrentPosition());
+                AnalyticsHelper.trackAutoplayFinished(mSelectedContent, getCurrentPosition());
               ContentBrowser.getInstance(PlaybackActivity.this).switchToHomeScreen();
               finish();
             }

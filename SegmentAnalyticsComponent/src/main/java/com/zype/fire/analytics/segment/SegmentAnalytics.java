@@ -112,7 +112,10 @@ public class SegmentAnalytics implements IAnalytics {
         Log.d(TAG, "trackAction(): action=" + mCustomTags.getCustomTag(action));
 //        Log.d(TAG, "trackAction(): attributes=" + String.valueOf(mCustomTags.getCustomTags(attributes)));
 
-        Properties properties = attributesToProperties(attributes);
+        Properties properties = new Properties();
+        if (actionIsPlayerEvent(action)) {
+            properties = attributesToProperties(attributes);
+        }
 
         if (action.equals(AnalyticsTags.ACTION_PLAY_VIDEO)) {
             isPlaying = false;
@@ -152,6 +155,7 @@ public class SegmentAnalytics implements IAnalytics {
                     else if (previousPlaybackPosition < duration * 0.75 && position >= duration * 0.75) {
                         Analytics.with(context).track("Video Content Completed 75 percent", properties);
                     }
+                    previousPlaybackPosition = position;
                     Log.d(TAG, "trackAction(): action is tracked");
                 }
                 break;
@@ -314,5 +318,22 @@ public class SegmentAnalytics implements IAnalytics {
 
         Log.d(TAG, "attributesToProperties(): " + properties.toString());
         return properties;
+    }
+
+    private boolean actionIsPlayerEvent(String action) {
+        switch (action) {
+            case AnalyticsTags.ACTION_PLAYBACK_STARTED:
+            case AnalyticsTags.ACTION_PLAYBACK:
+            case AnalyticsTags.ACTION_PLAYBACK_FINISHED:
+            case AnalyticsTags.ACTION_AUTOPLAY_FINISHED:
+            case AnalyticsTags.ACTION_PLAYBACK_CONTROL_PLAY:
+            case AnalyticsTags.ACTION_PLAYBACK_CONTROL_PAUSE:
+            case AnalyticsTags.ACTION_PLAYBACK_CONTROL_FF:
+            case AnalyticsTags.ACTION_PLAYBACK_CONTROL_REWIND:
+            case AnalyticsTags.ACTION_ERROR:
+                return true;
+            default:
+                return false;
+        }
     }
 }
