@@ -21,6 +21,7 @@
     "purchase_required@PurchaseRequired",
     "rental_required@RentalRequired",
     "season@Season",
+    "series_id@seriesId",
     "subscription_required@mSubscriptionRequired",
     "thumbnails@mCardImageUrl",
     "thumbnails@mBackgroundImageUrl",

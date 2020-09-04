@@ -344,6 +344,9 @@ public class Content implements Serializable {
     public static final String EXTRA_RENTAL_REQUIRED = "RentalRequired";
     // Rental required flag
     public static final String EXTRA_SEASON = "Season";
+
+    public static final String EXTRA_SERIES_ID = "seriesId";
+
     // Poster thumbnail url
     public static final String EXTRA_THUMBNAIL_POSTER_URL = "ThumbnailPosterUrl";
 
