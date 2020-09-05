@@ -96,9 +96,11 @@ public class GlideBitmapDrawable extends GlideDrawable {
             applyGravity = false;
         }
 
-        if (state.bitmap != null && !state.bitmap.isRecycled()) {
-            canvas.drawBitmap(state.bitmap, null, destRect, state.paint);
-        }
+        try {
+            if (state.bitmap != null && !state.bitmap.isRecycled()) {
+                canvas.drawBitmap(state.bitmap, null, destRect, state.paint);
+            }
+        }catch (Exception e){}
     }
 
     @Override
