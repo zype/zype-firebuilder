@@ -1,0 +1,2 @@
+com/amazon/analytics/R$string.class
+com/amazon/analytics/R.class
