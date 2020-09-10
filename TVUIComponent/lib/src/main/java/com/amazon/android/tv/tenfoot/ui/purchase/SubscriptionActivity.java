@@ -18,8 +18,8 @@ import com.amazon.android.contentbrowser.helper.PurchaseHelper;
 import com.amazon.android.model.event.ProgressOverlayDismissEvent;
 import com.amazon.android.model.event.PurchaseEvent;
 import com.amazon.android.tv.tenfoot.R;
-import com.amazon.android.tv.tenfoot.ui.Subscription.Model.Consumer;
-import com.amazon.android.tv.tenfoot.ui.Subscription.Model.SubscriptionItem;
+import com.amazon.android.tv.tenfoot.ui.purchase.Model.Consumer;
+import com.amazon.android.tv.tenfoot.ui.purchase.Model.SubscriptionItem;
 import com.amazon.android.ui.fragments.ErrorDialogFragment;
 import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.NetworkUtils;
@@ -107,8 +107,8 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
             }
         });
 
-        Button buttonCancelSelectPlan = (Button) findViewById(R.id.buttonCancelSelectPlan);
-        buttonCancelSelectPlan.setOnClickListener(v -> closeScreen());
+//        Button buttonCancelSelectPlan = (Button) findViewById(R.id.buttonCancelSelectPlan);
+//        buttonCancelSelectPlan.setOnClickListener(v -> closeScreen());
 
         updateViews();
         bindViews();
@@ -192,8 +192,9 @@ public class SubscriptionActivity extends Activity implements SubscriptionFragme
     private void showSubscriptionSuccessDialog() {
         dialogError = ErrorDialogFragment.newInstance(this,
                 ErrorUtils.ERROR_CATEGORY.ZYPE_CUSTOM,
-                getString(R.string.subscription_dialog_success_title),
-                String.format(getString(R.string.subscription_dialog_success_message), selectedSubscription.title),
+            "", "",
+//                getString(R.string.subscription_dialog_success_title),
+//                String.format(getString(R.string.subscription_dialog_success_message), selectedSubscription.title),
                 false,
                 (errorDialogFragment, errorButtonType, errorCategory) -> {
                     if (errorDialogFragment != null) {

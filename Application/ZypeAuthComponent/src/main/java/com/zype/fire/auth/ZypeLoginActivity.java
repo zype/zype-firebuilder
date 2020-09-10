@@ -101,13 +101,13 @@ public class ZypeLoginActivity extends Activity {
                 getAccessToken();
             }
         });
-        Button buttonSignUp = (Button) findViewById(R.id.buttonSignUp);
-        buttonSignUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onSignUp();
-            }
-        });
+//        Button buttonSignUp = (Button) findViewById(R.id.buttonSignUp);
+//        buttonSignUp.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                onSignUp();
+//            }
+//        });
 
         initParameters(savedInstanceState);
         bindViews();
@@ -145,7 +145,7 @@ public class ZypeLoginActivity extends Activity {
     // UI
     //
     private void bindViews() {
-        textMessage.setText(getString(R.string.sign_in_message));
+//        textMessage.setText(getString(R.string.sign_in_message));
         textPin.setText(pin);
 
         updateViews();

@@ -27,7 +27,6 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-import static android.support.v17.leanback.widget.FocusHighlight.ZOOM_FACTOR_MEDIUM;
 
 public class HeroSliderFragment extends RowsFragment {
 

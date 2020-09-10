@@ -778,7 +778,7 @@ public class ContentDetailsFragment extends androidx.leanback.app.DetailsFragmen
                         Log.e(TAG, "checkVideoEntitlement(): failed");
                     }
                 });
-            }
+//            }
         }
 
     }
