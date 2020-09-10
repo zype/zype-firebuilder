@@ -41,8 +41,8 @@ include ':app',
 //        ':AMZNMediaPlayerComponent',
         ':ExoPlayer2MediaPlayerComponent',
 //        ':PassThroughLoginComponent',
-//        ':AkamaiAnalyticsComponent'
-        ':LoggerAnalyticsComponent'
+        ':AkamaiAnalyticsComponent'
+//        ':LoggerAnalyticsComponent'
 
 /* Frameworks */
 project(':TVUIComponent').projectDir = new File(rootProject.projectDir, '../TVUIComponent/lib')
@@ -70,7 +70,7 @@ project(':ExoPlayer2MediaPlayerComponent').projectDir = new File(rootProject.pro
 project(':VastAdsComponent').projectDir = new File(rootProject.projectDir, '../VastAdsComponent')
 project(':AmazonInAppPurchaseComponent').projectDir = new File(rootProject.projectDir, '../AmazonInAppPurchaseComponent')
 //project(':PassThroughLoginComponent').projectDir = new File(rootProject.projectDir, '../PassThroughLoginComponent')
-//project(':AkamaiAnalyticsComponent').projectDir = new File(rootProject.projectDir, '../AkamaiAnalyticsComponent')
-project(':LoggerAnalyticsComponent').projectDir = new File(rootProject.projectDir, '../LoggerAnalyticsComponent')
+project(':AkamaiAnalyticsComponent').projectDir = new File(rootProject.projectDir, '../AkamaiAnalyticsComponent')
+//project(':LoggerAnalyticsComponent').projectDir = new File(rootProject.projectDir, '../LoggerAnalyticsComponent')
 // Uncomment when using ComScore Analytics
 //project(':comscore').projectDir = new File(rootProject.projectDir, '../ComScoreAnalyticsComponent/libs/comscore')

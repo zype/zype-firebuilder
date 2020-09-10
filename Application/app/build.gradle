@@ -56,15 +56,15 @@ android {
 
     def currentCodeVersion = versionProperties[versionCodeKey].toString().toInteger()
 
-    compileSdkVersion 28
+    compileSdkVersion 29
     buildToolsVersion "28.0.3"
 
     defaultConfig {
         applicationId "com.zype.aftv.demo"
         minSdkVersion 20
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode currentCodeVersion
-        versionName "2.1.2"
+        versionName "2.2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 //        multiDexKeepProguard file('multidex-config.pro')
@@ -164,8 +164,8 @@ dependencies {
 //    implementation project(':PassThroughAdsComponent')
     api project(':VastAdsComponent')
     api project(':AmazonInAppPurchaseComponent')
-//    implementation project(':AkamaiAnalyticsComponent')
-    implementation project(':LoggerAnalyticsComponent')
+    implementation project(':AkamaiAnalyticsComponent')
+//    implementation project(':LoggerAnalyticsComponent')
     // Uncomment when using CrashlyticsComponent
     /*implementation('com.crashlytics.sdk.android:crashlytics:2.6.1@aar') {
         transitive = true;
