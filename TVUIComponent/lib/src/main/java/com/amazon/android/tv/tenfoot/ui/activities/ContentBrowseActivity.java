@@ -177,7 +177,7 @@ public class ContentBrowseActivity extends BaseActivity implements
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    if (autoCloseTopMenu) {
+                    if (autoCloseTopMenu && isMenuOpened) {
                         hideTopMenu();
                     }
                 }
