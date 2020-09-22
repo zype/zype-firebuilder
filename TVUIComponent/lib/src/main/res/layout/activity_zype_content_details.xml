@@ -24,7 +24,7 @@
             android:layout_width="352dp"
             android:layout_height="196dp"
             android:layout_below="@id/main_logo"
-            android:layout_marginBottom="18dp"
+            android:layout_marginBottom="4dp"
             android:layout_marginLeft="@dimen/lb_browse_padding_start"
             android:orientation="vertical"
             >
