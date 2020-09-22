@@ -32,7 +32,6 @@ package com.amazon.android.tv.tenfoot.ui.activities;
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.helper.ErrorHelper;
 import com.amazon.android.interfaces.ICancellableLoad;
-import com.amazon.android.tv.tenfoot.BuildConfig;
 import com.amazon.android.tv.tenfoot.ui.epg.EPGDataManager;
 import com.amazon.android.tv.tenfoot.ui.sliders.HeroSlider;
 import com.amazon.android.utils.ErrorUtils;

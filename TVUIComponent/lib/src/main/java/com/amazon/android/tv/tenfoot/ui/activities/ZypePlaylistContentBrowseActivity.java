@@ -375,9 +375,7 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
         MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
         if (fragment != null) {
             isMenuOpened = true;
-            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.background_color_translucent));
-//            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.lb_error_background_color_translucent));
-//             fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.left_menu_background));
+            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.left_menu_background_color));
             int paddingTop = (int) getResources().getDimension(R.dimen.lb_browse_padding_top);
             fragment.getView().setPadding(0, paddingTop, 0, 0);
             getFragmentManager().beginTransaction()
