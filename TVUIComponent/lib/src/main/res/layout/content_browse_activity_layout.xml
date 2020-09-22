@@ -33,24 +33,6 @@ permissions and limitations under the License.
     android:layout_height="match_parent"
     android:background="@color/browse_background_color">
 
-
-    <LinearLayout
-        android:layout_width="@dimen/content_image_width"
-        android:layout_height="@dimen/content_image_height"
-        android:layout_alignParentTop="true"
-        android:gravity="top"
-        android:layout_alignParentRight="true">
-
-        <ImageView
-            android:id="@+id/content_image"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:layout_gravity="top"
-            android:background="@color/accent"
-            android:scaleType="fitCenter" />
-    </LinearLayout>
-
     <RelativeLayout
         android:id="@+id/main_frame"
         android:layout_width="match_parent"
@@ -78,7 +60,7 @@ permissions and limitations under the License.
             android:layout_height="46dp"
             android:layout_marginLeft="@dimen/lb_browse_padding_start"
             android:layout_marginTop="@dimen/lb_browse_padding_top"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="20dp"
             android:scaleType="centerInside"
             android:src="@drawable/company_logo" />
 
@@ -134,6 +116,22 @@ permissions and limitations under the License.
             android:layout_height="match_parent"
             tools:layout="@layout/action_widget_container" />
     </RelativeLayout>
+    <LinearLayout
+        android:layout_width="@dimen/content_image_width"
+        android:layout_height="@dimen/content_image_height"
+        android:layout_alignParentTop="true"
+        android:gravity="top"
+        android:layout_alignParentRight="true">
+
+        <ImageView
+            android:id="@+id/content_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:layout_gravity="top"
+            android:background="@color/accent"
+            android:scaleType="fitCenter" />
+    </LinearLayout>
 
     <include layout="@layout/action_widget_container" />
 </RelativeLayout>
