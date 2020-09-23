@@ -14,13 +14,11 @@
  */
 package com.amazon.android.tv.tenfoot.presenter;
 
-import android.support.v17.leanback.widget.Presenter;
+import androidx.leanback.widget.Presenter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.amazon.android.model.Action;
 import com.amazon.android.tv.tenfoot.R;
 
 /**

@@ -14,7 +14,11 @@
  */
 package com.amazon.android.tv.tenfoot.ui.purchase;
 
-import android.support.v17.leanback.widget.Presenter;
+import androidx.leanback.widget.BaseCardView;
+import androidx.leanback.widget.ImageCardView;
+import androidx.leanback.widget.Presenter;
+import androidx.core.content.ContextCompat;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

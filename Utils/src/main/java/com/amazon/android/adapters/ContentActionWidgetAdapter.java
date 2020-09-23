@@ -16,17 +16,15 @@ package com.amazon.android.adapters;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.PorterDuff;
-import android.support.annotation.MainThread;
-import android.support.v17.leanback.widget.HorizontalGridView;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.annotation.MainThread;
+import androidx.leanback.widget.HorizontalGridView;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 
 import com.amazon.android.configuration.ConfigurationManager;
 import com.amazon.android.model.Action;

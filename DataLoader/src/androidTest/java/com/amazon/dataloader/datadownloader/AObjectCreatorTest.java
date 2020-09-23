@@ -20,7 +20,7 @@ import com.amazon.dataloader.testResources.MockSingletonObjectCreator;
 import org.junit.Test;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import java.lang.reflect.InvocationTargetException;
 

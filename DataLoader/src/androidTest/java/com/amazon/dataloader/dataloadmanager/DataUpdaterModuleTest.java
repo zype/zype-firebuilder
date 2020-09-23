@@ -22,7 +22,7 @@ import com.amazon.utils.model.Data;
 import org.junit.Before;
 import org.junit.Test;
 
-import android.support.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atLeastOnce;

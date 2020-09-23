@@ -15,15 +15,16 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "24.0.3"
+    compileSdkVersion 28
+    buildToolsVersion "25.0.3"
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 23
+        minSdkVersion 20
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -33,6 +34,10 @@ android {
         debug {
             testCoverageEnabled true
         }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     packagingOptions {
         exclude 'META-INF/LICENSE'
@@ -48,12 +53,15 @@ jacoco {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':Utils')
-    // Set this dependency to use JUnit 4 rules
-    androidTestCompile 'com.android.support.test:rules:0.4.1'
+    api fileTree(dir: 'libs', include: ['*.jar'])
 
-    androidTestCompile('com.android.support.test:runner:0.4.1') {
+    api 'androidx.multidex:multidex:2.0.1'
+
+    api project(':Utils')
+    // Set this dependency to use JUnit 4 rules
+    androidTestImplementation 'androidx.test:rules:1.1.1'
+
+    androidTestImplementation('androidx.test.ext:junit:1.1.1') {
         exclude module: 'support-annotations'
     }
 }

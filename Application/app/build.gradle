@@ -23,6 +23,7 @@ apply from: "../artifacts.gradle"
 repositories {
     // Uncomment when using CrashlyticsComponent
     //maven { url 'https://maven.fabric.io/public' }
+    google()
 }
 
 buildscript {
@@ -30,9 +31,10 @@ buildscript {
         jcenter()
         // Uncomment when using CrashlyticsComponent
         //maven { url 'https://maven.fabric.io/public' }
+        google()
     }
     dependencies {
-        classpath 'me.tatarka:gradle-retrolambda:3.2.3'
+        classpath 'me.tatarka:gradle-retrolambda:3.7.1'
         // Uncomment when using CrashlyticsComponent
         //classpath 'io.fabric.tools:gradle:1.+'
     }
@@ -54,17 +56,19 @@ android {
 
     def currentCodeVersion = versionProperties[versionCodeKey].toString().toInteger()
 
-    compileSdkVersion 23
-    buildToolsVersion "25.0.0"
+    compileSdkVersion 29
+    buildToolsVersion "28.0.3"
 
     defaultConfig {
         applicationId "com.zype.aftv.demo"
-        minSdkVersion 21
-        targetSdkVersion 23
+        minSdkVersion 20
+        targetSdkVersion 29
         versionCode currentCodeVersion
-        versionName "2.1.2"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        versionName "2.2.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
+//        multiDexKeepProguard file('multidex-config.pro')
+        multiDexKeepFile file('multidex-config.txt')
     }
     buildTypes {
         release {
@@ -79,8 +83,11 @@ android {
         debug {
             setVersionNameSuffix(".${currentCodeVersion} DEBUG [${date}]")
             testCoverageEnabled = true
+//            multiDexKeepProguard file('multidex-config.pro')
+            multiDexKeepFile file('multidex-config.txt')
         }
     }
+    flavorDimensions "main"
     productFlavors {
         zype {
         }
@@ -90,10 +97,11 @@ android {
     }
 
     applicationVariants.all { variant ->
-        variant.outputs.each { output ->
+        variant.outputs.all { output ->
             def outputNameNew = "Zype-AFTV" + "-" + variant.productFlavors.name + "-" + variant.buildType.name +
                     "-" + defaultConfig.versionName + "-" + getDate() + ".apk"
-            output.outputFile = new File(output.outputFile.parent, outputNameNew)
+//            output.outputFile = new File(output.outputFile.parent, outputNameNew)
+            outputFileName = outputNameNew
         }
     }
 
@@ -110,7 +118,8 @@ android {
         exclude 'META-INF/services/com.fasterxml.jackson.core.ObjectCodec'
         exclude 'META-INF/rxjava.properties'
     }
-
+    dexOptions {
+    }
     lintOptions {
         abortOnError false
     }
@@ -132,32 +141,34 @@ public def store(File to, Properties properties) {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile 'junit:junit:4.12'
-    androidTestCompile 'org.mockito:mockito-core:1.9.5'
-    androidTestCompile ('com.android.support.test:rules:0.5') {
+    api fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestImplementation 'junit:junit:4.12'
+    androidTestImplementation 'org.mockito:mockito-core:1.9.5'
+    androidTestImplementation('androidx.test:rules:1.1.1') {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    androidTestCompile ('com.android.support.test:runner:0.5') {
+    androidTestImplementation('androidx.test.ext:junit:1.1.1') {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
-    androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
+    androidTestImplementation 'com.google.dexmaker:dexmaker:1.2'
+    androidTestImplementation 'com.google.dexmaker:dexmaker-mockito:1.2'
 
-    androidTestCompile 'com.jayway.android.robotium:robotium-solo:5.3.1'
+    androidTestImplementation 'com.jayway.android.robotium:robotium-solo:5.3.1'
 
-    compile project(':TVUIComponent')
-    compile project(':UAMP')
-//    compile project(':AMZNMediaPlayerComponent')
-    compile project(':ExoPlayer2MediaPlayerComponent')
-//    compile project(':PassThroughAdsComponent')
-    compile project(':VastAdsComponent')
-    compile project(':AmazonInAppPurchaseComponent')
-    compile project(':AkamaiAnalyticsComponent')
-//    compile project(':LoggerAnalyticsComponent')
+//    implementation 'com.google.firebase:firebase-crashlytics:17.0.1'
+//
+    api project(':TVUIComponent')
+    api project(':UAMP')
+//    implementation project(':AMZNMediaPlayerComponent')
+    api project(':ExoPlayer2MediaPlayerComponent')
+//    implementation project(':PassThroughAdsComponent')
+    api project(':VastAdsComponent')
+    api project(':AmazonInAppPurchaseComponent')
+    implementation project(':AkamaiAnalyticsComponent')
+//    implementation project(':LoggerAnalyticsComponent')
     // Uncomment when using CrashlyticsComponent
-    /*compile('com.crashlytics.sdk.android:crashlytics:2.6.1@aar') {
+    /*implementation('com.crashlytics.sdk.android:crashlytics:2.6.1@aar') {
         transitive = true;
     }*/
-    compile project(':ZypeAuthComponent')
+    api project(':ZypeAuthComponent')
 }

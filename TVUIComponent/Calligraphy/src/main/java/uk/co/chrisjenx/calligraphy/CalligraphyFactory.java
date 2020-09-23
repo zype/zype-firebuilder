@@ -51,7 +51,7 @@ class CalligraphyFactory {
     protected static boolean isActionBarTitle(TextView view) {
         if (matchesResourceIdName(view, ACTION_BAR_TITLE)) return true;
         if (parentIsToolbarV7(view)) {
-            final android.support.v7.widget.Toolbar parent = (android.support.v7.widget.Toolbar) view.getParent();
+            final androidx.appcompat.widget.Toolbar parent = (androidx.appcompat.widget.Toolbar) view.getParent();
             return TextUtils.equals(parent.getTitle(), view.getText());
         }
         return false;
@@ -67,14 +67,14 @@ class CalligraphyFactory {
     protected static boolean isActionBarSubTitle(TextView view) {
         if (matchesResourceIdName(view, ACTION_BAR_SUBTITLE)) return true;
         if (parentIsToolbarV7(view)) {
-            final android.support.v7.widget.Toolbar parent = (android.support.v7.widget.Toolbar) view.getParent();
+            final androidx.appcompat.widget.Toolbar parent = (androidx.appcompat.widget.Toolbar) view.getParent();
             return TextUtils.equals(parent.getSubtitle(), view.getText());
         }
         return false;
     }
 
     protected static boolean parentIsToolbarV7(View view) {
-        return CalligraphyUtils.canCheckForV7Toolbar() && view.getParent() != null && (view.getParent() instanceof android.support.v7.widget.Toolbar);
+        return CalligraphyUtils.canCheckForV7Toolbar() && view.getParent() != null && (view.getParent() instanceof androidx.appcompat.widget.Toolbar);
     }
 
     /**
@@ -154,7 +154,7 @@ class CalligraphyFactory {
 
         // AppCompat API21+ The ActionBar doesn't inflate default Title/SubTitle, we need to scan the
         // Toolbar(Which underlies the ActionBar) for its children.
-        if (CalligraphyUtils.canCheckForV7Toolbar() && view instanceof android.support.v7.widget.Toolbar) {
+        if (CalligraphyUtils.canCheckForV7Toolbar() && view instanceof androidx.appcompat.widget.Toolbar) {
             final ViewGroup parent = (ViewGroup) view;
             parent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)

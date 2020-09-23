@@ -22,6 +22,8 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import androidx.multidex.MultiDex;
+import androidx.multidex.MultiDexApplication;
 import android.util.Log;
 
 
@@ -53,6 +55,12 @@ public abstract class ModularApplication extends Application {
      * Key for retrieving the number of app crashes from Shared Preferences.
      */
     public static final String APP_CRASHES_KEY = "appCrashes";
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(base);
+    }
 
     /**
      * onCreate method.

@@ -37,7 +37,6 @@ import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.tv.tenfoot.ui.fragments.MenuFragment;
 import com.amazon.android.tv.tenfoot.ui.sliders.HeroSlider;
 import com.amazon.android.tv.tenfoot.ui.sliders.HeroSliderFragment;
-import com.amazon.android.tv.tenfoot.ui.sliders.Slider;
 import com.amazon.android.tv.tenfoot.utils.BrowseHelper;
 import com.amazon.android.ui.constants.ConfigurationConstants;
 import com.amazon.android.ui.fragments.LogoutSettingsFragment;
@@ -47,7 +46,6 @@ import com.amazon.android.utils.Helpers;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment;
-import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 
 import android.animation.Animator;
@@ -61,10 +59,10 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.ListRow;
-import android.support.v17.leanback.widget.Row;
-import android.support.v4.content.ContextCompat;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.ListRow;
+import androidx.leanback.widget.Row;
+import androidx.core.content.ContextCompat;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -82,8 +80,6 @@ import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
-
-import static com.zype.fire.api.ZypeSettings.SHOW_LEFT_MENU;
 
 /**
  * ContentBrowseActivity class that loads the ContentBrowseFragment.
@@ -113,6 +109,7 @@ public class ContentBrowseActivity extends BaseActivity implements
     private boolean isMenuOpened = false;
 
     private boolean sliderShown = false;
+    private boolean lastRowSelected = false;
 
     private Row lastSelectedRow = null;
     private boolean lastSelectedRowChanged = false;
@@ -208,7 +205,7 @@ public class ContentBrowseActivity extends BaseActivity implements
     }
 
     private void showHeroSlider() {
-        if(sliderShown || !slidersPresent()) {
+        if (sliderShown || !slidersPresent()) {
             return;
         }
         mContentImage.setVisibility(View.GONE);
@@ -330,7 +327,8 @@ public class ContentBrowseActivity extends BaseActivity implements
      * title, description, and image.
      */
     @Override
-    public void onItemSelected(Object item, Row row) {
+    public void onItemSelected(Object item, Row row, boolean isLastContentRow) {
+        lastRowSelected = isLastContentRow;
         if (row != lastSelectedRow && item != null) {
             lastSelectedRow = row;
             lastSelectedRowChanged = true;
@@ -445,7 +443,8 @@ public class ContentBrowseActivity extends BaseActivity implements
         MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
         if (fragment != null) {
             isMenuOpened = true;
-            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.lb_error_background_color_translucent));
+            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.background_color_translucent));
+//            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.lb_error_background_color_translucent));
 //             fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.left_menu_background));
             int paddingTop = (int) getResources().getDimension(R.dimen.lb_browse_padding_top);
             fragment.getView().setPadding(0, paddingTop, 0, 0);
@@ -511,7 +510,7 @@ public class ContentBrowseActivity extends BaseActivity implements
                         findViewById(R.id.full_content_browse_fragment).requestFocus();
                         Object item = ((ListRow) lastSelectedRow).getAdapter()
                                 .get(lastSelectedItemIndex == -1 ? 0 : lastSelectedItemIndex);
-                        onItemSelected(item, lastSelectedRow);
+                        onItemSelected(item, lastSelectedRow, lastRowSelected);
                         return true;
                     }
                 }
@@ -543,6 +542,9 @@ public class ContentBrowseActivity extends BaseActivity implements
                             }
                         }
                     }
+                }
+                if (!ZypeSettings.SETTINGS_PLAYLIST_ENABLED) {
+                    if (lastRowSelected && !isMenuOpened) return true;
                 }
                 break;
             case KeyEvent.KEYCODE_DPAD_RIGHT:

@@ -34,9 +34,9 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.CheckResult;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.CheckResult;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import rx.Observable;
 
@@ -145,14 +145,14 @@ class Launchers {
     }
 
     /**
-     * Class to start another {@link Activity} from {@link android.support.v4.app.Fragment}
+     * Class to start another {@link Activity} from {@link androidx.fragment.app.Fragment}
      */
     static class SourceSupportFragment extends Launchable {
 
-        private final android.support.v4.app.Fragment mFragment;
+        private final androidx.fragment.app.Fragment mFragment;
         private final RxLauncher mLauncher;
 
-        SourceSupportFragment(RxLauncher launcher, android.support.v4.app.Fragment fragment) {
+        SourceSupportFragment(RxLauncher launcher, androidx.fragment.app.Fragment fragment) {
             if (fragment == null) {
                 throw new IllegalArgumentException("Fragment should not be null.");
             }

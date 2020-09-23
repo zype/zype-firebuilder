@@ -39,16 +39,11 @@ import com.amazon.android.model.content.constants.ExtraKeys;
 import com.amazon.android.model.event.ContentUpdateEvent;
 import com.amazon.android.recipe.Recipe;
 import com.amazon.android.tv.tenfoot.R;
-import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
-import com.amazon.android.tv.tenfoot.presenter.PosterCardPresenter;
-import com.amazon.android.tv.tenfoot.presenter.SettingsCardPresenter;
+import com.amazon.android.tv.tenfoot.presenter.StubItemPresenter;
 import com.amazon.android.tv.tenfoot.ui.sliders.HeroSlider;
 import com.amazon.android.utils.Preferences;
-import com.zype.fire.api.ZypeApi;
-import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
-import com.zype.fire.auth.ZypeAuthentication;
 import com.amazon.android.tv.tenfoot.ui.activities.ContentBrowseActivity;
 import com.amazon.android.tv.tenfoot.utils.BrowseHelper;
 import com.amazon.android.ui.constants.PreferencesConstants;
@@ -63,28 +58,22 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v17.leanback.app.RowsFragment;
-import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.HeaderItem;
-import android.support.v17.leanback.widget.ListRow;
-import android.support.v17.leanback.widget.OnItemViewClickedListener;
-import android.support.v17.leanback.widget.OnItemViewSelectedListener;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v17.leanback.widget.Row;
-import android.support.v17.leanback.widget.RowHeaderPresenter;
-import android.support.v17.leanback.widget.RowPresenter;
-import android.support.v17.leanback.widget.VerticalGridView;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.leanback.app.RowsFragment;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.HeaderItem;
+import androidx.leanback.widget.ListRow;
+import androidx.leanback.widget.ListRowPresenter;
+import androidx.leanback.widget.OnItemViewClickedListener;
+import androidx.leanback.widget.OnItemViewSelectedListener;
+import androidx.leanback.widget.Presenter;
+import androidx.leanback.widget.Row;
+import androidx.leanback.widget.RowHeaderPresenter;
+import androidx.leanback.widget.RowPresenter;
+import androidx.leanback.widget.VerticalGridView;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 
-import java.util.HashMap;
-import java.util.List;
-
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
+import static androidx.leanback.widget.FocusHighlight.ZOOM_FACTOR_NONE;
 import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
 
 /**
@@ -108,8 +97,7 @@ public class ContentBrowseFragment extends RowsFragment {
 
     // Container Activity must implement this interface.
     public interface OnBrowseRowListener {
-
-        void onItemSelected(Object item, Row row);
+        void onItemSelected(Object item, Row row, boolean isLastContentRow);
     }
 
     @Override
@@ -141,6 +129,9 @@ public class ContentBrowseFragment extends RowsFragment {
         if (ZypeSettings.SETTINGS_PLAYLIST_ENABLED){
             mSettingsAdapter = BrowseHelper.addSettingsActionsToRowAdapter(getActivity(), mRowsAdapter);
             mLoginButtonIndex = BrowseHelper.getLoginButtonIndex(mSettingsAdapter);
+        }
+        else {
+            addStubRow(mRowsAdapter);
         }
 
         setAdapter(mRowsAdapter);
@@ -193,6 +184,9 @@ public class ContentBrowseFragment extends RowsFragment {
         if (receiver != null) {
             LocalBroadcastManager.getInstance(getActivity())
                     .registerReceiver(receiver, new IntentFilter(BROADCAST_DATA_LOADED));
+        }
+        if (mRowsAdapter != null) {
+            mRowsAdapter.notifyArrayItemRangeChanged(0, mRowsAdapter.size());
         }
 
         ArrayObjectAdapter rowsAdapter = (ArrayObjectAdapter) getAdapter();
@@ -384,7 +378,16 @@ public class ContentBrowseFragment extends RowsFragment {
         @Override
         public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
                                    RowPresenter.ViewHolder rowViewHolder, Row row) {
-            mCallback.onItemSelected(item, row);
+            boolean isLastContentRow = false;
+            if (!ZypeSettings.SETTINGS_PLAYLIST_ENABLED) {
+                if (mRowsAdapter.indexOf(row) == mRowsAdapter.size() - 2) {
+                    isLastContentRow = true;
+                }
+                else {
+                    isLastContentRow = false;
+                }
+            }
+            mCallback.onItemSelected(item, row, isLastContentRow);
         }
     }
 
@@ -427,4 +430,10 @@ public class ContentBrowseFragment extends RowsFragment {
         }
     }
 
+    private void addStubRow(ArrayObjectAdapter rowsAdapter) {
+        StubItemPresenter presenter = new StubItemPresenter();
+        ArrayObjectAdapter adapter = new ArrayObjectAdapter(presenter);
+        adapter.add("Item 1");
+        rowsAdapter.add(new ListRow(null, adapter));
+    }
 }

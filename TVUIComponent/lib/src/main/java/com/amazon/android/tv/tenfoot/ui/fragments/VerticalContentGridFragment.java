@@ -34,14 +34,14 @@ import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
 
 import android.os.Bundle;
-import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.VerticalGridPresenter;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.VerticalGridPresenter;
 import android.util.Log;
 
 /**
  * A fragment that displays content in a vertical grid.
  */
-public class VerticalContentGridFragment extends android.support.v17.leanback.app
+public class VerticalContentGridFragment extends androidx.leanback.app
         .VerticalGridFragment {
 
     private static final String TAG = VerticalContentGridFragment.class.getSimpleName();

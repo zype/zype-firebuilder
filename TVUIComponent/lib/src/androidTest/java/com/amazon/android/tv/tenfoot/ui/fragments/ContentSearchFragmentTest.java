@@ -16,7 +16,6 @@ package com.amazon.android.tv.tenfoot.ui.fragments;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.model.content.Content;
-import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.tv.tenfoot.ui.activities.ContentSearchActivity;
 import com.amazon.android.utils.Preferences;
 import com.robotium.solo.Solo;
@@ -25,7 +24,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import android.support.v17.leanback.widget.ListRow;
+import androidx.leanback.widget.ListRow;
 import android.test.ActivityInstrumentationTestCase2;
 
 import java.util.ArrayList;

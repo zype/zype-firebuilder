@@ -21,7 +21,7 @@ import com.amazon.android.utils.FileHelper;
 import org.junit.Before;
 import org.junit.Test;
 
-import android.support.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import java.util.ArrayList;
 import java.util.HashMap;

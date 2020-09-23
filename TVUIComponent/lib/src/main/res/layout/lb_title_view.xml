@@ -49,7 +49,7 @@ permissions and limitations under the License.
             android:layout_gravity="center_vertical|end"
             style="?attr/browseTitleTextStyle"/>
 
-    <android.support.v17.leanback.widget.SearchOrbView
+    <androidx.leanback.widget.SearchOrbView
             android:id="@+id/title_orb"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
