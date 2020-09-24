@@ -195,6 +195,7 @@ public class ContentBrowseActivity extends BaseActivity implements
         if(!sliderShown || !slidersPresent()) {
             return;
         }
+        Log.d(TAG, "hideHeroSlider()");
         mContentImage.setVisibility(View.VISIBLE);
         layoutContentDetails.setVisibility(View.VISIBLE);
         imageLogo.setVisibility(View.VISIBLE);
@@ -208,6 +209,7 @@ public class ContentBrowseActivity extends BaseActivity implements
         if (sliderShown || !slidersPresent()) {
             return;
         }
+        Log.d(TAG, "showHeroSlider()");
         mContentImage.setVisibility(View.GONE);
         layoutContentDetails.setVisibility(View.GONE);
         imageLogo.setVisibility(View.GONE);
@@ -279,10 +281,12 @@ public class ContentBrowseActivity extends BaseActivity implements
 
         if(slidersPresent()) {
             handler.postDelayed(() -> {
-                if(sliderHasFocus()
-                      || (event.getKeyCode()== KeyEvent.KEYCODE_BACK && sliderShown)) {
-                  sliderShown=false;
-                  showHeroSlider();
+                if (sliderHasFocus()) {
+                    if (!sliderShown
+                            || (event.getKeyCode() == KeyEvent.KEYCODE_BACK && sliderShown && isMenuOpened)) {
+                        sliderShown = false;
+                        showHeroSlider();
+                    }
                 }
                 else {
                     if (!isMenuOpened){
