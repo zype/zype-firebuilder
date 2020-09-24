@@ -70,6 +70,7 @@ import android.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1720,6 +1721,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      * @return List of action for provided content.
      */
     public List<Action> getContentActionList(Content content) {
+
+        if(content == null) {
+            return Collections.emptyList();
+        }
 
         List<Action> contentActionList = new ArrayList<>();
 
