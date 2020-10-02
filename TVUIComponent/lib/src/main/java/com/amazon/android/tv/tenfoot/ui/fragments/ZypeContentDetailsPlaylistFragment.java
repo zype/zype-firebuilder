@@ -266,9 +266,11 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
             }
 
             if (playlist.getContents() != null) {
-                for (Content content : playlist.getContents()) {
-                    listRowAdapter.add(content);
-                }
+                try {
+                    for (Content content : playlist.getContents()) {
+                        listRowAdapter.add(content);
+                    }
+                }catch (Exception e) {}
             }
 
             if (playlist.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
