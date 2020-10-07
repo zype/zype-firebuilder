@@ -216,7 +216,7 @@ public abstract class BaseActivity extends Activity implements TopMenuFragment.I
             getFragmentManager().beginTransaction()
                     .setCustomAnimations(R.animator.slide_in_top, R.animator.slide_out_top)
                     .hide(fragment)
-                    .commit();
+                    .commitAllowingStateLoss();
         }
     }
 
