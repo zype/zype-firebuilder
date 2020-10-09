@@ -2150,7 +2150,13 @@ public class PlaybackActivity extends BasePlaybackActivity implements
                     .ERROR_CATEGORY.NETWORK_ERROR, this);
             mIsNetworkError = true;
         }
-        mErrorDialogFragment.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
+        try{
+            if (!isFinishing()) {
+                mErrorDialogFragment.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
+            }
+        } catch (Exception ignored){
+
+        }
     }
 
     private boolean requestAudioFocus() {
