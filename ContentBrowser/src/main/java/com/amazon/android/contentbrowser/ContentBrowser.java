@@ -1401,18 +1401,17 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             recommendedContentContainer= new ContentContainer("");
         }
 
-
-        for (Content c : mContentLoader.getRootContentContainer()) {
-            if (content.hasSimilarTags(c) && !StringManipulation.areStringsEqual(c.getId(),
-                    content.getId())) {
-                recommendedContentContainer.addContent(c);
-            }
-        }
+//        for (Content c : mContentLoader.getRootContentContainer()) {
+//            if (content.hasSimilarTags(c) && !StringManipulation.areStringsEqual(c.getId(),
+//                    content.getId())) {
+//                recommendedContentContainer.addContent(c);
+//            }
+//        }
 
         // Use items from the same category as recommended contents
         // if there are no contents with similar tags and the config setting is set to true.
         if (recommendedContentContainer.getContents().isEmpty() &&
-                isUseCategoryAsDefaultRelatedContent()) {
+            isUseCategoryAsDefaultRelatedContent()) {
 
             ContentContainer parentContainer = getContainerForContent(content);
 
@@ -1422,45 +1421,48 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 //                    if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId
 //                            ())) {
 //                        recommendedContentContainer.addContent(relatedContent);
-                if (!content.isSubscriptionRequired()) {
-                    /* Zype, Evgeny Cherkasov */
-                    // Check is user logged in and has subscription.
-                    if (userLoggedIn) {
-                        // User is logged in and has subscription. Add all videos
-                        if (isUserSubscribed()) {
-                            for (Content relatedContent : parentContainer.getContents()) {
-                                if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId())) {
-                                    recommendedContentContainer.addContent(relatedContent);
-                                }
-                            }
-                        }
-                        else {
-                            // User is logged in but has no subscription. Add onlu not subscription videos
-                            for (Content relatedContent : parentContainer.getContents()) {
-                                if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId()) && !relatedContent.isSubscriptionRequired()) {
-                                    recommendedContentContainer.addContent(relatedContent);
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        // User id not logged in. Add only not subscription videos
-                        for (Content relatedContent : parentContainer.getContents()) {
-                            if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId()) && !relatedContent.isSubscriptionRequired()) {
-                                recommendedContentContainer.addContent(relatedContent);
-                            }
-                        }
-                    }
+                for (Content relatedContent : parentContainer.getContents()) {
+                    recommendedContentContainer.addContent(relatedContent);
                 }
-                else {
-                    // If current video is on subscription it mean we already checked user credentials
-                    // and can add all content from the category
-                    for (Content relatedContent : parentContainer.getContents()) {
-                        if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId())) {
-                            recommendedContentContainer.addContent(relatedContent);
-                        }
-                    }
-                }
+//                if (!content.isSubscriptionRequired()) {
+//                    /* Zype, Evgeny Cherkasov */
+//                    // Check is user logged in and has subscription.
+//                    if (userLoggedIn) {
+//                        // User is logged in and has subscription. Add all videos
+//                        if (isUserSubscribed()) {
+//                            for (Content relatedContent : parentContainer.getContents()) {
+//                                if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId())) {
+//                                    recommendedContentContainer.addContent(relatedContent);
+//                                }
+//                            }
+//                        }
+//                        else {
+//                            // User is logged in but has no subscription. Add onlu not subscription videos
+//                            for (Content relatedContent : parentContainer.getContents()) {
+//                                if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId()) && !relatedContent.isSubscriptionRequired()) {
+//                                    recommendedContentContainer.addContent(relatedContent);
+//                                }
+//                            }
+//                        }
+//                    }
+//                    else {
+//                        // User id not logged in. Add only not subscription videos
+//                        for (Content relatedContent : parentContainer.getContents()) {
+//                            if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId()) && !relatedContent.isSubscriptionRequired()) {
+//                                recommendedContentContainer.addContent(relatedContent);
+//                            }
+//                        }
+//                    }
+//                }
+//                else {
+//                    // If current video is on subscription it mean we already checked user credentials
+//                    // and can add all content from the category
+//                    for (Content relatedContent : parentContainer.getContents()) {
+//                        if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId())) {
+//                            recommendedContentContainer.addContent(relatedContent);
+//                        }
+//                    }
+//                }
 
             }
             else {
