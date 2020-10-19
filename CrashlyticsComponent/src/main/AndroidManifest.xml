@@ -27,5 +27,9 @@ permissions and limitations under the License.
 
         <meta-data android:name="AMZNAP@CrashlyticsAnalytics"
                    android:value="IAnalytics@com.amazon.analytics.crash.CrashlyticsAnalyticsImplCreator"/>
+
+        <meta-data
+          android:name="firebase_crashlytics_collection_enabled"
+          android:value="${crashlyticsCollectionEnabled}"/>
     </application>
 </manifest>

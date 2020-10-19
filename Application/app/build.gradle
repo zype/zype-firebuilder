@@ -94,9 +94,15 @@ android {
     flavorDimensions "main"
     productFlavors {
         zype {
+            manifestPlaceholders = [
+                    crashlyticsCollectionEnabled: "true"
+            ]
         }
         template {
             applicationId "<APPLICATION_ID>"
+            manifestPlaceholders = [
+                    crashlyticsCollectionEnabled: "true"
+            ]
         }
     }
 

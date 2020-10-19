@@ -56,7 +56,7 @@ public class CrashlyticsAnalytics implements IAnalytics {
     public void configure(Context context) {
 
 //        Fabric.with(context, new Crashlytics());
-        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
+//        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
 
         mCustomTags.init(context, R.string.crashlytics_analytics_custom_tags);
     }
