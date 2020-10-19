@@ -165,6 +165,7 @@ dependencies {
     api project(':VastAdsComponent')
     api project(':AmazonInAppPurchaseComponent')
     implementation project(':AkamaiAnalyticsComponent')
+    implementation project(':MediaMelonAnalyticsComponent')
 //    implementation project(':LoggerAnalyticsComponent')
     // Uncomment when using CrashlyticsComponent
     /*implementation('com.crashlytics.sdk.android:crashlytics:2.6.1@aar') {

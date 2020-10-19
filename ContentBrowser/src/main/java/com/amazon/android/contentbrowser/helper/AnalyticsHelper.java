@@ -35,6 +35,7 @@ import com.amazon.analytics.AnalyticsActionBuilder;
 import com.amazon.analytics.AnalyticsTags;
 import com.amazon.analytics.AnalyticsManager;
 import com.amazon.android.recipe.Recipe;
+import com.amazon.android.uamp.UAMP;
 
 /**
  * Analytics helper class.
@@ -233,7 +234,7 @@ public class AnalyticsHelper {
      * @param currentSegment  Segment number of current content being played.
      */
     public static void trackPlaybackStarted(Content content, long duration, long currentPosition,
-                                            int totalSegments, int currentSegment) {
+                                            int totalSegments, int currentSegment, UAMP player) {
 
         Map<String, Object> attributes = getBasicAnalyticsAttributesForContent(content);
         attributes.putAll(getDetailedContentAttributes(content));
@@ -245,6 +246,9 @@ public class AnalyticsHelper {
         attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_CURRENT_POSITION, currentPosition);
         attributes.put(AnalyticsTags.ATTRIBUTE_NUMBER_OF_SEGMENTS, totalSegments);
         attributes.put(AnalyticsTags.ATTRIBUTE_SEGMENT_NUMBER, currentSegment);
+
+        attributes.put(AnalyticsTags.ATTRIBUTE_PLAYER, player.getPlayerObject());
+
         sendAnalytics(AnalyticsTags.ACTION_PLAYBACK_STARTED, attributes);
     }
 

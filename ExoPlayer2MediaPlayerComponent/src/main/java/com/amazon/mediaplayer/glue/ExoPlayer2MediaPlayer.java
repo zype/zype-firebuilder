@@ -1047,4 +1047,9 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
             mSurfaceView.getHolder().setFixedSize(newWidth, newHeight);
         }
     }
+
+    @Override
+    public Object getPlayerObject() {
+        return mPlayer;
+    }
 }
