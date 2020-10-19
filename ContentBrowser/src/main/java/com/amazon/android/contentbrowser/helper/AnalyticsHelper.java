@@ -29,6 +29,7 @@ import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import com.amazon.analytics.AnalyticsActionBuilder;
 import com.amazon.analytics.AnalyticsTags;
@@ -147,12 +148,19 @@ public class AnalyticsHelper {
         // try to test individual components that rely on ContentBrowser.
         if (AnalyticsManager.getInstance(ContentBrowserApplication.getInstance()) != null) {
 
-            IAnalytics analyticsInterface =
+           /* IAnalytics analyticsInterface =
                     AnalyticsManager.getInstance(ContentBrowserApplication.getInstance())
                                     .getIAnalytics();
 
             if (analyticsInterface != null) {
                 analyticsInterface.trackAction(data);
+            }*/
+
+            Set<IAnalytics> analyticsSet = AnalyticsManager
+                    .getInstance(ContentBrowserApplication.getInstance())
+                    .getIAnalyticsSet();
+            for (IAnalytics analytics : analyticsSet) {
+                analytics.trackAction(data);
             }
         }
     }

@@ -18,6 +18,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 // Uncomment when using CrashlyticsComponent
 //apply plugin: 'io.fabric'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
 apply from: "../artifacts.gradle"
 
 repositories {
@@ -37,6 +39,8 @@ buildscript {
         classpath 'me.tatarka:gradle-retrolambda:3.7.1'
         // Uncomment when using CrashlyticsComponent
         //classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'com.google.gms:google-services:4.3.3'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.2.0'
     }
 }
 
@@ -165,6 +169,9 @@ dependencies {
     api project(':VastAdsComponent')
     api project(':AmazonInAppPurchaseComponent')
     implementation project(':AkamaiAnalyticsComponent')
+    
+    api project(':CrashlyticsComponent')
+
 //    implementation project(':LoggerAnalyticsComponent')
     // Uncomment when using CrashlyticsComponent
     /*implementation('com.crashlytics.sdk.android:crashlytics:2.6.1@aar') {

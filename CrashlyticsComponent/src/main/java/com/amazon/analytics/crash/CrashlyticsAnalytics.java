@@ -22,11 +22,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.amazon.analytics.CustomAnalyticsTags;
-import com.crashlytics.android.Crashlytics;
+//import com.crashlytics.android.Crashlytics;
 
 import com.amazon.analytics.AnalyticsTags;
-import io.fabric.sdk.android.Fabric;
+//import io.fabric.sdk.android.Fabric;
 import com.amazon.analytics.IAnalytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 /**
  * An analytics implementation using the
@@ -54,7 +55,8 @@ public class CrashlyticsAnalytics implements IAnalytics {
     @Override
     public void configure(Context context) {
 
-        Fabric.with(context, new Crashlytics());
+//        Fabric.with(context, new Crashlytics());
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
 
         mCustomTags.init(context, R.string.crashlytics_analytics_custom_tags);
     }
@@ -65,9 +67,13 @@ public class CrashlyticsAnalytics implements IAnalytics {
     @Override
     public void collectLifeCycleData(Activity activity, boolean active) {
 
-        Crashlytics.log("Collecting life cycle data for activity: " + activity.toString() +
+//        Crashlytics.log("Collecting life cycle data for activity: " + activity.toString() +
+//                                ", active:" + active);
+//        Crashlytics.setBool(activity.toString(), active);
+        FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+        crashlytics.log("Collecting life cycle data for activity: " + activity.toString() +
                                 ", active:" + active);
-        Crashlytics.setBool(activity.toString(), active);
+        crashlytics.setCustomKey(activity.toString(), active);
     }
 
     /**
@@ -77,14 +83,18 @@ public class CrashlyticsAnalytics implements IAnalytics {
     public void trackAction(HashMap<String, Object> data) {
 
         String action = (String) data.get(AnalyticsTags.ACTION_NAME);
-        Crashlytics.setString(AnalyticsTags.ACTION_NAME, mCustomTags.getCustomTag(action));
+//        Crashlytics.setString(AnalyticsTags.ACTION_NAME, mCustomTags.getCustomTag(action));
+        FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+        crashlytics.setCustomKey(AnalyticsTags.ACTION_NAME, mCustomTags.getCustomTag(action));
 
         try {
             Map<String, Object> contextDataObjectMap =
                     (Map<String, Object>) data.get(AnalyticsTags.ATTRIBUTES);
 
             for (String key : contextDataObjectMap.keySet()) {
-                Crashlytics.setString(mCustomTags.getCustomTag(key),
+//                Crashlytics.setString(mCustomTags.getCustomTag(key),
+//                        String.valueOf(contextDataObjectMap.get(key)));
+                crashlytics.setCustomKey(mCustomTags.getCustomTag(key),
                         String.valueOf(contextDataObjectMap.get(key)));
             }
         }
@@ -92,7 +102,8 @@ public class CrashlyticsAnalytics implements IAnalytics {
             Log.e(TAG, "The params map was not of type <String, String> for action " + action +
                     ", dropping the map and just logging the event", e);
             // Record action.
-            Crashlytics.setString(AnalyticsTags.ACTION_NAME, mCustomTags.getCustomTag(action));
+//            Crashlytics.setString(AnalyticsTags.ACTION_NAME, mCustomTags.getCustomTag(action));
+            crashlytics.setCustomKey(AnalyticsTags.ACTION_NAME, mCustomTags.getCustomTag(action));
         }
     }
 
@@ -102,7 +113,9 @@ public class CrashlyticsAnalytics implements IAnalytics {
     @Override
     public void trackState(String screen) {
 
-        Crashlytics.log("Tracking screen " + screen);
+//        Crashlytics.log("Tracking screen " + screen);
+        FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+        crashlytics.log("Tracking screen " + screen);
     }
 
     /**
@@ -111,7 +124,9 @@ public class CrashlyticsAnalytics implements IAnalytics {
     @Override
     public void trackCaughtError(String errorMessage, Throwable t) {
 
-        Crashlytics.logException(t);
+//        Crashlytics.logException(t);
+        FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+        crashlytics.recordException(t);
     }
 
 }
