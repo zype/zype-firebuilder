@@ -28,10 +28,9 @@ import com.google.android.exoplayer2.ExoPlayerLibraryInfo;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.mediamelon.smartstreaming.MMQBRMode;
-import com.mediamelon.smartstreaming.MMSmartStreamingExo2;
+import com.mediamelon.smartstreaming.MMSmartStreamingExo2_6;
 import com.mediamelon.smartstreaming.MMSmartStreamingInitializationStatus;
 import com.mediamelon.smartstreaming.MMSmartStreamingObserver;
-import com.zype.fire.analytics.mediamelon.R;
 
 import static com.amazon.analytics.AnalyticsTags.ATTRIBUTE_PLAYER;
 import static com.amazon.analytics.AnalyticsTags.ATTRIBUTE_VIDEO_ID;
@@ -72,15 +71,15 @@ public class MediaMelonAnalytics implements IAnalytics, MMSmartStreamingObserver
 
         mCustomTags.init(context, R.string.mediamelon_analytics_custom_tags);
 
-        MMSmartStreamingExo2.enableLogTrace(true);
-        isInitialized = MMSmartStreamingExo2.getRegistrationStatus();
+        MMSmartStreamingExo2_6.enableLogTrace(true);
+        isInitialized = MMSmartStreamingExo2_6.getRegistrationStatus();
 
         Log.d(TAG, "Configuration done.");
     }
 
     private void init(HashMap<String, Object> attributes) {
         if (!isInitialized) {
-            MMSmartStreamingExo2.registerMMSmartStreaming(
+            MMSmartStreamingExo2_6.registerMMSmartStreaming(
                     "ExoPlayer_" + ExoPlayerLibraryInfo.VERSION,
                     context.getString(R.string.mediamelon_customer_id),
                     (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_CONSUMER_ID),       // SubscriberId
@@ -88,8 +87,8 @@ public class MediaMelonAnalytics implements IAnalytics, MMSmartStreamingObserver
                     "",         // SubscriberType
                     ""          // SubscriberTag
             );
-            MMSmartStreamingExo2.reportPlayerInfo("MediaMelon", "ExoPlayer/" + ExoPlayerLibraryInfo.VERSION, "1.0");
-            MMSmartStreamingExo2.getInstance().setContext(context);
+            MMSmartStreamingExo2_6.reportPlayerInfo("MediaMelon", "ExoPlayer/" + ExoPlayerLibraryInfo.VERSION, "1.0");
+            MMSmartStreamingExo2_6.getInstance().setContext(context);
             isInitialized = true;
             Log.d(TAG, "init(): MediaMelon initialized");
         }
@@ -103,12 +102,8 @@ public class MediaMelonAnalytics implements IAnalytics, MMSmartStreamingObserver
      */
     @Override
     public void collectLifeCycleData(Activity activity, boolean active) {
-
-        if (!active) {
-        }
-
-        Log.d(TAG, "Collecting life cycle data for activity: " + activity.toString() + ", active: "
-                + active);
+        Log.d(TAG, "collectingLifeCycleData(): Activity: " + activity.toString() + ", active: "
+                + active + ". Not implemented.");
     }
 
     /**
@@ -129,7 +124,7 @@ public class MediaMelonAnalytics implements IAnalytics, MMSmartStreamingObserver
         switch (action) {
             case AnalyticsTags.ACTION_PLAYBACK_STARTED:
                 init(attributes);
-                MMSmartStreamingExo2.getInstance().initializeSession(
+                MMSmartStreamingExo2_6.getInstance().initializeSession(
                         (SimpleExoPlayer) attributes.get(ATTRIBUTE_PLAYER),
                         MMQBRMode.QBRModeDisabled,
                         (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_VIDEO_URL),
@@ -139,14 +134,14 @@ public class MediaMelonAnalytics implements IAnalytics, MMSmartStreamingObserver
                         (String) attributes.get(ATTRIBUTE_VIDEO_ID),
                         this
                 );
-                MMSmartStreamingExo2.getInstance().reportCustomMetadata("siteId",
+                MMSmartStreamingExo2_6.getInstance().reportCustomMetadata("siteId",
                         (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_SITE_ID));
-                MMSmartStreamingExo2.getInstance().reportCustomMetadata("subscriptionId",
+                MMSmartStreamingExo2_6.getInstance().reportCustomMetadata("subscriptionId",
                         (String) attributes.get(AnalyticsTags.ATTRIBUTE_SUBSCRIPTION_ID));
-                MMSmartStreamingExo2.getInstance().reportUserInitiatedPlayback();
+                MMSmartStreamingExo2_6.getInstance().reportUserInitiatedPlayback();
                 break;
             case AnalyticsTags.ACTION_PLAYBACK_FINISHED:
-                MMSmartStreamingExo2.getInstance().reportPlayerState(false, Player.STATE_ENDED);
+                MMSmartStreamingExo2_6.getInstance().reportPlayerState(false, Player.STATE_ENDED);
                 break;
         }
     }
