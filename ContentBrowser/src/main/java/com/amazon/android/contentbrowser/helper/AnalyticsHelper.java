@@ -36,6 +36,9 @@ import com.amazon.analytics.AnalyticsTags;
 import com.amazon.analytics.AnalyticsManager;
 import com.amazon.android.recipe.Recipe;
 import com.amazon.android.uamp.UAMP;
+import com.amazon.android.utils.Preferences;
+import com.zype.fire.api.Model.Analytics;
+import com.zype.fire.auth.ZypeAuthentication;
 
 /**
  * Analytics helper class.
@@ -248,6 +251,12 @@ public class AnalyticsHelper {
         attributes.put(AnalyticsTags.ATTRIBUTE_SEGMENT_NUMBER, currentSegment);
 
         attributes.put(AnalyticsTags.ATTRIBUTE_PLAYER, player.getPlayerObject());
+        Set<String> subscriptionIds = Preferences.getStringSet(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_IDS);
+        String subscriptionId = null;
+        if (subscriptionIds != null && !subscriptionIds.isEmpty()) {
+            subscriptionId = subscriptionIds.iterator().next();
+        }
+        attributes.put(AnalyticsTags.ATTRIBUTE_SUBSCRIPTION_ID, subscriptionId);
 
         sendAnalytics(AnalyticsTags.ACTION_PLAYBACK_STARTED, attributes);
     }

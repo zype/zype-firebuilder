@@ -17,6 +17,7 @@ import com.zype.fire.api.ZypeApi;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -30,10 +31,11 @@ public class ZypeAuthentication implements IAuthentication {
     public static final String PREFERENCE_ACCESS_TOKEN_EXPIRES_IN = "ZypeAccessTokenExpiresIn";
     public static final String PREFERENCE_REFRESH_TOKEN = "ZypeRefreshToken";
     public static final String PREFERENCE_RESOURCE_OWNER_ID = "ZypeResourceOwnerId";
-    public static final String PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT = "ZypeConsumerSubscriptionCount";
     public static final String PREFERENCE_CONSUMER_EMAIL = "ZypeConsumerEmail";
     public static final String PREFERENCE_CONSUMER_ID = "ZypeConsumerId";
     public static final String PREFERENCE_CONSUMER_PASSWORD = "ZypeConsumerPassword";
+    public static final String PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT = "ZypeConsumerSubscriptionCount";
+    public static final String PREFERENCE_CONSUMER_SUBSCRIPTION_IDS = "ZypeConsumerSubscriptionIds";
     public static final String PREFERENCE_IS_DEVICE_LINKED = "ZypeIsDeviceLinked";
 
     private static final String RESPONSE_ACCESS_TOKEN = "ResponseAccessToken";
@@ -144,6 +146,7 @@ public class ZypeAuthentication implements IAuthentication {
         Preferences.setString(ZypeAuthentication.PREFERENCE_REFRESH_TOKEN, "");
         Preferences.setString(ZypeAuthentication.PREFERENCE_RESOURCE_OWNER_ID, "");
         Preferences.setLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT, 0);
+        Preferences.setStringSet(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT, null);
         Preferences.setString(ZypeAuthentication.PREFERENCE_CONSUMER_ID, null);
         Preferences.setBoolean(ZypeAuthentication.PREFERENCE_IS_DEVICE_LINKED, false);
         responseHandler.onSuccess(new Bundle());
@@ -272,6 +275,7 @@ public class ZypeAuthentication implements IAuthentication {
         Preferences.setString(ZypeAuthentication.PREFERENCE_REFRESH_TOKEN, refreshToken);
         Preferences.setString(ZypeAuthentication.PREFERENCE_RESOURCE_OWNER_ID, resourceOwnerId);
         Preferences.setLong(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_COUNT, consumer.subscriptionCount);
+        Preferences.setStringSet(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_IDS, new HashSet<String>(consumer.subscriptionIds));
         Preferences.setString(ZypeAuthentication.PREFERENCE_CONSUMER_EMAIL, consumer.email);
         Preferences.setString(ZypeAuthentication.PREFERENCE_CONSUMER_ID, consumer.id);
         Preferences.setBoolean(ZypeAuthentication.PREFERENCE_IS_DEVICE_LINKED, isDeviceLinked);

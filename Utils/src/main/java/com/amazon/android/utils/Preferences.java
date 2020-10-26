@@ -18,6 +18,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import java.util.HashSet;
+import java.util.Set;
+
 
 /**
  * Preferences helper class.
@@ -86,6 +89,15 @@ public class Preferences {
         editor.apply();
     }
 
+    public static void setStringSet(String key, Set<String> value) {
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(sContext);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        editor.putStringSet(key, value);
+        editor.apply();
+    }
+
     /**
      * Set string value to preferences.
      *
@@ -120,6 +132,12 @@ public class Preferences {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(sContext);
         return prefs.getLong(key, 0);
+    }
+
+    public static Set<String> getStringSet(String key) {
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(sContext);
+        return prefs.getStringSet(key, new HashSet<>());
     }
 
     /**

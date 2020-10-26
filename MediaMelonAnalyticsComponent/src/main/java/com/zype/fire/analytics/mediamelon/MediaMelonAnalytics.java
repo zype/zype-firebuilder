@@ -17,6 +17,7 @@ package com.zype.fire.analytics.mediamelon;
 
 import android.app.Activity;
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.HashMap;
@@ -33,6 +34,7 @@ import com.mediamelon.smartstreaming.MMSmartStreamingInitializationStatus;
 import com.mediamelon.smartstreaming.MMSmartStreamingObserver;
 
 import static com.amazon.analytics.AnalyticsTags.ATTRIBUTE_PLAYER;
+import static com.amazon.analytics.AnalyticsTags.ATTRIBUTE_TITLE;
 import static com.amazon.analytics.AnalyticsTags.ATTRIBUTE_VIDEO_ID;
 
 /**
@@ -79,12 +81,14 @@ public class MediaMelonAnalytics implements IAnalytics, MMSmartStreamingObserver
 
     private void init(HashMap<String, Object> attributes) {
         if (!isInitialized) {
+            String consumerId = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_CONSUMER_ID);
+            String subscriptionId = (String) attributes.get(AnalyticsTags.ATTRIBUTE_SUBSCRIPTION_ID);
             MMSmartStreamingExo2_6.registerMMSmartStreaming(
                     "ExoPlayer_" + ExoPlayerLibraryInfo.VERSION,
                     context.getString(R.string.mediamelon_customer_id),
-                    (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_CONSUMER_ID),       // SubscriberId
-                    "",         // DomainName
-                    "",         // SubscriberType
+                    TextUtils.isEmpty(consumerId) ? "" : consumerId,       // SubscriberId
+                    context.getApplicationInfo().packageName,         // DomainName
+                    TextUtils.isEmpty(subscriptionId) ? "" : "subscription",         // SubscriberType
                     ""          // SubscriberTag
             );
             MMSmartStreamingExo2_6.reportPlayerInfo("MediaMelon", "ExoPlayer/" + ExoPlayerLibraryInfo.VERSION, "1.0");
@@ -130,7 +134,7 @@ public class MediaMelonAnalytics implements IAnalytics, MMSmartStreamingObserver
                         (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_VIDEO_URL),
                         null,
                         "",     // AssetId
-                        "",     // AssetName
+                        (String) attributes.get(ATTRIBUTE_TITLE),     // AssetName
                         (String) attributes.get(ATTRIBUTE_VIDEO_ID),
                         this
                 );
