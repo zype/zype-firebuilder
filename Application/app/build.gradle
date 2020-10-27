@@ -98,13 +98,15 @@ android {
     productFlavors {
         zype {
             manifestPlaceholders = [
-                    crashlyticsCollectionEnabled: "true"
+                    crashlyticsCollectionEnabled: "true",
+                    performanceMonitoringEnabled : "true"
             ]
         }
         template {
             applicationId "<APPLICATION_ID>"
             manifestPlaceholders = [
-                    crashlyticsCollectionEnabled: "true"
+                    crashlyticsCollectionEnabled: "true",
+                    performanceMonitoringEnabled : "true"
             ]
         }
     }
