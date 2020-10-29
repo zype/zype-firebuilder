@@ -6,7 +6,7 @@
     android:layout_height="35dp"
     android:orientation="vertical"
     android:background="@drawable/top_menu_item_background"
-    android:backgroundTint="#E6040460"
+    android:backgroundTint="@color/accent"
     android:focusable="true"
     android:clickable="true"
     >

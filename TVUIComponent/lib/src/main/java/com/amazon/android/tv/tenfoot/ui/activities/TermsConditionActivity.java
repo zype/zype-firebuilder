@@ -62,4 +62,8 @@ public class TermsConditionActivity extends BaseActivity {
         }
 
     }
+
+    @Override
+    public void setRestoreActivityValues() {
+    }
 }
