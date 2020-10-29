@@ -47,8 +47,6 @@ import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
-import com.mediamelon.smartstreaming.MMChunkInformation;
-import com.mediamelon.smartstreaming.MMPresentationInfo;
 
 import java.io.IOException;
 import java.text.NumberFormat;
@@ -59,9 +57,10 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
 /**
  * Logs player events using {@link Log}.
  */
-/* package */ final class EventLoggerExo2_6 implements Player.EventListener, MetadataOutput,
-    AudioRendererEventListener, VideoRendererEventListener, AdaptiveMediaSourceEventListener,
-    ExtractorMediaSource.EventListener, DefaultDrmSessionManager.EventListener {
+/* package */ final class EventLoggerExo2_6 extends Player.DefaultEventListener implements
+        MetadataOutput,
+        AudioRendererEventListener, VideoRendererEventListener, AdaptiveMediaSourceEventListener,
+        ExtractorMediaSource.EventListener, DefaultDrmSessionManager.EventListener {
 
   private static final String TAG = "EventLogger2_6";
   private static final int MAX_TIMELINE_ITEM_LINES = 3;
@@ -116,11 +115,11 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
   @Override
   public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
     Log.d(TAG, "playbackParameters " + String.format(
-        "[speed=%.2f, pitch=%.2f]", playbackParameters.speed, playbackParameters.pitch));
+            "[speed=%.2f, pitch=%.2f]", playbackParameters.speed, playbackParameters.pitch));
   }
 
   @Override
-  public void onTimelineChanged(Timeline timeline, Object manifest, int val) {
+  public void onTimelineChanged(Timeline timeline, Object manifest) {
     MMPresentationInfo info = new MMPresentationInfo();
     if(timeline.getWindowCount() > 0){
       timeline.getWindow(0, window);
@@ -199,14 +198,14 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
 
   @Override
   public void onAudioDecoderInitialized(String decoderName, long elapsedRealtimeMs,
-      long initializationDurationMs) {
+                                        long initializationDurationMs) {
     Log.d(TAG, "audioDecoderInitialized [" + getSessionTimeString() + ", " + decoderName + "]");
   }
 
   @Override
   public void onAudioInputFormatChanged(Format format) {
     Log.d(TAG, "audioFormatChanged [" + getSessionTimeString() + ", " + Format.toLogString(format)
-        + "]");
+            + "]");
   }
 
   @Override
@@ -217,7 +216,7 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
   @Override
   public void onAudioSinkUnderrun(int bufferSize, long bufferSizeMs, long elapsedSinceLastFeedMs) {
     printInternalError("audioTrackUnderrun [" + bufferSize + ", " + bufferSizeMs + ", "
-        + elapsedSinceLastFeedMs + "]", null);
+            + elapsedSinceLastFeedMs + "]", null);
     Log.e(TAG, "audioTrackUnderrun" + bufferSize + ", " + bufferSizeMs + ", " + elapsedSinceLastFeedMs + "]");
     long eventTime = -1;
     if(player != null){
@@ -236,14 +235,14 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
 
   @Override
   public void onVideoDecoderInitialized(String decoderName, long elapsedRealtimeMs,
-      long initializationDurationMs) {
+                                        long initializationDurationMs) {
     Log.d(TAG, "videoDecoderInitialized [" + getSessionTimeString() + ", " + decoderName + "]");
   }
 
   @Override
   public void onVideoInputFormatChanged(Format format) {
     Log.d(TAG, "videoFormatChanged [" + getSessionTimeString() + ", " + Format.toLogString(format)
-        + "]");
+            + "]");
   }
 
   @Override
@@ -259,7 +258,7 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
 
   @Override
   public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees,
-      float pixelWidthHeightRatio) {
+                                 float pixelWidthHeightRatio) {
     Log.d(TAG, "videoSizeChanged [" + width + ", " + height + "]");
   }
 
@@ -311,16 +310,16 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
 
   @Override
   public void onLoadStarted(DataSpec dataSpec, int dataType, int trackType, Format trackFormat,
-      int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs,
-      long mediaEndTimeMs, long elapsedRealtimeMs) {
+                            int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs,
+                            long mediaEndTimeMs, long elapsedRealtimeMs) {
     // Do nothing.
   }
 
   @Override
   public void onLoadError(DataSpec dataSpec, int dataType, int trackType, Format trackFormat,
-      int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs,
-      long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded,
-      IOException error, boolean wasCanceled) {
+                          int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs,
+                          long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded,
+                          IOException error, boolean wasCanceled) {
     printInternalError("loadError", error);
     long eventTime = -1;
     if(player != null){
@@ -331,15 +330,15 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
 
   @Override
   public void onLoadCanceled(DataSpec dataSpec, int dataType, int trackType, Format trackFormat,
-      int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs,
-      long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded) {
+                             int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs,
+                             long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded) {
     // Do nothing.
   }
 
   @Override
   public void onLoadCompleted(DataSpec dataSpec, int dataType, int trackType, Format trackFormat,
-      int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs,
-      long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded) {
+                              int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs,
+                              long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded) {
     // Do nothing.
     if(dataType == DATA_TYPE_MEDIA &&
             trackFormat!= null &&
@@ -362,7 +361,7 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
 
   @Override
   public void onDownstreamFormatChanged(int trackType, Format trackFormat, int trackSelectionReason,
-      Object trackSelectionData, long mediaTimeMs) {
+                                        Object trackSelectionData, long mediaTimeMs) {
     // Do nothing.
   }
 
@@ -378,7 +377,7 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
       if (entry instanceof TextInformationFrame) {
         TextInformationFrame textInformationFrame = (TextInformationFrame) entry;
         Log.d(TAG, prefix + String.format("%s: value=%s", textInformationFrame.id,
-            textInformationFrame.value));
+                textInformationFrame.value));
       } else if (entry instanceof UrlLinkFrame) {
         UrlLinkFrame urlLinkFrame = (UrlLinkFrame) entry;
         Log.d(TAG, prefix + String.format("%s: url=%s", urlLinkFrame.id, urlLinkFrame.url));
@@ -388,22 +387,22 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
       } else if (entry instanceof GeobFrame) {
         GeobFrame geobFrame = (GeobFrame) entry;
         Log.d(TAG, prefix + String.format("%s: mimeType=%s, filename=%s, description=%s",
-            geobFrame.id, geobFrame.mimeType, geobFrame.filename, geobFrame.description));
+                geobFrame.id, geobFrame.mimeType, geobFrame.filename, geobFrame.description));
       } else if (entry instanceof ApicFrame) {
         ApicFrame apicFrame = (ApicFrame) entry;
         Log.d(TAG, prefix + String.format("%s: mimeType=%s, description=%s",
-            apicFrame.id, apicFrame.mimeType, apicFrame.description));
+                apicFrame.id, apicFrame.mimeType, apicFrame.description));
       } else if (entry instanceof CommentFrame) {
         CommentFrame commentFrame = (CommentFrame) entry;
         Log.d(TAG, prefix + String.format("%s: language=%s, description=%s", commentFrame.id,
-            commentFrame.language, commentFrame.description));
+                commentFrame.language, commentFrame.description));
       } else if (entry instanceof Id3Frame) {
         Id3Frame id3Frame = (Id3Frame) entry;
         Log.d(TAG, prefix + String.format("%s", id3Frame.id));
       } else if (entry instanceof EventMessage) {
         EventMessage eventMessage = (EventMessage) entry;
         Log.d(TAG, prefix + String.format("EMSG: scheme=%s, id=%d, value=%s",
-            eventMessage.schemeIdUri, eventMessage.id, eventMessage.value));
+                eventMessage.schemeIdUri, eventMessage.id, eventMessage.value));
       }
     }
   }
@@ -465,9 +464,9 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
   }
 
   private static String getTrackStatusString(TrackSelection selection, TrackGroup group,
-      int trackIndex) {
+                                             int trackIndex) {
     return getTrackStatusString(selection != null && selection.getTrackGroup() == group
-        && selection.indexOf(trackIndex) != C.INDEX_UNSET);
+            && selection.indexOf(trackIndex) != C.INDEX_UNSET);
   }
 
   private static String getTrackStatusString(boolean enabled) {
