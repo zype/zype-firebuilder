@@ -17,6 +17,7 @@ package com.amazon.android.contentbrowser.database;
 import com.amazon.android.contentbrowser.database.records.VideoFavoriteRecord;
 import com.amazon.android.contentbrowser.database.tables.RecentTable;
 import com.amazon.android.contentbrowser.database.tables.RecommendationTable;
+import com.amazon.android.contentbrowser.database.tables.VideoEntitlementsTable;
 import com.amazon.android.contentbrowser.database.tables.VideoFavoritesTable;
 import com.amazon.android.contentbrowser.database.tables.WatchlistTable;
 import com.amazon.utils.StringManipulation;
@@ -48,7 +49,7 @@ public class ContentDatabase extends SQLiteOpenHelper {
      * The database version. If this is changed onUpgrade will be called. Put any logic needed to
      * change or maintain database in that method.
      */
-    private static int DATABASE_VERSION = 4;
+    private static int DATABASE_VERSION = 5;
     
     /**
      * The SQLiteDatabase instance.
@@ -137,6 +138,12 @@ public class ContentDatabase extends SQLiteOpenHelper {
         catch (Exception e) {
 
         }
+        try {
+            db.execSQL(VideoEntitlementsTable.SQL_CREATE_TABLE);
+        }
+        catch (Exception e) {
+
+        }
 
     }
     
@@ -154,6 +161,7 @@ public class ContentDatabase extends SQLiteOpenHelper {
             db.execSQL(WatchlistTable.SQL_CREATE_TABLE);
             /* Zype, Evgeny Cherkasov */
             db.execSQL(VideoFavoritesTable.SQL_CREATE_TABLE);
+            db.execSQL(VideoEntitlementsTable.SQL_CREATE_TABLE);
         }
         catch (Exception e) {
             Log.e(TAG, "Error creating database tables: " + e);

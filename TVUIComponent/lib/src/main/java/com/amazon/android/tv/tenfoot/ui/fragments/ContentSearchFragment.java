@@ -46,21 +46,21 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.HeaderItem;
-import android.support.v17.leanback.widget.ImageCardView;
-import android.support.v17.leanback.widget.ListRow;
-import android.support.v17.leanback.widget.ObjectAdapter;
-import android.support.v17.leanback.widget.OnItemViewClickedListener;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v17.leanback.widget.Row;
-import android.support.v17.leanback.widget.RowHeaderPresenter;
-import android.support.v17.leanback.widget.RowPresenter;
-import android.support.v17.leanback.widget.SearchBar;
-import android.support.v17.leanback.widget.SearchEditText;
-import android.support.v17.leanback.widget.SpeechOrbView;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.HeaderItem;
+import androidx.leanback.widget.ImageCardView;
+import androidx.leanback.widget.ListRow;
+import androidx.leanback.widget.ObjectAdapter;
+import androidx.leanback.widget.OnItemViewClickedListener;
+import androidx.leanback.widget.Presenter;
+import androidx.leanback.widget.Row;
+import androidx.leanback.widget.RowHeaderPresenter;
+import androidx.leanback.widget.RowPresenter;
+import androidx.leanback.widget.SearchBar;
+import androidx.leanback.widget.SearchEditText;
+import androidx.leanback.widget.SpeechOrbView;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -78,8 +78,8 @@ import android.widget.Toast;
  * SearchManager}.
  * This class will populate the search results row when the search is complete.
  */
-public class ContentSearchFragment extends android.support.v17.leanback.app.SearchFragment
-        implements android.support.v17.leanback.app.SearchFragment.SearchResultProvider {
+public class ContentSearchFragment extends androidx.leanback.app.SearchFragment
+        implements androidx.leanback.app.SearchFragment.SearchResultProvider {
 
     private static final String TAG = ContentSearchFragment.class.getSimpleName();
     private static final boolean DEBUG = BuildConfig.DEBUG;

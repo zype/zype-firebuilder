@@ -70,10 +70,13 @@ public class FavoritesManager {
         eventBus = EventBus.getDefault();
     }
 
+    public void clearVideoFavorites() {
+        if (ZypeConfiguration.isFavoritesViaApiEnabled(context)) {
+            contentBrowser.setFavoritesLoaded(false);
+            VideoFavoritesHelper.getInstance().clearDatabase(context);
+        }
+    }
 
-    // //////////
-    //
-    //
     public void loadFavoritesVideos(ContentContainer contentContainer) {
         Observable<Object> observable = Observable.just(contentContainer.getContentContainers().get(0));
         Recipe recipeDynamicParserVideos = Recipe.newInstance(context, "recipes/ZypeSearchContentsRecipe.json");

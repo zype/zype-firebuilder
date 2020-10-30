@@ -16,15 +16,15 @@ apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "24.0.3"
+    compileSdkVersion 28
+    buildToolsVersion "25.0.3"
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 23
+        minSdkVersion 20
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
     buildTypes {
@@ -43,37 +43,37 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.android.support:support-v4:23.1.1'
-    compile 'com.android.support:recommendation:23.1.1'
+    api fileTree(dir: 'libs', include: ['*.jar'])
+    api 'androidx.appcompat:appcompat:1.0.0'
+    api 'androidx.legacy:legacy-support-v4:1.0.0'
+    api 'androidx.recommendation:recommendation:1.0.0'
 
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
-    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
-    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
+    testImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
 
-    androidTestCompile('com.android.support.test:runner:0.4') {
+    androidTestImplementation('androidx.test.ext:junit:1.1.1') {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    androidTestCompile('com.android.support.test:rules:0.4') {
+    androidTestImplementation('androidx.test:rules:1.1.1') {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    androidTestCompile 'junit:junit:4.12'
+    androidTestImplementation 'junit:junit:4.12'
 
-    compile project(':ModuleInterface')
-    compile project(':AuthInterface')
-    compile project(':AnalyticsInterface')
-    compile project(':AdsInterface')
-    compile project(':PurchaseInterface')
-    compile project(':UAMP')
-    compile project(':DataLoader')
-    compile project(':DynamicParser')
-    compile project(':Utils')
-    compile project(':ContentModel')
+    api project(':ModuleInterface')
+    api project(':AuthInterface')
+    api project(':AnalyticsInterface')
+    api project(':AdsInterface')
+    api project(':PurchaseInterface')
+    api project(':UAMP')
+    api project(':DataLoader')
+    api project(':DynamicParser')
+    api project(':Utils')
+    api project(':ContentModel')
     // Global font support
-    compile project(':Calligraphy')
+    api project(':Calligraphy')
 
-    compile project(':ZypeAuthComponent')
+    api project(':ZypeAuthComponent')
 }
 
 buildscript {
@@ -81,6 +81,6 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'me.tatarka:gradle-retrolambda:3.2.3'
+        classpath 'me.tatarka:gradle-retrolambda:3.7.1'
     }
 }

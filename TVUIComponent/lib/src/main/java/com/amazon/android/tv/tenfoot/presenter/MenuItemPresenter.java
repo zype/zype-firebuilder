@@ -14,26 +14,18 @@
  */
 package com.amazon.android.tv.tenfoot.presenter;
 
-import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
-import android.support.v17.leanback.widget.BaseCardView;
-import android.support.v17.leanback.widget.ImageCardView;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
+import androidx.leanback.widget.BaseCardView;
+import androidx.leanback.widget.ImageCardView;
+import androidx.leanback.widget.Presenter;
+import androidx.core.content.ContextCompat;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.amazon.android.model.Action;
 import com.amazon.android.tv.tenfoot.R;
-import com.amazon.android.tv.tenfoot.base.TenFootApp;
-import com.amazon.android.tv.tenfoot.ui.Subscription.Model.SubscriptionItem;
-import com.amazon.android.tv.tenfoot.ui.Subscription.SubscriptionCardPresenter;
-import com.amazon.android.utils.Helpers;
 
 /**
  * Zype, Evgeny Cherkasov

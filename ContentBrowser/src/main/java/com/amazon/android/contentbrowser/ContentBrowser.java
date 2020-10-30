@@ -21,6 +21,7 @@ import com.amazon.android.contentbrowser.database.records.RecentRecord;
 import com.amazon.android.contentbrowser.database.records.VideoFavoriteRecord;
 import com.amazon.android.contentbrowser.helper.AnalyticsHelper;
 import com.amazon.android.contentbrowser.helper.AuthHelper;
+import com.amazon.android.contentbrowser.helper.EntitlementsManager;
 import com.amazon.android.contentbrowser.helper.ErrorHelper;
 import com.amazon.android.contentbrowser.helper.FontManager;
 import com.amazon.android.contentbrowser.Favorites.FavoritesManager;
@@ -46,7 +47,6 @@ import com.amazon.android.search.ISearchResult;
 import com.amazon.android.search.SearchManager;
 import com.amazon.android.ui.fragments.AlertDialogFragment;
 import com.amazon.android.ui.fragments.LogoutSettingsFragment;
-import com.amazon.android.ui.fragments.NoticeSettingsFragment;
 import com.amazon.android.ui.fragments.SlideShowSettingFragment;
 import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.LeanbackHelpers;
@@ -60,14 +60,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v17.leanback.widget.SparseArrayObjectAdapter;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.leanback.widget.SparseArrayObjectAdapter;
+
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -340,6 +343,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     /* Zype, Evgeny Cherkasov
      * begin */
     public static final String BROADCAST_DATA_LOADED = "DataLoaded";
+
+    public static final String BROADCAST_VIDEO_DETAIL_DATA_LOADED = "VideoDetailDataLoaded";
     /* Zype, end */
 
     /**
@@ -490,6 +495,8 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     private FavoritesManager favoritesManager;
     private boolean favoritesLoaded = false;
 
+    private EntitlementsManager entitlementsManager;
+
     /**
      * Returns AuthHelper instance.
      *
@@ -563,8 +570,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     private void setupMyLibraryAction() {
-        if (ZypeConfiguration.isUniversalTVODEnabled(mAppContext)) {
-            addSettingsAction(createMyLibrarySettingsAction());
+        if (ZypeSettings.LIBRARY_ENABLED) {
+            Action libraryAction = createMyLibrarySettingsAction();
+            addSettingsAction(libraryAction);
+            addSettingsHomeAction(libraryAction);
         }
     }
 
@@ -714,15 +723,18 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         //addSettingsAction(createSlideShowSettingAction());
         setupSearchAction();
-        setupLoginAction();
+        if (ZypeConfiguration.displayAccountNavigationButton()) {
+            setupLoginAction();
+        }
         if(ZypeSettings.EPG_ENABLED) {
             setupEpgAction();
         }
+        setupMyLibraryAction();
         setupFavoritesAction();
         //if (!TextUtils.isEmpty(Preferences.getString("ZypeTerms")))
-        addSettingsAction(createTermsOfUseSettingsAction());
-      //  setupMyLibraryAction();
-
+        if (ZypeConfiguration.displayTermsNavigationButton()) {
+            addSettingsAction(createTermsOfUseSettingsAction());
+        }
 
         mSearchManager.addSearchAlgo(DEFAULT_SEARCH_ALGO_NAME, new ISearchAlgo<Content>() {
             @Override
@@ -759,7 +771,28 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 else {
                     if (screenName != null) {
                         if (screenName.equals(CONTENT_SUBMENU_SCREEN)) {
-                            runGlobalRecipesForLastSelected(activity, ContentBrowser.this);
+                            if (getLastSelectedContentContainer().getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG)
+                                    .equals(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID)) {
+                                int favoritesSize = getLastSelectedContentContainer().getContentContainers().get(0).getContents().size();
+                                Log.d(TAG, "onScreenCreate(): favoritesLoaded=" + isFavoritesLoaded() + ", size=" + favoritesSize);
+                                if (isFavoritesLoaded() && favoritesSize > 0) {
+                                    Handler handler = new Handler();
+                                    handler.post(() -> mEventBus.post(new FavoritesLoadEvent(isFavoritesLoaded())));
+                                }
+                                else {
+                                    setFavoritesLoaded(false);
+                                    if (ZypeConfiguration.isFavoritesViaApiEnabled(mAppContext)) {
+                                        loadFavoritesVideos(getLastSelectedContentContainer());
+                                    }
+                                    else {
+                                        loadLocalFavoritesVideos(getLastSelectedContentContainer());
+                                    }
+                                }
+                            }
+                            else {
+                                runGlobalRecipesForLastSelected(activity, ContentBrowser.this);
+                            }
+//                            runGlobalRecipesForLastSelected(activity, ContentBrowser.this);
                         }
                     }
                 }
@@ -870,7 +903,6 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         // TODO: Consider other way to get subscription count preference to avoid dependency of ZypeAuthComponent
         userLoggedIn = authenticationStatusUpdateEvent.isUserAuthenticated();
         updateUserSubscribed();
-
         updateLoginAction();
 
         if(authenticationStatusUpdateEvent.isRegistration()) {
@@ -930,6 +962,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
         /* Zype, Evgeny Cherkasov */
         favoritesManager = new FavoritesManager(mAppContext, this);
+        entitlementsManager = new EntitlementsManager(mAppContext, this);
 
         // The app successfully loaded its modules so clear out the crash number.
         Preferences.setLong(ModularApplication.APP_CRASHES_KEY, 0);
@@ -1287,7 +1320,6 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      */
     private Action createMyLibrarySettingsAction() {
         return new Action().setAction(MY_LIBRARY)
-                // TODO: Change action icon
                 .setIconResourceId(R.drawable.ic_video_library_white_48dp)
                 .setLabel1(mAppContext.getString(R.string.my_library_label));
     }
@@ -1369,18 +1401,17 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             recommendedContentContainer= new ContentContainer("");
         }
 
-
-        for (Content c : mContentLoader.getRootContentContainer()) {
-            if (content.hasSimilarTags(c) && !StringManipulation.areStringsEqual(c.getId(),
-                    content.getId())) {
-                recommendedContentContainer.addContent(c);
-            }
-        }
+//        for (Content c : mContentLoader.getRootContentContainer()) {
+//            if (content.hasSimilarTags(c) && !StringManipulation.areStringsEqual(c.getId(),
+//                    content.getId())) {
+//                recommendedContentContainer.addContent(c);
+//            }
+//        }
 
         // Use items from the same category as recommended contents
         // if there are no contents with similar tags and the config setting is set to true.
         if (recommendedContentContainer.getContents().isEmpty() &&
-                isUseCategoryAsDefaultRelatedContent()) {
+            isUseCategoryAsDefaultRelatedContent()) {
 
             ContentContainer parentContainer = getContainerForContent(content);
 
@@ -1390,45 +1421,48 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 //                    if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId
 //                            ())) {
 //                        recommendedContentContainer.addContent(relatedContent);
-                if (!content.isSubscriptionRequired()) {
-                    /* Zype, Evgeny Cherkasov */
-                    // Check is user logged in and has subscription.
-                    if (userLoggedIn) {
-                        // User is logged in and has subscription. Add all videos
-                        if (isUserSubscribed()) {
-                            for (Content relatedContent : parentContainer.getContents()) {
-                                if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId())) {
-                                    recommendedContentContainer.addContent(relatedContent);
-                                }
-                            }
-                        }
-                        else {
-                            // User is logged in but has no subscription. Add onlu not subscription videos
-                            for (Content relatedContent : parentContainer.getContents()) {
-                                if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId()) && !relatedContent.isSubscriptionRequired()) {
-                                    recommendedContentContainer.addContent(relatedContent);
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        // User id not logged in. Add only not subscription videos
-                        for (Content relatedContent : parentContainer.getContents()) {
-                            if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId()) && !relatedContent.isSubscriptionRequired()) {
-                                recommendedContentContainer.addContent(relatedContent);
-                            }
-                        }
-                    }
+                for (Content relatedContent : parentContainer.getContents()) {
+                    recommendedContentContainer.addContent(relatedContent);
                 }
-                else {
-                    // If current video is on subscription it mean we already checked user credentials
-                    // and can add all content from the category
-                    for (Content relatedContent : parentContainer.getContents()) {
-                        if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId())) {
-                            recommendedContentContainer.addContent(relatedContent);
-                        }
-                    }
-                }
+//                if (!content.isSubscriptionRequired()) {
+//                    /* Zype, Evgeny Cherkasov */
+//                    // Check is user logged in and has subscription.
+//                    if (userLoggedIn) {
+//                        // User is logged in and has subscription. Add all videos
+//                        if (isUserSubscribed()) {
+//                            for (Content relatedContent : parentContainer.getContents()) {
+//                                if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId())) {
+//                                    recommendedContentContainer.addContent(relatedContent);
+//                                }
+//                            }
+//                        }
+//                        else {
+//                            // User is logged in but has no subscription. Add onlu not subscription videos
+//                            for (Content relatedContent : parentContainer.getContents()) {
+//                                if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId()) && !relatedContent.isSubscriptionRequired()) {
+//                                    recommendedContentContainer.addContent(relatedContent);
+//                                }
+//                            }
+//                        }
+//                    }
+//                    else {
+//                        // User id not logged in. Add only not subscription videos
+//                        for (Content relatedContent : parentContainer.getContents()) {
+//                            if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId()) && !relatedContent.isSubscriptionRequired()) {
+//                                recommendedContentContainer.addContent(relatedContent);
+//                            }
+//                        }
+//                    }
+//                }
+//                else {
+//                    // If current video is on subscription it mean we already checked user credentials
+//                    // and can add all content from the category
+//                    for (Content relatedContent : parentContainer.getContents()) {
+//                        if (!StringManipulation.areStringsEqual(content.getId(), relatedContent.getId())) {
+//                            recommendedContentContainer.addContent(relatedContent);
+//                        }
+//                    }
+//                }
 
             }
             else {
@@ -1601,19 +1635,22 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                             boolean result = isAuthenticatedResultBundle.getBoolean(AuthHelper.RESULT);
                             if (result) {
                                 setLastSelectedContentContainer(contentContainer);
+//                                loadFavoritesVideos(contentContainer);
                                 switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
                             }
                             else {
-                                // TODO: Switch to Favorites screen after successful login
-                                mAuthHelper.handleAuthChain(extra -> mNavigator.startActivity(CONTENT_HOME_SCREEN, intent -> {
-                                }));
+                                mAuthHelper.handleAuthChain(extra -> {
+                                    setLastSelectedContentContainer(contentContainer);
+//                                    loadFavoritesVideos(contentContainer);
+                                    switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
+                                });
                             }
                         });
             }
             else {
                 setLastSelectedContentContainer(contentContainer);
                 switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
-                loadLocalFavoritesVideos(contentContainer);
+//                loadLocalFavoritesVideos(contentContainer);
             }
         }
     }
@@ -1661,8 +1698,19 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                             switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
                         }
                         else {
-                            mAuthHelper.handleAuthChain(extra -> mNavigator.startActivity(CONTENT_HOME_SCREEN, intent -> {
-                            }));
+                            mAuthHelper.handleAuthChain(extra -> {
+                                ContentLoader.ILoadContentForContentContainer listener = new ContentLoader.ILoadContentForContentContainer() {
+                                    @Override
+                                    public void onContentsLoaded() {
+                                    }
+                                };
+                                mContentLoader.loadContentForMyLibraryContentContainer(contentContainer, activity, listener);
+
+                                setLastSelectedContentContainer(contentContainer);
+                                switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
+
+//                                mNavigator.startActivity(CONTENT_HOME_SCREEN, intent -> {})
+                            });
                         }
                     });
         }
@@ -1675,6 +1723,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      * @return List of action for provided content.
      */
     public List<Action> getContentActionList(Content content) {
+
+        if(content == null) {
+            return Collections.emptyList();
+        }
 
         List<Action> contentActionList = new ArrayList<>();
 
@@ -1695,20 +1747,22 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         boolean subscriptionRequired = content.isSubscriptionRequired();
         boolean purchaseRequired = false;
         boolean playlistPurchaseRequired = false;
-        boolean entitled = false;
+        boolean entitled = entitlementsManager.isVideoEntitled(content);
 
         if (ZypeConfiguration.isUniversalTVODEnabled(mAppContext)) {
             purchaseRequired = content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED);
-            if (purchaseRequired && content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
-                entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
-            }
+//            if (purchaseRequired && content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
+//                entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
+//            }
 
-            ContentContainer playlist = getRootContentContainer()
-                    .findContentContainerById(content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
-            if (playlist != null) {
-                playlistPurchaseRequired = playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED);
-                if (!entitled && playlistPurchaseRequired && content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
-                    entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
+            if (ZypeSettings.PLAYLIST_PURCHASE_ENABLED) {
+                ContentContainer playlist = getRootContentContainer()
+                        .findContentContainerById(content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
+                if (playlist != null) {
+                    playlistPurchaseRequired = playlist.getExtraValueAsBoolean(ContentContainer.EXTRA_PURCHASE_REQUIRED);
+//                    if (!entitled && playlistPurchaseRequired && content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
+//                        entitled = content.getExtraValueAsBoolean(Content.EXTRA_ENTITLED);
+//                    }
                 }
             }
         }
@@ -1796,7 +1850,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
                 // Add "Resume" button if content playback is not complete.
                 if (record != null && !record.isPlaybackComplete()) {
-                    contentActionList.add(createActionButton(CONTENT_ACTION_RESUME,
+                    contentActionList.add(createActionButton(1, CONTENT_ACTION_RESUME,
                             R.string.resume_1, R.string.resume_2));
                     // Add "Watch From Beginning" button to start content over.
                     contentActionList.add(createActionButton(CONTENT_ACTION_WATCH_FROM_BEGINNING,
@@ -1804,7 +1858,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 }
                 // If the content has not been played yet, add the "Watch Now" button.
                 else {
-                    contentActionList.add(createActionButton(CONTENT_ACTION_WATCH_NOW,
+                    contentActionList.add(createActionButton(1, CONTENT_ACTION_WATCH_NOW,
                             R.string.watch_now_1, R.string.watch_now_2));
                 }
                 if (isWatchlistRowEnabled()) {
@@ -1812,13 +1866,13 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 }
             }
             else {
-                contentActionList.add(createActionButton(CONTENT_ACTION_WATCH_NOW,
+                contentActionList.add(createActionButton(1, CONTENT_ACTION_WATCH_NOW,
                         R.string.watch_now_1, R.string.watch_now_2));
             }
         }
 
         if(registrationRequired) {
-            contentActionList.add(createActionButton(CONTENT_REGISTRATION_REQUIRED,
+            contentActionList.add(createActionButton(2, CONTENT_REGISTRATION_REQUIRED,
                 R.string.action_signup_to_watch1, R.string.action_signup_to_watch2));
 
             if (content.hasTrailer()) {
@@ -1829,11 +1883,11 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         }
 
         if (showSubscribe) {
-            contentActionList.add(createActionButton(CONTENT_ACTION_CHOOSE_PLAN,
+            contentActionList.add(createActionButton(3, CONTENT_ACTION_CHOOSE_PLAN,
                     R.string.action_subscription_1, R.string.action_subscription_2));
         }
         if (showPurchase) {
-            contentActionList.add(createActionButton(CONTENT_ACTION_CONFIRM_PURCHASE,
+            contentActionList.add(createActionButton(4, CONTENT_ACTION_CONFIRM_PURCHASE,
                     R.string.action_buy_video_1, R.string.action_buy_video_2));
         }
         if (showPurchasePlaylist) {
@@ -1842,10 +1896,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             if (playlist != null) {
                 String purchasePrice = playlist.getExtraStringValue(ContentContainer.EXTRA_PURCHASE_PRICE);
                 int itemCount = playlist.getExtraValueAsInt(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT);
-                Action action = createActionButton(CONTENT_ACTION_CONFIRM_PURCHASE_PLAYLIST,
+                Action action = createActionButton(5, CONTENT_ACTION_CONFIRM_PURCHASE_PLAYLIST,
                         R.string.action_buy_playlist_1, R.string.action_buy_playlist_2);
-                action.setLabel1(String.format(mAppContext.getResources().getString(R.string.action_buy_playlist_1), String.valueOf(itemCount)));
-                action.setLabel2(String.format(mAppContext.getResources().getString(R.string.action_buy_playlist_2), purchasePrice));
+                action.setLabel1(5, String.format(mAppContext.getResources().getString(R.string.action_buy_playlist_1), String.valueOf(itemCount)));
+                action.setLabel2(5, String.format(mAppContext.getResources().getString(R.string.action_buy_playlist_2), purchasePrice));
                 contentActionList.add(action);
             }
         }
@@ -1911,11 +1965,16 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
      * @param stringId2       The id of the string to be displayed on the second line of text.
      * @return The action.
      */
-    private Action createActionButton(int contentActionId, int stringId1, int stringId2) {
+    private Action createActionButton(int state, int contentActionId, int stringId1, int stringId2) {
 
         return new Action().setId(contentActionId)
-                .setLabel1(mAppContext.getResources().getString(stringId1))
-                .setLabel2(mAppContext.getResources().getString(stringId2));
+                .setState(state)
+                .setLabel1(state, mAppContext.getResources().getString(stringId1))
+                .setLabel2(state, mAppContext.getResources().getString(stringId2));
+    }
+
+    private Action createActionButton(int contentActionId, int stringId1, int stringId2) {
+        return createActionButton(0, contentActionId, stringId1, stringId2);
     }
 
     /**
@@ -2954,16 +3013,26 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                             }
                         }, throwable -> {
                             Log.e(TAG, "Recipe chain failed:", throwable);
+                            LocalBroadcastManager.getInstance(mNavigator.getActiveActivity())
+                                    .sendBroadcast(new Intent(BROADCAST_DATA_LOADED));
+//                            ErrorHelper.injectErrorFragment(
+//                                    mNavigator.getActiveActivity(),
+//                                    ErrorUtils.ERROR_CATEGORY.FEED_ERROR,
+//                                    (errorDialogFragment, errorButtonType,
+//                                     errorCategory) -> {
+//                                        if (errorButtonType ==
+//                                                ErrorUtils.ERROR_BUTTON_TYPE.EXIT_APP) {
+//                                            mNavigator.getActiveActivity().finishAffinity();
+//                                        }
+//                                    });
                             ErrorHelper.injectErrorFragment(
-                                    mNavigator.getActiveActivity(),
-                                    ErrorUtils.ERROR_CATEGORY.FEED_ERROR,
-                                    (errorDialogFragment, errorButtonType,
-                                     errorCategory) -> {
-                                        if (errorButtonType ==
-                                                ErrorUtils.ERROR_BUTTON_TYPE.EXIT_APP) {
-                                            mNavigator.getActiveActivity().finishAffinity();
-                                        }
-                                    });
+                                mNavigator.getActiveActivity(),
+                                ErrorUtils.ERROR_CATEGORY.ZYPE_NO_VIDEOS,
+                                (errorDialogFragment, errorButtonType, errorCategory) -> {
+                                    errorDialogFragment.dismiss();
+                                    mNavigator.getActiveActivity().finish();
+                                }
+                            );
 
                         }, () -> {
                             Log.v(TAG, "Recipe chain completed");
@@ -3129,8 +3198,14 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 //                                switchToHomeScreen();
                                 // TODO: Consider to use event bus instead of broadcast
                                 // This broadcast is handled in ZypePlaylistContentBrowseFragment to update content
-                                LocalBroadcastManager.getInstance(mNavigator.getActiveActivity())
-                                        .sendBroadcast(new Intent(BROADCAST_DATA_LOADED));
+                                if (root.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID)) {
+                                    setFavoritesLoaded(true);
+                                    mEventBus.post(new FavoritesLoadEvent(isFavoritesLoaded()));
+                                }
+                                else {
+                                    LocalBroadcastManager.getInstance(mNavigator.getActiveActivity())
+                                            .sendBroadcast(new Intent(BROADCAST_DATA_LOADED));
+                                }
                             }
                         });
 
@@ -3183,7 +3258,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     }
 
     public void loadFavoritesVideos(ContentContainer contentContainer) {
+        setFavoritesLoaded(false);
         ContentContainer favoritesContentContainer = contentContainer.getContentContainers().get(0);
+        favoritesContentContainer.getContents().clear();
 
         Observable<Object> observable = Observable.just(favoritesContentContainer);
         Recipe recipeDynamicParserVideos = Recipe.newInstance(mAppContext, "recipes/ZypeSearchContentsRecipe.json");
@@ -3449,6 +3526,14 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
     public PurchaseHelper getPurchaseHelper() {
         return mPurchaseHelper;
+    }
+
+    public EntitlementsManager getEntitlementsManager() {
+        return entitlementsManager;
+    }
+
+    public FavoritesManager getFavoritesManager() {
+        return favoritesManager;
     }
 
     public boolean isCreateAccountTermsOfServiceRequired() {

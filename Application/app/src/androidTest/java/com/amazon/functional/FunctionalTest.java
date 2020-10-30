@@ -29,11 +29,11 @@ import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.runner.RunWith;
 
-import android.support.test.InstrumentationRegistry;
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
-import android.support.v17.leanback.widget.HorizontalGridView;
-import android.support.v17.leanback.widget.SearchEditText;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.leanback.widget.HorizontalGridView;
+import androidx.leanback.widget.SearchEditText;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Button;

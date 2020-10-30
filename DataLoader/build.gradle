@@ -16,15 +16,15 @@ apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "24.0.3"
+    compileSdkVersion 28
+    buildToolsVersion "25.0.3"
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 23
+        minSdkVersion 20
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -56,21 +56,21 @@ jacoco {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':Utils')
+    api fileTree(dir: 'libs', include: ['*.jar'])
+    api project(':Utils')
     /* Zype, Evgeny Cherkasov */
-    compile project(':ZypeAPI')
+    api project(':ZypeAPI')
 
-    androidTestCompile('com.android.support.test:runner:0.4.1') {
+    androidTestImplementation('androidx.test.ext:junit:1.1.1') {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    androidTestCompile('com.android.support.test:rules:0.4.1') {
+    androidTestImplementation('androidx.test:rules:1.1.1') {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    androidTestCompile 'junit:junit:4.12'
-    androidTestCompile 'org.mockito:mockito-core:1.9.5'
-    androidTestCompile "com.google.dexmaker:dexmaker:1.0"
-    androidTestCompile "com.google.dexmaker:dexmaker-mockito:1.0"
+    androidTestImplementation 'junit:junit:4.12'
+    androidTestImplementation 'org.mockito:mockito-core:1.9.5'
+    androidTestImplementation "com.google.dexmaker:dexmaker:1.0"
+    androidTestImplementation "com.google.dexmaker:dexmaker-mockito:1.0"
 
 }
 
@@ -79,6 +79,6 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'me.tatarka:gradle-retrolambda:3.2.3'
+        classpath 'me.tatarka:gradle-retrolambda:3.7.1'
     }
 }

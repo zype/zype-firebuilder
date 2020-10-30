@@ -36,18 +36,14 @@ import com.amazon.android.model.PlaylistAction;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.model.content.constants.ExtraKeys;
+import com.amazon.android.model.event.ContentUpdateEvent;
 import com.amazon.android.recipe.Recipe;
 import com.amazon.android.tv.tenfoot.R;
-import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
-import com.amazon.android.tv.tenfoot.presenter.PosterCardPresenter;
-import com.amazon.android.tv.tenfoot.presenter.SettingsCardPresenter;
+import com.amazon.android.tv.tenfoot.presenter.StubItemPresenter;
 import com.amazon.android.tv.tenfoot.ui.sliders.HeroSlider;
 import com.amazon.android.utils.Preferences;
-import com.zype.fire.api.ZypeApi;
-import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
-import com.zype.fire.auth.ZypeAuthentication;
 import com.amazon.android.tv.tenfoot.ui.activities.ContentBrowseActivity;
 import com.amazon.android.tv.tenfoot.utils.BrowseHelper;
 import com.amazon.android.ui.constants.PreferencesConstants;
@@ -62,28 +58,22 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v17.leanback.app.RowsFragment;
-import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.HeaderItem;
-import android.support.v17.leanback.widget.ListRow;
-import android.support.v17.leanback.widget.OnItemViewClickedListener;
-import android.support.v17.leanback.widget.OnItemViewSelectedListener;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v17.leanback.widget.Row;
-import android.support.v17.leanback.widget.RowHeaderPresenter;
-import android.support.v17.leanback.widget.RowPresenter;
-import android.support.v17.leanback.widget.VerticalGridView;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.leanback.app.RowsFragment;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.HeaderItem;
+import androidx.leanback.widget.ListRow;
+import androidx.leanback.widget.ListRowPresenter;
+import androidx.leanback.widget.OnItemViewClickedListener;
+import androidx.leanback.widget.OnItemViewSelectedListener;
+import androidx.leanback.widget.Presenter;
+import androidx.leanback.widget.Row;
+import androidx.leanback.widget.RowHeaderPresenter;
+import androidx.leanback.widget.RowPresenter;
+import androidx.leanback.widget.VerticalGridView;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 
-import java.util.HashMap;
-import java.util.List;
-
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
+import static androidx.leanback.widget.FocusHighlight.ZOOM_FACTOR_NONE;
 import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
 
 /**
@@ -107,8 +97,7 @@ public class ContentBrowseFragment extends RowsFragment {
 
     // Container Activity must implement this interface.
     public interface OnBrowseRowListener {
-
-        void onItemSelected(Object item);
+        void onItemSelected(Object item, Row row, boolean isLastContentRow);
     }
 
     @Override
@@ -140,6 +129,9 @@ public class ContentBrowseFragment extends RowsFragment {
         if (ZypeSettings.SETTINGS_PLAYLIST_ENABLED){
             mSettingsAdapter = BrowseHelper.addSettingsActionsToRowAdapter(getActivity(), mRowsAdapter);
             mLoginButtonIndex = BrowseHelper.getLoginButtonIndex(mSettingsAdapter);
+        }
+        else {
+            addStubRow(mRowsAdapter);
         }
 
         setAdapter(mRowsAdapter);
@@ -192,6 +184,9 @@ public class ContentBrowseFragment extends RowsFragment {
         if (receiver != null) {
             LocalBroadcastManager.getInstance(getActivity())
                     .registerReceiver(receiver, new IntentFilter(BROADCAST_DATA_LOADED));
+        }
+        if (mRowsAdapter != null) {
+            mRowsAdapter.notifyArrayItemRangeChanged(0, mRowsAdapter.size());
         }
 
         ArrayObjectAdapter rowsAdapter = (ArrayObjectAdapter) getAdapter();
@@ -251,6 +246,21 @@ public class ContentBrowseFragment extends RowsFragment {
         }
     }
 
+    @Subscribe
+    public void onContentUpdateEvent(ContentUpdateEvent event) {
+        for (int rowIndex = 0; rowIndex < mRowsAdapter.size(); rowIndex++) {
+            ArrayObjectAdapter rowAdapter = (ArrayObjectAdapter) ((ListRow) mRowsAdapter.get(rowIndex)).getAdapter();
+            for (int i = 0; i < rowAdapter.size(); i++) {
+                Content content = (Content) rowAdapter.get(i);
+                if (content.getId().equals(event.videoId)) {
+                    content.setExtraValue(Content.EXTRA_PLAYBACK_POSITION_PERCENTAGE,
+                            ContentBrowser.getInstance(getActivity()).getContentLoader().getContentPlaybackPositionPercentage(content));
+                }
+                rowAdapter.notifyArrayItemRangeChanged(i, i + 1);
+            }
+        }
+    }
+
     private final class ItemViewClickedListener implements OnItemViewClickedListener {
 
         @Override
@@ -289,49 +299,52 @@ public class ContentBrowseFragment extends RowsFragment {
                 Log.d(TAG, "Content with title " + content.getTitle() + " was clicked");
 
                 /* Zype, Evgeny Cherkasov */
-                // Get video entitlement for purchase required videos
-                if (ZypeConfiguration.isUniversalTVODEnabled(getActivity())) {
-                    if (content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED)
-                            && !content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
-                        String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
-                        HashMap<String, String> params = new HashMap<>();
-                        params.put(ZypeApi.ACCESS_TOKEN, accessToken);
-                        ZypeApi.getInstance().getApi().checkVideoEntitlement(content.getId(), params).enqueue(new Callback<ResponseBody>() {
-                            @Override
-                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                Log.e(TAG, "onItemClicked(): check video entitlement: code=" + response.code());
-                                if (response.isSuccessful()) {
-                                    content.setExtraValue(Content.EXTRA_ENTITLED, true);
-                                }
-                                else {
-                                    content.setExtraValue(Content.EXTRA_ENTITLED, false);
-                                }
-                                ContentBrowser.getInstance(getActivity())
-                                        .setLastSelectedContent(content)
-                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
-                            }
-
-                            @Override
-                            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                Log.e(TAG, "onItemClicked(): check video entitlement: failed");
-                                content.setExtraValue(Content.EXTRA_ENTITLED, false);
-                                ContentBrowser.getInstance(getActivity())
-                                        .setLastSelectedContent(content)
-                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
-                            }
-                        });
-                    }
-                    else {
-                        ContentBrowser.getInstance(getActivity())
-                                .setLastSelectedContent(content)
-                                .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
-                    }
-                }
-                else {
-                    ContentBrowser.getInstance(getActivity())
-                            .setLastSelectedContent(content)
-                            .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
-                }
+//                // Get video entitlement for purchase required videos
+//                if (ZypeConfiguration.isUniversalTVODEnabled(getActivity())) {
+//                    if (content.getExtraValueAsBoolean(Content.EXTRA_PURCHASE_REQUIRED)
+//                            && !content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
+//                        String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
+//                        HashMap<String, String> params = new HashMap<>();
+//                        params.put(ZypeApi.ACCESS_TOKEN, accessToken);
+//                        ZypeApi.getInstance().getApi().checkVideoEntitlement(content.getId(), params).enqueue(new Callback<ResponseBody>() {
+//                            @Override
+//                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                                Log.e(TAG, "onItemClicked(): check video entitlement: code=" + response.code());
+//                                if (response.isSuccessful()) {
+//                                    content.setExtraValue(Content.EXTRA_ENTITLED, true);
+//                                }
+//                                else {
+//                                    content.setExtraValue(Content.EXTRA_ENTITLED, false);
+//                                }
+//                                ContentBrowser.getInstance(getActivity())
+//                                        .setLastSelectedContent(content)
+//                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
+//                            }
+//
+//                            @Override
+//                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                                Log.e(TAG, "onItemClicked(): check video entitlement: failed");
+//                                content.setExtraValue(Content.EXTRA_ENTITLED, false);
+//                                ContentBrowser.getInstance(getActivity())
+//                                        .setLastSelectedContent(content)
+//                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
+//                            }
+//                        });
+//                    }
+//                    else {
+//                        ContentBrowser.getInstance(getActivity())
+//                                .setLastSelectedContent(content)
+//                                .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
+//                    }
+//                }
+//                else {
+//                    ContentBrowser.getInstance(getActivity())
+//                            .setLastSelectedContent(content)
+//                            .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
+//                }
+                ContentBrowser.getInstance(getActivity())
+                        .setLastSelectedContent(content)
+                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
             }
             else if (item instanceof ContentContainer) {
                 ContentContainer contentContainer = (ContentContainer) item;
@@ -365,8 +378,16 @@ public class ContentBrowseFragment extends RowsFragment {
         @Override
         public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
                                    RowPresenter.ViewHolder rowViewHolder, Row row) {
-
-            mCallback.onItemSelected(item);
+            boolean isLastContentRow = false;
+            if (!ZypeSettings.SETTINGS_PLAYLIST_ENABLED) {
+                if (mRowsAdapter.indexOf(row) == mRowsAdapter.size() - 2) {
+                    isLastContentRow = true;
+                }
+                else {
+                    isLastContentRow = false;
+                }
+            }
+            mCallback.onItemSelected(item, row, isLastContentRow);
         }
     }
 
@@ -409,4 +430,10 @@ public class ContentBrowseFragment extends RowsFragment {
         }
     }
 
+    private void addStubRow(ArrayObjectAdapter rowsAdapter) {
+        StubItemPresenter presenter = new StubItemPresenter();
+        ArrayObjectAdapter adapter = new ArrayObjectAdapter(presenter);
+        adapter.add("Item 1");
+        rowsAdapter.add(new ListRow(null, adapter));
+    }
 }

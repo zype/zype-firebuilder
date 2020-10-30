@@ -342,7 +342,7 @@ public class ZypeApi {
         try {
             HashMap<String, String> params = new HashMap<>();
             params.put(APP_KEY, ZypeSettings.APP_KEY);
-            params.put(PER_PAGE, String.valueOf(PER_PAGE_DEFAULT));
+            params.put(PER_PAGE, String.valueOf(300));
             Response response = apiImpl.getPlaylists(page, params).execute();
             if (response.isSuccessful()) {
                 return (PlaylistsResponse) response.body();

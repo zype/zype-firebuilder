@@ -1,4 +1,4 @@
-package com.amazon.android.tv.tenfoot.ui.Subscription.Model;
+package com.amazon.android.tv.tenfoot.ui.purchase.Model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

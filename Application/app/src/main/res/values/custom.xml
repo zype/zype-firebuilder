@@ -97,6 +97,7 @@ permissions and limitations under the License.
     <!-- Background color for normal state of action button -->
     <drawable name="action_button_normal">@drawable/btn_normal</drawable>
 
+    <color name="action_button_background">#666666</color>
     <!-- End of Button Customization -->
 
     <!-- Playback Overlay Customization -->
@@ -143,7 +144,7 @@ permissions and limitations under the License.
 
     <color name="error_dialog_bg_color">@color/background</color>
     <color name="background_color_translucent">#CC000000</color>
-    <color name="background_hero_slider_image">#99000000</color>
+    <color name="hero_slider_overlay_color">#99000000</color>
     <color name="lock_color">#FF0000</color>
     <color name="unlock_color">#0000FF</color>
 

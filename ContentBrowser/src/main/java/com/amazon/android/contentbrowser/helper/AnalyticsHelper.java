@@ -24,7 +24,7 @@ import com.amazon.android.contentbrowser.app.ContentBrowserApplication;
 import com.amazon.android.model.content.Content;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import java.util.HashMap;

@@ -17,11 +17,10 @@ package com.amazon.android.adapters;
 import android.content.Context;
 
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.support.annotation.MainThread;
-import android.support.v17.leanback.widget.HorizontalGridView;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.MainThread;
+import androidx.leanback.widget.HorizontalGridView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +33,7 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 /**
- * This class extends the {@link android.support.v7.widget.RecyclerView.Adapter}
+ * This class extends the {@link RecyclerView.Adapter}
  * It is used to display Actions items.
  */
 public class ActionWidgetAdapter extends RecyclerView.Adapter {
@@ -169,7 +168,7 @@ public class ActionWidgetAdapter extends RecyclerView.Adapter {
     }
 
     /**
-     * Called when RecyclerView needs a new {@link android.support.v7.widget.RecyclerView
+     * Called when RecyclerView needs a new {@link RecyclerView
      * .ViewHolder} of the given type to represent an item.
      *
      * @param parent   The parent view.

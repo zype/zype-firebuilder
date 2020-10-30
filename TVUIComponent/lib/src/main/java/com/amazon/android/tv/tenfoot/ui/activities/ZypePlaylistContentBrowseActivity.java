@@ -30,7 +30,6 @@
 package com.amazon.android.tv.tenfoot.ui.activities;
 
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -41,11 +40,15 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.ListRow;
+import androidx.leanback.widget.Row;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -60,7 +63,7 @@ import com.amazon.android.model.event.FavoritesLoadEvent;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment;
-import com.amazon.android.tv.tenfoot.ui.fragments.ContentDetailsFragment;
+import com.amazon.android.tv.tenfoot.ui.fragments.MenuFragment;
 import com.amazon.android.tv.tenfoot.ui.fragments.ZypePlaylistContentBrowseFragment;
 import com.amazon.android.tv.tenfoot.utils.BrowseHelper;
 import com.amazon.android.tv.tenfoot.utils.ContentHelper;
@@ -71,6 +74,7 @@ import com.amazon.android.ui.utils.BackgroundImageUtils;
 import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.GlideHelper;
 import com.amazon.android.utils.Helpers;
+import com.zype.fire.api.ZypeSettings;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -91,7 +95,8 @@ import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LO
  */
 public class ZypePlaylistContentBrowseActivity extends BaseActivity
         implements ZypePlaylistContentBrowseFragment.OnBrowseRowListener,
-                    ErrorDialogFragment.ErrorDialogFragmentListener {
+        ErrorDialogFragment.ErrorDialogFragmentListener,
+        MenuFragment.IMenuFragmentListener {
 
     private final String TAG = ZypePlaylistContentBrowseActivity.class.getSimpleName();
 
@@ -101,14 +106,23 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
 
     private TextView mContentTitle;
     private TextView mContentDescription;
+    private TextView mContentEpisode;
     private ImageView mContentImage;
     private ProgressBar progressBar;
-    private TextView mContentEpisode;
     private Subscription mContentImageLoadSubscription;
 
     // View that contains the background
     private View mMainFrame;
     private Drawable mBackgroundWithPreview;
+
+    private boolean isMenuOpened = false;
+
+    private boolean lastRowSelected = false;
+
+    private Object lastSelectedItem = null;
+    private Row lastSelectedRow = null;
+    private boolean lastSelectedRowChanged = false;
+    private int lastSelectedItemIndex = -1;
 
     private BroadcastReceiver receiver;
 
@@ -158,6 +172,8 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
         mMainFrame = findViewById(R.id.main_frame);
         mMainFrame.setBackground(mBackgroundWithPreview);
 
+        hideMenu();
+
         progressBar = (ProgressBar) findViewById(R.id.feed_progress);
         progressBar.setVisibility(View.VISIBLE);
 
@@ -176,15 +192,24 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
      * title, description, and image.
      */
     @Override
-    public void onItemSelected(Object item) {
-
+    public void onItemSelected(Object item, Row row, boolean isLastContentRow) {
+        lastRowSelected = isLastContentRow;
+        if (row != lastSelectedRow && item != null) {
+            lastSelectedRow = row;
+            lastSelectedRowChanged = true;
+        }
+        else {
+            lastSelectedRowChanged = false;
+        }
+        lastSelectedItemIndex = ((ArrayObjectAdapter) ((ListRow) row).getAdapter()).indexOf(item);
         if (item instanceof Content) {
             Content content = (Content) item;
             callImageLoadSubscription(content.getTitle(),
                     content.getDescription(),
                     content.getBackgroundImageUrl());
 
-            if (!TextUtils.isEmpty(ContentHelper.getEpisodeSubTitle(this, content))){
+            if (ZypeSettings.SHOW_EPISODE_NUMBER
+                    && !TextUtils.isEmpty(ContentHelper.getEpisodeSubTitle(this, content))) {
                 mContentEpisode.setVisibility(View.VISIBLE);
                 mContentEpisode.setText(ContentHelper.getEpisodeSubTitle(this, content));
             }
@@ -340,8 +365,136 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
     //
     @Subscribe
     public void onFavoritesLoadEvent(FavoritesLoadEvent event) {
+        Log.d(TAG, "onFavoritesLoadEvent()");
+        progressBar.setVisibility(View.INVISIBLE);
         ((ZypePlaylistContentBrowseFragment) getFragmentManager()
                 .findFragmentById(R.id.full_content_browse_fragment)).updateContents();
+    }
+
+    private void showMenu() {
+        MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+        if (fragment != null) {
+            isMenuOpened = true;
+            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.background_color_translucent));
+//            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.lb_error_background_color_translucent));
+//             fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.left_menu_background));
+            int paddingTop = (int) getResources().getDimension(R.dimen.lb_browse_padding_top);
+            fragment.getView().setPadding(0, paddingTop, 0, 0);
+            getFragmentManager().beginTransaction()
+                    .show(fragment)
+                    .commit();
+            fragment.getView().requestFocus();
+        }
+    }
+
+    private void hideMenu() {
+        MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+        if (fragment != null) {
+            isMenuOpened = false;
+            getFragmentManager().beginTransaction()
+                    .hide(fragment)
+                    .commit();
+        }
+    }
+
+    @Override
+    public void showMenuFragment() {
+        if (!isMenuOpened){
+            showMenu();
+        }
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        Log.d(TAG, "event=" + event.toString());
+
+        switch (event.getKeyCode()) {
+
+            case KeyEvent.KEYCODE_MENU:
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    if (ZypeSettings.SHOW_LEFT_MENU) {
+                        Log.d(TAG, "Menu button pressed");
+                        if (!isMenuOpened) {
+                            showMenu();
+                        }
+                        return true;
+                    }
+                }
+                break;
+            case KeyEvent.KEYCODE_BACK: {
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    Log.d(TAG, "Back button pressed");
+                    if (isMenuOpened) {
+                        hideMenu();
+                        return true;
+                    }
+                }
+                break;
+            }
+            case KeyEvent.KEYCODE_DPAD_UP:
+                Log.d(TAG, "Up button pressed");
+                if (isMenuOpened) {
+                    MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+                    if (fragment != null) {
+                        ArrayObjectAdapter menuAdapter = (ArrayObjectAdapter) fragment.getAdapter();
+                        if (fragment.getSelectedMenuItemIndex() == 0) {
+                            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                break;
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+                Log.d(TAG, "Down button pressed");
+                if (isMenuOpened) {
+                    MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+                    if (fragment != null) {
+                        ArrayObjectAdapter menuAdapter = (ArrayObjectAdapter) fragment.getAdapter();
+                        if (fragment.getSelectedMenuItemIndex() + 1 >= menuAdapter.size()) {
+                            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                else {
+                    if (lastRowSelected) return true;
+                }
+                break;
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                Log.d(TAG, "Right button pressed");
+                if (isMenuOpened) {
+                    hideMenu();
+                    findViewById(R.id.full_content_browse_fragment).requestFocus();
+                    return true;
+                }
+                break;
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                Log.d(TAG, "Left button pressed");
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    if (!isMenuOpened) {
+                        if (lastSelectedItemIndex == 0) {
+                            lastSelectedItemIndex = -1;
+                            if (lastSelectedRowChanged) {
+                                showMenu();
+                            }
+                        }
+                        else if (lastSelectedItemIndex == -1 ){
+                            showMenu();
+                        }
+                    }
+                }
+                break;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public void onItemSelected(Action item) {
+        hideMenu();
+        ContentBrowser.getInstance(this)
+                .settingsActionTriggered(this, item);
     }
 
 }

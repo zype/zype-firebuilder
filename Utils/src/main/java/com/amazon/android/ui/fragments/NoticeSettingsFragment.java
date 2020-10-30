@@ -18,7 +18,6 @@ import com.amazon.android.model.Action;
 import com.amazon.android.ui.interfaces.ASettingsFragment;
 import com.amazon.android.ui.interfaces.SingleViewProvider;
 import com.amazon.android.utils.Helpers;
-import com.amazon.android.utils.Preferences;
 import com.amazon.utils.R;
 //import com.zype.fire.api.ZypeSettings;
 
@@ -27,7 +26,7 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.graphics.Point;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;

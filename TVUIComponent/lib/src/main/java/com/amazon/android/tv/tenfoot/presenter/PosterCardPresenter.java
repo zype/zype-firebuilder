@@ -34,10 +34,10 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.support.v17.leanback.widget.BaseCardView;
-import android.support.v17.leanback.widget.ImageCardView;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v4.content.ContextCompat;
+import androidx.leanback.widget.BaseCardView;
+import androidx.leanback.widget.ImageCardView;
+import androidx.leanback.widget.Presenter;
+import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -204,25 +204,23 @@ public class PosterCardPresenter extends Presenter {
 
                 // Display lock icon for subscription video
                 ImageView mBadgeImage = (ImageView) cardView.findViewById(R.id.extra_badge);
-
-                if (content.isSubscriptionRequired()) {
-                    mBadgeImage.setVisibility(View.VISIBLE);
-                    if (contentBrowser.isUserSubscribed()) {
-                        if (!ZypeSettings.UNLOCK_TRANSPARENT){
-                            mBadgeImage.setBackgroundColor(mContext.getResources().getColor(R.color.unlock_color));
-                        }
-                        mBadgeImage.setImageResource(R.drawable.unlocked);
-                        //cardView.setBadgeImage(imageUnlocked);
-                    }
-                    else {
+                if (contentBrowser.getPurchaseHelper().isVideoPaywalled(content)) {
+                    if (contentBrowser.getPurchaseHelper().isVideoLocked(content)) {
+                        mBadgeImage.setVisibility(View.VISIBLE);
                         mBadgeImage.setBackgroundColor(mContext.getResources().getColor(R.color.lock_color));
                         mBadgeImage.setImageResource(R.drawable.locked);
-                        //cardView.setBadgeImage(imageLocked);
+                    } else {
+                        if (ZypeSettings.UNLOCK_TRANSPARENT) {
+                            mBadgeImage.setVisibility(View.GONE);
+                        } else {
+                            mBadgeImage.setVisibility(View.VISIBLE);
+                            mBadgeImage.setBackgroundColor(mContext.getResources().getColor(R.color.unlock_color));
+                            mBadgeImage.setImageResource(R.drawable.unlocked);
+                        }
                     }
                 }
                 else {
                     mBadgeImage.setVisibility(View.GONE);
-                    //cardView.setBadgeImage(null);
                 }
             }
         }

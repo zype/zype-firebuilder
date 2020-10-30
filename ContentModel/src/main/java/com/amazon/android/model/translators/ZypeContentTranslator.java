@@ -84,15 +84,13 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
                 case Content.URL_FIELD_NAME:
                     model.setUrl(value.toString());
                     break;
-                case Content.CARD_IMAGE_URL_FIELD_NAME: {
+                case Content.CARD_IMAGE_URL_FIELD_NAME:
                     model.setCardImageUrl(findThumbnailUrl(field, value));
                     model.setExtraValue(Content.EXTRA_THUMBNAIL_POSTER_URL, findThumbnailUrl(Content.EXTRA_THUMBNAIL_POSTER_URL, value));
                     break;
-                }
-                case Content.BACKGROUND_IMAGE_URL_FIELD_NAME: {
+                case Content.BACKGROUND_IMAGE_URL_FIELD_NAME:
                     model.setBackgroundImageUrl(findThumbnailUrl(field, value));
                     break;
-                }
                 case Content.TAGS_FIELD_NAME:
                     // Expecting value to be a list.
                     model.setTags(value.toString());
@@ -114,6 +112,7 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
                     model.setChannelId(value.toString());
                     break;
                 case Content.DURATION_FIELD_NAME:
+//                    model.setDuration(Long.valueOf((String) value));
                     model.setDuration(Long.valueOf(value.toString()));
                     break;
                 case Content.AD_CUE_POINTS_FIELD_NAME:
@@ -126,8 +125,11 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
                     model.setFormat(value.toString());
                     break;
                 case Content.FIELD_IMAGES:
-                    model.setExtraValue(Content.EXTRA_IMAGE_POSTER_URL, findImagePosterUrl(value));
+                    model.setExtraValue(Content.EXTRA_IMAGE_POSTER_URL,
+                            findImageByLayout(value, "poster"));
                     model.setFeaturedImageUrl(findFeaturedImageUrl(value));
+                    model.setExtraValue(Content.EXTRA_THUMBNAIL_SQUARE_URL,
+                            findImageByLayout(value, "square"));
                     break;
                 default:
                     model.setExtraValue(field, value);
@@ -205,7 +207,7 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
                     jsonImage = jsonObject;
                 }
                 else {
-                    if (Math.abs(jsonObject.getInt("height") - requiredImageHeight) < Math.abs(jsonImage.getInt("height") - requiredImageHeight)) {
+                    if (Math.abs(jsonObject.getInt("height") - requiredImageHeight) <= Math.abs(jsonImage.getInt("height") - requiredImageHeight)) {
                         jsonImage = jsonObject;
                     }
                 }
@@ -242,14 +244,14 @@ public class ZypeContentTranslator extends AModelTranslator<Content> {
     }
 
 
-    private String findImagePosterUrl(Object value) {
+    private String findImageByLayout(Object value, String layout) {
         String result = "null";
         try {
             JSONArray jsonValue = new JSONArray(value.toString());
             JSONObject jsonImage = null;
             for (int i = 0; i < jsonValue.length(); i++) {
                 JSONObject jsonObject = jsonValue.getJSONObject(i);
-                if (jsonObject.getString("layout").equals("poster")) {
+                if (jsonObject.getString("layout").equals(layout)) {
                     jsonImage = jsonObject;
                     break;
                 }

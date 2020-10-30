@@ -23,9 +23,9 @@ import com.amazon.utils.R;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.text.TextUtils;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,6 +51,8 @@ public class ErrorDialogFragment extends DialogFragment {
     private static final String ARG_ACTION_LABELS = "actionLabels";
     public static final String ARG_ERROR_MESSAGE = "errorMessage";
     public static final String ARG_ERROR_CATEGORY = "errorCategory";
+    public static final String ARG_SHOW_IMAGE = "ShowImage";
+    public static final String ARG_TITLE = "Title";
     private List<Button> mButtonsList;
     private ErrorDialogFragmentListener mListener;
     private boolean mIsPaused;
@@ -113,6 +115,17 @@ public class ErrorDialogFragment extends DialogFragment {
                                                   String errorMessage,
                                                   ErrorDialogFragmentListener
                                                           errorDialogFragmentListener) {
+        return newInstance(context, errorCategory,
+                null, errorMessage, true, errorDialogFragmentListener);
+    }
+
+    public static ErrorDialogFragment newInstance(Context context,
+                                                  ErrorUtils.ERROR_CATEGORY errorCategory,
+                                                  String title,
+                                                  String errorMessage,
+                                                  boolean showImage,
+                                                  ErrorDialogFragmentListener
+                                                          errorDialogFragmentListener) {
 
         ErrorDialogFragment errorDialogFragment = new ErrorDialogFragment();
         errorDialogFragment.mListener = errorDialogFragmentListener;
@@ -122,6 +135,7 @@ public class ErrorDialogFragment extends DialogFragment {
         Bundle args = new Bundle();
         // Set the error category.
         args.putSerializable(ARG_ERROR_CATEGORY, errorCategory);
+        args.putString(ARG_TITLE, title);
         // Get the error message.
         if (errorMessage == null) {
             args.putString(ARG_ERROR_MESSAGE, ErrorUtils.getErrorMessage(context, errorCategory));
@@ -129,6 +143,7 @@ public class ErrorDialogFragment extends DialogFragment {
         else {
             args.putString(ARG_ERROR_MESSAGE, errorMessage);
         }
+        args.putBoolean(ARG_SHOW_IMAGE, showImage);
         // Get the button details.
         args.putStringArrayList(ARG_ACTION_LABELS, (ArrayList<String>) ErrorUtils
                 .getButtonLabelsList(context, errorCategory));

@@ -24,7 +24,7 @@ import com.zype.fire.api.MarketplaceGateway;
 import com.zype.fire.api.ZypeConfiguration;
 
 import android.content.Context;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.VisibleForTesting;
 import android.util.Log;
 
 import java.util.ArrayList;

@@ -27,7 +27,7 @@ import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -317,7 +317,7 @@ public class EllipsizedTextView extends TextView {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
         } while (getLineCount() > getMaxLines() && getLineCount() > 1);
-        requestFocus();
+//        requestFocus();
     }
 
     /**
@@ -386,7 +386,7 @@ public class EllipsizedTextView extends TextView {
             if (mStateDrawable != null) {
                 mStateDrawable.setBounds(0, 0, mStateDrawable.getIntrinsicWidth(), mStateDrawable
                         .getIntrinsicHeight());
-                mStateDrawable.setState(FOCUSED_STATE_SET);
+                mStateDrawable.setState(EMPTY_STATE_SET);
             }
         }
 

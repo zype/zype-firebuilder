@@ -1,27 +1,24 @@
 package com.amazon.android.tv.tenfoot.ui.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.support.v17.leanback.app.RowsFragment;
-import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v17.leanback.widget.ListRow;
-import android.support.v17.leanback.widget.ListRowPresenter;
-import android.support.v17.leanback.widget.OnItemViewClickedListener;
-import android.support.v17.leanback.widget.OnItemViewSelectedListener;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v17.leanback.widget.Row;
-import android.support.v17.leanback.widget.RowPresenter;
+import androidx.leanback.app.RowsFragment;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.ListRow;
+import androidx.leanback.widget.ListRowPresenter;
+import androidx.leanback.widget.OnItemViewClickedListener;
+import androidx.leanback.widget.OnItemViewSelectedListener;
+import androidx.leanback.widget.Presenter;
+import androidx.leanback.widget.Row;
+import androidx.leanback.widget.RowPresenter;
 import android.util.Log;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.model.Action;
-import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
 import com.amazon.android.tv.tenfoot.presenter.MenuItemPresenter;
 
 import java.util.List;
 
-import static android.support.v17.leanback.widget.FocusHighlight.ZOOM_FACTOR_MEDIUM;
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static androidx.leanback.widget.FocusHighlight.ZOOM_FACTOR_MEDIUM;
 
 /**
  * Created by Evgeny Cherkasov on 18.04.2018.

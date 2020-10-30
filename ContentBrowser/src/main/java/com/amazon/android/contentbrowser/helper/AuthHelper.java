@@ -16,6 +16,7 @@
 package com.amazon.android.contentbrowser.helper;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
+import com.amazon.android.contentbrowser.Favorites.FavoritesManager;
 import com.amazon.android.contentbrowser.R;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.module.ModuleManager;
@@ -44,8 +45,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -481,6 +482,11 @@ public class AuthHelper {
                               handleAuthenticationActivityResultBundle(resultBundle);
 
                               if (resultBundle != null) {
+                                  if (mContentBrowser.getEntitlementsManager() != null) {
+                                      mContentBrowser.getEntitlementsManager().clearVideoEntitlements();
+                                      mContentBrowser.getEntitlementsManager().loadVideoEntitlements(mAppContext);
+                                  }
+
                                   resultBundle.putBoolean(RESULT, activityResult.isOk());
                                   broadcastAuthenticationStatus(activityResult.isOk());
                                   resultBundle.putBoolean(RESULT_FROM_ACTIVITY, true);
@@ -635,7 +641,14 @@ public class AuthHelper {
         mIAuthentication.logout(context, new IAuthentication.ResponseHandler() {
             @Override
             public void onSuccess(Bundle extras) {
-
+                EntitlementsManager entitlementsManager = mContentBrowser.getEntitlementsManager();
+                if (entitlementsManager != null) {
+                    entitlementsManager.clearVideoEntitlements();
+                }
+                FavoritesManager favoritesManager = mContentBrowser.getFavoritesManager();
+                if (favoritesManager != null) {
+                    favoritesManager.clearVideoFavorites();
+                }
                 AnalyticsHelper.trackLogOutResultSuccess();
                 broadcastAuthenticationStatus(false);
                 Log.d(TAG, "Account logout success");

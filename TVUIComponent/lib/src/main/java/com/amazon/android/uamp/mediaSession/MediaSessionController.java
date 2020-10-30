@@ -17,8 +17,8 @@ package com.amazon.android.uamp.mediaSession;
 import android.content.Intent;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
-import android.support.annotation.NonNull;
-import android.support.v17.leanback.app.TenFootPlaybackOverlayFragment;
+import androidx.annotation.NonNull;
+import androidx.leanback.app.TenFootPlaybackOverlayFragment;
 import android.util.Log;
 import android.content.Context;
 

@@ -21,7 +21,7 @@ import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.support.app.recommendation.ContentRecommendation;
+import androidx.recommendation.app.ContentRecommendation;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;

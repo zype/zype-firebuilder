@@ -17,7 +17,7 @@ package com.amazon.dataloader.datadownloader;
 import org.junit.Test;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import java.io.IOException;
 import java.util.HashMap;

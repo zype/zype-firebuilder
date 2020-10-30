@@ -28,7 +28,7 @@ permissions and limitations under the License.
     <!-- Background color for focused action button -->
     <drawable name="action_button_focused">@drawable/btn_generic_focused</drawable>
     <!-- Background color for normal state of action button -->
-    <drawable name="action_button_normal">@drawable/btn_normal</drawable>
+    <drawable name="action_button_normal">@drawable/action_btn_normal</drawable>
     <!-- URL the end user must visit to authenticate their device for second screen login -->
     <string name="second_screen_login_instruction_line_2">Visit YOUR_AUTHENTICATION_URL</string>
     <!-- The company logo to display on the second screen login screen -->
@@ -41,5 +41,9 @@ permissions and limitations under the License.
     <string name="default_bold_font">Roboto Bold</string>
     <!-- A default regular device font used for buttons and subtitles -->
     <string name="default_regular_font">Roboto Regular</string>
+    <color name="hero_slider_overlay_color">#99000000</color>
+
+    <!-- Action button text size -->
+    <dimen name="action_text">14sp</dimen>
 
 </resources>

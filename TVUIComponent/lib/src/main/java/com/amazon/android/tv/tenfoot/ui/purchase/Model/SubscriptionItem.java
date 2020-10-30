@@ -1,4 +1,4 @@
-package com.amazon.android.tv.tenfoot.ui.Subscription.Model;
+package com.amazon.android.tv.tenfoot.ui.purchase.Model;
 
 /**
  * Created by Evgeny Cherkasov on 07.08.2017.

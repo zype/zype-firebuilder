@@ -55,6 +55,10 @@ public class VideoData {
     @Expose
     public List<String> keywords = new ArrayList<>();
 
+    @SerializedName("marketplace_ids")
+    @Expose
+    public MarketplaceIds marketplaceIds;
+
     @SerializedName("on_air")
     @Expose
     public boolean onAir;

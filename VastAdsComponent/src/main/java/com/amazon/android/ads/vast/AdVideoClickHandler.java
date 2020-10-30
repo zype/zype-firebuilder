@@ -27,7 +27,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.support.v4.app.ActivityCompat.startActivity;
+import static androidx.core.app.ActivityCompat.startActivity;
 
 /**
  * This implementation handles various click uris available in a vast ad <VideoClicks> container

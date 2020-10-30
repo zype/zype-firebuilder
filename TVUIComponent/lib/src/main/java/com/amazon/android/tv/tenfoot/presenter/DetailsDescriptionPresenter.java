@@ -23,7 +23,7 @@ import com.amazon.android.ui.widget.EllipsizedTextView;
 import com.amazon.android.tv.tenfoot.R;
 
 import android.content.Context;
-import android.support.v17.leanback.widget.Presenter;
+import androidx.leanback.widget.Presenter;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;

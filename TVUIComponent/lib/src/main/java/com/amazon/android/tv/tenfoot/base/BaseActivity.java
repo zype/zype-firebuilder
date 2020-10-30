@@ -23,9 +23,9 @@ import com.zype.fire.api.ZypeSettings;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v17.leanback.widget.HorizontalGridView;
-import android.support.v17.leanback.widget.OnChildViewHolderSelectedListener;
-import android.support.v7.widget.RecyclerView;
+import androidx.leanback.widget.HorizontalGridView;
+import androidx.leanback.widget.OnChildViewHolderSelectedListener;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -137,9 +137,8 @@ public abstract class BaseActivity extends Activity {
                     });
         }
     }
-    public void showMenuFragment(){
 
-    }
+    public void showMenuFragment() {}
 
     protected void requestActionFocus() {
         HorizontalGridView actionWidgetContainer =

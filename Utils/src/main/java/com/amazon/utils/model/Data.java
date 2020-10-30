@@ -14,7 +14,7 @@
  */
 package com.amazon.utils.model;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Data structure used to carry the raw data received from external sources.

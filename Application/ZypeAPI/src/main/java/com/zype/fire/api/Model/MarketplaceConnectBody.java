@@ -32,6 +32,9 @@ public class MarketplaceConnectBody implements Serializable {
     @SerializedName("site_id")
     public String siteId;
 
+    @SerializedName("product_id")
+    public String productId;
+
     @SerializedName("purchase_token")
     public String purchaseToken;
 

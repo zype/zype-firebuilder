@@ -31,9 +31,12 @@
 package com.amazon.android.uamp.ui;
 
 import com.amazon.android.configuration.ConfigurationManager;
+import com.amazon.android.model.event.ContentUpdateEvent;
 import com.amazon.android.tv.tenfoot.base.TenFootApp;
 import com.amazon.android.ui.constants.ConfigurationConstants;
+import com.amazon.android.utils.GlideHelper;
 import com.amazon.mediaplayer.tracks.MediaFormat;
+import com.google.android.exoplayer.ExoPlayerLibraryInfo;
 import com.google.android.exoplayer.text.CaptionStyleCompat;
 import com.google.android.exoplayer.text.SubtitleLayout;
 
@@ -60,13 +63,14 @@ import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.Helpers;
 import com.amazon.android.utils.Preferences;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.media.session.PlaybackState;
 
 import com.amazon.mediaplayer.AMZNMediaPlayer;
 import com.amazon.mediaplayer.AMZNMediaPlayer.PlayerState;
 import com.amazon.mediaplayer.playback.text.Cue;
 import com.amazon.mediaplayer.tracks.TrackType;
-import com.zype.fire.api.IZypeApi;
 import com.zype.fire.api.Model.AdvertisingSchedule;
 import com.zype.fire.api.Model.ErrorBody;
 import com.zype.fire.api.Model.PlayerData;
@@ -74,21 +78,22 @@ import com.zype.fire.api.Model.PlayerResponse;
 import com.zype.fire.api.Util.AdMacrosHelper;
 import com.zype.fire.api.Util.ErrorHelper;
 import com.zype.fire.api.ZypeApi;
+import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 import com.zype.fire.auth.ZypeAuthentication;
 import com.amazon.utils.DateAndTimeHelper;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.v17.leanback.app.TenFootPlaybackOverlayFragment;
+import androidx.annotation.NonNull;
+import androidx.leanback.app.TenFootPlaybackOverlayFragment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -102,6 +107,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -133,7 +140,7 @@ import static com.amazon.android.contentbrowser.ContentBrowser.SHOW_PLAYLIST_AUT
 /**
  * PlaybackOverlayActivity for content playback that loads PlaybackOverlayFragment
  */
-public class PlaybackActivity extends Activity implements
+public class PlaybackActivity extends BasePlaybackActivity implements
         PlaybackOverlayFragment.OnPlayPauseClickedListener, AMZNMediaPlayer
         .OnStateChangeListener, AMZNMediaPlayer.OnErrorListener, AMZNMediaPlayer.OnInfoListener,
         AudioManager.OnAudioFocusChangeListener, AMZNMediaPlayer.OnCuesListener,
@@ -153,6 +160,7 @@ public class PlaybackActivity extends Activity implements
 
     private FrameLayout mVideoView;
     private SubtitleLayout mSubtitleLayout;
+    private FrameLayout mAudioView;
     private FrameLayout mAdsView;
     private UAMP mPlayer;
     private Content mSelectedContent;
@@ -209,6 +217,8 @@ public class PlaybackActivity extends Activity implements
 
     private boolean isAutoPlay=false;
     private boolean messageAlreadyShow=false;
+
+    private boolean isAudio = false;
 
 
   enum AudioFocusState {
@@ -948,6 +958,7 @@ public class PlaybackActivity extends Activity implements
                 // exists for this content and playback is not complete.
                 if (record != null && !record.isPlaybackComplete()) {
                     mCurrentPlaybackPosition = record.getPlaybackLocation();
+                    Log.d(TAG, "loadContentPlaybackState(): restored position " + mCurrentPlaybackPosition);
                 }
             }
         }
@@ -990,6 +1001,12 @@ public class PlaybackActivity extends Activity implements
                     mPlayer.getCurrentPosition(), isFinished,
                     DateAndTimeHelper.getCurrentDate().getTime(),
                     mPlayer.getDuration());
+
+            if (ZypeConfiguration.displayWatchedBarOnVideoThumbnails()) {
+                EventBus.getDefault().post(new ContentUpdateEvent(mSelectedContent.getId()));
+            }
+
+            Log.d(TAG, "storeContentPlaybackState(): saved position " + mPlayer.getCurrentPosition());
         }
         else {
             Log.e(TAG, "Cannot update recent content playback state. Database is null");
@@ -1034,13 +1051,13 @@ public class PlaybackActivity extends Activity implements
 
         // The CC button has been pushed so now we don't want to use global settings for CC state.
         mCaptioningHelper.setUseGlobalSetting(false);
-        /* Zype, Evgeny Cherkasov */
-        if (state) {
-            showClosedCaptionDialog();
-        }
-        else {
+//        /* Zype, Evgeny Cherkasov */
+//        if (state) {
+//            showClosedCaptionDialog();
+//        }
+//        else {
             modifyClosedCaptionState(state);
-        }
+//        }
     }
 
     /**
@@ -1054,30 +1071,31 @@ public class PlaybackActivity extends Activity implements
             if (isClosedCaptionAvailable()) {
 
                 // Enable CC. Prioritizing CLOSED_CAPTION before SUBTITLE if enabled
-//                if (ContentBrowser.getInstance(this).isEnableCEA608() &&
-//                        mPlayer.getTrackCount(TrackType.CLOSED_CAPTION) > 0) {
-//                    mPlayer.enableTextTrack(TrackType.CLOSED_CAPTION, state);
-//                }
-//                else {
-//                    mPlayer.enableTextTrack(TrackType.SUBTITLE, state);
-//                }
-                /* Zype, Evgeny Cherkasov */
-                int ccTrackIndex = -1;
-                if (state) {
-                    ccTrackIndex = getClosedCaptionsTrackIndex(ccTrack);
-                }
-                TrackType type;
-                if (ContentBrowser.getInstance(this).isEnableCEA608()) {
-                    type = TrackType.CLOSED_CAPTION;
+                if (ContentBrowser.getInstance(this).isEnableCEA608() &&
+                        mPlayer.getTrackCount(TrackType.CLOSED_CAPTION) > 0) {
+                    mPlayer.enableTextTrack(TrackType.CLOSED_CAPTION, state);
                 }
                 else {
-                    type = TrackType.SUBTITLE;
+                    mPlayer.enableTextTrack(TrackType.SUBTITLE, state);
                 }
-                mPlayer.setSelectedTrack(type, ccTrackIndex);
+//                /* Zype, Evgeny Cherkasov */
+//                int ccTrackIndex = -1;
+//                if (state) {
+//                    ccTrackIndex = getClosedCaptionsTrackIndex(ccTrack);
+//                }
+//                TrackType type;
+//                if (ContentBrowser.getInstance(this).isEnableCEA608()) {
+//                    type = TrackType.CLOSED_CAPTION;
+//                }
+//                else {
+//                    type = TrackType.SUBTITLE;
+//                }
+//                mPlayer.setSelectedTrack(type, ccTrackIndex);
 
                 // Update internal state.
                 mIsClosedCaptionEnabled = state;
                 mPlaybackOverlayFragment.updateCCButtonState(state, true);
+                mSubtitleLayout.setVisibility(state ? View.VISIBLE : View.INVISIBLE);
                 Log.d(TAG, "Content support CC. Change CC state to " + state);
             }
             else {
@@ -1098,6 +1116,8 @@ public class PlaybackActivity extends Activity implements
         mVideoView.setClickable(false);
 
         mSubtitleLayout = (SubtitleLayout) findViewById(R.id.subtitles);
+
+        mAudioView = (FrameLayout) findViewById(R.id.audioView);
 
         mAdsView = (FrameLayout) findViewById(R.id.adsView);
         // Avoid focus stealing.
@@ -1135,11 +1155,46 @@ public class PlaybackActivity extends Activity implements
         }
     }
 
+    private void switchToContentView() {
+        if (isAudio) {
+            switchToAudioView();
+        }
+        else {
+            switchToVideoView();
+        }
+    }
+
     private void switchToVideoView() {
         // Show Video view.
         setVisibilityOfViewGroupWithInnerSurfaceView(mVideoView, View.VISIBLE);
         // Show Subtitle view.
         mSubtitleLayout.setVisibility(View.VISIBLE);
+        // Hide Audio view
+        setVisibilityOfViewGroupWithInnerSurfaceView(mAudioView, View.GONE);
+        // Hide Ads view.
+        setVisibilityOfViewGroupWithInnerSurfaceView(mAdsView, View.GONE);
+    }
+
+    private void switchToAudioView() {
+        Log.d(TAG, "switchToAudioView()");
+        // Show Audio view
+        setVisibilityOfViewGroupWithInnerSurfaceView(mAudioView, View.VISIBLE);
+        ImageView imageThumbnail = (ImageView) mAudioView.findViewById(R.id.imageThumbnail);
+        String thumbnailUrl = mSelectedContent.getExtraValueAsString(Content.EXTRA_THUMBNAIL_SQUARE_URL);
+        if (TextUtils.isEmpty(thumbnailUrl) || thumbnailUrl.equals("null")) {
+            thumbnailUrl = mSelectedContent.getBackgroundImageUrl();
+        }
+        if (!TextUtils.isEmpty(thumbnailUrl) && !thumbnailUrl.equals("null")) {
+            GlideHelper.loadImageWithCrossFadeTransition(this,
+                    imageThumbnail,
+                    thumbnailUrl,
+                    1000,
+                    R.color.browse_background_color);
+        }
+        // Hide Video view.
+        setVisibilityOfViewGroupWithInnerSurfaceView(mVideoView, View.GONE);
+        // Hide Subtitle view.
+        mSubtitleLayout.setVisibility(View.GONE);
         // Hide Ads view.
         setVisibilityOfViewGroupWithInnerSurfaceView(mAdsView, View.GONE);
     }
@@ -1151,6 +1206,8 @@ public class PlaybackActivity extends Activity implements
         setVisibilityOfViewGroupWithInnerSurfaceView(mVideoView, View.GONE);
         // Hide Subtitle view.
         mSubtitleLayout.setVisibility(View.GONE);
+        // Hide Audio view
+        setVisibilityOfViewGroupWithInnerSurfaceView(mAudioView, View.GONE);
     }
 
     /**
@@ -1397,7 +1454,8 @@ public class PlaybackActivity extends Activity implements
                 mAdsImplementation.init(this, mAdsView, playerExtras);
             }
 
-            mPlayer.setUserAgent(System.getProperty("http.agent"));
+            mPlayer.setUserAgent(getUserAgent(PlaybackActivity.this,
+                    getString(R.string.app_name_short)));
             mPlayer.addStateChangeListener(this);
             mPlayer.addErrorListener(this);
             mPlayer.addInfoListener(this);
@@ -1519,7 +1577,7 @@ public class PlaybackActivity extends Activity implements
             // We only want to show the video view if the group of ads has finished playing.
             if (adPodComplete) {
                 showProgress();
-                switchToVideoView();
+                switchToContentView();
                 enableMediaSession();
             }
 
@@ -1747,7 +1805,7 @@ public class PlaybackActivity extends Activity implements
 
         // Request Zype API for player data
         String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
-        HashMap<String, String> params = new HashMap<>();
+        HashMap<String, String> params = getValues();
         if (!TextUtils.isEmpty(accessToken)) {
             params.put(ZypeApi.ACCESS_TOKEN, accessToken);
         }
@@ -1759,8 +1817,9 @@ public class PlaybackActivity extends Activity implements
             params.put(ZypeApi.UUID, uuid);
         }
         ZypeApi.getInstance().getApi()
-                .getPlayer(IZypeApi.HEADER_USER_AGENT, mSelectedContent.getId(), params)
-                .enqueue(new Callback<PlayerResponse>() {
+                .getPlayer(getUserAgent(PlaybackActivity.this, getString(R.string.app_name_short)),
+                                            mSelectedContent.getId(), params)
+                    .enqueue(new Callback<PlayerResponse>() {
             @Override
             public void onResponse(Call<PlayerResponse> call, Response<PlayerResponse> response) {
                 if (response.isSuccessful()) {
@@ -1944,7 +2003,7 @@ public class PlaybackActivity extends Activity implements
                 if (mPlaybackOverlayFragment != null) {
                     // TODO: remove this update once we find a way to get duration and cc state
                     // from bright cove before PLAYING state. DEVTECH-4973
-                    if (mPrevState == PlayerState.READY) {
+                    if (mPrevState == PlayerState.READY || mPrevState == PlayerState.SEEKING) {
                         modifyClosedCaptionState(mIsClosedCaptionEnabled);
                         mPlaybackOverlayFragment.updatePlayback();
                     }
@@ -2234,8 +2293,10 @@ public class PlaybackActivity extends Activity implements
     private Content updateContentWithPlayerData(Content content, PlayerData playerData) {
         if (playerData != null) {
             // Url
-            content.setUrl(playerData.body.files.get(0).url);
+            String url = playerData.body.files.get(0).url;
+            content.setUrl(url);
             content.setExtraValue(Content.EXTRA_VIDEO_URL, content.getUrl());
+            checkIsAudio(url);
             // Ads
             if (playerData.body.advertising != null && playerData.body.advertising.schedule.size() > 0) {
                 content.setAdCuePoints(new ArrayList<>());
@@ -2281,6 +2342,15 @@ public class PlaybackActivity extends Activity implements
         return content;
     }
 
+    private void checkIsAudio(String url) {
+        String urlLower = url.toLowerCase();
+        isAudio = urlLower.contains(".mp3")
+                || urlLower.contains(".m4a")
+                || urlLower.contains(".wav")
+                || urlLower.contains(".wma")
+                || urlLower.contains(".aiff")
+                || urlLower.contains(".ac3");
+    }
 //    private void setupAkamai() {
 //        akamaiPlugin = new AnalyticsPlugin(getApplicationContext(), getAkamaiConfigUrl());
 //        if (ContentBrowser.getInstance(this).isUserLoggedIn()) {
@@ -2359,9 +2429,11 @@ public class PlaybackActivity extends Activity implements
             }
             for (int i = 0; i < mPlayer.getTrackCount(type); i++) {
                 MediaFormat mediaFormat = mPlayer.getTrackFormat(type, i);
-                if (track.equalsIgnoreCase(mediaFormat.mTrackId)) {
-                    result = i;
-                    break;
+                if (mediaFormat != null) {
+                    if (track.equalsIgnoreCase(mediaFormat.mTrackId)) {
+                        result = i;
+                        break;
+                    }
                 }
             }
         }
@@ -2383,7 +2455,9 @@ public class PlaybackActivity extends Activity implements
         List<CharSequence> tracks = new ArrayList<>();
         for (int i = 0; i < mPlayer.getTrackCount(type); i++) {
             MediaFormat mediaFormat = mPlayer.getTrackFormat(type, i);
-            tracks.add(mediaFormat.mTrackId);
+            if (mediaFormat != null) {
+                tracks.add(mediaFormat.mTrackId);
+            }
         }
 
         // Show selection dialog

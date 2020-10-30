@@ -14,6 +14,7 @@
  */
 package com.amazon.android.ads.vast.model.vast;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,7 +61,13 @@ public class VideoClicks {
             if (clickThroughMap != null) {
                 getVideoClickElements().put(CLICK_THROUGH_KEY, new ClickElement(clickThroughMap));
             }
-            Map<String, Map> clickTrackingMap = videoClicksMap.get(CLICK_TRACKING_KEY);
+            Map<String, Map> clickTrackingMap;
+            if (videoClicksMap.get(CLICK_TRACKING_KEY) instanceof ArrayList) {
+                clickTrackingMap = (Map<String, Map>) ((ArrayList) videoClicksMap.get(CLICK_TRACKING_KEY)).get(0);
+            }
+            else {
+                clickTrackingMap = videoClicksMap.get(CLICK_TRACKING_KEY);
+            }
             if (clickTrackingMap != null) {
                 getVideoClickElements().put(CLICK_TRACKING_KEY, new ClickElement(clickTrackingMap));
             }

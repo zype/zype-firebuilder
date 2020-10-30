@@ -26,11 +26,12 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package android.support.v17.leanback.app;
+package androidx.leanback.app;
 
 
 import com.amazon.android.configuration.ConfigurationManager;
 import com.amazon.android.tv.tenfoot.R;
+import com.amazon.android.uamp.ui.PlaybackOverlayFragment;
 import com.amazon.android.ui.constants.ConfigurationConstants;
 
 import android.animation.Animator;
@@ -44,15 +45,15 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v17.leanback.animation.LogAccelerateInterpolator;
-import android.support.v17.leanback.animation.LogDecelerateInterpolator;
-import android.support.v17.leanback.widget.ItemBridgeAdapter;
-import android.support.v17.leanback.widget.ObjectAdapter;
-import android.support.v17.leanback.widget.PlaybackControlsRowPresenter;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v17.leanback.widget.VerticalGridView;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.leanback.animation.LogAccelerateInterpolator;
+import androidx.leanback.animation.LogDecelerateInterpolator;
+import androidx.leanback.widget.ItemBridgeAdapter;
+import androidx.leanback.widget.ObjectAdapter;
+import androidx.leanback.widget.PlaybackControlsRowPresenter;
+import androidx.leanback.widget.Presenter;
+import androidx.leanback.widget.VerticalGridView;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.InputEvent;
 import android.view.KeyEvent;

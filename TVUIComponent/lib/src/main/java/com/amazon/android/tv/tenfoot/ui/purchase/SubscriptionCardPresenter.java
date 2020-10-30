@@ -12,28 +12,20 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package com.amazon.android.tv.tenfoot.ui.Subscription;
+package com.amazon.android.tv.tenfoot.ui.purchase;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
-import android.support.v17.leanback.widget.BaseCardView;
-import android.support.v17.leanback.widget.ImageCardView;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
+import androidx.leanback.widget.BaseCardView;
+import androidx.leanback.widget.ImageCardView;
+import androidx.leanback.widget.Presenter;
+import androidx.core.content.ContextCompat;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.amazon.android.model.Action;
 import com.amazon.android.tv.tenfoot.R;
-import com.amazon.android.tv.tenfoot.base.TenFootApp;
-import com.amazon.android.tv.tenfoot.ui.Subscription.Model.SubscriptionItem;
-import com.amazon.android.utils.Helpers;
+import com.amazon.android.tv.tenfoot.ui.purchase.Model.SubscriptionItem;
 
 /**
  * A CardPresenter used to generate Views and bind SettingsItems to them on demand.

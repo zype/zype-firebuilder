@@ -29,7 +29,8 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -210,6 +211,10 @@ public class LogoutSettingsFragment extends ASettingsFragment {
         CalligraphyUtils.applyFontToTextView(context, rejectLogout, ConfigurationManager
                 .getInstance(context).getTypefacePath(ConfigurationConstants.REGULAR_FONT));
 
+        rejectLogout.setTextColor(ContextCompat
+                .getColorStateList(context,
+                        R.color.action_button_text_color_selector));
+
         rejectLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -237,6 +242,10 @@ public class LogoutSettingsFragment extends ASettingsFragment {
         // Font needs to be applied since this was created dynamically.
         CalligraphyUtils.applyFontToTextView(context, acceptLogout, ConfigurationManager
                 .getInstance(context).getTypefacePath(ConfigurationConstants.REGULAR_FONT));
+
+        acceptLogout.setTextColor(ContextCompat
+                .getColorStateList(context,
+                        R.color.action_button_text_color_selector));
 
         acceptLogout.setOnClickListener(new View.OnClickListener() {
             @Override

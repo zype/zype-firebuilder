@@ -328,6 +328,8 @@ public class Content implements Serializable {
     public static final String EXTRA_ENTITLED = "Entitled";
     // Poster image url
     public static final String EXTRA_IMAGE_POSTER_URL = "ImagePosterUrl";
+    // Marketplace id
+    public static final String EXTRA_MARKETPLACE_ID = "marketplaceId";
     // Pass required flag
     public static final String EXTRA_PASS_REQUIRED = "PassRequired";
     // Playlist id
@@ -342,6 +344,8 @@ public class Content implements Serializable {
     public static final String EXTRA_SEASON = "Season";
     // Poster thumbnail url
     public static final String EXTRA_THUMBNAIL_POSTER_URL = "ThumbnailPosterUrl";
+
+    public static final String EXTRA_THUMBNAIL_SQUARE_URL = "ThumbnailSquareUrl";
     // Poster thumbnail url
     public static final String EXTRA_VIDEO_FAVORITE_ID = "VideoFavoriteId";
     // Video player url

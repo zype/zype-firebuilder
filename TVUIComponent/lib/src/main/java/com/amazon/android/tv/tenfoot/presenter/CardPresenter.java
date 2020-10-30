@@ -49,10 +49,11 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.support.v17.leanback.widget.BaseCardView;
-import android.support.v17.leanback.widget.ImageCardView;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v4.content.ContextCompat;
+import androidx.leanback.widget.BaseCardView;
+import androidx.leanback.widget.ImageCardView;
+import androidx.leanback.widget.Presenter;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -115,7 +116,7 @@ public class CardPresenter extends Presenter {
 //                }
             }
         };
-        cardView.setInfoAreaBackground(sFocusedFadeMask);
+//        cardView.setInfoAreaBackground(sFocusedFadeMask);
         cardView.setFocusable(true);
         cardView.setFocusableInTouchMode(true);
 
@@ -161,24 +162,21 @@ public class CardPresenter extends Presenter {
 
 
                 if (SHOW_TITLE) {
-
                     String title = ContentHelper.getCardViewSubtitle(mContext, content);
-
-                    if(titleText != null) {
-                        if(TextUtils.isEmpty(title)) {
+                    if (titleText != null) {
+                        if (TextUtils.isEmpty(title)) {
                             titleText.setVisibility(View.GONE);
                         }
                         else {
                             titleText.setVisibility(View.VISIBLE);
                         }
                     }
-
                     cardView.setTitleText(title);
                     cardView.setContentText(content.getTitle()+ "\n ");
                 }
                 else {
-                    cardView.setContentText("");
                     cardView.setTitleText("");
+                    cardView.setContentText("");
                 }
                 cardView.setMainImageDimensions(mCardWidthDp, mCardHeightDp);
                 /* Zype, Evgeny Cherkasov */
@@ -210,40 +208,55 @@ public class CardPresenter extends Presenter {
                 }
 
                 /* Zype, Evgeny Cherkasov */
-                // Display lock icon for subscription video
+                // Display lock icon for paywalled video
                 ImageView mBadgeImage = (ImageView) cardView.findViewById(R.id.extra_badge);
-
-                if (content.isSubscriptionRequired()) {
-                    mBadgeImage.setVisibility(View.VISIBLE);
-                    if (contentBrowser.isUserSubscribed()) {
-                        if (!ZypeSettings.UNLOCK_TRANSPARENT){
-                            mBadgeImage.setBackgroundColor(mContext.getResources().getColor(R.color.unlock_color));
-                        }
-                        mBadgeImage.setImageResource(R.drawable.unlocked);
-                        //cardView.setBadgeImage(imageUnlocked);
-                    }
-                    else {
+                if (contentBrowser.getPurchaseHelper().isVideoPaywalled(content)) {
+                    if (contentBrowser.getPurchaseHelper().isVideoLocked(content)) {
+                        mBadgeImage.setVisibility(View.VISIBLE);
                         mBadgeImage.setBackgroundColor(mContext.getResources().getColor(R.color.lock_color));
                         mBadgeImage.setImageResource(R.drawable.locked);
-                        //cardView.setBadgeImage(imageLocked);
+                    } else {
+                        if (ZypeSettings.UNLOCK_TRANSPARENT) {
+                            mBadgeImage.setVisibility(View.GONE);
+                        } else {
+                            mBadgeImage.setVisibility(View.VISIBLE);
+                            mBadgeImage.setBackgroundColor(mContext.getResources().getColor(R.color.unlock_color));
+                            mBadgeImage.setImageResource(R.drawable.unlocked);
+                        }
                     }
                 }
                 else {
                     mBadgeImage.setVisibility(View.GONE);
-                    //cardView.setBadgeImage(null);
                 }
             }
         }
         else if (item instanceof ContentContainer) {
             ContentContainer contentContainer = (ContentContainer) item;
-            if(titleText != null) {
-                titleText.setVisibility(View.GONE);
-            }
-
+//            if(titleText != null) {
+//                titleText.setVisibility(View.GONE);
+//            }
+//
+//            if (SHOW_TITLE) {
+//                cardView.setContentText(contentContainer.getName()+ "\n ");
+//            }
+//            else {
+//                cardView.setContentText("");
+//            }
             if (SHOW_TITLE) {
+                String title = "";
+                if (titleText != null) {
+                    if (TextUtils.isEmpty(title)) {
+                        titleText.setVisibility(View.GONE);
+                    }
+                    else {
+                        titleText.setVisibility(View.VISIBLE);
+                    }
+                }
+                cardView.setTitleText(title);
                 cardView.setContentText(contentContainer.getName()+ "\n ");
             }
             else {
+                cardView.setTitleText("");
                 cardView.setContentText("");
             }
 
@@ -266,6 +279,8 @@ public class CardPresenter extends Presenter {
             else {
                 cardView.getMainImageView().setImageDrawable(mDefaultCardImage);
             }
+            cardView.setInfoAreaBackground(sFocusedFadeMask);
+
         }
         /* Zype, Evgeny CHerkasov */
         else if (item instanceof Action) {
@@ -274,8 +289,10 @@ public class CardPresenter extends Presenter {
             cardView.setMainImageScaleType(ImageView.ScaleType.CENTER);
             cardView.setMainImageDimensions(mCardWidthDp, mCardHeightDp);
             try {
-                cardView.setMainImage(ContextCompat.getDrawable(TenFootApp.getInstance().getApplicationContext(),
-                        action.getIconResourceId()));
+                Drawable iconDrawable = ContextCompat.getDrawable(TenFootApp.getInstance().getApplicationContext(),
+                        action.getIconResourceId());
+                DrawableCompat.setTint(iconDrawable, ContextCompat.getColor(mContext, R.color.primary_text));
+                cardView.setMainImage(iconDrawable);
             }
             catch (Resources.NotFoundException e) {
                 Log.e(TAG, "Resource not found", e);

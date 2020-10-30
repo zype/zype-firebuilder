@@ -11,6 +11,7 @@
     "description@mDescription",
     "duration@mDuration",
     "images@Images",
+    "marketplace_ids/amazon_fire_tv@marketplaceId",
     "on_air@live",
     "playerUrl@mUrl",
     "pass_required@PassRequired",
@@ -26,6 +27,5 @@
     "registration_required@RegistrationRequired",
     "preview_ids@previewIds",
     "episode@mEpisode"
-
   ]
 }

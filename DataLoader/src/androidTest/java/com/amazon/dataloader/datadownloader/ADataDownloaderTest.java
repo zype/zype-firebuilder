@@ -19,7 +19,7 @@ import com.amazon.dataloader.testResources.MockDataDownloader;
 import org.junit.Test;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

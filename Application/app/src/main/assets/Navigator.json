@@ -42,7 +42,7 @@
       "verifyNetworkConnection": true,
       "onAction": "CONTENT_SUBMENU_SCREEN"
     },
-    "com.amazon.android.tv.tenfoot.ui.activities.ContentDetailsActivity": {
+    "com.amazon.android.tv.tenfoot.ui.activities.ZypeContentDetailsActivity": {
       "verifyScreenAccess": false,
       "verifyNetworkConnection": true,
       "onAction": "CONTENT_DETAILS_SCREEN"
@@ -57,17 +57,17 @@
       "verifyNetworkConnection": true,
       "onAction": "CONTENT_RENDERER_SCREEN"
     },
-    "com.amazon.android.tv.tenfoot.ui.Subscription.SubscriptionActivity": {
+    "com.amazon.android.tv.tenfoot.ui.purchase.SubscriptionActivity": {
       "verifyScreenAccess": false,
       "verifyNetworkConnection": true,
       "onAction": "SUBSCRIPTION_SCREEN"
     },
-    "com.amazon.android.tv.tenfoot.ui.Subscription.BuyVideoActivity": {
+    "com.amazon.android.tv.tenfoot.ui.purchase.BuyVideoActivity": {
       "verifyScreenAccess": false,
       "verifyNetworkConnection": true,
       "onAction": "BUY_VIDEO_SCREEN"
     },
-    "com.amazon.android.tv.tenfoot.ui.Subscription.CreateLoginActivity": {
+    "com.amazon.android.tv.tenfoot.ui.purchase.CreateLoginActivity": {
       "verifyScreenAccess": false,
       "verifyNetworkConnection": true,
       "onAction": "USER_SIGN_UP_SCREEN"

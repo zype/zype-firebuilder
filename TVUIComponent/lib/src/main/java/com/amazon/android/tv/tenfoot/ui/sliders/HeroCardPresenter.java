@@ -3,9 +3,9 @@ package com.amazon.android.tv.tenfoot.ui.sliders;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
-import android.support.v17.leanback.widget.ImageCardView;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v4.content.ContextCompat;
+import androidx.leanback.widget.ImageCardView;
+import androidx.leanback.widget.Presenter;
+import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
@@ -18,7 +18,7 @@ import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.utils.Helpers;
 import com.bumptech.glide.Glide;
 
-import static android.support.v17.leanback.widget.ImageCardView.CARD_TYPE_FLAG_IMAGE_ONLY;
+import static androidx.leanback.widget.ImageCardView.CARD_TYPE_FLAG_IMAGE_ONLY;
 
 public class HeroCardPresenter extends Presenter {
   private static final String TAG = "HeroCardPresenter";
@@ -105,13 +105,11 @@ public class HeroCardPresenter extends Presenter {
 
     ImageView imageView = ((ViewHolder) viewHolder).mCardView.getMainImageView();
 
-    if(slider.isSelected()) {
-     imageView.setAlpha(1.0f);
-      imageView.setColorFilter(mContext.getResources().getColor(R.color.transparent));
-    }else {
-     imageView.setAlpha(0.5f);
-     imageView.setColorFilter(mContext.getResources().getColor(R.color.background_hero_slider_image));
-    }
+    int color = slider.isSelected() ? mContext.getResources().getColor(R.color.transparent)
+                  : mContext.getResources().getColor(R.color.hero_slider_overlay_color);
+    float alpha = slider.isSelected() ? 1.0f : (color >> 24) / -255f;
+    imageView.setAlpha(alpha);
+    imageView.setColorFilter(color);
   }
 
   @Override

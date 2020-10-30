@@ -37,7 +37,6 @@ import com.amazon.android.model.content.ContentContainer;
 import com.amazon.android.tv.tenfoot.ui.fragments.MenuFragment;
 import com.amazon.android.tv.tenfoot.ui.sliders.HeroSlider;
 import com.amazon.android.tv.tenfoot.ui.sliders.HeroSliderFragment;
-import com.amazon.android.tv.tenfoot.ui.sliders.Slider;
 import com.amazon.android.tv.tenfoot.utils.BrowseHelper;
 import com.amazon.android.ui.constants.ConfigurationConstants;
 import com.amazon.android.ui.fragments.LogoutSettingsFragment;
@@ -47,7 +46,6 @@ import com.amazon.android.utils.Helpers;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment;
-import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 
 import android.animation.Animator;
@@ -61,13 +59,16 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v17.leanback.widget.ArrayObjectAdapter;
-import android.support.v4.content.ContextCompat;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.ListRow;
+import androidx.leanback.widget.Row;
+import androidx.core.content.ContextCompat;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -79,8 +80,6 @@ import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
-
-import static com.zype.fire.api.ZypeSettings.SHOW_LEFT_MENU;
 
 /**
  * ContentBrowseActivity class that loads the ContentBrowseFragment.
@@ -103,11 +102,18 @@ public class ContentBrowseActivity extends BaseActivity implements
     // View that contains the background
     private View mMainFrame;
     private Drawable mBackgroundWithPreview;
+    private View layoutContentDetails;
+    private View imageLogo;
 
     /* Zype, Evgeny Cherkasov */
     private boolean isMenuOpened = false;
 
     private boolean sliderShown = false;
+    private boolean lastRowSelected = false;
+
+    private Row lastSelectedRow = null;
+    private boolean lastSelectedRowChanged = false;
+    private int lastSelectedItemIndex = -1;
 
     private final Handler handler = new Handler();
 
@@ -130,8 +136,10 @@ public class ContentBrowseActivity extends BaseActivity implements
                 .getInstance(this).getTypefacePath(ConfigurationConstants.LIGHT_FONT));
 
         mContentImage = (ImageView) findViewById(R.id.content_image);
-
         mContentImage.setImageURI(Uri.EMPTY);
+
+        layoutContentDetails = (LinearLayout) findViewById(R.id.content_details);
+        imageLogo = findViewById(R.id.main_logo);
 
         // Get display/background size
         Display display = getWindowManager().getDefaultDisplay();
@@ -188,6 +196,8 @@ public class ContentBrowseActivity extends BaseActivity implements
             return;
         }
         mContentImage.setVisibility(View.VISIBLE);
+        layoutContentDetails.setVisibility(View.VISIBLE);
+        imageLogo.setVisibility(View.VISIBLE);
         HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
         fadeInFadeOut(Arrays.asList(findViewById(R.id.content_image), findViewById(R.id.content_details),
             findViewById(R.id.main_logo)), Arrays.asList(fragment.getView()));
@@ -195,10 +205,12 @@ public class ContentBrowseActivity extends BaseActivity implements
     }
 
     private void showHeroSlider() {
-        if(sliderShown || !slidersPresent()) {
+        if (sliderShown || !slidersPresent()) {
             return;
         }
         mContentImage.setVisibility(View.GONE);
+        layoutContentDetails.setVisibility(View.GONE);
+        imageLogo.setVisibility(View.GONE);
         HeroSliderFragment fragment = (HeroSliderFragment) getFragmentManager().findFragmentById(R.id.hero_slider_fragment);
         fadeInFadeOut(Arrays.asList(fragment.getView()), Arrays.asList(findViewById(R.id.content_image), findViewById(R.id.content_details),
             findViewById(R.id.main_logo)));
@@ -267,7 +279,8 @@ public class ContentBrowseActivity extends BaseActivity implements
 
         if(slidersPresent()) {
             handler.postDelayed(() -> {
-              if(sliderHasFocus() || event.getKeyCode()== KeyEvent.KEYCODE_BACK) {
+                if(sliderHasFocus()
+                      || (event.getKeyCode()== KeyEvent.KEYCODE_BACK && sliderShown)) {
                   sliderShown=false;
                   showHeroSlider();
                 }
@@ -314,8 +327,16 @@ public class ContentBrowseActivity extends BaseActivity implements
      * title, description, and image.
      */
     @Override
-    public void onItemSelected(Object item) {
-
+    public void onItemSelected(Object item, Row row, boolean isLastContentRow) {
+        lastRowSelected = isLastContentRow;
+        if (row != lastSelectedRow && item != null) {
+            lastSelectedRow = row;
+            lastSelectedRowChanged = true;
+        }
+        else {
+            lastSelectedRowChanged = false;
+        }
+        lastSelectedItemIndex = ((ArrayObjectAdapter) ((ListRow) row).getAdapter()).indexOf(item);
         if (item instanceof Content) {
             Content content = (Content) item;
             callImageLoadSubscription(content.getTitle(),
@@ -486,13 +507,17 @@ public class ContentBrowseActivity extends BaseActivity implements
                     Log.d(TAG, "Back button pressed");
                     if (isMenuOpened) {
                         hideMenu();
+                        findViewById(R.id.full_content_browse_fragment).requestFocus();
+                        Object item = ((ListRow) lastSelectedRow).getAdapter()
+                                .get(lastSelectedItemIndex == -1 ? 0 : lastSelectedItemIndex);
+                        onItemSelected(item, lastSelectedRow, lastRowSelected);
                         return true;
                     }
                 }
                 break;
             }
             case KeyEvent.KEYCODE_DPAD_UP:
-                Log.d(TAG, "Down button pressed");
+                Log.d(TAG, "Up button pressed");
                 if (isMenuOpened) {
                     MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
                     if (fragment != null) {
@@ -515,6 +540,33 @@ public class ContentBrowseActivity extends BaseActivity implements
                             if (event.getAction() == KeyEvent.ACTION_DOWN) {
                                 return true;
                             }
+                        }
+                    }
+                }
+                if (!ZypeSettings.SETTINGS_PLAYLIST_ENABLED) {
+                    if (lastRowSelected && !isMenuOpened) return true;
+                }
+                break;
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                Log.d(TAG, "Right button pressed");
+                if (isMenuOpened) {
+                    hideMenu();
+                    findViewById(R.id.full_content_browse_fragment).requestFocus();
+                    return true;
+                }
+                break;
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                Log.d(TAG, "Left button pressed");
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    if (!isMenuOpened && !sliderHasFocus()) {
+                        if (lastSelectedItemIndex == 0) {
+                            lastSelectedItemIndex = -1;
+                            if (lastSelectedRowChanged) {
+                                showMenu();
+                            }
+                        }
+                        else if (lastSelectedItemIndex == -1 ){
+                            showMenu();
                         }
                     }
                 }

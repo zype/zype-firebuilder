@@ -53,6 +53,7 @@ import com.amazon.android.ads.vast.model.vast.VastAd;
 import com.amazon.android.ads.vast.model.vast.VastResponse;
 import com.amazon.android.ads.vast.model.vmap.AdBreak;
 import com.amazon.android.ads.vast.model.vmap.AdSource;
+import com.amazon.android.ads.vast.model.vmap.AdTagURI;
 import com.amazon.android.ads.vast.model.vmap.Tracking;
 import com.amazon.android.ads.vast.model.vmap.VmapResponse;
 import com.amazon.android.ads.vast.processor.AdTagProcessor;
@@ -89,6 +90,7 @@ import java.util.TimerTask;
 import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
 
+import static com.amazon.utils.DateAndTimeHelper.addSeconds;
 import static com.amazon.utils.DateAndTimeHelper.convertDateFormatToSeconds;
 
 /**
@@ -261,7 +263,7 @@ public class VASTAdsPlayer implements IAds,
         if (mMidRollAds != null && mMidRollAds.size() > 0
                 && mPlayedMidRollAds.containsValue(false)) {
 
-            long positionInSeconds = (long) position / 1000;
+            final long positionInSeconds = (long) position / 1000;
             // Play the list of mid-roll ads that matched the playback position if not already
             // played
             if (mMidRollAds.containsKey(positionInSeconds)
@@ -271,7 +273,15 @@ public class VASTAdsPlayer implements IAds,
                 Log.d(TAG, "Play mid-rolls at position " + positionInSeconds);
                 mCurrentAdType = IAds.MID_ROLL_AD;
                 mPlayedMidRollAds.put(positionInSeconds, true);
-                mAdListener.startAdPod(0, mMidRollAds.get(positionInSeconds));
+
+                // Load VAST response from the ad tag uri if it is not ready yet,
+                // update ad break with that response and call startAdPod().
+                if (!isMidRollReady(positionInSeconds)) {
+                    loadMidRollAds(positionInSeconds);
+                }
+                else {
+                    mAdListener.startAdPod(0, mMidRollAds.get(positionInSeconds));
+                }
             }
         }
     }
@@ -592,7 +602,7 @@ public class VASTAdsPlayer implements IAds,
                         mAdType = adTagProcessor.processList(videoExtras.getStringArrayList("AdTags"), videoExtras.getIntArray("mAdCuePoints"));
                     }
                     else {
-                        mAdType = adTagProcessor.process("", 0);
+                        mAdType = adTagProcessor.process("");
                     }
 
                     if (mAdType == AdTagProcessor.AdTagType.no_ad_break_found) {
@@ -618,6 +628,63 @@ public class VASTAdsPlayer implements IAds,
         }
     }
 
+    private boolean isMidRollReady(long positionInSeconds) {
+        List<AdBreak> adBreaks = mMidRollAds.get(positionInSeconds);
+        for (AdBreak adBreak : adBreaks) {
+            if (getVastResponseFromAdBreak(adBreak) == null)
+                return false;
+        }
+        return true;
+    }
+
+    private void loadMidRollAds(final long positionInSeconds) {
+
+        Log.d(TAG, "loadMidRollAds()");
+
+        final List<AdBreak> adBreaks = mMidRollAds.get(positionInSeconds);
+        if (NetworkTools.connectedToInternet(mContext)) {
+            (new Thread(new Runnable() {
+                @Override
+                public void run() {
+//                    mMediaPicker = new DefaultMediaPicker(mContext);
+                    for (AdBreak adBreak : adBreaks) {
+                        AdTagProcessor adTagProcessor = new AdTagProcessor(mMediaPicker);
+
+                        AdSource adSource = adBreak.getAdSource();
+                        AdTagURI adTagURI = adSource.getAdTagURI();
+                        String adUrl = adTagURI.getUri();
+                        // Try to add a correlator value to the url if needed.
+                        adUrl = NetworkUtils.addParameterToUrl(adUrl, IAds.CORRELATOR_PARAMETER,
+                                "" + System.currentTimeMillis());
+
+                        mAdType = adTagProcessor.process(adUrl);
+
+                        if (mAdType == AdTagProcessor.AdTagType.no_ad_break_found) {
+                            //No Ad break found just mark this ad as complete.
+                            mVASTPlayerListener.vastComplete();
+                            break;
+                        } else if (mAdType == AdTagProcessor.AdTagType.vast) {
+                            adSource.setVastResponse(adTagProcessor.getVastResponse());
+//                            mAdListener.adsReady();
+                        } else if (mAdType == AdTagProcessor.AdTagType.validation_error) {
+                            mVASTPlayerListener.vastError(ERROR_SCHEMA_VALIDATION);
+                            break;
+                        } else {
+                            mVASTPlayerListener.vastError(ERROR_XML_PARSE);
+                            break;
+                        }
+                    }
+                    if (isMidRollReady(positionInSeconds)) {
+                        mAdListener.midrollAdsReady(positionInSeconds);
+                    }
+                }
+            })).start();
+        }
+        else {
+            mVASTPlayerListener.vastError(ERROR_NO_NETWORK);
+        }
+    }
+
     /**
      * An ad listener that deals with playing ad pods (multiple ads at a time).
      */
@@ -633,6 +700,12 @@ public class VASTAdsPlayer implements IAds,
 
             Log.d(TAG, "Ad models are ready; Starting pre-roll ads");
             startAdPod(0, mAdResponse.getPreRollAdBreaks(0));
+        }
+
+        @Override
+        public void midrollAdsReady(long positionInSeconds) {
+            Log.d(TAG, "midrollAdsReady():  Starting mid-roll ads");
+            startAdPod(0, mMidRollAds.get(positionInSeconds));
         }
 
         /**

@@ -40,6 +40,15 @@ permissions and limitations under the License.
     <dimen name="lb_details_overview_description_margin_bottom">35dp</dimen>
     <!-- space between action buttons-->
     <dimen name="lb_details_overview_action_items_margin">8dp</dimen>
+    <dimen name="lb_details_overview_margin_left">@dimen/lb_browse_padding_start</dimen>
+    <dimen name="lb_details_overview_margin_right">@dimen/lb_browse_padding_start</dimen>
+    <dimen name="lb_details_overview_description_margin_left">24dp</dimen>
+    <dimen name="lb_details_overview_description_margin_right">24dp</dimen>
+    <dimen name="lb_details_v2_card_height">260dp</dimen>
+    <dimen name="lb_details_v2_blank_height">24dp</dimen>
+    <dimen name="lb_details_v2_description_margin_top">0dp</dimen>
+    <dimen name="lb_details_v2_description_margin_bottom">16dp</dimen>
+    <dimen name="lb_details_v2_logo_margin_start">@dimen/lb_browse_padding_start</dimen>
 
     <!-- Playback fragment customization -->
     <dimen name="lb_playback_controls_z">4dp</dimen>

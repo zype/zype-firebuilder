@@ -30,6 +30,7 @@ permissions and limitations under the License.
             @style/Widget.Leanback.DetailsActionButtonStyle.Custom
         </item>
         <item name="android:windowBackground">@color/background</item>
+        <item name="imageCardViewStyle">@style/CustomImageCardViewStyle</item>
    </style>
 
     <declare-styleable name="LeanbackTheme">
@@ -134,5 +135,9 @@ permissions and limitations under the License.
         <item name="android:windowFrame">@null</item>
         <item name="android:windowBackground">@color/error_dialog_bg_color</item>
         <item name="android:gravity">center_horizontal</item>
+    </style>
+
+    <style name="CustomImageCardViewStyle" parent="Widget.Leanback.ImageCardViewStyle">
+        <item name="cardBackground">@color/card_background</item>
     </style>
 </resources>
