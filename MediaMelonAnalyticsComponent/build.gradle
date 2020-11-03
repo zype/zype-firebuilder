@@ -45,7 +45,7 @@ jacoco {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    api fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
 
     api 'com.amazon.android:exoplayer:2.7.1'
 

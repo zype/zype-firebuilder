@@ -48,8 +48,8 @@ public class MMSmartStreamingExo2_6 implements MMSmartStreamingObserver{
      * @return SDK version (major.minor.patch)
      */
     public static String getVersion(){
-        return MMSmartStreaming.getVersion();
-    }
+    return MMSmartStreaming.getVersion();
+  }
 
     /**
      * Gets the registration status (done via registerMMSmartStreaming)
@@ -75,8 +75,8 @@ public class MMSmartStreamingExo2_6 implements MMSmartStreamingObserver{
         DisplayMetrics dm = ctx.get().getResources().getDisplayMetrics();
         Integer height = dm.heightPixels;
         Integer width = dm.widthPixels;
-
-        mainHandler = new Handler(ctx.get().getMainLooper());
+	
+	mainHandler = new Handler(ctx.get().getMainLooper());
 
         TelephonyManager tm = (TelephonyManager)ctx.get().getSystemService(Context.TELEPHONY_SERVICE);
         MMSmartStreaming.reportDeviceInfo(Build.BRAND, Build.MODEL, "Android", Build.VERSION.RELEASE, (tm!=null? (tm.getNetworkOperatorName()):null), width, height);
@@ -173,11 +173,11 @@ public class MMSmartStreamingExo2_6 implements MMSmartStreamingObserver{
     }
 
     /**
-     * Disables the fetching of manifests by the SDK to determine the presentation information of the content.
-     * SDK will rely completely on presentation information provided as part of setPresentationInformation.
-     * @param [disable] Disables/Enables the manifest fetch by the SDK
-     * @see setPresentationInformation
-     */
+    * Disables the fetching of manifests by the SDK to determine the presentation information of the content.
+    * SDK will rely completely on presentation information provided as part of setPresentationInformation.
+    * @param [disable] Disables/Enables the manifest fetch by the SDK
+    * @see setPresentationInformation
+    */
     public static void disableManifestsFetch(boolean disable){
         try{
             MMSmartStreaming.disableManifestsFetch(disable);
@@ -196,7 +196,7 @@ public class MMSmartStreamingExo2_6 implements MMSmartStreamingObserver{
      * @param subscriberID New Subscriber ID
      * @see registerMMSmartStreaming
      * @see updateSubscriber
-     *
+     * 
      */
     public static void updateSubscriberID(String subscriberID){
         MMSmartStreaming.updateSubscriberID(subscriberID);
@@ -249,14 +249,14 @@ public class MMSmartStreamingExo2_6 implements MMSmartStreamingObserver{
     public void initializeSession(SimpleExoPlayer simplePlayer, MMQBRMode mode, String manifestURL, String metaURL, String assetID, String assetName, MMSmartStreamingObserver observer){
         reset();
         if(observer != null) {
-            obs = new WeakReference<MMSmartStreamingObserver>(observer);
-        }
+      	   obs = new WeakReference<MMSmartStreamingObserver>(observer);
+    	}
         playerSimple = new WeakReference<SimpleExoPlayer>(simplePlayer);
         if(playerSimple != null){
             EventLoggerExo2_6 eventLogger = new EventLoggerExo2_6(simplePlayer);
             playerSimple.get().addListener(eventLogger);
             playerSimple.get().addMetadataOutput(eventLogger);
-            playerSimple.get().setAudioDebugListener(eventLogger);
+//            playerSimple.get().setAudioDebugListener(eventLogger);
             playerSimple.get().setVideoDebugListener(eventLogger);
         }
         MMSmartStreaming.getInstance().initializeSession(mode, manifestURL, metaURL, assetID, assetName, this);
@@ -283,14 +283,14 @@ public class MMSmartStreamingExo2_6 implements MMSmartStreamingObserver{
     public void initializeSession(SimpleExoPlayer simplePlayer, MMQBRMode mode, String manifestURL, String metaURL, String assetID, String assetName, String videoId, MMSmartStreamingObserver observer){
         reset();
         if(observer != null) {
-            obs = new WeakReference<MMSmartStreamingObserver>(observer);
-        }
+      	   obs = new WeakReference<MMSmartStreamingObserver>(observer);
+    	}
         playerSimple = new WeakReference<SimpleExoPlayer>(simplePlayer);
         if(playerSimple != null){
             EventLoggerExo2_6 eventLogger = new EventLoggerExo2_6(simplePlayer);
             playerSimple.get().addListener(eventLogger);
             playerSimple.get().addMetadataOutput(eventLogger);
-            playerSimple.get().setAudioDebugListener(eventLogger);
+//            playerSimple.get().setAudioDebugListener(eventLogger);
             playerSimple.get().setVideoDebugListener(eventLogger);
         }
         MMSmartStreaming.getInstance().initializeSession(mode, manifestURL, metaURL, assetID, assetName, videoId, this);
@@ -435,44 +435,44 @@ public class MMSmartStreamingExo2_6 implements MMSmartStreamingObserver{
     }
 
     void reset(){
-        obs = null;
-        cumulativeFramesDropped = 0;
-        sendBufferingCompletionOnReady = false;
-        playbackPollingStarted = false;
-        playerSimple = null;
-        if(timer != null) {
-            timer.cancel();
-            timer = null;
-        }
+      obs = null;
+      cumulativeFramesDropped = 0;
+      sendBufferingCompletionOnReady = false;
+      playbackPollingStarted = false;
+      playerSimple = null;
+      if(timer != null) {
+        timer.cancel();
+        timer = null;
+      }
     }
 
     void stopPlaybackPolling(){
-        playbackPollingStarted = false;
-        if(timer != null) {
-            timer.cancel();
-            timer = null;
-        }
+     playbackPollingStarted = false;
+     if(timer != null) {
+       timer.cancel();
+       timer = null;
+     }
     }
 
     void startPlaybackPolling(){
-        if(playbackPollingStarted == false){
-            playbackPollingStarted = true;
-            if(timer == null){
-                timer = new Timer();
-            }
-            timer.scheduleAtFixedRate(new TimerTask() {
-                synchronized public void run() {
-                    mainHandler.post(new Runnable() {
-                        public void run() {
-                            if(playerSimple != null) {
-                                MMSmartStreamingExo2_6.getInstance().reportPlaybackPosition(playerSimple.get().getCurrentPosition());
-                            }
-                        }
-                    });
-
-                }
-            }, 2000, 2000);
+      if(playbackPollingStarted == false){
+        playbackPollingStarted = true;
+        if(timer == null){
+          timer = new Timer();
         }
+        timer.scheduleAtFixedRate(new TimerTask() {
+          synchronized public void run() {
+	    mainHandler.post(new Runnable() {
+              public void run() {
+                if(playerSimple != null) {
+                    MMSmartStreamingExo2_6.getInstance().reportPlaybackPosition(playerSimple.get().getCurrentPosition());
+                }
+              }
+            });
+
+          }
+        }, 2000, 2000);
+      }
     }
     /**
      * Reports the current player state to analytics.
@@ -487,7 +487,7 @@ public class MMSmartStreamingExo2_6 implements MMSmartStreamingObserver{
         }
         switch (exoPlayerState){
             case Player.STATE_IDLE:
-                break;
+            break;
             case Player.STATE_BUFFERING:{
                 MMSmartStreaming.getInstance().reportBufferingStarted();
                 sendBufferingCompletionOnReady = true;
@@ -597,7 +597,7 @@ public class MMSmartStreamingExo2_6 implements MMSmartStreamingObserver{
      * @param adClient Client used to play the ad, eg: VAST
      * @param adURL Tag represented by the ad.
      * @param adDuration Length of the video ad (in milliseconds).
-     * @param adPosition Position of the ad in the video  playback; one of "pre", "post" or "mid"
+     * @param adPosition Position of the ad in the video  playback; one of "pre", "post" or "mid" 
      *                   that represents that the ad played before, after or during playback respectively.
      * @param adType Type of the ad (linear, non-linear etc).
      * @param adCreativeType Ad MIME type
@@ -615,10 +615,10 @@ public class MMSmartStreamingExo2_6 implements MMSmartStreamingObserver{
 
     }
 
-    /**
-     * Reports current advertisement playback position
-     * @param playbackPosition Current playback position in the Ad (in milliseconds)
-     */
+        /**
+         * Reports current advertisement playback position
+         * @param playbackPosition Current playback position in the Ad (in milliseconds)
+         */
     public void reportAdPlaybackTime(Long playbackPosition){
         MMSmartStreaming.getInstance().reportAdPlaybackTime(playbackPosition);
     }

@@ -142,7 +142,9 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
     private static final DefaultBandwidthMeter BANDWIDTH_METER = new DefaultBandwidthMeter();
 
     private Handler mMediaSourceHandler;
-    private EventLogger eventLogger;
+//    private EventLogger eventLogger;
+    // The 'CustomEventLogger' is an EventLogger with additional support of MediaMelon
+    private CustomEventLogger eventLogger;
 
 
 
@@ -263,7 +265,9 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
          */
         mTrackSelectionFactory = new AdaptiveTrackSelection.Factory(BANDWIDTH_METER);
         mTrackSelector = new DefaultTrackSelector(mTrackSelectionFactory);
-        eventLogger = new EventLogger(mTrackSelector);
+//        eventLogger = new EventLogger(mTrackSelector);
+        // The 'CustomEventLogger' is an EventLogger with additional support of MediaMelon
+        eventLogger = new CustomEventLogger(mTrackSelector);
 
         mPlayer = ExoPlayerFactory.newSimpleInstance(mContext, mTrackSelector);
         mPlayer.addListener(eventLogger);

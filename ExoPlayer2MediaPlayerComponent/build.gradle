@@ -52,10 +52,13 @@ jacoco {
 }
 
 dependencies {
-    api fileTree(dir: 'libs', include: ['*.jar'])
+//    api fileTree(dir: 'libs', include: ['*.jar'])
+//    api fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+
     api 'androidx.appcompat:appcompat:1.0.0'
     api 'androidx.legacy:legacy-support-v4:1.0.0'
     api 'com.amazon.android:exoplayer:2.7.1'
+    api project(':MediaMelonAnalyticsComponent')
     api project(':ModuleInterface')
     api project(':UAMP')
 
