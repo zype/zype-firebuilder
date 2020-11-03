@@ -25,11 +25,15 @@ import com.amazon.android.tv.tenfoot.ui.activities.FullContentBrowseActivity;
 import com.amazon.android.tv.tenfoot.ui.activities.SplashActivity;
 
 import android.content.res.Resources;
+
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 import android.util.Log;
+import android.webkit.WebView;
 
 import com.amazon.android.uamp.ui.PlaybackActivity;
 import com.amazon.analytics.AnalyticsTags;
+import com.zype.fire.api.ZypeConfiguration;
 
 /**
  * TenFoot Application class.
@@ -45,6 +49,21 @@ public class TenFootApp extends ContentBrowserApplication {
     public void onCreate() {
 
         super.onCreate();
+
+        int nightMode = AppCompatDelegate.MODE_NIGHT_NO;
+        if (ZypeConfiguration.getTheme(this).equals(ZypeConfiguration.THEME_DARK)) {
+            nightMode = AppCompatDelegate.MODE_NIGHT_YES;
+        }
+        if (nightMode != AppCompatDelegate.MODE_NIGHT_NO) {
+            Log.d("Log","Manually instantiating WebView to avoid night mode issue.");
+            try {
+                new WebView(getApplicationContext());
+            }
+            catch (Exception e) {
+                Log.e("Log","Got exception while trying to instantiate WebView to avoid night mode issue. Ignoring problem.", e);
+            }
+        }
+        AppCompatDelegate.setDefaultNightMode(nightMode);
 
         try {
             /**
@@ -85,5 +104,6 @@ public class TenFootApp extends ContentBrowserApplication {
                          .addAnalyticsConstantForActivity(PlaybackActivity.class
                                                                   .getSimpleName(),
                                                           AnalyticsTags.SCREEN_PLAYBACK);
-    }
+
+        }
 }

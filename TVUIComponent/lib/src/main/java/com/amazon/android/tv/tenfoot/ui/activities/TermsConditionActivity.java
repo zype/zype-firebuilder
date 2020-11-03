@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat;
 
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.utils.Preferences;
+import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 
 /**
@@ -33,7 +34,7 @@ public class TermsConditionActivity extends Activity {
         webView.getSettings().setUseWideViewPort(true);
         webView.setBackgroundColor(ContextCompat.getColor(this, R.color.browse_background_color));
 //        webView.loadUrl(ZypeSettings.TERMS_CONDITION_URL);
-        String textColor = ZypeSettings.LIGHT_THEME ? "#000" : "#fff";
+        String textColor = ZypeConfiguration.getTheme(this).equals(ZypeConfiguration.THEME_LIGHT) ? "#000" : "#fff";
         String finalHtml = "<html><head>"
                 + "<style type=\"text/css\">body {color: " + textColor + "} "
                 + "</style></head>"

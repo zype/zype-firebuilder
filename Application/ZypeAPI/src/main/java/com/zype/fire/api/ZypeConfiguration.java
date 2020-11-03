@@ -26,6 +26,9 @@ public class ZypeConfiguration {
     private static final String PREFERENCE_SUBSCRIBE_TO_WATCH_AD_FREE = "ZypeSubscribeToWatchAdFree";
     private static final String PREFERENCE_UNIVERSAL_SUBSCRIPTION = "ZypeUniversalSubscription";
     private static final String PREFERENCE_UNIVERSAL_TVOD = "ZypeUniversalTVOD";
+    private static final String PREFERENCE_THEME = "ZypeTheme";
+    public static final String THEME_LIGHT = "light";
+    public static final String THEME_DARK = "dark";
 
     private static SharedPreferences getPreferences(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context);
@@ -59,6 +62,9 @@ public class ZypeConfiguration {
         }
         if (!TextUtils.isEmpty(appData.featuredPlaylistId)) {
             editor.putString(PREFERENCE_ROOT_PLAYLIST_ID, appData.featuredPlaylistId);
+        }
+        if (!TextUtils.isEmpty(appData.theme)) {
+            editor.putString(PREFERENCE_THEME, appData.theme);
         }
         if (!TextUtils.isEmpty(appData.siteId)) {
             editor.putString(PREFERENCE_SITE_ID, appData.siteId);
@@ -150,6 +156,10 @@ public class ZypeConfiguration {
 
     public static boolean isUniversalSubscriptionEnabled(Context context) {
         return getBooleanPreference(PREFERENCE_UNIVERSAL_SUBSCRIPTION, ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED, context);
+    }
+
+    public static String getTheme(Context context) {
+        return getStringPreference(PREFERENCE_THEME, ZypeSettings.THEME, context);
     }
 
     public static boolean isUniversalTVODEnabled(Context context) {
