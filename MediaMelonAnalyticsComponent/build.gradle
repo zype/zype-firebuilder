@@ -1,5 +1,5 @@
 /**
- * Copyright 2015-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018 Zype Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-
 apply plugin: 'com.android.library'
 
 android {
@@ -25,8 +24,6 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        multiDexEnabled true
-
     }
     buildTypes {
         release {
@@ -38,11 +35,7 @@ android {
         }
     }
     packagingOptions {
-        pickFirst 'META-INF/LICENSE'
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        pickFirst  'META-INF/LICENSE'
     }
 }
 
@@ -52,15 +45,12 @@ jacoco {
 }
 
 dependencies {
-//    api fileTree(dir: 'libs', include: ['*.jar'])
-//    api fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    api fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
 
-    api 'androidx.appcompat:appcompat:1.0.0'
-    api 'androidx.legacy:legacy-support-v4:1.0.0'
     api 'com.amazon.android:exoplayer:2.7.1'
-    api project(':MediaMelonAnalyticsComponent')
+
     api project(':ModuleInterface')
-    api project(':UAMP')
+    api project(':AnalyticsInterface')
 
     // Set this dependency to use JUnit 4 rules
     androidTestImplementation 'androidx.test:rules:1.1.1'

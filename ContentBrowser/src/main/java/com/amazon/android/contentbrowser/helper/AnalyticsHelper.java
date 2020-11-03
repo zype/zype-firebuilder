@@ -29,11 +29,16 @@ import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import com.amazon.analytics.AnalyticsActionBuilder;
 import com.amazon.analytics.AnalyticsTags;
 import com.amazon.analytics.AnalyticsManager;
 import com.amazon.android.recipe.Recipe;
+import com.amazon.android.uamp.UAMP;
+import com.amazon.android.utils.Preferences;
+import com.zype.fire.api.Model.Analytics;
+import com.zype.fire.auth.ZypeAuthentication;
 
 /**
  * Analytics helper class.
@@ -147,12 +152,18 @@ public class AnalyticsHelper {
         // try to test individual components that rely on ContentBrowser.
         if (AnalyticsManager.getInstance(ContentBrowserApplication.getInstance()) != null) {
 
-            IAnalytics analyticsInterface =
-                    AnalyticsManager.getInstance(ContentBrowserApplication.getInstance())
-                                    .getIAnalytics();
-
-            if (analyticsInterface != null) {
-                analyticsInterface.trackAction(data);
+//            IAnalytics analyticsInterface =
+//                    AnalyticsManager.getInstance(ContentBrowserApplication.getInstance())
+//                                    .getIAnalytics();
+//
+//            if (analyticsInterface != null) {
+//                analyticsInterface.trackAction(data);
+//            }
+            Set<IAnalytics> analyticsSet = AnalyticsManager
+                    .getInstance(ContentBrowserApplication.getInstance())
+                    .getIAnalyticsSet();
+            for (IAnalytics analytics : analyticsSet) {
+                analytics.trackAction(data);
             }
         }
     }
@@ -226,7 +237,7 @@ public class AnalyticsHelper {
      * @param currentSegment  Segment number of current content being played.
      */
     public static void trackPlaybackStarted(Content content, long duration, long currentPosition,
-                                            int totalSegments, int currentSegment) {
+                                            int totalSegments, int currentSegment, UAMP player) {
 
         Map<String, Object> attributes = getBasicAnalyticsAttributesForContent(content);
         attributes.putAll(getDetailedContentAttributes(content));
@@ -238,6 +249,15 @@ public class AnalyticsHelper {
         attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_CURRENT_POSITION, currentPosition);
         attributes.put(AnalyticsTags.ATTRIBUTE_NUMBER_OF_SEGMENTS, totalSegments);
         attributes.put(AnalyticsTags.ATTRIBUTE_SEGMENT_NUMBER, currentSegment);
+
+        attributes.put(AnalyticsTags.ATTRIBUTE_PLAYER, player.getPlayerObject());
+        Set<String> subscriptionIds = Preferences.getStringSet(ZypeAuthentication.PREFERENCE_CONSUMER_SUBSCRIPTION_IDS);
+        String subscriptionId = null;
+        if (subscriptionIds != null && !subscriptionIds.isEmpty()) {
+            subscriptionId = subscriptionIds.iterator().next();
+        }
+        attributes.put(AnalyticsTags.ATTRIBUTE_SUBSCRIPTION_ID, subscriptionId);
+
         sendAnalytics(AnalyticsTags.ACTION_PLAYBACK_STARTED, attributes);
     }
 

@@ -501,6 +501,8 @@ public class AnalyticsTags {
     public static final String ATTRIBUTE_CONTENT_ANALYTICS_VIDEO_ID = "ATTRIBUTE_CONTENT_ANALYTICS_VIDEO_ID";
     public static final String ATTRIBUTE_CONTENT_LIVE = "ATTRIBUTE_CONTENT_LIVE";
     public static final String ATTRIBUTE_CONTENT_VIDEO_URL = "ATTRIBUTE_CONTENT_VIDEO_URL";
+    public static final String ATTRIBUTE_PLAYER = "ATTRIBUTE_PLAYER";
+    public static final String ATTRIBUTE_SUBSCRIPTION_ID = "ATTRIBUTE_SUBSCRIPTION_ID";
 
     /////////////////////////////////////////////////////////////////////////
     //                  Non-Customizable screen names.                     //

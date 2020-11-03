@@ -2048,7 +2048,7 @@ public class PlaybackActivity extends BasePlaybackActivity implements
                 }
                 AnalyticsHelper.trackPlaybackStarted(mSelectedContent, getDuration(),
                         mCurrentPlaybackPosition,
-                        mTotalSegments, currentSegment);
+                        mTotalSegments, currentSegment, mPlayer);
                 /* Zype, Evgeny Cherkasov */
                 // Akamai analytics
 //                akamaiPlugin.handlePlay();

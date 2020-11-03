@@ -345,7 +345,7 @@ public class Content implements Serializable {
     // Poster thumbnail url
     public static final String EXTRA_VIDEO_FAVORITE_ID = "VideoFavoriteId";
     // Video player url
-    public static final String EXTRA_VIDEO_URL = "VideoFavoriteId";
+    public static final String EXTRA_VIDEO_URL = "VideoUrl";
 
     public static final String EXTRA_REGISTRATION_REQUIRED = "RegistrationRequired";
 
