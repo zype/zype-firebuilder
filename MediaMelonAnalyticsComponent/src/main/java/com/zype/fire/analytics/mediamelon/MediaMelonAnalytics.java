@@ -59,6 +59,8 @@ public class MediaMelonAnalytics implements IAnalytics, MMSmartStreamingObserver
      */
     private boolean isInitialized = false;
 
+    private boolean isPlaying = false;
+
     private Context context;
 
     /**
@@ -125,26 +127,35 @@ public class MediaMelonAnalytics implements IAnalytics, MMSmartStreamingObserver
         Log.d(TAG, "Tracking action " + mCustomTags.getCustomTag(action) + " with attributes: "
                 + String.valueOf(mCustomTags.getCustomTags(attributes)));
 
+        if (action.equals(AnalyticsTags.ACTION_PLAY_VIDEO)) {
+            isPlaying = false;
+        }
+
         switch (action) {
             case AnalyticsTags.ACTION_PLAYBACK_STARTED:
-                init(attributes);
-                MMSmartStreamingExo2_6.getInstance().initializeSession(
-                        (SimpleExoPlayer) attributes.get(ATTRIBUTE_PLAYER),
-                        MMQBRMode.QBRModeDisabled,
-                        (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_VIDEO_URL),
-                        null,
-                        "",     // AssetId
-                        (String) attributes.get(ATTRIBUTE_TITLE),     // AssetName
-                        (String) attributes.get(ATTRIBUTE_VIDEO_ID),
-                        this
-                );
-                MMSmartStreamingExo2_6.getInstance().reportCustomMetadata("siteId",
-                        (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_SITE_ID));
-                MMSmartStreamingExo2_6.getInstance().reportCustomMetadata("subscriptionId",
-                        (String) attributes.get(AnalyticsTags.ATTRIBUTE_SUBSCRIPTION_ID));
-                MMSmartStreamingExo2_6.getInstance().reportUserInitiatedPlayback();
+                if (!isPlaying) {
+                    isPlaying = true;
+
+                    init(attributes);
+                    MMSmartStreamingExo2_6.getInstance().initializeSession(
+                            (SimpleExoPlayer) attributes.get(ATTRIBUTE_PLAYER),
+                            MMQBRMode.QBRModeDisabled,
+                            (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_VIDEO_URL),
+                            null,
+                            "",     // AssetId
+                            (String) attributes.get(ATTRIBUTE_TITLE),     // AssetName
+                            (String) attributes.get(ATTRIBUTE_VIDEO_ID),
+                            this
+                    );
+                    MMSmartStreamingExo2_6.getInstance().reportCustomMetadata("siteId",
+                            (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_SITE_ID));
+                    MMSmartStreamingExo2_6.getInstance().reportCustomMetadata("subscriptionId",
+                            (String) attributes.get(AnalyticsTags.ATTRIBUTE_SUBSCRIPTION_ID));
+                    MMSmartStreamingExo2_6.getInstance().reportUserInitiatedPlayback();
+                }
                 break;
             case AnalyticsTags.ACTION_PLAYBACK_FINISHED:
+                isPlaying = false;
                 MMSmartStreamingExo2_6.getInstance().reportPlayerState(false, Player.STATE_ENDED);
                 break;
         }
