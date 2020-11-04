@@ -108,7 +108,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
             LocalBroadcastManager.getInstance(getActivity())
                     .registerReceiver(receiver, new IntentFilter(BROADCAST_DATA_LOADED));
         }
-//        updateContents();
+       updateContents();
     }
 
     @Override
