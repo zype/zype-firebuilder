@@ -45,5 +45,6 @@ permissions and limitations under the License.
 
     <!-- Action button text size -->
     <dimen name="action_text">14sp</dimen>
+    <color name="menu_item_sel">#1D2029</color>
 
 </resources>

@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat;
 
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.utils.Preferences;
+import com.zype.fire.api.ZypeConfiguration;
 import com.zype.fire.api.ZypeSettings;
 
 /**

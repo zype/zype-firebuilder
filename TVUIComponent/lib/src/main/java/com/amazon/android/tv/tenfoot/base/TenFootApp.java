@@ -25,6 +25,7 @@ import com.amazon.android.tv.tenfoot.ui.activities.FullContentBrowseActivity;
 import com.amazon.android.tv.tenfoot.ui.activities.SplashActivity;
 
 import android.content.res.Resources;
+
 import androidx.core.content.ContextCompat;
 import android.util.Log;
 
@@ -85,5 +86,6 @@ public class TenFootApp extends ContentBrowserApplication {
                          .addAnalyticsConstantForActivity(PlaybackActivity.class
                                                                   .getSimpleName(),
                                                           AnalyticsTags.SCREEN_PLAYBACK);
-    }
+
+        }
 }

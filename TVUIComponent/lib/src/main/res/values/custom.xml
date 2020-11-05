@@ -16,7 +16,7 @@ permissions and limitations under the License.
 
 <resources>
 
-     <string translatable="false" name="browse_title"><![CDATA[TenFootUI]]></string>
+    <string translatable="false" name="browse_title"><![CDATA[TenFootUI]]></string>
 
     <!-- Default App Colors -->
 
@@ -175,5 +175,6 @@ permissions and limitations under the License.
     ENCRYPTION_WIDEVINE -->
     <string name="drm_encryption_schema">ENCRYPTION_DEFAULT</string>
     <color name="background_color_translucent">#CC000000</color>
+    <color name="menu_item_sel">#1D2029</color>
 
 </resources>
