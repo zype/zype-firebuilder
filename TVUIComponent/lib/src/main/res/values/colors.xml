@@ -1,43 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-Copyright 2015-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+  <!--
+  Copyright 2015-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-A copy of the License is located at
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  A copy of the License is located at
 
-    http://aws.amazon.com/apache2.0/
+      http://aws.amazon.com/apache2.0/
 
-or in the "license" file accompanying this file. This file is distributed
-on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-express or implied. See the License for the specific language governing
-permissions and limitations under the License.
--->
+  or in the "license" file accompanying this file. This file is distributed
+  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+  express or implied. See the License for the specific language governing
+  permissions and limitations under the License.
+  -->
 
 <resources>
-
-    <!-- *************************************** START LIGHT THEME COLORS  ***************************************************************** -->
-    <color name="search_edit_text_bg_color">#4D000000</color>
-    <color name="search_edit_text_bg_color_unfocused">#1A000000</color>
-    <color name="tnc_title">#000</color>
-    <color name="search_edit_text_color">#99000000</color>
-    <color name="search_edit_text_hint_color">#99000000</color>
-    <color name="search_orb_not_recording_color">#FFEEEEEE</color>
-
-
-    <!-- *************************************** END LIGHT THEME COLORS ***************************************************************** -->
-
-<!--    &lt;!&ndash; *************************************** START DARK THEME COLORS  ***************************************************************** &ndash;&gt;-->
-<!--    <color name="search_edit_text_bg_color">#4DFFFFFF</color>-->
-<!--    <color name="search_edit_text_bg_color_unfocused">#1AFFFFFF</color>-->
-<!--    <color name="tnc_title">#fff</color>-->
-<!--    <color name="search_edit_text_color">#99FFFFFF</color>-->
-<!--    <color name="search_edit_text_hint_color">#99FFFFFF</color>-->
-<!--    <color name="search_orb_not_recording_color">#FFEEEEEE</color>-->
-
-    <!--    &lt;!&ndash; *************************************** END DARK THEME COLORS  ***************************************************************** &ndash;&gt;-->
-
-
     <!-- Overriding Android Leanback color resources -->
     <color name="lb_details_description_color">@color/details_description_title</color>
     <color name="lb_details_description_subtitle_color">@color/details_description_subtitle</color>
@@ -65,6 +42,12 @@ permissions and limitations under the License.
     <color name="lb_speech_orb_not_recording_icon">@color/search_orb_not_recording_color</color>
     <color name="lb_speech_orb_not_recording_pulsed">@color/search_orb</color>
 
+    <color name="search_edit_text_color">#99FFFFFF</color>
+    <color name="search_edit_text_hint_color">#99FFFFFF</color>
+    <color name="search_edit_text_bg_color">#4DFFFFFF</color>
+    <color name="search_edit_text_bg_color_unfocused">#1AFFFFFF</color>
+    <color name="search_orb_not_recording_color">#FFEEEEEE</color>
+
     <color name="lb_playback_controls_background_dark">#c0000000</color>
     <color name="lb_playback_controls_background_light">#80000000</color>
     <!--
@@ -87,5 +70,6 @@ permissions and limitations under the License.
     <color name="epg_event_layout_text">@color/lb_basic_card_content_text_color</color>
     <color name="epg_time_bar">#33ffffff</color>
     <color name="epg_event_layout_background_selected">@color/accent</color>
+
 
 </resources>

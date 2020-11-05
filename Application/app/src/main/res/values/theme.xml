@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <!-- *************************************** START LIGHT THEME COLORS  ***************************************************************** -->
+
+  <!--  &lt;!&ndash; The background color of the screens. &ndash;&gt;-->
+  <!--  <color name="background">#FFFFFF</color>-->
+  <!--  &lt;!&ndash; Used for card background &ndash;&gt;-->
+  <!--  <color name="card_background">#FFFFFF</color>-->
+  <!--  &lt;!&ndash; Color of splash screen spinning loader animation &ndash;&gt;-->
+  <!--  <color name="spinner_color">#FF000000</color>-->
+  <!--  &lt;!&ndash; Used for the text of a selected item's title and description.-->
+  <!--       Also used for button text, Splash screen text, and read more dialog text. &ndash;&gt;-->
+  <!--  <color name="primary_text">#E6000000</color>-->
+  <!--  &lt;!&ndash; Used for the category titles and content subtitles &ndash;&gt;-->
+  <!--  <color name="tertiary_text">#99000000</color>-->
+  <!--  <color name="background_color_translucent">#CCFFFFFF</color>-->
+  <!--  <color name="search_edit_text_bg_color">#4D000000</color>-->
+  <!--  <color name="search_edit_text_bg_color_unfocused">#1A000000</color>-->
+  <!--  <color name="tnc_title">#000</color>-->
+  <!--  <color name="search_edit_text_color">#99000000</color>-->
+  <!--  <color name="search_edit_text_hint_color">#99000000</color>-->
+  <!--  <color name="search_orb_not_recording_color">#FFEEEEEE</color>-->
+  <!--  <color name="menu_item_sel">#00000000</color>-->
+
+
+  <!-- *************************************** END LIGHT THEME COLORS ***************************************************************** -->
+
+
+  <!-- *************************************** START DARK THEME COLORS  ***************************************************************** -->
+
+  <!-- The background color of the screens. -->
+  <color name="background">#22282E</color>
+  <!--       Used for card background -->
+  <color name="card_background">#2B2B2B</color>
+  <!--       Color of splash screen spinning loader animation -->
+  <color name="spinner_color">#FFFFFFFF</color>
+  <!--   Used for the text of a selected item's title and description.
+        Also used for button text, Splash screen text, and read more dialog text. -->
+  <color name="primary_text">#E6FFFFFF</color>
+  <!--       Used for the category titles and content subtitles -->
+  <color name="tertiary_text">#99FFFFFF</color>
+  <color name="background_color_translucent">#CC000000</color>
+  <color name="search_edit_text_bg_color">#4DFFFFFF</color>
+  <color name="search_edit_text_bg_color_unfocused">#1AFFFFFF</color>
+  <color name="menu_item_sel">#1D2029</color>
+  <color name="tnc_title">#fff</color>
+  <color name="search_edit_text_color">#99FFFFFF</color>
+  <color name="search_edit_text_hint_color">#99FFFFFF</color>
+  <color name="search_orb_not_recording_color">#FFEEEEEE</color>
+
+  <!-- *************************************** END DARK THEME COLORS ***************************************************************** -->
+
+</resources>
