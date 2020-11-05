@@ -16,23 +16,55 @@ permissions and limitations under the License.
 
 <resources>
 
-     <string translatable="false" name="browse_title"><![CDATA[TenFootUI]]></string>
+    <string translatable="false" name="browse_title"><![CDATA[TenFootUI]]></string>
 
     <!-- Default App Colors -->
 
+    <!-- *************************************** START LIGHT THEME COLORS  ***************************************************************** -->
+
     <!-- The background color of the screens. -->
     <color name="background">#FFFFFF</color>
-    <!-- Used for card background. -->
+    <!-- Used for card background -->
     <color name="card_background">#FFFFFF</color>
-    <!-- The color of button highlights and widgets. -->
-    <color name="accent">#EE962D</color>
+    <!-- Color of splash screen spinning loader animation -->
+    <color name="spinner_color">#FF000000</color>
     <!-- Used for the text of a selected item's title and description.
          Also used for button text, Splash screen text, and read more dialog text. -->
     <color name="primary_text">#E6000000</color>
-    <!-- Used for the text on the card views and playback progress bar text. -->
-    <color name="secondary_text">#FFFFFFFF</color>
     <!-- Used for the category titles and content subtitles -->
     <color name="tertiary_text">#99000000</color>
+    <color name="background_color_translucent">#CCFFFFFF</color>
+    <color name="menu_item_sel">#00000000</color>
+
+    <!-- *************************************** END LIGHT THEME COLORS ***************************************************************** -->
+
+
+    <!-- *************************************** START DARK THEME COLORS  ***************************************************************** -->
+
+    <!-- The background color of the screens. -->
+    <!--
+        <color name="background">#22282E</color>
+        &lt;!&ndash; Used for card background &ndash;&gt;
+        <color name="card_background">#2B2B2B</color>
+        &lt;!&ndash; Color of splash screen spinning loader animation &ndash;&gt;
+        <color name="spinner_color">#FFFFFFFF</color>
+        &lt;!&ndash; Used for the text of a selected item's title and description.
+            Also used for button text, Splash screen text, and read more dialog text. &ndash;&gt;
+        <color name="primary_text">#E6FFFFFF</color>
+        &lt;!&ndash; Used for the category titles and content subtitles &ndash;&gt;
+        <color name="tertiary_text">#99FFFFFF</color>
+        <color name="background_color_translucent">#CC000000</color>
+            <color name="menu_item_sel">#1D2029</color>
+
+    -->
+
+    <!-- *************************************** END DARK THEME COLORS ***************************************************************** -->
+
+
+    <!-- The color of button highlights and widgets. -->
+    <color name="accent">#EE962D</color>
+      <!-- Used for the text on the card views and playback progress bar text. -->
+    <color name="secondary_text">#FFFFFFFF</color>
 
     <color name="transparent">#00FFFFFF</color>
 
@@ -46,9 +78,7 @@ permissions and limitations under the License.
     <drawable name="splash_background">@color/background</drawable>
     <!-- Company logo to show on Splash Screen -->
     <drawable name="splash_logo">@drawable/fire_app_builder_white</drawable>
-    <!-- Color of splash screen loader -->
-    <color name="spinner_color">#FF000000</color>
-    <!-- Alpha of spinner -->
+   <!-- Alpha of spinner -->
     <integer name="spinner_alpha">60</integer>
     <!-- color of loading and reloading text-->
     <color name="feed_loading">@color/primary_text</color>
@@ -174,7 +204,6 @@ permissions and limitations under the License.
     <!-- Drm encryption schema, Allowed options are ENCRYPTION_DEFAULT, ENCRYPTION_PLAYREADY,
     ENCRYPTION_WIDEVINE -->
     <string name="drm_encryption_schema">ENCRYPTION_DEFAULT</string>
-    <color name="background_color_translucent">#FCFFFFFF</color>
 
-    <color name="menu_item_sel">#00000000</color>
+
 </resources>

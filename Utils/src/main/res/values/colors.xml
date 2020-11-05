@@ -15,6 +15,14 @@ permissions and limitations under the License.
 -->
 <resources>
 
+    <!-- *************************************** START LIGHT THEME COLORS  ***************************************************************** -->
+    <color name="spinner_color">#FF000000</color>
+    <!-- *************************************** END LIGHT THEME COLORS ***************************************************************** -->
+
+    <!--    &lt;!&ndash; *************************************** START DARK THEME COLORS  ***************************************************************** &ndash;&gt;-->
+    <!--     <color name="spinner_color">#FFFFFF</color>-->
+    <!--    &lt;!&ndash; *************************************** END DARK THEME COLORS  ***************************************************************** &ndash;&gt;-->
+
     <!-- logout dialog -->
     <color name="logout_title_color">@color/primary_text</color>
     <color name="logout_desc_color">@color/tertiary_text</color>
@@ -25,7 +33,6 @@ permissions and limitations under the License.
     <color name="details_description_extended">@color/primary_text</color>
     <color name="error_dialog_bg_color">#13181F</color>
     <color name="progress_fragment_bg_color">#CC000000</color>
-    <color name="spinner_color">#FF000000</color>
     <!-- Text color for unfocused action button -->
     <color name="action_button_text_color">@color/primary_text</color>
     <!-- Text color for focused action button -->

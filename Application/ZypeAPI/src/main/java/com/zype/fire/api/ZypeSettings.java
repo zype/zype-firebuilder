@@ -32,6 +32,7 @@ public class ZypeSettings {
      * This flag controls the following:
      * - Text color on Terms and Privacy Policy screen
     */
+    public static final boolean LIGHT_THEME = true;
     public static final boolean SHOW_EPISODE_NUMBER = false;
     public static final boolean SHOW_TITLE = false;
     public static final boolean SHOW_LEFT_MENU = true;
@@ -63,6 +64,4 @@ public class ZypeSettings {
      * service for verifying subscription.
      */
     public static final String AMAZON_SHARED_KEY = "2:QwDSMRWE6-QskpjXS0LDjFOqu9jWadiFvygv15Onw2Xt917Bm-9vHXUfwWmTFyKo:Lntf8F3vQfgCgGjTIh7kVw==";
-
-    public static final String THEME = ZypeConfiguration.THEME_DARK;
 }

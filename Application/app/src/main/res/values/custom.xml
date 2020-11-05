@@ -22,30 +22,61 @@ permissions and limitations under the License.
 
     <!-- App colors -->
 
+    <!-- *************************************** START LIGHT THEME COLORS  ***************************************************************** -->
+
     <!-- The background color of the screens. -->
     <color name="background">#FFFFFF</color>
     <!-- Used for card background -->
     <color name="card_background">#FFFFFF</color>
+    <!-- Color of splash screen spinning loader animation -->
+    <color name="spinner_color">#FF000000</color>
+    <!-- Used for the text of a selected item's title and description.
+         Also used for button text, Splash screen text, and read more dialog text. -->
+    <color name="primary_text">#E6000000</color>
+    <!-- Used for the category titles and content subtitles -->
+    <color name="tertiary_text">#99000000</color>
+    <color name="search_edit_text_bg_color">#4D000000</color>
+    <color name="search_edit_text_bg_color_unfocused">#1A000000</color>
+    <color name="background_color_translucent">#CCFFFFFF</color>
+
+    <!-- *************************************** END LIGHT THEME COLORS ***************************************************************** -->
+
+
+    <!-- *************************************** START DARK THEME COLORS  ***************************************************************** -->
+
+    <!-- The background color of the screens. -->
+<!--
+    <color name="background">#22282E</color>
+    &lt;!&ndash; Used for card background &ndash;&gt;
+    <color name="card_background">#2B2B2B</color>
+    &lt;!&ndash; Color of splash screen spinning loader animation &ndash;&gt;
+    <color name="spinner_color">#FFFFFFFF</color>
+    &lt;!&ndash; Used for the text of a selected item's title and description.
+        Also used for button text, Splash screen text, and read more dialog text. &ndash;&gt;
+    <color name="primary_text">#E6FFFFFF</color>
+    &lt;!&ndash; Used for the category titles and content subtitles &ndash;&gt;
+    <color name="tertiary_text">#99FFFFFF</color>
+    <color name="background_color_translucent">#CC000000</color>
+    <color name="search_edit_text_bg_color">#4DFFFFFF</color>
+    <color name="search_edit_text_bg_color_unfocused">#1AFFFFFF</color>
+-->
+
+    <!-- *************************************** END DARK THEME COLORS ***************************************************************** -->
+
+
     <!-- Background color of the progress bar -->
     <color name="playback_background_progress_bar">#FF373737</color>
     <!-- Color of buffered progress bar -->
     <color name="playback_buffered_progress">#FF5A5A5A</color>
     <!-- Color of the progress bar -->
     <color name="progress_bar">@color/accent</color>
-    <!-- Color of splash screen spinning loader animation -->
-    <color name="spinner_color">#FF000000</color>
     <!-- The color of button highlights and widgets. -->
     <color name="accent">#00AEEF</color>
     <!-- FullContentBrowser:
          The header's bar color (left-hand navigation bar). -->
     <color name="browse_headers_bar">#0DFFFFFF</color>
-    <!-- Used for the text of a selected item's title and description.
-         Also used for button text, Splash screen text, and read more dialog text. -->
-    <color name="primary_text">#E6000000</color>
     <!-- Used for the text on the card views and playback progress bar text. -->
     <color name="secondary_text">#FFFFFFFF</color>
-    <!-- Used for the category titles and content subtitles -->
-    <color name="tertiary_text">#99000000</color>
     <!-- End of App Colors -->
 
     <!-- App Configurations -->
@@ -117,8 +148,6 @@ permissions and limitations under the License.
     <!-- Background color of Search screen -->
     <drawable name="search_background">@color/background</drawable>
 
-    <color name="search_edit_text_bg_color">#4D000000</color>
-    <color name="search_edit_text_bg_color_unfocused">#1A000000</color>
 
     <!-- End of Search Bar Customization -->
 
@@ -143,7 +172,6 @@ permissions and limitations under the License.
     <!-- End of Authentication Customization -->
 
     <color name="error_dialog_bg_color">@color/background</color>
-    <color name="background_color_translucent">#CCFFFFFF</color>
     <color name="hero_slider_overlay_color">#99000000</color>
     <color name="lock_color">#FF0000</color>
     <color name="unlock_color">#0000FF</color>

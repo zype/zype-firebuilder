@@ -34,7 +34,7 @@ public class TermsConditionActivity extends Activity {
         webView.getSettings().setUseWideViewPort(true);
         webView.setBackgroundColor(ContextCompat.getColor(this, R.color.browse_background_color));
 //        webView.loadUrl(ZypeSettings.TERMS_CONDITION_URL);
-        String textColor = ZypeConfiguration.getTheme(this).equals(ZypeConfiguration.THEME_LIGHT) ? "#000" : "#fff";
+        String textColor = ZypeSettings.LIGHT_THEME ? "#000" : "#fff";
         String finalHtml = "<html><head>"
                 + "<style type=\"text/css\">body {color: " + textColor + "} "
                 + "</style></head>"

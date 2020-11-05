@@ -15,6 +15,21 @@ permissions and limitations under the License.
 -->
 
 <resources>
+
+    <!-- *************************************** START LIGHT THEME COLORS  ***************************************************************** -->
+    <color name="search_edit_text_bg_color">#4D000000</color>
+    <color name="search_edit_text_bg_color_unfocused">#1A000000</color>
+    <color name="tnc_title">#000</color>
+
+    <!-- *************************************** END LIGHT THEME COLORS ***************************************************************** -->
+
+<!--    &lt;!&ndash; *************************************** START DARK THEME COLORS  ***************************************************************** &ndash;&gt;-->
+<!--    <color name="search_edit_text_bg_color">#4DFFFFFF</color>-->
+<!--    <color name="search_edit_text_bg_color_unfocused">#1AFFFFFF</color>-->
+<!--    <color name="tnc_title">#fff</color>-->
+    <!--    &lt;!&ndash; *************************************** END DARK THEME COLORS  ***************************************************************** &ndash;&gt;-->
+
+
     <!-- Overriding Android Leanback color resources -->
     <color name="lb_details_description_color">@color/details_description_title</color>
     <color name="lb_details_description_subtitle_color">@color/details_description_subtitle</color>
@@ -44,15 +59,13 @@ permissions and limitations under the License.
 
     <color name="search_edit_text_color">#99FFFFFF</color>
     <color name="search_edit_text_hint_color">#99FFFFFF</color>
-    <color name="search_edit_text_bg_color">#4D000000</color>
-    <color name="search_edit_text_bg_color_unfocused">#1A000000</color>
     <color name="search_orb_not_recording_color">#FFEEEEEE</color>
 
     <color name="lb_playback_controls_background_dark">#c0000000</color>
     <color name="lb_playback_controls_background_light">#80000000</color>
-<!--
-    <color name="playback_video_details_text_color">@color/primary_text</color>
--->
+    <!--
+        <color name="playback_video_details_text_color">@color/primary_text</color>
+    -->
 
     <color name="error_dialog_bg_color">#13181F</color>
     <color name="image_card_place_holder">#D3D3D3</color>
@@ -70,6 +83,5 @@ permissions and limitations under the License.
     <color name="epg_event_layout_text">@color/lb_basic_card_content_text_color</color>
     <color name="epg_time_bar">#33ffffff</color>
     <color name="epg_event_layout_background_selected">@color/accent</color>
-
 
 </resources>

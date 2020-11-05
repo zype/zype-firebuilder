@@ -8,11 +8,12 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="25dp"
         android:gravity="center"
         android:padding="5dp"
         android:text="@string/terms_title"
-        android:textColor="#fff"
+        android:textColor="@color/tnc_title"
         android:textSize="20sp"
         android:textStyle="bold" />
 
