@@ -63,6 +63,7 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
 
   private static final String TAG = "EventLogger2_6";
   private static final int MAX_TIMELINE_ITEM_LINES = 3;
+  private static boolean isPresentationInfoSet = false;
   private static final NumberFormat TIME_FORMAT;
   static {
     TIME_FORMAT = NumberFormat.getInstance(Locale.US);
@@ -81,6 +82,7 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
     window = new Timeline.Window();
     period = new Timeline.Period();
     startTimeMs = SystemClock.elapsedRealtime();
+    isPresentationInfoSet = false;
   }
 
   // Player.EventListener
@@ -93,6 +95,37 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
   @Override
   public void onPlayerStateChanged(boolean playWhenReady, int state) {
     MMSmartStreamingExo2_6.getInstance().reportPlayerState(playWhenReady, state);
+
+    if(isPresentationInfoSet == false && playWhenReady == true && state == 3)  // STATE_READY = 3
+    {
+      MMPresentationInfo info = new MMPresentationInfo();
+
+      info.isLive = true;
+      info.duration = -1L;
+
+      if(player.getDuration() > 0 && player.isCurrentWindowDynamic() == false)
+      {
+        info.isLive = false;
+        info.duration = player.getDuration();
+
+        MMSmartStreamingExo2_6.getInstance().setPresentationInformation(info);
+        isPresentationInfoSet = true;
+
+      }
+
+      if(player.getDuration() < 0 && player.isCurrentWindowDynamic() == true)
+      {
+        MMSmartStreamingExo2_6.getInstance().setPresentationInformation(info);
+        isPresentationInfoSet = true;
+      }
+
+    }
+
+    if(state == 4)          // STATE_ENDED = 4
+    {
+      isPresentationInfoSet = false;
+    }
+
     Log.d(TAG, "state " +  playWhenReady + ", " + getStateString(state));
   }
 
@@ -114,23 +147,9 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
   @Override
   public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
     Log.d(TAG, "playbackParameters " + String.format(
-        "[speed=%.2f, pitch=%.2f]", playbackParameters.speed, playbackParameters.pitch));
+            "[speed=%.2f, pitch=%.2f]", playbackParameters.speed, playbackParameters.pitch));
   }
 
-//  @Override
-//  public void onTimelineChanged(Timeline timeline, Object manifest) {
-//    MMPresentationInfo info = new MMPresentationInfo();
-//    if(timeline.getWindowCount() > 0){
-//      timeline.getWindow(0, window);
-//      info.isLive = window.isDynamic;
-//      info.duration = window.getDurationMs();
-//    }
-//
-//    if(info.isLive == true) {
-//      info.duration = -1L;
-//    }
-//    MMSmartStreamingExo2_6.getInstance().setPresentationInformation(info);
-//  }
 
   @Override
   public void onPlayerError(ExoPlaybackException e) {
@@ -172,11 +191,50 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
     if(info.isLive == true) {
       info.duration = -1L;
     }
-    MMSmartStreamingExo2_6.getInstance().setPresentationInformation(info);
+
+    if(info.isLive == false && info.duration > 0)
+    {
+      MMSmartStreamingExo2_6.getInstance().setPresentationInformation(info);
+      isPresentationInfoSet = true;
+    }
+
+    if(info.isLive == true && info.duration < 0)
+    {
+      MMSmartStreamingExo2_6.getInstance().setPresentationInformation(info);
+      isPresentationInfoSet = true;
+    }
+
   }
 
   @Override
   public void onTracksChanged(TrackGroupArray ignored, TrackSelectionArray trackSelections) {
+
+    if(isPresentationInfoSet == false)
+    {
+      MMPresentationInfo info = new MMPresentationInfo();
+
+      info.isLive = true;
+      info.duration = -1L;
+
+      if(player.getDuration() > 0 && player.isCurrentWindowDynamic() == false)
+      {
+        info.isLive = false;
+        info.duration = player.getDuration();
+
+        MMSmartStreamingExo2_6.getInstance().setPresentationInformation(info);
+        isPresentationInfoSet = true;
+
+      }
+
+      if(player.getDuration() < 0 && player.isCurrentWindowDynamic() == true)
+      {
+        MMSmartStreamingExo2_6.getInstance().setPresentationInformation(info);
+        isPresentationInfoSet = true;
+
+      }
+
+    }
+
   }
 
   @Override
@@ -207,14 +265,14 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
 
   @Override
   public void onVideoDecoderInitialized(String decoderName, long elapsedRealtimeMs,
-      long initializationDurationMs) {
+                                        long initializationDurationMs) {
     Log.d(TAG, "videoDecoderInitialized [" + getSessionTimeString() + ", " + decoderName + "]");
   }
 
   @Override
   public void onVideoInputFormatChanged(Format format) {
     Log.d(TAG, "videoFormatChanged [" + getSessionTimeString() + ", " + Format.toLogString(format)
-        + "]");
+            + "]");
   }
 
   @Override
@@ -230,7 +288,7 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
 
   @Override
   public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees,
-      float pixelWidthHeightRatio) {
+                                 float pixelWidthHeightRatio) {
     Log.d(TAG, "videoSizeChanged [" + width + ", " + height + "]");
   }
 
@@ -268,16 +326,16 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
 
   @Override
   public void onLoadStarted(DataSpec dataSpec, int dataType, int trackType, Format trackFormat,
-      int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs,
-      long mediaEndTimeMs, long elapsedRealtimeMs) {
+                            int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs,
+                            long mediaEndTimeMs, long elapsedRealtimeMs) {
     // Do nothing.
   }
 
   @Override
   public void onLoadError(DataSpec dataSpec, int dataType, int trackType, Format trackFormat,
-      int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs,
-      long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded,
-      IOException error, boolean wasCanceled) {
+                          int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs,
+                          long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded,
+                          IOException error, boolean wasCanceled) {
     printInternalError("loadError", error);
     long eventTime = -1;
     if(player != null){
@@ -288,16 +346,16 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
 
   @Override
   public void onLoadCanceled(DataSpec dataSpec, int dataType, int trackType, Format trackFormat,
-      int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs,
-      long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded) {
+                             int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs,
+                             long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded) {
     // Do nothing.
   }
 
 
   @Override
   public void onLoadCompleted(DataSpec dataSpec, int dataType, int trackType, Format trackFormat,
-      int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs,
-      long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded) {
+                              int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs,
+                              long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded) {
     // Do nothing.
 
     if(dataType == DATA_TYPE_MEDIA &&
@@ -321,7 +379,7 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
 
   @Override
   public void onDownstreamFormatChanged(int trackType, Format trackFormat, int trackSelectionReason,
-      Object trackSelectionData, long mediaTimeMs) {
+                                        Object trackSelectionData, long mediaTimeMs) {
     // Do nothing.
   }
 
@@ -337,7 +395,7 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
       if (entry instanceof TextInformationFrame) {
         TextInformationFrame textInformationFrame = (TextInformationFrame) entry;
         Log.d(TAG, prefix + String.format("%s: value=%s", textInformationFrame.id,
-            textInformationFrame.value));
+                textInformationFrame.value));
       } else if (entry instanceof UrlLinkFrame) {
         UrlLinkFrame urlLinkFrame = (UrlLinkFrame) entry;
         Log.d(TAG, prefix + String.format("%s: url=%s", urlLinkFrame.id, urlLinkFrame.url));
@@ -347,22 +405,22 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
       } else if (entry instanceof GeobFrame) {
         GeobFrame geobFrame = (GeobFrame) entry;
         Log.d(TAG, prefix + String.format("%s: mimeType=%s, filename=%s, description=%s",
-            geobFrame.id, geobFrame.mimeType, geobFrame.filename, geobFrame.description));
+                geobFrame.id, geobFrame.mimeType, geobFrame.filename, geobFrame.description));
       } else if (entry instanceof ApicFrame) {
         ApicFrame apicFrame = (ApicFrame) entry;
         Log.d(TAG, prefix + String.format("%s: mimeType=%s, description=%s",
-            apicFrame.id, apicFrame.mimeType, apicFrame.description));
+                apicFrame.id, apicFrame.mimeType, apicFrame.description));
       } else if (entry instanceof CommentFrame) {
         CommentFrame commentFrame = (CommentFrame) entry;
         Log.d(TAG, prefix + String.format("%s: language=%s, description=%s", commentFrame.id,
-            commentFrame.language, commentFrame.description));
+                commentFrame.language, commentFrame.description));
       } else if (entry instanceof Id3Frame) {
         Id3Frame id3Frame = (Id3Frame) entry;
         Log.d(TAG, prefix + String.format("%s", id3Frame.id));
       } else if (entry instanceof EventMessage) {
         EventMessage eventMessage = (EventMessage) entry;
         Log.d(TAG, prefix + String.format("EMSG: scheme=%s, id=%d, value=%s",
-            eventMessage.schemeIdUri, eventMessage.id, eventMessage.value));
+                eventMessage.schemeIdUri, eventMessage.id, eventMessage.value));
       }
     }
   }
@@ -424,9 +482,9 @@ import static com.google.android.exoplayer2.C.DATA_TYPE_MEDIA;
   }
 
   private static String getTrackStatusString(TrackSelection selection, TrackGroup group,
-      int trackIndex) {
+                                             int trackIndex) {
     return getTrackStatusString(selection != null && selection.getTrackGroup() == group
-        && selection.indexOf(trackIndex) != C.INDEX_UNSET);
+            && selection.indexOf(trackIndex) != C.INDEX_UNSET);
   }
 
   private static String getTrackStatusString(boolean enabled) {
