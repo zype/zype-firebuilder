@@ -2150,7 +2150,13 @@ public class PlaybackActivity extends BasePlaybackActivity implements
                     .ERROR_CATEGORY.NETWORK_ERROR, this);
             mIsNetworkError = true;
         }
-        mErrorDialogFragment.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
+        try{
+            if (!isFinishing()) {
+                mErrorDialogFragment.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
+            }
+        } catch (Exception ignored){
+
+        }
     }
 
     private boolean requestAudioFocus() {
@@ -2267,10 +2273,14 @@ public class PlaybackActivity extends BasePlaybackActivity implements
         // We need to pass id, duration and adCuePoints to player interface.
         // Usually required for ads support.
         // The player interface doesn't know about the video model so we are using Bundles.
-        mPlayer.getExtra().putBundle(IAds.VIDEO_EXTRAS, videoExtras);
+        if (mPlayer != null && mPlayer.getExtra() != null) {
+            mPlayer.getExtra().putBundle(IAds.VIDEO_EXTRAS, videoExtras);
+        }
 
         // Set Ads video extras.
-        mAdsImplementation.getExtra().putBundle(IAds.VIDEO_EXTRAS, videoExtras);
+        if (mAdsImplementation.getExtra() != null) {
+            mAdsImplementation.getExtra().putBundle(IAds.VIDEO_EXTRAS, videoExtras);
+        }
 
         mAdsImplementation.showAds();
     }
