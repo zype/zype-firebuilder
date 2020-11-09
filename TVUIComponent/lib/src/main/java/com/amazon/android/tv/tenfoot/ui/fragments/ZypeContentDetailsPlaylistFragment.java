@@ -249,7 +249,7 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
                 Handler handler = new Handler();
                 handler.postDelayed(() -> {
                     LocalBroadcastManager.getInstance(getActivity())
-                            .sendBroadcast(new Intent(BROADCAST_DATA_LOADED));
+                        .sendBroadcast(new Intent(BROADCAST_DATA_LOADED));
                 }, 1000L);
                 return;
             }
@@ -268,25 +268,27 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
                     for (Content content : playlist.getContents()) {
                         listRowAdapter.add(content);
                     }
-                }catch (Exception e) {}
+                } catch (Exception e) {
+                }
             }
 
             if (playlist.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
                 PlaylistAction action = new PlaylistAction();
                 action.setAction(ContentBrowser.NEXT_PAGE)
-                        .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
-                        .setLabel1(getString(R.string.action_load_more));
+                    .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
+                    .setLabel1(getString(R.string.action_load_more));
                 action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, playlist.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
                 listRowAdapter.add(action);
             }
 
-        rowsAdapter.add(new ListRow(header, listRowAdapter));
-        isDataLoaded = true;
+            rowsAdapter.add(new ListRow(header, listRowAdapter));
+            isDataLoaded = true;
+        }
 
         Handler handler = new Handler();
         handler.post(() -> {
             LocalBroadcastManager.getInstance(getActivity())
-                    .sendBroadcast(new Intent(BROADCAST_VIDEO_DETAIL_DATA_LOADED));
+                .sendBroadcast(new Intent(BROADCAST_VIDEO_DETAIL_DATA_LOADED));
         });
     }
 
