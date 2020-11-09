@@ -34,6 +34,8 @@ permissions and limitations under the License.
     <!-- Used for the category titles and content subtitles -->
     <color name="tertiary_text">#99FFFFFF</color>
 
+    <color name="primary_text_inverse">@color/tertiary_text</color>
+
     <color name="transparent">#00FFFFFF</color>
 
     <color name="hero_slider_overlay_color">#99000000</color>

@@ -115,6 +115,7 @@ public class ContentSearchFragment extends androidx.leanback.app.SearchFragment
         super.onCreate(savedInstanceState);
 
         CustomListRowPresenter presenter = new CustomListRowPresenter();
+        presenter.setSelectEffectEnabled(false);
         presenter.setHeaderPresenter(new RowHeaderPresenter());
         mRowsAdapter = new ArrayObjectAdapter(presenter);
 

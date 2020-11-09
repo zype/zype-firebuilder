@@ -46,4 +46,5 @@ permissions and limitations under the License.
     <!-- Action button text size -->
     <dimen name="action_text">14sp</dimen>
 
+    <color name="dialog_background_color">@color/background</color>
 </resources>

@@ -113,7 +113,6 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
             LocalBroadcastManager.getInstance(getActivity())
                     .registerReceiver(receiver, new IntentFilter(BROADCAST_DATA_LOADED));
         }
-//        updateContents();
     }
 
     @Override
@@ -138,6 +137,20 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
         // Uncomment this code to remove shadow from the cards
         //customListRowPresenter.setShadowEnabled(false);
 
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(TAG, "onReceive(): isDataLoaded=" + isDataLoaded + "intent=" + intent.getAction());
+                if (isDataLoaded) {
+                    updateContents();
+                }
+                else {
+                    loadContentContainer(mRowsAdapter);
+                }
+                isDataLoaded = true;
+            }
+        };
+
         mRowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
 
         loadContentContainer(mRowsAdapter);
@@ -157,21 +170,6 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
 //                }
 //            }
 //        }, WAIT_BEFORE_FOCUS_REQUEST_MS);
-
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.d(TAG, "onReceive(): isDataLoaded=" + isDataLoaded + "intent=" + intent.getAction());
-                if (isDataLoaded) {
-                    updateContents();
-                }
-                else {
-                    loadContentContainer(mRowsAdapter);
-                }
-                isDataLoaded = true;
-            }
-        };
-
     }
 
     @Override
@@ -282,9 +280,14 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
                 listRowAdapter.add(action);
             }
 
-            rowsAdapter.add(new ListRow(header, listRowAdapter));
-            isDataLoaded = true;
-        }
+        rowsAdapter.add(new ListRow(header, listRowAdapter));
+        isDataLoaded = true;
+
+        Handler handler = new Handler();
+        handler.post(() -> {
+            LocalBroadcastManager.getInstance(getActivity())
+                    .sendBroadcast(new Intent(BROADCAST_VIDEO_DETAIL_DATA_LOADED));
+        });
     }
 
     public void updateContents() {
