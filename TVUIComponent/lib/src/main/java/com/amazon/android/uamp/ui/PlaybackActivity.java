@@ -2015,6 +2015,7 @@ public class PlaybackActivity extends BasePlaybackActivity implements
                     // from bright cove before PLAYING state. DEVTECH-4973
                     if (mPrevState == PlayerState.READY || mPrevState == PlayerState.SEEKING) {
                         modifyClosedCaptionState(mIsClosedCaptionEnabled);
+                        mPlayer.updateSurfaceView();
                         mPlaybackOverlayFragment.updatePlayback();
                     }
                     mPlaybackOverlayFragment.togglePlaybackUI(true);
