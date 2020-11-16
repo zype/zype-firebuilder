@@ -1580,7 +1580,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             case SEARCH:
                 searchActionTriggered(activity);
                 break;
-
+            case HOME:
+                homeActionTriggered(activity);
+                break;
             default:
                 Log.e(TAG, "Unsupported action " + settingsAction);
                 break;
@@ -1672,12 +1674,14 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         switchToScreen(ContentBrowser.EPG_SCREEN);
     }
 
+    private void homeActionTriggered(Activity activity) {
+        switchToScreen(ContentBrowser.CONTENT_HOME_SCREEN);
+    }
+
     private void searchActionTriggered(Activity activity) {
         ContentBrowser.getInstance(activity)
                 .switchToScreen(ContentBrowser.CONTENT_SEARCH_SCREEN);
     }
-
-
 
     private void openTermsTriggered(Activity activity) {
         ContentBrowser.getInstance(activity)
