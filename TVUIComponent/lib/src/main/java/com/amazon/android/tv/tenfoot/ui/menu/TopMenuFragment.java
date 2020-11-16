@@ -8,25 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
-import androidx.leanback.app.RowsFragment;
-import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.HorizontalGridView;
-import androidx.leanback.widget.ListRow;
-import androidx.leanback.widget.ListRowPresenter;
-import androidx.leanback.widget.OnItemViewClickedListener;
-import androidx.leanback.widget.OnItemViewSelectedListener;
-import androidx.leanback.widget.Presenter;
-import androidx.leanback.widget.Row;
-import androidx.leanback.widget.RowPresenter;
 
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.model.Action;
 import com.amazon.android.tv.tenfoot.R;
-import com.amazon.android.tv.tenfoot.presenter.MenuItemPresenter;
 
 import java.util.List;
-
-import static androidx.leanback.widget.FocusHighlight.ZOOM_FACTOR_MEDIUM;
 
 /**
  * Zype, Evgeny Cherkasov
@@ -56,6 +44,7 @@ public class TopMenuFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_top_menu, container);
         menuContainer = rootView.findViewById(R.id.gridTopMenu);
+        menuContainer.setItemSpacing(getResources().getInteger(R.integer.top_navigation_item_spacing));
         return rootView;
     }
 

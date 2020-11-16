@@ -1208,10 +1208,14 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         if (ZypeSettings.SHOW_TOP_MENU) {
             addSettingsAction(new Action().setAction(HOME)
                 .setLabel1(mAppContext.getString(R.string.menu_home)));
-            setupLogoutAction();
+            if (ZypeConfiguration.displayAccountNavigationButton()) {
+                setupLogoutAction();
+            }
             setupSearchAction();
             setupFavoritesAction();
-            addSettingsAction(createTermsOfUseSettingsAction());
+            if (ZypeConfiguration.displayTermsNavigationButton()) {
+                addSettingsAction(createTermsOfUseSettingsAction());
+            }
         }
         else {
             //addSettingsAction(createSlideShowSettingAction());
