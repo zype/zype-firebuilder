@@ -39,6 +39,7 @@ permissions and limitations under the License.
         android:id="@+id/content_search_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="64dp"
         />
     <fragment
         android:id="@+id/fragmentTopMenu"
