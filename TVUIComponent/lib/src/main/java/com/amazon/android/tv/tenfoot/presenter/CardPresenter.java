@@ -114,12 +114,14 @@ public class CardPresenter extends Presenter {
 
                 super.setSelected(selected);
 
-                // Uncomment this code to remove shadow from the cards
+                // comment this code to remove shadow from the cards
                 if (SHOW_TITLE) {
                 CardView cardView1 = this.findViewById(R.id.main_image_lt);
                 cardView1.setCardElevation(selected ? 6f : 0f);
                 cardView1.setContentPadding(selected ? 5 : 0, 0, 0, 0);
                 }
+                //
+
 //                if (mInfoField != null) {
 //                    mInfoField.setBackground(sFocusedFadeMask);
 //                }
