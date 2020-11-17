@@ -76,6 +76,7 @@ import java.util.List;
 
 import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
 import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_VIDEO_DETAIL_DATA_LOADED;
+import static com.zype.fire.api.ZypeSettings.SHOW_TITLE;
 
 /* Zype, Evgeny Cherkasov */
 
@@ -135,7 +136,7 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
         customListRowPresenter = new CustomListRowPresenter(position);
         customListRowPresenter.setHeaderPresenter(new RowHeaderPresenter());
         // Uncomment this code to remove shadow from the cards
-        //customListRowPresenter.setShadowEnabled(false);
+        customListRowPresenter.setShadowEnabled(!SHOW_TITLE);
 
         receiver = new BroadcastReceiver() {
             @Override
