@@ -119,7 +119,6 @@ public class CardPresenter extends Presenter {
                 CardView cardView1 = this.findViewById(R.id.main_image_lt);
                 cardView1.setCardElevation(selected ? 6f : 0f);
                 cardView1.setContentPadding(selected ? 5 : 0, 0, 0, 0);
-                    Log.d("Negi", "setSelected: ");
                 }
 //                if (mInfoField != null) {
 //                    mInfoField.setBackground(sFocusedFadeMask);
