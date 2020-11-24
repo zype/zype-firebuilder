@@ -29,6 +29,7 @@ import com.amazon.analytics.CustomAnalyticsTags;
 import com.amazon.analytics.IAnalytics;
 import com.segment.analytics.Analytics;
 import com.segment.analytics.Properties;
+import com.zype.fire.api.ZypeSettings;
 
 import org.w3c.dom.Text;
 
@@ -71,7 +72,7 @@ public class SegmentAnalytics implements IAnalytics {
 
         // Create an analytics client with the given context and Segment write key.
         Analytics analytics = new Analytics.Builder(this.context,
-                this.context.getString(R.string.segment_analytics_write_key))
+                ZypeSettings.SEGMENT_ANALYTICS_WRITE_KEY)
                 .trackApplicationLifecycleEvents()
 //                .recordScreenViews()
                 .logLevel(Analytics.LogLevel.VERBOSE)

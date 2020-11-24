@@ -17,6 +17,5 @@ permissions and limitations under the License.
 
     <!-- File path for the custom analytics tag configuration -->
     <string name="segment_analytics_custom_tags">configurations/SegmentCustomAnalyticsTags.json</string>
-    <string name="segment_analytics_write_key">etP6NsW0ahoGMsH7JnoCuCpdd5lFGUio</string>
 
 </resources>
