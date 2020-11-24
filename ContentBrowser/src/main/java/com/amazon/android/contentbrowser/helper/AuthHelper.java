@@ -47,6 +47,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -671,15 +673,20 @@ public class AuthHelper {
      */
     private static ErrorUtils.ERROR_CATEGORY convertAuthErrorToErrorUtils(Bundle bundle) {
 
-        switch (bundle.getString(AuthenticationConstants.ERROR_CATEGORY)) {
-            case AuthenticationConstants.REGISTRATION_ERROR_CATEGORY:
-                return ErrorUtils.ERROR_CATEGORY.REGISTRATION_CODE_ERROR;
-            case AuthenticationConstants.NETWORK_ERROR_CATEGORY:
-                return ErrorUtils.ERROR_CATEGORY.NETWORK_ERROR;
-            case AuthenticationConstants.AUTHENTICATION_ERROR_CATEGORY:
-                return ErrorUtils.ERROR_CATEGORY.AUTHENTICATION_ERROR;
-            case AuthenticationConstants.AUTHORIZATION_ERROR_CATEGORY:
-                return ErrorUtils.ERROR_CATEGORY.AUTHORIZATION_ERROR;
+        if (bundle != null) {
+            String category = bundle.getString(AuthenticationConstants.ERROR_CATEGORY);
+            if (!TextUtils.isEmpty(category)) {
+                switch (category) {
+                    case AuthenticationConstants.REGISTRATION_ERROR_CATEGORY:
+                        return ErrorUtils.ERROR_CATEGORY.REGISTRATION_CODE_ERROR;
+                    case AuthenticationConstants.NETWORK_ERROR_CATEGORY:
+                        return ErrorUtils.ERROR_CATEGORY.NETWORK_ERROR;
+                    case AuthenticationConstants.AUTHENTICATION_ERROR_CATEGORY:
+                        return ErrorUtils.ERROR_CATEGORY.AUTHENTICATION_ERROR;
+                    case AuthenticationConstants.AUTHORIZATION_ERROR_CATEGORY:
+                        return ErrorUtils.ERROR_CATEGORY.AUTHORIZATION_ERROR;
+                }
+            }
         }
         return ErrorUtils.ERROR_CATEGORY.NETWORK_ERROR;
     }

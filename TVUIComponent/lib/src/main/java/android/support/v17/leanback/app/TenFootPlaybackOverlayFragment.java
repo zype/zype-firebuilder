@@ -547,7 +547,7 @@ public class TenFootPlaybackOverlayFragment extends DetailsFragment {
         }
 
         // Set the key pressed to true if the action is DOWN and remember which key is pressed
-        if (((KeyEvent) event).getAction() == KeyEvent.ACTION_DOWN) {
+        if (event instanceof KeyEvent && ((KeyEvent) event).getAction() == KeyEvent.ACTION_DOWN) {
             mKeyPressed = true;
             mKeyCode = keyCode;
         }

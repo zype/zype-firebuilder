@@ -87,6 +87,7 @@ public class HeroSliderFragment extends RowsFragment {
 
     private void loadRows() {
         CustomListRowPresenter customListRowPresenter = new CustomListRowPresenter();
+        customListRowPresenter.setShadowEnabled(false);
 
         rowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
         cardPresenter = new HeroCardPresenter();

@@ -17,6 +17,9 @@ package com.amazon.android.tv.tenfoot.presenter;
 import androidx.leanback.widget.ListRowPresenter;
 import androidx.leanback.widget.RowPresenter;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.amazon.android.tv.tenfoot.R;
 
 /**
  * Customized ListRowPresenter to get each category to correspond to a 2-row horizontal grid.
@@ -24,6 +27,8 @@ import android.view.ViewGroup;
 public class CustomListRowPresenter extends ListRowPresenter {
 
     private int initialSelectedPosition;
+
+    private int headerColor = -1;
 
     public CustomListRowPresenter(int position) {
         super();
@@ -52,5 +57,14 @@ public class CustomListRowPresenter extends ListRowPresenter {
             ViewHolder vh = (ListRowPresenter.ViewHolder) holder;
             vh.getGridView().setSelectedPosition(initialSelectedPosition);
         }
+        // Set custom header text color, if it is defined.
+        TextView viewHeader = (TextView) holder.getHeaderViewHolder().view.findViewById(R.id.row_header);
+        if (headerColor != -1) {
+            viewHeader.setTextColor(headerColor);
+        }
+    }
+
+    public void setHeaderColor(int color) {
+        headerColor = color;
     }
 }

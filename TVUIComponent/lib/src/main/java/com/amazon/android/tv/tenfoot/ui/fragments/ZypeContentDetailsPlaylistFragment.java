@@ -113,7 +113,6 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
             LocalBroadcastManager.getInstance(getActivity())
                     .registerReceiver(receiver, new IntentFilter(BROADCAST_DATA_LOADED));
         }
-//        updateContents();
     }
 
     @Override
@@ -138,6 +137,20 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
         // Uncomment this code to remove shadow from the cards
         //customListRowPresenter.setShadowEnabled(false);
 
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(TAG, "onReceive(): isDataLoaded=" + isDataLoaded + "intent=" + intent.getAction());
+                if (isDataLoaded) {
+                    updateContents();
+                }
+                else {
+                    loadContentContainer(mRowsAdapter);
+                }
+                isDataLoaded = true;
+            }
+        };
+
         mRowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
 
         loadContentContainer(mRowsAdapter);
@@ -157,21 +170,6 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
 //                }
 //            }
 //        }, WAIT_BEFORE_FOCUS_REQUEST_MS);
-
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.d(TAG, "onReceive(): isDataLoaded=" + isDataLoaded + "intent=" + intent.getAction());
-                if (isDataLoaded) {
-                    updateContents();
-                }
-                else {
-                    loadContentContainer(mRowsAdapter);
-                }
-                isDataLoaded = true;
-            }
-        };
-
     }
 
     @Override
@@ -241,45 +239,57 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
         rowsAdapter.clear();
 
         Content video = ContentBrowser.getInstance(getActivity()).getLastSelectedContent();
-        String playlistId = video.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID);
-        ContentContainer playlist = ContentBrowser.getInstance(getActivity()).getPlayList(playlistId);
 
-        if (playlist == null) {
-            isDataLoaded = true;
-            mCallback.onItemSelected(video, null, -1, 0);
-            return;
-        }
+        if (video != null) {
+            String playlistId = video.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID);
+            ContentContainer playlist = ContentBrowser.getInstance(getActivity()).getPlayList(playlistId);
 
-        CardPresenter cardPresenter = new CardPresenter();
-        PosterCardPresenter posterCardPresenter = new PosterCardPresenter();
-
-        HeaderItem header = new HeaderItem(0, playlist.getName());
-        ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
-        if (playlist.getExtraStringValue(ContentContainer.EXTRA_THUMBNAIL_LAYOUT).equals("poster")) {
-            listRowAdapter = new ArrayObjectAdapter(posterCardPresenter);
-        }
-
-        int videoIndex = 0;
-        for (Content content : playlist.getContents()) {
-            listRowAdapter.add(content);
-            if (content.getId().equals(video.getId())) {
-                videoIndex = listRowAdapter.indexOf(content);
+            if (playlist == null) {
+                isDataLoaded = true;
+                Handler handler = new Handler();
+                handler.postDelayed(() -> {
+                    LocalBroadcastManager.getInstance(getActivity())
+                        .sendBroadcast(new Intent(BROADCAST_DATA_LOADED));
+                }, 1000L);
+                return;
             }
-        }
 
-        if (playlist.getContents().size() < playlist.getExtraValueAsInt(ContentContainer.EXTRA_PLAYLIST_ITEM_COUNT)) {
+            CardPresenter cardPresenter = new CardPresenter();
+            PosterCardPresenter posterCardPresenter = new PosterCardPresenter();
+
+            HeaderItem header = new HeaderItem(0, playlist.getName());
+            ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
+            if (playlist.getExtraStringValue(ContentContainer.EXTRA_THUMBNAIL_LAYOUT).equals("poster")) {
+                listRowAdapter = new ArrayObjectAdapter(posterCardPresenter);
+            }
+
+            if (playlist.getContents() != null) {
+                try {
+                    for (Content content : playlist.getContents()) {
+                        listRowAdapter.add(content);
+                    }
+                } catch (Exception e) {
+                }
+            }
+
             if (playlist.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
                 PlaylistAction action = new PlaylistAction();
                 action.setAction(ContentBrowser.NEXT_PAGE)
-                        .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
-                        .setLabel1(getString(R.string.action_load_more));
+                    .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
+                    .setLabel1(getString(R.string.action_load_more));
                 action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, playlist.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
                 listRowAdapter.add(action);
             }
+
+            rowsAdapter.add(new ListRow(header, listRowAdapter));
+            isDataLoaded = true;
         }
 
-        rowsAdapter.add(new ListRow(header, listRowAdapter));
-        isDataLoaded = true;
+        Handler handler = new Handler();
+        handler.post(() -> {
+            LocalBroadcastManager.getInstance(getActivity())
+                .sendBroadcast(new Intent(BROADCAST_VIDEO_DETAIL_DATA_LOADED));
+        });
     }
 
     public void updateContents() {
