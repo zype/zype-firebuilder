@@ -198,8 +198,8 @@ public class CardPresenter extends Presenter {
                         public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                             cardView.setInfoAreaBackground(infoFieldWithProgressBarBackground);
                             Bitmap bitmap = Helpers.addProgressToThumbnail((Activity) mContext, resource, playbackPercentage, 0);
-                            ImageView imageView = cardView.findViewById(R.id.main_image);
-                            imageView.setImageBitmap(bitmap);                        }
+                            cardView.getMainImageView().setImageBitmap(bitmap);
+                        }
                     };
                     GlideHelper.loadImageIntoSimpleTargetBitmap(
                             viewHolder.view.getContext(),
@@ -210,7 +210,7 @@ public class CardPresenter extends Presenter {
                 }
                 else {
                     GlideHelper.loadImageIntoView(
-                            cardView.findViewById(R.id.main_image),
+                            cardView.getMainImageView(),
                             viewHolder.view.getContext(),
                             content.getCardImageUrl(),
                             new GlideHelper.LoggingListener<>(),
@@ -275,7 +275,7 @@ public class CardPresenter extends Presenter {
             /* Zype, Evgeny Cherkasov */
             // Show image for playlist
             if (contentContainer.getExtraStringValue(Content.CARD_IMAGE_URL_FIELD_NAME) != null) {
-                GlideHelper.loadImageIntoView(cardView.findViewById(R.id.main_image),
+                GlideHelper.loadImageIntoView(cardView.getMainImageView(),
                         viewHolder.view.getContext(),
                         contentContainer.getExtraStringValue(Content.CARD_IMAGE_URL_FIELD_NAME),
                         new GlideHelper.LoggingListener<>(),
@@ -318,7 +318,7 @@ public class CardPresenter extends Presenter {
         ImageCardView cardView = (ImageCardView) viewHolder.view;
         // Remove references to images so that the garbage collector can free up memory.
         cardView.setBadgeImage(null);
-        //cardView.setMainImage(null);
+        cardView.getMainImageView().setImageDrawable(null);
     }
 }
 

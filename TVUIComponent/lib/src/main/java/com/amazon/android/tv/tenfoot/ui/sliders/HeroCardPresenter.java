@@ -98,12 +98,12 @@ public class HeroCardPresenter extends Presenter {
       Glide.with(((ViewHolder) viewHolder).mCardView.getContext())
           .load(slider.getUrl())
               .placeholder(mContext.getResources().getColor(R.color.image_card_place_holder))
-              .into((ImageView)((ViewHolder) viewHolder).mCardView.findViewById(R.id.main_image));
+              .into(((ViewHolder) viewHolder).mCardView.getMainImageView());
 
       mInfoField.setBackgroundColor(mContext.getResources().getColor(R.color.transparent));
     }
 
-    ImageView imageView = ((ViewHolder) viewHolder).mCardView.findViewById(R.id.main_image);
+    ImageView imageView = ((ViewHolder) viewHolder).mCardView.getMainImageView();
 
     int color = slider.isSelected() ? mContext.getResources().getColor(R.color.transparent)
                   : mContext.getResources().getColor(R.color.hero_slider_overlay_color);
@@ -118,7 +118,7 @@ public class HeroCardPresenter extends Presenter {
     ImageCardView cardView = (ImageCardView) viewHolder.view;
     // Remove references to images so that the garbage collector can free up memory.
     cardView.setBadgeImage(null);
-    //cardView.setMainImage(null);
+    cardView.getMainImageView().setImageDrawable(null);
   }
 
   @Override
