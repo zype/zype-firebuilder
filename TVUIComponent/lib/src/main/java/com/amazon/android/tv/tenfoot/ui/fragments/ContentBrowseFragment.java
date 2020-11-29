@@ -75,6 +75,7 @@ import android.util.Log;
 
 import static androidx.leanback.widget.FocusHighlight.ZOOM_FACTOR_NONE;
 import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
+import static com.zype.fire.api.ZypeSettings.SHOW_TITLE;
 
 /**
  * This fragment displays content in horizontal rows for browsing. Each row has its title displayed
@@ -119,7 +120,7 @@ public class ContentBrowseFragment extends RowsFragment {
         customListRowPresenter.setHeaderPresenter(new RowHeaderPresenter());
 
         // Uncomment this code to remove shadow from the cards
-        //customListRowPresenter.setShadowEnabled(false);
+        customListRowPresenter.setShadowEnabled(!SHOW_TITLE);
 
         /* Zype, Evgney Cherkasov */
 //        ArrayObjectAdapter rowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
