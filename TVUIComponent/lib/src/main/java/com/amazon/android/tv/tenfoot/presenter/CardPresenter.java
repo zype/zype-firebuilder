@@ -49,6 +49,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+
+import androidx.cardview.widget.CardView;
 import androidx.leanback.widget.BaseCardView;
 import androidx.leanback.widget.ImageCardView;
 import androidx.leanback.widget.Presenter;
@@ -111,6 +113,15 @@ public class CardPresenter extends Presenter {
             public void setSelected(boolean selected) {
 
                 super.setSelected(selected);
+
+                // comment this code to remove shadow from the cards
+                if (SHOW_TITLE) {
+                CardView cardView1 = this.findViewById(R.id.main_image_lt);
+                cardView1.setCardElevation(selected ? 6f : 0f);
+                cardView1.setContentPadding(selected ? 5 : 0, 0, 0, 0);
+                }
+                //
+
 //                if (mInfoField != null) {
 //                    mInfoField.setBackground(sFocusedFadeMask);
 //                }
@@ -307,7 +318,7 @@ public class CardPresenter extends Presenter {
         ImageCardView cardView = (ImageCardView) viewHolder.view;
         // Remove references to images so that the garbage collector can free up memory.
         cardView.setBadgeImage(null);
-        cardView.setMainImage(null);
+        cardView.getMainImageView().setImageDrawable(null);
     }
 }
 
