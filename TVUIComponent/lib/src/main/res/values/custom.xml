@@ -178,4 +178,11 @@ permissions and limitations under the License.
     <string name="drm_encryption_schema">ENCRYPTION_DEFAULT</string>
     <color name="background_color_translucent">#CC000000</color>
 
+    <color name="app_exit_bg_color">#50000000</color>
+    <color name="app_bg_color">#000000</color>
+    <color name="app_text_color">#FFFFFF</color>
+    <string name="exit_alert_message">Are you sure you want to exit %s?</string>
+    <string name="positive">Yes, exit.</string>
+    <string name="negative">No, take me back.</string>
+
 </resources>

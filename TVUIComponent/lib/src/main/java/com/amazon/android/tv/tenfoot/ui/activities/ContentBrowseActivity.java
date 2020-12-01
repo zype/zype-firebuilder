@@ -46,17 +46,22 @@ import com.amazon.android.utils.Helpers;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment;
+import com.amazon.utils.BlurView;
 import com.zype.fire.api.ZypeSettings;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.leanback.widget.ArrayObjectAdapter;
@@ -65,8 +70,11 @@ import androidx.leanback.widget.Row;
 import androidx.core.content.ContextCompat;
 import android.util.Log;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -114,8 +122,11 @@ public class ContentBrowseActivity extends BaseActivity implements
     private Row lastSelectedRow = null;
     private boolean lastSelectedRowChanged = false;
     private int lastSelectedItemIndex = -1;
+    private boolean isShowingExitAlert = false;
 
     private final Handler handler = new Handler();
+    private AlertDialog dialogWhichDisplayAlert;
+    private  Dialog fakeDialogUseToGetWindowForBlurEffect;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -220,6 +231,9 @@ public class ContentBrowseActivity extends BaseActivity implements
     }
 
     private void fadeInFadeOut(List<View> fadeInViews, List<View> fadeOutViews) {
+        if (isShowingExitAlert)
+            return;
+
         final AnimatorSet animatorSet = new AnimatorSet();
 
         List<Animator> animations = new ArrayList<>();
@@ -502,6 +516,7 @@ public class ContentBrowseActivity extends BaseActivity implements
             case KeyEvent.KEYCODE_BACK: {
                 if (sliderHasFocus()){
                     sliderShown=false;
+                    isShowingExitAlert=true;
                     showHeroSlider();
                 }
 
@@ -582,5 +597,67 @@ public class ContentBrowseActivity extends BaseActivity implements
         hideMenu();
         ContentBrowser.getInstance(this)
                 .settingsActionTriggered(this, item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        fakeDialogUseToGetWindowForBlurEffect = new Dialog(this);
+        new BlurAsyncTask().execute();
+    }
+
+    private class BlurAsyncTask extends AsyncTask<Void, Integer, Bitmap> {
+
+
+        protected Bitmap doInBackground(Void...arg0) {
+
+            Bitmap map  = BlurView.takeScreenShot(ContentBrowseActivity.this);
+            return new BlurView().fastBlur(map, 10);
+        }
+
+
+        protected void onPostExecute(Bitmap result) {
+            if (result != null){
+                final Drawable draw=new BitmapDrawable(getResources(),result);
+                Window window = fakeDialogUseToGetWindowForBlurEffect.getWindow();
+                assert window != null;
+                window.setBackgroundDrawable(draw);
+                window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+                window.setGravity(Gravity.CENTER);
+                fakeDialogUseToGetWindowForBlurEffect.show();
+
+                // real one
+                AlertDialog.Builder builder = new AlertDialog.Builder(ContentBrowseActivity.this,R.style.MyDialogTheme);
+           //     builder.setMessage("This is Blur Demo");
+                // set the custom layout
+                final View customLayout = getLayoutInflater().inflate(R.layout.view_custom_dialog, null);
+                TextView message= (TextView) customLayout.findViewById(R.id.exitMessage);
+                message.setText(String.format(getString(R.string.exit_alert_message), getString(R.string.app_name)));
+                builder.setView(customLayout);
+
+                builder.setCancelable(false);
+                customLayout.findViewById(R.id.yesBtn).setOnClickListener(v -> {
+                    fakeDialogUseToGetWindowForBlurEffect.dismiss();
+                    ContentBrowseActivity.this.finish();
+                });
+
+                customLayout.findViewById(R.id.noBtn).setOnClickListener(v -> {
+                    fakeDialogUseToGetWindowForBlurEffect.dismiss();
+                    if (dialogWhichDisplayAlert !=null){
+                        dialogWhichDisplayAlert.dismiss();
+                    }
+                });
+
+                dialogWhichDisplayAlert = builder.create();
+
+                // position real dialogWhichDisplayAlert using Gravity.CENTER;
+                dialogWhichDisplayAlert.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                WindowManager.LayoutParams wmlp = dialogWhichDisplayAlert.getWindow().getAttributes();
+                wmlp.gravity = Gravity.CENTER;
+                dialogWhichDisplayAlert.show();
+                isShowingExitAlert=false;
+
+            }
+
+        }
     }
 }
