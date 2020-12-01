@@ -8,11 +8,11 @@ import android.content.Context;
 
 public class ZypeSettings {
     // Zype app key
-    public static final String APP_KEY = "C0zChR4FyNVixEOsyJCi1_HLdmklFlj-uUbOAamfEq0f7ML7aJkekOFIbPmbiS9j";
+    public static final String APP_KEY = "_L22X939Nwk6YZde4VvDf8V7iPV15FCYGn-mDI0-1DAznYwYlB1gtsOOZ9lNibCn";
     // OAuth credentials
-    public static final String CLIENT_ID = "6f861db9b340975edddd68d853069e095a37a1609ca328b96b35b17be68b0470";
+    public static final String CLIENT_ID = "6ebc48c1846c801d9b5614373489ebfc9b4e0ff04be630a0804522b369a86403";
     // Playlist
-    public static final String ROOT_PLAYLIST_ID = "5c91b0d2be3b9e14f51c450e";
+    public static final String ROOT_PLAYLIST_ID = "5f22f3690b5475000106e061";
 
     public static final String FAVORITES_PLAYLIST_ID = "Favorites";
     public static final String MY_LIBRARY_PLAYLIST_ID = "MyLibrary";
@@ -32,9 +32,9 @@ public class ZypeSettings {
      * This flag controls the following:
      * - Text color on Terms and Privacy Policy screen
     */
-    public static final boolean LIGHT_THEME = false;
+    public static final boolean LIGHT_THEME = true;
     public static final boolean SHOW_EPISODE_NUMBER = false;
-    public static final boolean SHOW_TITLE = false;
+    public static final boolean SHOW_TITLE = true;
     public static final boolean SHOW_LEFT_MENU = true;
     public static final boolean SHOW_SEARCH_ICON = true;
     public static final boolean SETTINGS_PLAYLIST_ENABLED = true;

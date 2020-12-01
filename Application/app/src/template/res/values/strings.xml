@@ -13,10 +13,10 @@ express or implied. See the License for the specific language governing
 permissions and limitations under the License.
 -->
 <resources>
-    <string name="app_name"><APP_NAME></string>
+    <string name="app_name">Test app</string>
     <!-- The app's display name that should have a max of 15 characters
          Currently used with recommendations on the Home Screen -->
-    <string translatable="false" name="app_name_short"><APP_NAME_SHORT></string>
+    <string translatable="false" name="app_name_short">Test app</string>
     <!-- Copyright string -->
     <string name="copyright">Copyright 2019. All Rights Reserved.</string>
     <!-- Search hint text -->

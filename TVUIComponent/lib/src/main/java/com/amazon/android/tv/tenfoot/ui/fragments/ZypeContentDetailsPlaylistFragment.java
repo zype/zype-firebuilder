@@ -97,6 +97,7 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
     private boolean isDataLoaded = false;
     private boolean isEmptyFavoritesShown = false;
 
+    private boolean contentUpdationInProgress = false;
     CustomListRowPresenter customListRowPresenter;
 
     // Container Activity must implement this interface.
@@ -142,6 +143,7 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Log.d(TAG, "onReceive(): isDataLoaded=" + isDataLoaded + "intent=" + intent.getAction());
+                contentUpdationInProgress = false;
                 if (isDataLoaded) {
                     updateContents();
                 }
@@ -235,7 +237,7 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
     }
 
     private void loadContentContainer(ArrayObjectAdapter rowsAdapter) {
-        Log.d(TAG, "loadContentContainer()");
+        Log.d(TAG, "loadRootContentContainer()");
 
         rowsAdapter.clear();
 
@@ -250,7 +252,7 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
                 Handler handler = new Handler();
                 handler.postDelayed(() -> {
                     LocalBroadcastManager.getInstance(getActivity())
-                        .sendBroadcast(new Intent(BROADCAST_DATA_LOADED));
+                            .sendBroadcast(new Intent(BROADCAST_DATA_LOADED));
                 }, 1000L);
                 return;
             }
@@ -267,30 +269,19 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
             if (playlist.getContents() != null) {
                 try {
                     for (Content content : playlist.getContents()) {
+                        if (playlist.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0 &&
+                                playlist.getContents().indexOf(content) == playlist.getContentCount()-1){
+                            content.setExtraValue(ContentBrowser.NEXT_PAGE, true);
+                            content.setExtraValue(Content.EXTRA_PLAYLIST_ID, playlist.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+                        }
                         listRowAdapter.add(content);
                     }
-                } catch (Exception e) {
-                }
-            }
-
-            if (playlist.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
-                PlaylistAction action = new PlaylistAction();
-                action.setAction(ContentBrowser.NEXT_PAGE)
-                    .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
-                    .setLabel1(getString(R.string.action_load_more));
-                action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, playlist.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
-                listRowAdapter.add(action);
+                }catch (Exception e) {}
             }
 
             rowsAdapter.add(new ListRow(header, listRowAdapter));
             isDataLoaded = true;
         }
-
-        Handler handler = new Handler();
-        handler.post(() -> {
-            LocalBroadcastManager.getInstance(getActivity())
-                .sendBroadcast(new Intent(BROADCAST_VIDEO_DETAIL_DATA_LOADED));
-        });
     }
 
     public void updateContents() {
@@ -303,8 +294,6 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
         ContentContainer playlist = ContentBrowser.getInstance(getActivity()).getPlayList(playlistId);
 
         if (playlist == null) {
-            isDataLoaded = true;
-            mCallback.onItemSelected(video, null, -1, 0);
             return;
         }
 
@@ -316,19 +305,22 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
         if (listRowAdapter.size() > 0 && listRowAdapter.get(listRowAdapter.size() - 1) instanceof PlaylistAction) {
             listRowAdapter.remove(listRowAdapter.get(listRowAdapter.size() - 1));
         }
+        if (listRowAdapter.size() > 0 && listRowAdapter.get(listRowAdapter.size() - 1) instanceof Content) {
+            Content content = (Content) listRowAdapter.get(listRowAdapter.size() - 1);
+            content.setExtraValue(ContentBrowser.NEXT_PAGE, false);
+        }
+
         // Add new contents
         if (playlist.getContentCount() > listRowAdapter.size()) {
             for (int i = listRowAdapter.size(); i < playlist.getContentCount(); i++) {
-                listRowAdapter.add(playlist.getContents().get(i));
-            }
-            // Add a button for loading next page of playlist videos
-            if (playlist.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
-                PlaylistAction action = new PlaylistAction();
-                action.setAction(ContentBrowser.NEXT_PAGE)
-                        .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
-                        .setLabel1(getString(R.string.action_load_more));
-                action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, playlist.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
-                listRowAdapter.add(action);
+                Content content = playlist.getContents().get(i);
+
+                if (playlist.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0 &&
+                        playlist.getContents().indexOf(content) == playlist.getContentCount()-1){
+                    content.setExtraValue(ContentBrowser.NEXT_PAGE, true);
+                    content.setExtraValue(Content.EXTRA_PLAYLIST_ID, playlist.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+                }
+                listRowAdapter.add(content);
             }
         }
     }
@@ -338,12 +330,92 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
         @Override
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
                                   RowPresenter.ViewHolder rowViewHolder, Row row) {
+
+            /*if (item instanceof ContentContainer) {
+                ContentContainer contentContainer = (ContentContainer) item;
+                if (!contentContainer.getContents().isEmpty()) {
+                    item = contentContainer.getContents().get(0);
+                }
+                else {
+                    if (Integer.valueOf(contentContainer.getExtraStringValue("playlistItemCount")) > 0) {
+                        // Playlist has  videos, but they is not loaded yet.
+                        // Load videos and then open video detail screen of the first video in the playlist
+                        ContentLoader.ILoadContentForContentContainer listener = new ContentLoader.ILoadContentForContentContainer() {
+                            @Override
+                            public void onContentsLoaded() {
+                                ContentBrowser.getInstance(getActivity())
+                                        .setLastSelectedContent(contentContainer.getContents().get(0))
+                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+                            }
+                        };
+                        // TODO: Add mCompositeSubscription parameter from ContentBrowser
+                        ContentLoader.getInstance(getActivity()).loadContentForContentContainer(contentContainer, getActivity(), listener);
+                        return;
+                    }
+                }
+            }
+*/
             if (item instanceof Content) {
+//                Content content = (Content) item;
+//                Log.d(TAG, "Content with title " + content.getTitle() + " was clicked");
+//
+//                /* Zype, Evgeny Cherkasov */
+//                // Get video entitlement
+//                if (ZypeConfiguration.isUniversalTVODEnabled(getActivity())) {
+//                    if (!content.getExtras().containsKey(Content.EXTRA_ENTITLED)) {
+//                        String accessToken = Preferences.getString(ZypeAuthentication.ACCESS_TOKEN);
+//                        HashMap<String, String> params = new HashMap<>();
+//                        params.put(ZypeApi.ACCESS_TOKEN, accessToken);
+//                        ZypeApi.getInstance().getApi().checkVideoEntitlement(content.getId(), params).enqueue(new Callback<ResponseBody>() {
+//                            @Override
+//                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                                Log.e(TAG, "onItemClicked(): check video entitlement: code=" + response.code());
+//                                if (response.isSuccessful()) {
+//                                    content.setExtraValue(Content.EXTRA_ENTITLED, true);
+//                                }
+//                                else {
+//                                    content.setExtraValue(Content.EXTRA_ENTITLED, false);
+//                                }
+//                                ContentBrowser.getInstance(getActivity())
+//                                        .setLastSelectedContent(content)
+//                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+//                            }
+//
+//                            @Override
+//                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                                Log.e(TAG, "onItemClicked(): check video entitlement: failed");
+//                                content.setExtraValue(Content.EXTRA_ENTITLED, false);
+//                                ContentBrowser.getInstance(getActivity())
+//                                        .setLastSelectedContent(content)
+//                                        .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+//                            }
+//                        });
+//                    }
+//                    else {
+//                        ContentBrowser.getInstance(getActivity())
+//                                .setLastSelectedContent(content)
+//                                .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+//                    }
+//                }
+//                else {
+//                    ContentBrowser.getInstance(getActivity())
+//                            .setLastSelectedContent(content)
+//                            .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN);
+//                }
                 mCallback.onItemClicked(item);
             }
-            else if (item instanceof PlaylistAction) {
+            /*else if (item instanceof ContentContainer) {
+                ContentContainer contentContainer = (ContentContainer) item;
+                Log.d(TAG, "ContentContainer with name " + contentContainer.getName() + " was " +
+                        "clicked");
+
+                ContentBrowser.getInstance(getActivity())
+                        .setLastSelectedContentContainer(contentContainer)
+                        .switchToScreen(ContentBrowser.CONTENT_SUBMENU_SCREEN);
+            }*/
+            else if (item instanceof PlaylistAction) {      //No need
                 PlaylistAction action = (PlaylistAction) item;
-                if (action.getAction().equals(ContentBrowser.NEXT_PAGE)) {
+                if (action.getAction().equals(ContentBrowser.NEXT_PAGE)) {      //
                     Log.d(TAG, "Next page button was clicked");
                     Content video = ContentBrowser.getInstance(getActivity()).getLastSelectedContent();
                     String playlistId = video.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID);
@@ -354,6 +426,11 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
                     ContentBrowser.getInstance(getActivity()).settingsActionTriggered(getActivity(),action);
                 }
             }
+            /*else if (item instanceof Action) {
+                Action action = (Action) item;
+                Log.d(TAG, "Settings with title " + action.getAction() + " was clicked");
+                ContentBrowser.getInstance(getActivity()).settingsActionTriggered(getActivity(),action);
+            }*/
         }
     }
 
@@ -364,6 +441,16 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
                                    RowPresenter.ViewHolder rowViewHolder, Row row) {
 
             mCallback.onItemSelected(item, row, mRowsAdapter.indexOf(row), mRowsAdapter.size());
+
+            if (item instanceof Content) {
+                Content content = (Content) item;
+                if (content.getExtras().containsKey(ContentBrowser.NEXT_PAGE) && content.getExtraValueAsBoolean(ContentBrowser.NEXT_PAGE) && !contentUpdationInProgress) {
+                    contentUpdationInProgress = true;
+                    Log.d(TAG, "Next page item was selected");
+                    String playlistId = content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID);
+                    ContentBrowser.getInstance(getActivity()).loadPlaylistVideos(playlistId);                }
+            }
         }
     }
+
 }
