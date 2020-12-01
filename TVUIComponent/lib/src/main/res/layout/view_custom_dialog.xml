@@ -15,13 +15,12 @@
 
 
     <LinearLayout
-      android:id="@+id/topview"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_gravity="center"
       android:background="@color/app_exit_bg_color"
       android:gravity="center"
-      android:minHeight="180dp"
+      android:minHeight="170dp"
       android:orientation="vertical"
       android:paddingLeft="25dp"
       android:paddingRight="25dp">
@@ -40,53 +39,38 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="35dp"
+        android:layout_marginTop="@dimen/logout_fragment_button_height"
         android:orientation="horizontal">
 
-        <androidx.cardview.widget.CardView
+        <Button
           android:id="@+id/yesBtn"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginEnd="10dp"
+          android:background="@drawable/button_bg_state"
+          android:clickable="true"
+          android:focusable="true"
           android:minWidth="@dimen/logout_fragment_button_width"
           android:minHeight="@dimen/logout_fragment_button_height"
-          card_view:cardBackgroundColor="@color/app_text_color"
-          card_view:cardCornerRadius="15dp"
-          card_view:cardElevation="0dp">
+          android:text="@string/positive"
+          android:textColor="@drawable/text_color_selector"
+          android:textSize="@dimen/logout_fragment_title_size"
+          android:textStyle="bold" />
 
-          <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:text="@string/positive"
-            android:textColor="@color/app_bg_color"
-            android:textSize="@dimen/logout_fragment_title_size"
-            android:textStyle="bold" />
 
-        </androidx.cardview.widget.CardView>
-
-        <LinearLayout
+        <Button
           android:id="@+id/noBtn"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginStart="10dp"
-          android:background="@drawable/btn_bg_rounded"
-          android:minHeight="35dp">
+          android:background="@drawable/button_bg_state"
+          android:minHeight="@dimen/logout_fragment_button_height"
+          android:paddingLeft="15dp"
+          android:paddingRight="15dp"
+          android:text="@string/negative"
+          android:textColor="@drawable/text_color_selector"
+          android:textSize="@dimen/logout_fragment_title_size"
+          android:textStyle="bold" />
 
-          <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"
-            android:gravity="center"
-            android:text="@string/negative"
-            android:textColor="@color/app_text_color"
-            android:textSize="@dimen/logout_fragment_title_size"
-            android:textStyle="bold" />
-
-        </LinearLayout>
       </LinearLayout>
     </LinearLayout>
   </androidx.cardview.widget.CardView>

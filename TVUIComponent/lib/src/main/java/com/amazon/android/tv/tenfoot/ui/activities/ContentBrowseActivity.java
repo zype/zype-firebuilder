@@ -66,6 +66,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -598,8 +599,9 @@ public class ContentBrowseActivity extends BaseActivity implements
         builder.setCancelable(true);
 
         AlertDialog alertDialog = builder.create();
-
-        customLayout.findViewById(R.id.yesBtn).setOnClickListener(v -> {
+        Button yesBtn= (Button) customLayout.findViewById(R.id.yesBtn);
+        yesBtn.setPressed(true);
+        yesBtn.setOnClickListener(v -> {
             alertDialog.dismiss();
             finish();
         });
