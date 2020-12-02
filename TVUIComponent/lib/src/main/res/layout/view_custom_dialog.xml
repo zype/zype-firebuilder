@@ -44,6 +44,7 @@
 
         <Button
           android:id="@+id/yesBtn"
+          style="?android:attr/borderlessButtonStyle"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginEnd="10dp"
@@ -60,6 +61,7 @@
 
         <Button
           android:id="@+id/noBtn"
+          style="?android:attr/borderlessButtonStyle"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_state"
