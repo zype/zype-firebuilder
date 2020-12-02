@@ -34,7 +34,7 @@ public class ZypeSettings {
     */
     public static final boolean LIGHT_THEME = false;
     public static final boolean SHOW_EPISODE_NUMBER = false;
-    public static final boolean SHOW_TITLE = false;
+    public static final boolean SHOW_TITLE = true;
     public static final boolean SHOW_LEFT_MENU = true;
     public static final boolean SHOW_SEARCH_ICON = true;
     public static final boolean SETTINGS_PLAYLIST_ENABLED = true;
