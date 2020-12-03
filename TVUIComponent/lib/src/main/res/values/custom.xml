@@ -180,12 +180,12 @@ permissions and limitations under the License.
 
     <!-- Only these colors alert exit alert theme changes  -->
 
-    <color name="app_exit_bg_color">#90000000</color>
+    <color name="app_exit_bg_color">#9022282E</color>
     <color name="app_text_color">#FFFFFF</color>
 
     <!-- Only these colors alert exit alert theme changes -->
 
-    <color name="app_bg_color">#000000</color>
+    <color name="app_bg_color">#22282E</color>
     <string name="exit_alert_message">Are you sure you want to exit %s?</string>
     <string name="positive">Yes, exit.</string>
     <string name="negative">No, take me back.</string>
