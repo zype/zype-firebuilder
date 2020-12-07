@@ -164,6 +164,7 @@ dependencies {
 //    implementation project(':PassThroughAdsComponent')
     api project(':VastAdsComponent')
     api project(':AmazonInAppPurchaseComponent')
+    api project(':GoogleInAppPurchaseComponent')
     implementation project(':AkamaiAnalyticsComponent')
 //    implementation project(':LoggerAnalyticsComponent')
     // Uncomment when using CrashlyticsComponent
