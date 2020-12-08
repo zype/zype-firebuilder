@@ -215,7 +215,8 @@ public class DefaultMediaPicker implements MediaPicker {
 
         // check if the MediaFile is compatible with the device.
         // further checks can be added here
-        return media.getType().matches(SUPPORTED_VIDEO_TYPE_REGEX);
+        return media.getType().matches(SUPPORTED_VIDEO_TYPE_REGEX)
+                || media.getType().equals("application/x-mpegURL");
     }
 
     private MediaFile getBestMatch(List<MediaFile> list) {
