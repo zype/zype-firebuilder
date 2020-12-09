@@ -140,4 +140,11 @@ permissions and limitations under the License.
     <style name="CustomImageCardViewStyle" parent="Widget.Leanback.ImageCardViewStyle">
         <item name="cardBackground">@color/card_background</item>
     </style>
+
+
+  <style name="MyDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+    <item name="android:colorBackground">@color/app_exit_bg_color</item>
+    <item name="android:windowBackground">@color/app_exit_bg_color</item>
+  </style>
+
 </resources>

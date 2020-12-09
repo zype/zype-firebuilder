@@ -51,6 +51,11 @@ public class AnalyticsTags {
     public static final String ACTION_PLAYBACK_STARTED = "ACTION_PLAYBACK_STARTED";
 
     /**
+     * Customizable action for current state of video playback.
+     */
+    public static final String ACTION_PLAYBACK = "ACTION_PLAYBACK";
+
+    /**
      * Customizable action for starting a purchase.
      */
     public static final String ACTION_PURCHASE_INITIATED = "ACTION_PURCHASE_INITIATED";
@@ -116,6 +121,8 @@ public class AnalyticsTags {
      * Customizable action for finishing video playback.
      */
     public static final String ACTION_PLAYBACK_FINISHED = "ACTION_PLAYBACK_FINISHED";
+
+    public static final String ACTION_AUTOPLAY_FINISHED = "ACTION_AUTOPLAY_FINISHED";
 
     /**
      * Customizable action for starting a buffer event.
@@ -494,10 +501,24 @@ public class AnalyticsTags {
 
     /* Zype */
     public static final String ATTRIBUTE_CONTENT_ANALYTICS_BEACON = "ATTRIBUTE_CONTENT_ANALYTICS_BEACON";
+    public static final String ATTRIBUTE_CONTENT_ANALYTICS_CHANNEL =
+            "ATTRIBUTE_CONTENT_ANALYTICS_CHANNEL";
     public static final String ATTRIBUTE_CONTENT_ANALYTICS_CONSUMER_ID = "ATTRIBUTE_CONTENT_ANALYTICS_CONSUMER_ID";
+    public static final String ATTRIBUTE_CONTENT_ANALYTICS_CREATED_AT =
+            "ATTRIBUTE_CONTENT_ANALYTICS_CREATED_AT";
+    public static final String ATTRIBUTE_CONTENT_ANALYTICS_DESCRIPTION =
+            "ATTRIBUTE_CONTENT_ANALYTICS_DESCRIPTION";
     public static final String ATTRIBUTE_CONTENT_ANALYTICS_DEVICE = "ATTRIBUTE_CONTENT_ANALYTICS_DEVICE";
     public static final String ATTRIBUTE_CONTENT_ANALYTICS_PLAYER_ID = "ATTRIBUTE_CONTENT_ANALYTICS_PLAYER_ID";
+    public static final String ATTRIBUTE_CONTENT_ANALYTICS_SERIES_ID =
+            "ATTRIBUTE_CONTENT_ANALYTICS_SERIES_ID";
+    public static final String ATTRIBUTE_CONTENT_ANALYTICS_SESSION_ID =
+            "ATTRIBUTE_CONTENT_ANALYTICS_SESSION_ID";
     public static final String ATTRIBUTE_CONTENT_ANALYTICS_SITE_ID = "ATTRIBUTE_CONTENT_ANALYTICS_SITE_ID";
+    public static final String ATTRIBUTE_CONTENT_ANALYTICS_THUMBNAIL =
+            "ATTRIBUTE_CONTENT_ANALYTICS_THUMBNAIL";
+    public static final String ATTRIBUTE_CONTENT_ANALYTICS_UPDATED_AT =
+            "ATTRIBUTE_CONTENT_ANALYTICS_UPDATED_AT";
     public static final String ATTRIBUTE_CONTENT_ANALYTICS_VIDEO_ID = "ATTRIBUTE_CONTENT_ANALYTICS_VIDEO_ID";
     public static final String ATTRIBUTE_CONTENT_LIVE = "ATTRIBUTE_CONTENT_LIVE";
     public static final String ATTRIBUTE_CONTENT_VIDEO_URL = "ATTRIBUTE_CONTENT_VIDEO_URL";
