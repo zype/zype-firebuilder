@@ -39,10 +39,10 @@ android {
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
 
+    api project(':ContentBrowser')
     api project(':ModuleInterface')
     api project(':PurchaseInterface')
     api project(':Utils')
-    /* Zype, Evgeny Cherkasov */
     api project(':ZypeAPI')
 
     def billing_version = "3.0.2"

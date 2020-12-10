@@ -14,6 +14,7 @@
  */
 package com.amazon.purchase;
 
+import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.purchase.model.Product;
 import com.amazon.purchase.model.Receipt;
 import com.amazon.purchase.model.Response;
@@ -220,15 +221,15 @@ public class PurchaseManager {
      * @param purchaseManagerListener The listener to listen to SKU registration updates.
      * @throws Exception if there were any uncaught errors.
      */
-    public void init(IPurchase purchaseSystem, PurchaseManagerListener
-            purchaseManagerListener) throws Exception {
+    public void init(IPurchase purchaseSystem, ContentBrowser contentBrowser,
+                     PurchaseManagerListener purchaseManagerListener) throws Exception {
 
         setPurchaseUpdateStatus(PurchaseUpdateStatus.ON_GOING);
         try {
             this.mPurchaseSystem = ObjectVerification.notNull(purchaseSystem, "a null purchase " +
                     "system cannot be registered");
             // Init purchaseSystem and register listener.
-            mPurchaseSystem.init(sContext, null);
+            mPurchaseSystem.init(sContext, contentBrowser, null);
             mPurchaseSystem.registerDefaultPurchaseListener(createPurchaseListener());
             registerSkusAndPurchases(purchaseManagerListener);
         }

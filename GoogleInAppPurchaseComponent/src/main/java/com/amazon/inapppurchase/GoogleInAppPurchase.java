@@ -14,13 +14,14 @@
  */
 package com.amazon.inapppurchase;
 
-import com.amazon.device.iap.PurchasingListener;
-import com.amazon.device.iap.PurchasingService;
-import com.amazon.device.iap.model.FulfillmentResult;
-import com.amazon.device.iap.model.ProductDataResponse;
-import com.amazon.device.iap.model.PurchaseResponse;
-import com.amazon.device.iap.model.PurchaseUpdatesResponse;
-import com.amazon.device.iap.model.UserDataResponse;
+import com.amazon.android.contentbrowser.ContentBrowser;
+//import com.amazon.device.iap.PurchasingListener;
+//import com.amazon.device.iap.PurchasingService;
+//import com.amazon.device.iap.model.FulfillmentResult;
+//import com.amazon.device.iap.model.ProductDataResponse;
+//import com.amazon.device.iap.model.PurchaseResponse;
+//import com.amazon.device.iap.model.PurchaseUpdatesResponse;
+//import com.amazon.device.iap.model.UserDataResponse;
 import com.amazon.purchase.IPurchase;
 import com.amazon.purchase.model.Product;
 import com.amazon.purchase.model.Receipt;
@@ -29,9 +30,14 @@ import com.amazon.purchase.model.UserData;
 import com.amazon.utils.ObjectVerification;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingFlowParams;
 import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.android.billingclient.api.SkuDetails;
+import com.android.billingclient.api.SkuDetailsParams;
+import com.android.billingclient.api.SkuDetailsResponseListener;
+import com.zype.fire.api.ZypeSettings;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -40,6 +46,8 @@ import android.util.Log;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,8 +87,15 @@ public class GoogleInAppPurchase implements IPurchase {
     protected AReceiptVerifier mReceiptVerifier;
 
 
+    private ContentBrowser contentBrowser;
     private PurchasesUpdatedListener purchasesUpdatedListener;
     private BillingClient billingClient;
+    private final Map<String, SkuDetails> skuDetailsMap = new HashMap<>();
+
+    private final static String REQUEST_PRODUCTS = "getProducts";
+    private final static String REQUEST_PURCHASE = "purchase";
+    private final static String REQUEST_PURCHASES_DATA = "getUserPurchaseData";
+    private final static String REQUEST_USER_DATA = "getUserData";
 
     /**
      * Constructor that initializes the default variable values.
@@ -104,10 +119,11 @@ public class GoogleInAppPurchase implements IPurchase {
      * {@inheritDoc}
      */
     @Override
-    public void init(Context context, Bundle extras) {
+    public void init(Context context, ContentBrowser contentBrowser, Bundle extras) {
 
         this.mContext = ObjectVerification.notNull(context, "Context cannot be null")
                 .getApplicationContext();
+        this.contentBrowser = contentBrowser;
         this.mExtras = extras;
 
         String receiptVerificationClassPath =
@@ -128,6 +144,7 @@ public class GoogleInAppPurchase implements IPurchase {
                 .setListener(purchasesUpdatedListener)
                 .enablePendingPurchases()
                 .build();
+        connectBillingClient();
     }
 
     /**
@@ -167,9 +184,9 @@ public class GoogleInAppPurchase implements IPurchase {
     public void registerDefaultPurchaseListener(PurchaseListener purchaseListener) {
 
         this.mPurchaseListener = purchaseListener;
-        PurchasingListener iapListener = createIapPurchasingListener(purchaseListener);
-        PurchasingService.registerListener(mContext, iapListener);
-        Log.d(TAG, PurchasingService.IS_SANDBOX_MODE + "IS_SANDBOX_MODE");
+//        PurchasingListener iapListener = createIapPurchasingListener(purchaseListener);
+//        PurchasingService.registerListener(mContext, iapListener);
+//        Log.d(TAG, PurchasingService.IS_SANDBOX_MODE + "IS_SANDBOX_MODE");
     }
 
     /**
@@ -177,21 +194,61 @@ public class GoogleInAppPurchase implements IPurchase {
      */
     @Override
     public String getUserData() {
-
-        String requestId = PurchasingService.getUserData().toString();
-        Log.d(TAG, "calling PurchaseService getUserData with requestId " + requestId);
-        return requestId;
+        Log.d(TAG, "getUserData(): Not implemented");
+        return REQUEST_USER_DATA;
+//        String requestId = PurchasingService.getUserData().toString();
+//        Log.d(TAG, "calling PurchaseService getUserData with requestId " + requestId);
+//        return requestId;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getProducts(Set<String> skuSet) {
+    public String getProducts(final Set<String> skuSet) {
+        Log.d(TAG, "getProducts()");
+        final SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
+        params.setSkusList(new ArrayList<String>(skuSet))
+                .setType(BillingClient.SkuType.SUBS);
+        SkuDetailsResponseListener subsListener = new SkuDetailsResponseListener() {
+            @Override
+            public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> skuDetailsList) {
+                final Map<String, SkuDetails> skuDetailsMapTemp = new HashMap<>();
+                final Response response = createResponse(isSuccessful(billingResult), REQUEST_PRODUCTS);
+                final Map<String, Product> productMap = createProductMapFromProductDataResponse(skuDetailsList);
+                for (SkuDetails skuDetails : skuDetailsList) {
+                    skuDetailsMapTemp.put(skuDetails.getSku(), skuDetails);
+                }
+                final SkuDetailsResponseListener inappListener = new SkuDetailsResponseListener() {
+                    @Override
+                    public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> skuDetailsList) {
+                        if (isSuccessful(billingResult)) {
+                            response.setStatus(Response.Status.SUCCESSFUL);
+                        }
+                        productMap.putAll(createProductMapFromProductDataResponse(skuDetailsList));
+                        for (SkuDetails skuDetails : skuDetailsList) {
+                            skuDetailsMapTemp.put(skuDetails.getSku(), skuDetails);
+                        }
+                        skuDetailsMap.clear();
+                        skuDetailsMap.putAll(skuDetailsMapTemp);
+                        for (String sku : productMap.keySet()) {
+                            if (skuSet.contains(sku)) {
+                                skuSet.remove(sku);
+                            }
+                        }
+                        mPurchaseListener.onProductDataResponse(response, productMap, skuSet);
+                    }
+                };
 
-        String requestId = PurchasingService.getProductData(skuSet).toString();
-        Log.d(TAG, "calling PurchaseService getProducts with requestId " + requestId);
-        return requestId;
+                params.setType(BillingClient.SkuType.INAPP);
+                billingClient.querySkuDetailsAsync(params.build(), inappListener);
+            }
+        };
+        billingClient.querySkuDetailsAsync(params.build(), subsListener);
+        return REQUEST_PRODUCTS;
+//        String requestId = PurchasingService.getProductData(skuSet).toString();
+//        Log.d(TAG, "calling PurchaseService getProducts with requestId " + requestId);
+//        return requestId;
     }
 
     /**
@@ -199,10 +256,21 @@ public class GoogleInAppPurchase implements IPurchase {
      */
     @Override
     public String getUserPurchaseData(boolean reset) {
+        Log.d(TAG, "getUserPurchaseData()");
+        Purchase.PurchasesResult purchasesResult = billingClient.queryPurchases(BillingClient.SkuType.SUBS);
+        Response response = createResponse(isSuccessful(purchasesResult.getBillingResult()), REQUEST_PURCHASES_DATA);
+        List<Receipt> receipts = createReceiptList(purchasesResult.getPurchasesList());
+        UserData userData = createUserData();
+        purchasesResult = billingClient.queryPurchases(BillingClient.SkuType.INAPP);
+        if (isSuccessful(purchasesResult.getBillingResult())) {
+            response.setStatus(Response.Status.SUCCESSFUL);
+        }
+        receipts.addAll(createReceiptList(purchasesResult.getPurchasesList()));
+        mPurchaseListener.onUserDataResponse(response, receipts, userData, false);
 
-        String requestId = PurchasingService.getPurchaseUpdates(reset).toString();
-        Log.d(TAG, "calling PurchaseService getUserPurchaseData with requestId " + requestId);
-        return requestId;
+//        String requestId = PurchasingService.getPurchaseUpdates(reset).toString();
+//        Log.d(TAG, "calling PurchaseService getUserPurchaseData with requestId " + requestId);
+        return REQUEST_PURCHASES_DATA;
     }
 
     /**
@@ -210,10 +278,26 @@ public class GoogleInAppPurchase implements IPurchase {
      */
     @Override
     public String purchase(String sku) {
-
-        String requestId = PurchasingService.purchase(sku).toString();
-        Log.d(TAG, "calling PurchaseService purchase with requestId " + requestId);
-        return requestId;
+        Log.d(TAG, "purchase()");
+        SkuDetails skuDetails = skuDetailsMap.get(sku);
+        if (skuDetails != null) {
+            BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
+                    .setSkuDetails(skuDetails)
+                    .build();
+            int responseCode = billingClient.launchBillingFlow(contentBrowser.getNavigator().getActiveActivity(),
+                    billingFlowParams).getResponseCode();
+            if (responseCode != BillingClient.BillingResponseCode.OK) {
+                Response response = createResponse(false, REQUEST_PURCHASE);
+                mPurchaseListener.onPurchaseResponse(response, sku, null, null);
+            }
+        }
+        else {
+            Response response = createResponse(false, REQUEST_PURCHASE);
+            mPurchaseListener.onPurchaseResponse(response, sku, null, null);
+        }
+//        String requestId = PurchasingService.purchase(sku).toString();
+//        Log.d(TAG, "calling PurchaseService purchase with requestId " + requestId);
+        return REQUEST_PURCHASE;
     }
 
     /**
@@ -221,8 +305,8 @@ public class GoogleInAppPurchase implements IPurchase {
      */
     @Override
     public String isPurchaseValid(String sku, UserData userData, Receipt receipt) {
+        Log.d(TAG, "isPurchaseValid()");
 
-        Log.d(TAG, "calling validateReceipt");
         String requestId = createRandomString(receipt.getReceiptId(), 10);
         mReceiptVerifier.validateReceipt(mContext, requestId, sku, userData, receipt,
                 mPurchaseListener);
@@ -234,12 +318,12 @@ public class GoogleInAppPurchase implements IPurchase {
      * {@inheritDoc}
      */
     @Override
-    public void notifyFulfillment(String sku, UserData userData, Receipt receipt, Receipt
-            .FulfillmentStatus
-            fulfillmentResult) {
+    public void notifyFulfillment(String sku, UserData userData, Receipt receipt,
+                                  Receipt.FulfillmentStatus fulfillmentResult) {
+        Log.d(TAG, "notifyFulfillment()");
 
-        Log.d(TAG, "calling PurchaseService notifyFulfillment " + receipt);
-        PurchasingService.notifyFulfillment(receipt.getReceiptId(), FulfillmentResult.FULFILLED);
+//        Log.d(TAG, "calling PurchaseService notifyFulfillment " + receipt);
+//        PurchasingService.notifyFulfillment(receipt.getReceiptId(), FulfillmentResult.FULFILLED);
     }
 
     // Google Billing Library
@@ -248,8 +332,18 @@ public class GoogleInAppPurchase implements IPurchase {
         return new PurchasesUpdatedListener() {
             @Override
             public void onPurchasesUpdated(BillingResult billingResult, List<Purchase> purchases) {
-                // TODO: onPurchasesUpdated
-                // To be implemented in a later section.
+                Response response = createResponse(isSuccessful(billingResult), REQUEST_PURCHASE);
+                Purchase purchase = null;
+                if (purchases != null && !purchases.isEmpty()) {
+                    purchase = purchases.get(0);
+                }
+                if (purchase != null) {
+                    mPurchaseListener.onPurchaseResponse(response, purchase.getSku(),
+                            createReceipt(purchase), createUserData());
+                }
+                else {
+                    mPurchaseListener.onPurchaseResponse(response, null, null, null);
+                }
             }
         };
     }
@@ -274,90 +368,90 @@ public class GoogleInAppPurchase implements IPurchase {
         }
     }
 
-    /**
-     * Creates IAP purchase listener from PurchaseListener.
-     */
-    /*package private*/
-    PurchasingListener createIapPurchasingListener(final PurchaseListener listener) {
-
-        Log.d(TAG, "PurchasingListener registered");
-        return new PurchasingListener() {
-            @Override
-            public void onUserDataResponse(UserDataResponse userDataResponse) {
-
-                Log.d(TAG, "UserDataResponse received " + userDataResponse.toString());
-                Response response = createResponse(isSuccessful(userDataResponse),
-                        userDataResponse.getRequestId().toString());
-
-                UserData userData = createUserDataFromIapUserData(userDataResponse.getUserData());
-                listener.onGetUserDataResponse(response, userData);
-            }
-
-            @Override
-            public void onProductDataResponse(ProductDataResponse productDataResponse) {
-
-                Log.d(TAG, "ProductDataResponse received " + productDataResponse.toString());
-                Response response = createResponse(isSuccessful(productDataResponse),
-                        productDataResponse.getRequestId().toString());
-
-                Map<String, Product> productMap = createProductMapFromProductDataResponse
-                        (productDataResponse.getProductData());
-
-                listener.onProductDataResponse(response, productMap,
-                        productDataResponse.getUnavailableSkus());
-            }
-
-            @Override
-            public void onPurchaseResponse(PurchaseResponse purchaseResponse) {
-
-                Log.d(TAG, "purchaseResponse received " + purchaseResponse.toString());
-                Response response = createResponse(isSuccessful(purchaseResponse),
-                        purchaseResponse.getRequestId().toString());
-
-                com.amazon.device.iap.model.Receipt iapReceipt = purchaseResponse.getReceipt();
-
-                String sku = null;
-                if (iapReceipt != null) {
-                    sku = iapReceipt.getSku();
-                }
-                listener.onPurchaseResponse(response, sku, createReceipt(iapReceipt),
-                        createUserDataFromIapUserData(purchaseResponse
-                                .getUserData()));
-            }
-
-            @Override
-            public void onPurchaseUpdatesResponse(PurchaseUpdatesResponse purchaseUpdatesResponse) {
-
-                Log.d(TAG, "purchaseUpdatesResponse received " + purchaseUpdatesResponse.toString
-                        ());
-                Response response = createResponse(isSuccessful(purchaseUpdatesResponse),
-                        purchaseUpdatesResponse.getRequestId()
-                                .toString());
-
-                List<Receipt> receipts = createReceiptList(purchaseUpdatesResponse.getReceipts());
-                UserData userData = createUserDataFromIapUserData(purchaseUpdatesResponse
-                        .getUserData());
-
-                listener.onUserDataResponse(response, receipts, userData, purchaseUpdatesResponse
-                        .hasMore());
-            }
-        };
-    }
+//    /**
+//     * Creates IAP purchase listener from PurchaseListener.
+//     */
+//    /*package private*/
+//    PurchasingListener createIapPurchasingListener(final PurchaseListener listener) {
+//
+//        Log.d(TAG, "PurchasingListener registered");
+//        return new PurchasingListener() {
+//            @Override
+//            public void onUserDataResponse(UserDataResponse userDataResponse) {
+//
+//                Log.d(TAG, "UserDataResponse received " + userDataResponse.toString());
+//                Response response = createResponse(isSuccessful(userDataResponse),
+//                        userDataResponse.getRequestId().toString());
+//
+//                UserData userData = createUserDataFromIapUserData(userDataResponse.getUserData());
+//                listener.onGetUserDataResponse(response, userData);
+//            }
+//
+//            @Override
+//            public void onProductDataResponse(ProductDataResponse productDataResponse) {
+//
+//                Log.d(TAG, "ProductDataResponse received " + productDataResponse.toString());
+//                Response response = createResponse(isSuccessful(productDataResponse),
+//                        productDataResponse.getRequestId().toString());
+//
+//                Map<String, Product> productMap = createProductMapFromProductDataResponse
+//                        (productDataResponse.getProductData());
+//
+//                listener.onProductDataResponse(response, productMap,
+//                        productDataResponse.getUnavailableSkus());
+//            }
+//
+//            @Override
+//            public void onPurchaseResponse(PurchaseResponse purchaseResponse) {
+//
+//                Log.d(TAG, "purchaseResponse received " + purchaseResponse.toString());
+//                Response response = createResponse(isSuccessful(purchaseResponse),
+//                        purchaseResponse.getRequestId().toString());
+//
+//                com.amazon.device.iap.model.Receipt iapReceipt = purchaseResponse.getReceipt();
+//
+//                String sku = null;
+//                if (iapReceipt != null) {
+//                    sku = iapReceipt.getSku();
+//                }
+//                listener.onPurchaseResponse(response, sku, createReceipt(iapReceipt),
+//                        createUserDataFromIapUserData(purchaseResponse
+//                                .getUserData()));
+//            }
+//
+//            @Override
+//            public void onPurchaseUpdatesResponse(PurchaseUpdatesResponse purchaseUpdatesResponse) {
+//
+//                Log.d(TAG, "purchaseUpdatesResponse received " + purchaseUpdatesResponse.toString
+//                        ());
+//                Response response = createResponse(isSuccessful(purchaseUpdatesResponse),
+//                        purchaseUpdatesResponse.getRequestId()
+//                                .toString());
+//
+//                List<Receipt> receipts = createReceiptList(purchaseUpdatesResponse.getReceipts());
+//                UserData userData = createUserDataFromIapUserData(purchaseUpdatesResponse
+//                        .getUserData());
+//
+//                listener.onUserDataResponse(response, receipts, userData, purchaseUpdatesResponse
+//                        .hasMore());
+//            }
+//        };
+//    }
 
     /**
      * Converts a list of IAP receipts to purchase receipts.
      *
-     * @param iapReceipts The IAP receipts to be converted.
+     * @param purchases The IAP receipts to be converted.
      * @return The purchase receipts.
      */
-    private List<Receipt> createReceiptList(List<com.amazon.device.iap.model.Receipt> iapReceipts) {
+    private List<Receipt> createReceiptList(List<Purchase> purchases) {
 
         List<Receipt> receipts = new ArrayList<>();
-        if (iapReceipts == null) {
+        if (purchases == null) {
             return receipts;
         }
-        for (com.amazon.device.iap.model.Receipt iapReceipt : iapReceipts) {
-            receipts.add(createReceipt(iapReceipt));
+        for (Purchase purchase : purchases) {
+            receipts.add(createReceipt(purchase));
         }
         return receipts;
     }
@@ -365,40 +459,45 @@ public class GoogleInAppPurchase implements IPurchase {
     /**
      * Converts a single IAP receipt to a purchase receipt.
      *
-     * @param iapReceipt The IAP receipt to be converted.
+     * @param purchase The IAP receipt to be converted.
      * @return The purchase receipt.
      */
-    private Receipt createReceipt(com.amazon.device.iap.model.Receipt iapReceipt) {
+    private Receipt createReceipt(Purchase purchase) {
 
-        if (iapReceipt == null) {
+        if (purchase == null) {
             return null;
         }
         Receipt receipt = new Receipt();
-        receipt.setSku(iapReceipt.getSku());
-        receipt.setPurchasedDate(iapReceipt.getPurchaseDate());
-        receipt.setExpiryDate(iapReceipt.getCancelDate());
-        receipt.setReceiptId(iapReceipt.getReceiptId());
-        receipt.setProductType(getProductType(iapReceipt.getProductType()));
+        receipt.setSku(purchase.getSku());
+        Date purchaseDate = new Date();
+        purchaseDate.setTime(purchase.getPurchaseTime());
+        receipt.setPurchasedDate(purchaseDate);
+        receipt.setExpiryDate(null);
+        receipt.setReceiptId(purchase.getPurchaseToken());
+        receipt.setProductType(isSubscription(purchase) ? Product.ProductType.SUBSCRIBE : Product.ProductType.BUY);
         return receipt;
+    }
+
+    private boolean isSubscription(Purchase purchase) {
+        return Arrays.asList(ZypeSettings.PLAN_IDS).contains(purchase.getSku());
     }
 
     /**
      * Converts a list of IAP products to purchase products.
      *
-     * @param iapProductMap The IAP products to be converted.
+     * @param skuDetailsList The IAP products to be converted.
      * @return The purchase products.
      */
-    private Map<String, Product> createProductMapFromProductDataResponse(Map<String,
-            com.amazon.device.iap.model.Product> iapProductMap) {
+    private Map<String, Product> createProductMapFromProductDataResponse(List<SkuDetails> skuDetailsList) {
 
         Map<String, Product> productMap = new HashMap<>();
-        if (iapProductMap == null) {
+        if (skuDetailsList == null) {
             return productMap;
         }
-        for (String sku : iapProductMap.keySet()) {
-            Product product = createProductFromIapProduct(iapProductMap.get(sku));
+        for (SkuDetails skuDetails : skuDetailsList) {
+            Product product = createProductFromIapProduct(skuDetails);
             if (product != null) {
-                productMap.put(sku, product);
+                productMap.put(skuDetails.getSku(), product);
             }
         }
 
@@ -408,67 +507,51 @@ public class GoogleInAppPurchase implements IPurchase {
     /**
      * Converts an IAP product to a purchase product.
      *
-     * @param iapProduct The IAP product to be converted.
+     * @param skuDetails The IAP product to be converted.
      * @return The purchase product.
      */
-    private Product createProductFromIapProduct(com.amazon.device.iap.model.Product iapProduct) {
+    private Product createProductFromIapProduct(SkuDetails skuDetails) {
 
-        if (iapProduct == null) {
+        if (skuDetails == null) {
             return null;
         }
         Product product = new Product();
-        product.setPrice(iapProduct.getPrice());
-        product.setSku(iapProduct.getSku());
-        product.setTitle(iapProduct.getTitle());
-        product.setDescription(iapProduct.getDescription());
-        product.setIconUrl(iapProduct.getSmallIconUrl());
-        product.setProductType(getProductType(iapProduct.getProductType()));
+        product.setPrice(skuDetails.getPrice());
+        product.setSku(skuDetails.getSku());
+        product.setTitle(skuDetails.getTitle());
+        product.setDescription(skuDetails.getDescription());
+        product.setIconUrl("");
+        product.setProductType(getProductType(skuDetails.getType()));
         return product;
     }
 
     /**
      * Converts an IAP product type to a purchase product type.
      *
-     * @param productType The IAP product to be converted.
+     * @param skuType The IAP product to be converted.
      * @return The purchase product.
      */
-    private Product.ProductType getProductType(com.amazon.device.iap.model.ProductType
-                                                       productType) {
+    private Product.ProductType getProductType(String skuType) {
 
-        if (productType == null) {
+        if (skuType == null) {
             return null;
         }
-        switch (productType) {
-            /* Zype, Evgeny Cherkasov
-             * begin */
-//            case CONSUMABLE:
-//                return Product.ProductType.RENT;
-            case CONSUMABLE:
-                return Product.ProductType.BUY;
-//            case ENTITLED:
-//                return Product.ProductType.BUY;
-            /* Zype
-             * end */
-            case SUBSCRIPTION:
-                return Product.ProductType.SUBSCRIBE;
-            default:
-                throw new RuntimeException("product type " + productType + " not supported");
+        if (BillingClient.SkuType.INAPP.equals(skuType)) {
+            return Product.ProductType.BUY;
+        } else if (BillingClient.SkuType.SUBS.equals(skuType)) {
+            return Product.ProductType.SUBSCRIBE;
         }
+        throw new RuntimeException("product type " + skuType + " not supported");
     }
 
     /**
      * Converts an IAP user data to a purchase user data object.
      *
-     * @param iapUserData The IAP user data to be converted.
      * @return The purchase user data.
      */
-    private UserData createUserDataFromIapUserData(com.amazon.device.iap.model.UserData
-                                                           iapUserData) {
+    private UserData createUserData() {
 
-        if (iapUserData == null) {
-            return null;
-        }
-        return new UserData(iapUserData.getUserId(), iapUserData.getMarketplace());
+        return new UserData("", "GooglePlay");
     }
 
     /**
@@ -489,53 +572,53 @@ public class GoogleInAppPurchase implements IPurchase {
         }
     }
 
+//    /**
+//     * Decides whether the IAP user data response is a successful one or not.
+//     *
+//     * @param response The response to be checked.
+//     * @return Whether the IAP response is a successful one or not.
+//     */
+//    private boolean isSuccessful(UserDataResponse response) {
+//
+//        return UserDataResponse.RequestStatus.SUCCESSFUL.equals(response.getRequestStatus());
+//    }
+
+
     /**
-     * Decides whether the IAP user data response is a successful one or not.
+     * Decides whether the IAP request result is a successful one or not.
      *
-     * @param response The response to be checked.
-     * @return Whether the IAP response is a successful one or not.
-     */
-    private boolean isSuccessful(UserDataResponse response) {
-
-        return UserDataResponse.RequestStatus.SUCCESSFUL.equals(response.getRequestStatus());
-    }
-
-
-    /**
-     * Decides whether the IAP product data response is a successful one or not.
-     *
-     * @param response The response to be checked.
+     * @param result The response to be checked.
      * @return Whether the IAP response is of successful one or not.
      */
-    private boolean isSuccessful(ProductDataResponse response) {
+    private boolean isSuccessful(BillingResult result) {
 
-        return ProductDataResponse.RequestStatus.SUCCESSFUL.equals(response.getRequestStatus());
+        return result.getResponseCode() == BillingClient.BillingResponseCode.OK;
     }
 
 
-    /**
-     * Decides whether the IAP purchase response is a successful one or not.
-     *
-     * @param response The response to be checked.
-     * @return Whether the IAP response is a successful one or not.
-     */
-    private boolean isSuccessful(PurchaseResponse response) {
-
-        return PurchaseResponse.RequestStatus.SUCCESSFUL.equals(response.getRequestStatus()) ||
-                PurchaseResponse.RequestStatus.ALREADY_PURCHASED
-                        .equals(response.getRequestStatus());
-    }
-
-    /**
-     * Decides whether the IAP purchase updates response is a successful one or not.
-     *
-     * @param response The response to be checked.
-     * @return Whether the IAP response is a successful one or not.
-     */
-    private boolean isSuccessful(PurchaseUpdatesResponse response) {
-
-        return PurchaseUpdatesResponse.RequestStatus.SUCCESSFUL.equals(response.getRequestStatus());
-    }
+//    /**
+//     * Decides whether the IAP purchase response is a successful one or not.
+//     *
+//     * @param response The response to be checked.
+//     * @return Whether the IAP response is a successful one or not.
+//     */
+//    private boolean isSuccessful(PurchaseResponse response) {
+//
+//        return PurchaseResponse.RequestStatus.SUCCESSFUL.equals(response.getRequestStatus()) ||
+//                PurchaseResponse.RequestStatus.ALREADY_PURCHASED
+//                        .equals(response.getRequestStatus());
+//    }
+//
+//    /**
+//     * Decides whether the IAP purchase updates response is a successful one or not.
+//     *
+//     * @param response The response to be checked.
+//     * @return Whether the IAP response is a successful one or not.
+//     */
+//    private boolean isSuccessful(PurchaseUpdatesResponse response) {
+//
+//        return PurchaseUpdatesResponse.RequestStatus.SUCCESSFUL.equals(response.getRequestStatus());
+//    }
 
     /**
      * Creates a random string of the given length and appends the prefix to the front of it.
