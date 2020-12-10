@@ -19,8 +19,8 @@ permissions and limitations under the License.
             android:allowBackup="true"
             android:supportsRtl="true">
 
-        <meta-data android:name="AMZNAP@AmazonInAppPurchase"
-                   android:value="IPurchase@com.amazon.inapppurchase.AmazonInAppPurchaseImplCreator"/>
+        <meta-data android:name="AMZNAP@GoogleInAppPurchase"
+                   android:value="IPurchase@com.amazon.inapppurchase.GoogleInAppPurchaseImplCreator"/>
         <receiver android:name="com.amazon.device.iap.ResponseReceiver">
             <intent-filter>
                 <action

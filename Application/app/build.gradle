@@ -163,7 +163,7 @@ dependencies {
     api project(':ExoPlayer2MediaPlayerComponent')
 //    implementation project(':PassThroughAdsComponent')
     api project(':VastAdsComponent')
-    api project(':AmazonInAppPurchaseComponent')
+//    api project(':AmazonInAppPurchaseComponent')
     api project(':GoogleInAppPurchaseComponent')
     implementation project(':AkamaiAnalyticsComponent')
 //    implementation project(':LoggerAnalyticsComponent')

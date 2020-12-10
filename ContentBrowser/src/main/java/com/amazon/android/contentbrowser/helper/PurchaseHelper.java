@@ -191,7 +191,7 @@ public class PurchaseHelper {
         // listener.
         this.mPurchaseManager = PurchaseManager.getInstance(mContext.getApplicationContext());
         try {
-            mPurchaseManager.init(purchaseSystem, mContentBrowser, new PurchaseManagerListener() {
+            mPurchaseManager.init(purchaseSystem, mContentBrowser.getNavigator(), new PurchaseManagerListener() {
                 @Override
                 public void onRegisterSkusResponse(Response response) {
 

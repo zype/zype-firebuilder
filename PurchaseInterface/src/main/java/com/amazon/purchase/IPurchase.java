@@ -14,7 +14,7 @@
  */
 package com.amazon.purchase;
 
-import com.amazon.android.contentbrowser.ContentBrowser;
+import com.amazon.android.navigator.Navigator;
 import com.amazon.purchase.model.Product;
 import com.amazon.purchase.model.Receipt;
 import com.amazon.purchase.model.Response;
@@ -38,7 +38,7 @@ public interface IPurchase {
      * @param context The application context.
      * @param extras  Any extra params.
      */
-    void init(Context context, ContentBrowser contentBrowser, Bundle extras);
+    void init(Context context, Navigator navigator, Bundle extras);
 
     /**
      * Registers the {@link PurchaseListener} for all purchase calls.

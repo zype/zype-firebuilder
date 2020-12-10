@@ -14,7 +14,7 @@
  */
 package com.amazon.purchase;
 
-import com.amazon.android.contentbrowser.ContentBrowser;
+import com.amazon.android.navigator.Navigator;
 import com.amazon.purchase.model.Product;
 import com.amazon.purchase.model.Receipt;
 import com.amazon.purchase.model.Response;
@@ -41,7 +41,7 @@ import static com.amazon.purchase.PurchaseUtils.*;
 
 /**
  * This class handles the purchase data setup required when the app starts. The user first
- * configures the PurchaseManager via {@link #init(IPurchase, PurchaseManagerListener)} and waits
+ * configures the PurchaseManager via {@link #init(IPurchase, Navigator, PurchaseManagerListener)} and waits
  * for the product registration to finish via the {@link PurchaseManagerListener}. The product
  * registration involves fetching the existing purchases of the current logged in user and updating
  * the products with their latest receipts. The purchase update state can be checked with the
@@ -221,7 +221,7 @@ public class PurchaseManager {
      * @param purchaseManagerListener The listener to listen to SKU registration updates.
      * @throws Exception if there were any uncaught errors.
      */
-    public void init(IPurchase purchaseSystem, ContentBrowser contentBrowser,
+    public void init(IPurchase purchaseSystem, Navigator navigator,
                      PurchaseManagerListener purchaseManagerListener) throws Exception {
 
         setPurchaseUpdateStatus(PurchaseUpdateStatus.ON_GOING);
@@ -229,7 +229,7 @@ public class PurchaseManager {
             this.mPurchaseSystem = ObjectVerification.notNull(purchaseSystem, "a null purchase " +
                     "system cannot be registered");
             // Init purchaseSystem and register listener.
-            mPurchaseSystem.init(sContext, contentBrowser, null);
+            mPurchaseSystem.init(sContext, navigator, null);
             mPurchaseSystem.registerDefaultPurchaseListener(createPurchaseListener());
             registerSkusAndPurchases(purchaseManagerListener);
         }

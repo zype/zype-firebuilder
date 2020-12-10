@@ -37,7 +37,7 @@ include ':app',
         /* Implementations */
 //        ':PassThroughAdsComponent',
         ':VastAdsComponent',
-        ':AmazonInAppPurchaseComponent',
+//        ':AmazonInAppPurchaseComponent',
         ':GoogleInAppPurchaseComponent',
 //        ':AMZNMediaPlayerComponent',
         ':ExoPlayer2MediaPlayerComponent',
@@ -69,7 +69,7 @@ project(':PurchaseInterface').projectDir = new File(rootProject.projectDir, '../
 project(':ExoPlayer2MediaPlayerComponent').projectDir = new File(rootProject.projectDir, '../ExoPlayer2MediaPlayerComponent')
 //project(':PassThroughAdsComponent').projectDir = new File(rootProject.projectDir, '../PassThroughAdsComponent')
 project(':VastAdsComponent').projectDir = new File(rootProject.projectDir, '../VastAdsComponent')
-project(':AmazonInAppPurchaseComponent').projectDir = new File(rootProject.projectDir, '../AmazonInAppPurchaseComponent')
+//project(':AmazonInAppPurchaseComponent').projectDir = new File(rootProject.projectDir, '../AmazonInAppPurchaseComponent')
 project(':GoogleInAppPurchaseComponent').projectDir = new File(rootProject.projectDir, '../GoogleInAppPurchaseComponent')
 //project(':PassThroughLoginComponent').projectDir = new File(rootProject.projectDir, '../PassThroughLoginComponent')
 project(':AkamaiAnalyticsComponent').projectDir = new File(rootProject.projectDir, '../AkamaiAnalyticsComponent')

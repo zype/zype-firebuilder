@@ -58,7 +58,6 @@ jacoco {
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
-    api project(':ContentBrowser')
     api project(':Utils')
     api project(':ZypeAPI')
 

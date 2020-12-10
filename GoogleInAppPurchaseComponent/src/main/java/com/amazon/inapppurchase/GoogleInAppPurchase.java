@@ -14,7 +14,6 @@
  */
 package com.amazon.inapppurchase;
 
-import com.amazon.android.contentbrowser.ContentBrowser;
 //import com.amazon.device.iap.PurchasingListener;
 //import com.amazon.device.iap.PurchasingService;
 //import com.amazon.device.iap.model.FulfillmentResult;
@@ -22,6 +21,7 @@ import com.amazon.android.contentbrowser.ContentBrowser;
 //import com.amazon.device.iap.model.PurchaseResponse;
 //import com.amazon.device.iap.model.PurchaseUpdatesResponse;
 //import com.amazon.device.iap.model.UserDataResponse;
+import com.amazon.android.navigator.Navigator;
 import com.amazon.purchase.IPurchase;
 import com.amazon.purchase.model.Product;
 import com.amazon.purchase.model.Receipt;
@@ -87,7 +87,7 @@ public class GoogleInAppPurchase implements IPurchase {
     protected AReceiptVerifier mReceiptVerifier;
 
 
-    private ContentBrowser contentBrowser;
+    private Navigator navigator;
     private PurchasesUpdatedListener purchasesUpdatedListener;
     private BillingClient billingClient;
     private final Map<String, SkuDetails> skuDetailsMap = new HashMap<>();
@@ -119,11 +119,11 @@ public class GoogleInAppPurchase implements IPurchase {
      * {@inheritDoc}
      */
     @Override
-    public void init(Context context, ContentBrowser contentBrowser, Bundle extras) {
+    public void init(Context context, Navigator navigator, Bundle extras) {
 
         this.mContext = ObjectVerification.notNull(context, "Context cannot be null")
                 .getApplicationContext();
-        this.contentBrowser = contentBrowser;
+        this.navigator = navigator;
         this.mExtras = extras;
 
         String receiptVerificationClassPath =
@@ -284,7 +284,7 @@ public class GoogleInAppPurchase implements IPurchase {
             BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
                     .setSkuDetails(skuDetails)
                     .build();
-            int responseCode = billingClient.launchBillingFlow(contentBrowser.getNavigator().getActiveActivity(),
+            int responseCode = billingClient.launchBillingFlow(navigator.getActiveActivity(),
                     billingFlowParams).getResponseCode();
             if (responseCode != BillingClient.BillingResponseCode.OK) {
                 Response response = createResponse(false, REQUEST_PURCHASE);
