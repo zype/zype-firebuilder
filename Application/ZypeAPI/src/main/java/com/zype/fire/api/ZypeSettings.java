@@ -8,7 +8,7 @@ import android.content.Context;
 
 public class ZypeSettings {
     // Zype app key
-    public static final String APP_KEY = "_L22X939Nwk6YZde4VvDf8V7iPV15FCYGn-mDI0-1DAznYwYlB1gtsOOZ9lNibCn";
+    public static final String APP_KEY = "C0zChR4FyNVixEOsyJCi1_HLdmklFlj-uUbOAamfEq0f7ML7aJkekOFIbPmbiS9j";
     // OAuth credentials
     public static final String CLIENT_ID = "6ebc48c1846c801d9b5614373489ebfc9b4e0ff04be630a0804522b369a86403";
     // Playlist

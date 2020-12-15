@@ -92,7 +92,7 @@ android {
         zype {
         }
         template {
-            applicationId "com.zype.test"
+            applicationId "<APPLICATION_ID>"
         }
     }
 
