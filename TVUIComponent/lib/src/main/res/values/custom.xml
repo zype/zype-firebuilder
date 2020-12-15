@@ -23,7 +23,7 @@ permissions and limitations under the License.
     <!-- The background color of the screens. -->
     <color name="background">#22282E</color>
     <!-- Used for card background. -->
-    <color name="card_background">#2B2B2B</color>
+    <color name="card_background">@color/background</color>
     <!-- The color of button highlights and widgets. -->
     <color name="accent">#EE962D</color>
     <!-- Used for the text of a selected item's title and description.

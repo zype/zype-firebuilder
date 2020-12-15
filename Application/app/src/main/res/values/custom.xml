@@ -25,7 +25,7 @@ permissions and limitations under the License.
     <!-- The background color of the screens. -->
     <color name="background">#22282E</color>
     <!-- Used for card background -->
-    <color name="card_background">#2B2B2B</color>
+    <color name="card_background">@color/background</color>
     <!-- Background color of the progress bar -->
     <color name="playback_background_progress_bar">#FF373737</color>
     <!-- Color of buffered progress bar -->
