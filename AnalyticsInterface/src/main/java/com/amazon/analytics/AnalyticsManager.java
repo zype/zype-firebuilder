@@ -70,11 +70,6 @@ public class AnalyticsManager implements Application.ActivityLifecycleCallbacks 
      */
     private final Map<String, String> mAnalyticsConstantMap = new HashMap<>();
 
-    /**
-     * Analytics interface reference.
-     */
-    private IAnalytics mIAnalytics;
-
     private Set<IAnalytics> analyticsSet = new HashSet<>();
 
 
@@ -87,11 +82,7 @@ public class AnalyticsManager implements Application.ActivityLifecycleCallbacks 
 
             if (intent.getAction().equals(ANALYTICS_INTENT_ACTION)) {
                 Log.v(TAG, "Got Analytics broadcast!!! : " + intent);
-                HashMap<String, Object> data = intent.getParcelableExtra
-                        (ANALYTICS_INTENT_ACTION_DATA);
-                /*if (mIAnalytics != null) {
-                    mIAnalytics.trackAction(data);
-                }*/
+                HashMap<String, Object> data = intent.getParcelableExtra(ANALYTICS_INTENT_ACTION_DATA);
 
                 for (IAnalytics analytics : analyticsSet) {
                     analytics.trackAction(data);
@@ -143,24 +134,8 @@ public class AnalyticsManager implements Application.ActivityLifecycleCallbacks 
      * @param iAnalytics Analytics interface.
      */
     public void setAnalyticsInterface(IAnalytics iAnalytics) {
-
-        /*if (mIAnalytics == null) {
-            mIAnalytics = iAnalytics;
-            mIAnalytics.configure(mAppContext);
-        }*/
-
         analyticsSet.add(iAnalytics);
         iAnalytics.configure(mAppContext);
-    }
-
-    /**
-     * Get {@link IAnalytics} interface.
-     *
-     * @return Analytics interface.
-     */
-    public IAnalytics getIAnalytics() {
-
-        return mIAnalytics;
     }
 
     public Set<IAnalytics> getIAnalyticsSet() {
@@ -205,15 +180,6 @@ public class AnalyticsManager implements Application.ActivityLifecycleCallbacks 
 
         String activityName = getActivityName(activity);
         Log.d(TAG, activityName + " onActivityResumed, analytics tracking.");
-        /*if (mIAnalytics != null) {
-            mIAnalytics.collectLifeCycleData(activity, true);
-
-            // Track state through analytics.
-            String analyticsConstant = mAnalyticsConstantMap.get(activityName);
-            if (analyticsConstant != null) {
-                mIAnalytics.trackState(analyticsConstant);
-            }
-        }*/
 
         for (IAnalytics analytics : analyticsSet) {
             analytics.collectLifeCycleData(activity, true);
@@ -234,9 +200,6 @@ public class AnalyticsManager implements Application.ActivityLifecycleCallbacks 
 
         String activityName = getActivityName(activity);
         Log.d(TAG, activityName + " onActivityPaused, analytics tracking.");
-        /*if (mIAnalytics != null) {
-            mIAnalytics.collectLifeCycleData(activity, false);
-        }*/
 
         for (IAnalytics analytics : analyticsSet) {
             analytics.collectLifeCycleData(activity, false);

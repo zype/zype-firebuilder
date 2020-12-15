@@ -30,6 +30,7 @@ dependencies {
     api project(':ModuleInterface')
     api project(':AnalyticsInterface')
     api project(':Utils')
+    api project(':ZypeAPI')
 //    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
 //        transitive = true;
 //    }

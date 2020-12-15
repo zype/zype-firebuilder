@@ -27,6 +27,9 @@ import com.amazon.analytics.CustomAnalyticsTags;
 import com.amazon.analytics.AnalyticsTags;
 //import io.fabric.sdk.android.Fabric;
 import com.amazon.analytics.IAnalytics;
+import com.zype.fire.api.ZypeSettings;
+
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 /**
@@ -54,13 +57,22 @@ public class CrashlyticsAnalytics implements IAnalytics {
      */
     @Override
     public void configure(Context context) {
-
-//        Fabric.with(context, new Crashlytics());
-//        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
-
+        initializeFirebaseApp(context);
         mCustomTags.init(context, R.string.crashlytics_analytics_custom_tags);
     }
 
+    private void initializeFirebaseApp(Context context) {
+        if(!ZypeSettings.FIREBASE_ENABLED) {
+            return;
+        }
+
+        FirebaseApp firebaseApp = FirebaseApp.initializeApp(context);
+        if(firebaseApp != null) {
+            Log.i("ZypeApp", "FirebaseApp initialization successful");
+        } else {
+            Log.i("ZypeApp", "FirebaseApp initialization unsuccessful");
+        }
+    }
     /**
      * {@inheritDoc}
      */
