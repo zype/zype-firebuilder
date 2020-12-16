@@ -38,7 +38,7 @@ permissions and limitations under the License.
          Also used for button text, Splash screen text, and read more dialog text. -->
     <color name="primary_text">#E6FFFFFF</color>
     <!-- Used for the text on the card views and playback progress bar text. -->
-    <color name="secondary_text">#FF000000</color>
+    <color name="secondary_text">#E6FFFFFF</color>
     <!-- Used for the category titles and content subtitles -->
     <color name="tertiary_text">#99FFFFFF</color>
     <!-- End of App Colors -->
