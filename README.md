@@ -148,7 +148,27 @@ This option is turned off by default. To turn it on make the method `displayLeft
 The watched bar is displayed on the video thumbnail and shows the time that user watched this video.
 This option is turned on by default. To turn it off make the method `displayWatchedBarOnVideoThumbnails()` in the `ZypeConfiguration.java` return `false` value.
 
-6. Rebuild the project
+6. Analytics
+
+**Segment analytics**
+
+To enable Segment Analytics:
+- In the ***settings.gradle*** file uncomment lines referencing to `SegmentAnalyticsComponent`.
+- In the ***app/build.gradle*** file uncomment the following row:   
+```    
+    compile project(':SegmentAnalyticsComponent')
+```
+- Rebuild the project
+
+***Note:** You can find detail instructions on adding and removing Fire App Builder components [here](https://developer.amazon.com/docs/fire-app-builder/load-a-component.html#loadcomponent)* 
+
+Setting up Segment Analytics:
+- In the `SegmentAnalyticsComponent` module open the ***res/values/values.xml*** file and set your Segment write key in this line:
+```
+    <string name="segment_analytics_write_key">Your WRITE_KEY here</string>
+```
+
+7. Rebuild the project
 
 ## Built With
 
