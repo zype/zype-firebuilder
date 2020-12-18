@@ -32,9 +32,9 @@ public class ZypeSettings {
      * This flag controls the following:
      * - Text color on Terms and Privacy Policy screen
     */
-    public static final boolean LIGHT_THEME = false;
+    public static final boolean LIGHT_THEME = true;
     public static final boolean SHOW_EPISODE_NUMBER = false;
-    public static final boolean SHOW_TITLE = false;
+    public static final boolean SHOW_TITLE = true;
     public static final boolean SHOW_LEFT_MENU = true;
     public static final boolean SHOW_SEARCH_ICON = true;
     public static final boolean SETTINGS_PLAYLIST_ENABLED = true;
