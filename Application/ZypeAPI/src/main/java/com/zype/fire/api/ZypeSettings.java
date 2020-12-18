@@ -8,11 +8,11 @@ import android.content.Context;
 
 public class ZypeSettings {
     // Zype app key
-    public static final String APP_KEY = "C0zChR4FyNVixEOsyJCi1_HLdmklFlj-uUbOAamfEq0f7ML7aJkekOFIbPmbiS9j";
+    public static final String APP_KEY = "";
     // OAuth credentials
-    public static final String CLIENT_ID = "6ebc48c1846c801d9b5614373489ebfc9b4e0ff04be630a0804522b369a86403";
+    public static final String CLIENT_ID = "";
     // Playlist
-    public static final String ROOT_PLAYLIST_ID = "5f22f3690b5475000106e061";
+    public static final String ROOT_PLAYLIST_ID = "";
 
     public static final String FAVORITES_PLAYLIST_ID = "Favorites";
     public static final String MY_LIBRARY_PLAYLIST_ID = "MyLibrary";
@@ -59,9 +59,13 @@ public class ZypeSettings {
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = false;
     public static final boolean UNIVERSAL_TVOD = false;
 
+    // Analytics
+    public static final boolean SEGMENT_ANALYTICS = false;
+    public static final String SEGMENT_ANALYTICS_WRITE_KEY = "";
+
     /**
      * Amazon shared key is required for native subscription feature. It is used in request to Zype Bifrost
      * service for verifying subscription.
      */
-    public static final String AMAZON_SHARED_KEY = "2:QwDSMRWE6-QskpjXS0LDjFOqu9jWadiFvygv15Onw2Xt917Bm-9vHXUfwWmTFyKo:Lntf8F3vQfgCgGjTIh7kVw==";
+    public static final String AMAZON_SHARED_KEY = "";
 }

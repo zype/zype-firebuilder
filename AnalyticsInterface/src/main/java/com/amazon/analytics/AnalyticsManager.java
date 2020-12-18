@@ -26,7 +26,9 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This class handles common analytics tasks and tracks Activity lifecycle events.
@@ -73,6 +75,10 @@ public class AnalyticsManager implements Application.ActivityLifecycleCallbacks 
      */
     private IAnalytics mIAnalytics;
 
+    private Set<IAnalytics> analyticsSet = new HashSet<>();
+
+    private String sessionId;
+
     /**
      * Local broadcast receiver.
      */
@@ -84,8 +90,11 @@ public class AnalyticsManager implements Application.ActivityLifecycleCallbacks 
                 Log.v(TAG, "Got Analytics broadcast!!! : " + intent);
                 HashMap<String, Object> data = intent.getParcelableExtra
                         (ANALYTICS_INTENT_ACTION_DATA);
-                if (mIAnalytics != null) {
-                    mIAnalytics.trackAction(data);
+//                if (mIAnalytics != null) {
+//                    mIAnalytics.trackAction(data);
+//                }
+                for (IAnalytics analytics : analyticsSet) {
+                    analytics.trackAction(data);
                 }
             }
         }
@@ -135,10 +144,12 @@ public class AnalyticsManager implements Application.ActivityLifecycleCallbacks 
      */
     public void setAnalyticsInterface(IAnalytics iAnalytics) {
 
-        if (mIAnalytics == null) {
-            mIAnalytics = iAnalytics;
-            mIAnalytics.configure(mAppContext);
-        }
+//        if (mIAnalytics == null) {
+//            mIAnalytics = iAnalytics;
+//            mIAnalytics.configure(mAppContext);
+//        }
+        analyticsSet.add(iAnalytics);
+        iAnalytics.configure(mAppContext);
     }
 
     /**
@@ -149,6 +160,10 @@ public class AnalyticsManager implements Application.ActivityLifecycleCallbacks 
     public IAnalytics getIAnalytics() {
 
         return mIAnalytics;
+    }
+
+    public Set<IAnalytics> getIAnalyticsSet() {
+        return analyticsSet;
     }
 
     /**
@@ -189,13 +204,22 @@ public class AnalyticsManager implements Application.ActivityLifecycleCallbacks 
 
         String activityName = getActivityName(activity);
         Log.d(TAG, activityName + " onActivityResumed, analytics tracking.");
-        if (mIAnalytics != null) {
-            mIAnalytics.collectLifeCycleData(activity, true);
+//        if (mIAnalytics != null) {
+//            mIAnalytics.collectLifeCycleData(activity, true);
+//
+//            // Track state through analytics.
+//            String analyticsConstant = mAnalyticsConstantMap.get(activityName);
+//            if (analyticsConstant != null) {
+//                mIAnalytics.trackState(analyticsConstant);
+//            }
+//        }
+        for (IAnalytics analytics : analyticsSet) {
+            analytics.collectLifeCycleData(activity, true);
 
             // Track state through analytics.
             String analyticsConstant = mAnalyticsConstantMap.get(activityName);
             if (analyticsConstant != null) {
-                mIAnalytics.trackState(analyticsConstant);
+                analytics.trackState(analyticsConstant);
             }
         }
     }
@@ -208,8 +232,11 @@ public class AnalyticsManager implements Application.ActivityLifecycleCallbacks 
 
         String activityName = getActivityName(activity);
         Log.d(TAG, activityName + " onActivityPaused, analytics tracking.");
-        if (mIAnalytics != null) {
-            mIAnalytics.collectLifeCycleData(activity, false);
+//        if (mIAnalytics != null) {
+//            mIAnalytics.collectLifeCycleData(activity, false);
+//        }
+        for (IAnalytics analytics : analyticsSet) {
+            analytics.collectLifeCycleData(activity, false);
         }
     }
 
@@ -293,5 +320,13 @@ public class AnalyticsManager implements Application.ActivityLifecycleCallbacks 
     void reset() {
 
         sInstance = null;
+    }
+
+    public void setSessionId(String value) {
+        sessionId = value;
+    }
+
+    public String getSessionId() {
+        return sessionId;
     }
 }
