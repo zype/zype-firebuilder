@@ -33,7 +33,8 @@ permissions and limitations under the License.
             android:name="com.amazon.android.tv.tenfoot.base.TenFootApp"
             android:icon="@drawable/app_logo"
             android:theme="@style/AppTheme"
-            android:banner="@drawable/app_banner">
+            android:banner="@drawable/app_banner"
+        >
         <activity
                 android:name="com.amazon.android.tv.tenfoot.ui.activities.SplashActivity"
                 android:screenOrientation="landscape"

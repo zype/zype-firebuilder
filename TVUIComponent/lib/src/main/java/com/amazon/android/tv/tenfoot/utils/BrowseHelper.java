@@ -123,7 +123,7 @@ public class BrowseHelper {
     public static void loadRootContentContainer(Activity activity, ArrayObjectAdapter rowsAdapter) {
 
         ContentContainer rootContentContainer = ContentBrowser.getInstance(activity)
-                                                              .getRootContentContainer();
+                .getRootContentContainer();
 
         CardPresenter cardPresenter = new CardPresenter();
         /* Zype, Evgeny Cherkasov */
@@ -134,8 +134,8 @@ public class BrowseHelper {
             /* Zype, Evgeny Cherkasob */
             // Don't show My Library and Favorites content container
             if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)
-                || contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID)
-                || contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID)) {
+                    || contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID)
+                    || contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID)) {
                 continue;
             }
 
@@ -150,10 +150,6 @@ public class BrowseHelper {
                 listRowAdapter.add(innerContentContainer);
             }
 
-            for (Content content : contentContainer.getContents()) {
-                listRowAdapter.add(content);
-            }
-
             /* Zype, Evgeny Cherkasov */
             // Update NextPage parameter because the first page of playlist videos was loaded
             // while running global recipes chain
@@ -166,14 +162,24 @@ public class BrowseHelper {
                     contentContainer.setExtraValue(ExtraKeys.NEXT_PAGE, -1);
                 }
             }
-            if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
+
+            for (Content content : contentContainer.getContents()) {
+                if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0 &&
+                        contentContainer.getContents().indexOf(content) == contentContainer.getContentCount() - 1){
+                    content.setExtraValue(ContentBrowser.NEXT_PAGE, true);
+                    content.setExtraValue(Content.EXTRA_PLAYLIST_ID, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+                }
+                listRowAdapter.add(content);
+            }
+
+           /* if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
                 PlaylistAction action = new PlaylistAction();
                 action.setAction(ContentBrowser.NEXT_PAGE)
                         .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
-                        .setLabel1(activity.getString(R.string.action_load_more));
+                        .setLabel1("activity.getString(R.string.action_load_more)");
                 action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
                 listRowAdapter.add(action);
-            }
+            }*/
 
             rowsAdapter.add(new ListRow(header, listRowAdapter));
         }
@@ -193,13 +199,13 @@ public class BrowseHelper {
         if (ContentBrowser.getInstance(activity).getContentLoader().isContentLoaded()) {
 
             List<Content> recentContent = ContentBrowser.getInstance(activity)
-                                                        .getRecentContent();
+                    .getRecentContent();
 
             int maxItems = ContentBrowser.getInstance(activity).getMaxNumberOfRecentItems();
 
             return updateListRow(activity.getApplicationContext(), rowsAdapter, recentListRow,
-                                 recentContent, rowsAdapter.size() - 1, R.string.recent_row,
-                                 maxItems);
+                    recentContent, rowsAdapter.size() - 1, R.string.recent_row,
+                    maxItems);
 
         }
         return null;
@@ -222,14 +228,14 @@ public class BrowseHelper {
         if (ContentBrowser.getInstance(activity).getContentLoader().isContentLoaded()) {
 
             List<Content> watchlistItems = ContentBrowser.getInstance(activity)
-                                                         .getWatchlistContent();
+                    .getWatchlistContent();
 
             // This row should be inserted before the settings row and the recent row if present.
             int rowIndex = recentListRow == null ? rowsAdapter.size() - 1 : rowsAdapter.size() - 2;
             Log.d(TAG, "Inserting watchlist row at index " + rowIndex);
             return updateListRow(activity.getApplicationContext(), rowsAdapter, watchlistListRow,
-                                 watchlistItems, rowIndex, R.string.watchlist_row,
-                                 watchlistItems.size());
+                    watchlistItems, rowIndex, R.string.watchlist_row,
+                    watchlistItems.size());
         }
         return null;
     }

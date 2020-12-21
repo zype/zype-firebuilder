@@ -34,6 +34,8 @@ permissions and limitations under the License.
     <!-- Used for the category titles and content subtitles -->
     <color name="tertiary_text">#99FFFFFF</color>
 
+    <color name="primary_text_inverse">@color/tertiary_text</color>
+
     <color name="transparent">#00FFFFFF</color>
 
     <color name="hero_slider_overlay_color">#99000000</color>
@@ -175,5 +177,17 @@ permissions and limitations under the License.
     ENCRYPTION_WIDEVINE -->
     <string name="drm_encryption_schema">ENCRYPTION_DEFAULT</string>
     <color name="background_color_translucent">#CC000000</color>
+
+    <!-- Only these colors alert exit alert theme changes  -->
+
+    <color name="app_exit_bg_color">#9022282E</color>
+    <color name="app_text_color">#FFFFFF</color>
+
+    <!-- Only these colors alert exit alert theme changes -->
+
+    <color name="app_bg_color">#22282E</color>
+    <string name="exit_alert_message">Are you sure you want to exit %s?</string>
+    <string name="positive">Yes, exit.</string>
+    <string name="negative">No, take me back.</string>
 
 </resources>

@@ -121,7 +121,7 @@ permissions and limitations under the License.
     <dimen name="content_image_gradient_size">100dp</dimen>
     <dimen name="content_image_width">540dp</dimen>
     <dimen name="content_image_height">400dp</dimen>
-    <dimen name="content_image_gradient_size_zype">35dp</dimen>
+    <dimen name="content_image_gradient_size_zype">0dp</dimen>
 
     <!-- EPG -->
     <!-- EPG dimensions-->

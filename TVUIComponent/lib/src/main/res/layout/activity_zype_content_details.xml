@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
+
     <RelativeLayout
         android:id="@+id/main_frame"
         android:layout_width="match_parent"
@@ -22,7 +23,7 @@
         <LinearLayout
             android:id="@+id/content_details"
             android:layout_width="352dp"
-            android:layout_height="196dp"
+            android:layout_height="178dp"
             android:layout_below="@id/main_logo"
             android:layout_marginBottom="18dp"
             android:layout_marginLeft="@dimen/lb_browse_padding_start"
@@ -49,16 +50,6 @@
                 android:singleLine="true"
                 android:textSize="@dimen/lb_details_description_body_text_size"/>
 
-<!--
-            <TextView
-                android:id="@+id/content_detail_description"
-                style="@style/Widget.Leanback.DetailsDescriptionBodyStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="3"
-                android:textSize="@dimen/lb_details_description_body_text_size"/>
--->
             <com.amazon.android.ui.widget.EllipsizedTextView
                 android:id="@+id/content_detail_description"
                 style="@style/DetailsDescription"

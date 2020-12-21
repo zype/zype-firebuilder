@@ -26,10 +26,11 @@ permissions and limitations under the License.
             android:layout_width="256dp"
             android:layout_height="166dp"
             android:layout_centerInParent="true"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="0dp"
             android:src="@drawable/splash_logo"
             />
 
+<!--
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -39,6 +40,7 @@ permissions and limitations under the License.
             android:textColor="@color/feed_loading"
             android:textSize="@dimen/feed_loading_text_size"
             android:layout_marginBottom="@dimen/feed_loading_margin_bottom"/>
+-->
 
     <ProgressBar
             android:id="@+id/feed_progress"
@@ -49,6 +51,7 @@ permissions and limitations under the License.
             android:layout_centerInParent="true"
             android:indeterminateDrawable="@drawable/custom_progress"/>
 
+<!--
     <TextView
             android:id="@+id/copyright"
             android:text="@string/copyright"
@@ -60,4 +63,5 @@ permissions and limitations under the License.
             android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="@dimen/copyright_margin_bottom"/>
+-->
 </RelativeLayout>
