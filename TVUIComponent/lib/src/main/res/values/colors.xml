@@ -60,6 +60,8 @@ permissions and limitations under the License.
 
     <color name="lb_control_button_color">@color/primary_text</color>
 
+    <color name="left_menu_background_color">@color/background</color>
+
     <!-- EPG colors-->
     <color name="schedule_color">#181818</color>
     <color name="default_channel_color">#000000</color>

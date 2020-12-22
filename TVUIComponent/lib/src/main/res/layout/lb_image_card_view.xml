@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 This file was modified by Amazon:
 Copyright 2015-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
@@ -31,19 +30,31 @@ permissions and limitations under the License.
 -->
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-       xmlns:lb="http://schemas.android.com/apk/res-auto">
+    xmlns:lb="http://schemas.android.com/apk/res-auto">
 
-    <ImageView
+    <androidx.cardview.widget.CardView
+        android:id="@+id/main_image_lt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#00000000"
+        lb:cardBackgroundColor="#00000000"
+        lb:cardElevation="0dp"
+        lb:cardPreventCornerOverlap="false"
+        lb:cardUseCompatPadding="false">
+
+        <ImageView
             android:id="@+id/main_image"
+            style="@style/Widget.Leanback.ImageCardView.ImageStyle"
             android:layout_width="120dp"
             android:layout_height="172dp"
-            style="@style/Widget.Leanback.ImageCardView.ImageStyle"/>
+            android:src="@drawable/movie" />
+
+    </androidx.cardview.widget.CardView>
 
     <androidx.leanback.widget.NonOverlappingRelativeLayout
-            android:id="@+id/info_field"
-            style="@style/Widget.Leanback.ImageCardView.InfoAreaStyle"
-            android:layout_height="match_parent"
-            android:layout_width="wrap_content">
-    </androidx.leanback.widget.NonOverlappingRelativeLayout>
+        android:id="@+id/info_field"
+        style="@style/Widget.Leanback.ImageCardView.InfoAreaStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"></androidx.leanback.widget.NonOverlappingRelativeLayout>
 
 </merge>

@@ -30,6 +30,7 @@
 
 package com.amazon.android.uamp.ui;
 
+import com.amazon.analytics.AnalyticsManager;
 import com.amazon.android.configuration.ConfigurationManager;
 import com.amazon.android.model.event.ContentUpdateEvent;
 import com.amazon.android.tv.tenfoot.base.TenFootApp;
@@ -114,6 +115,8 @@ import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -154,7 +157,7 @@ public class PlaybackActivity extends BasePlaybackActivity implements
     private static final float AUDIO_FOCUS_DUCK_VOLUME = 0.1f;
     private static final float AUDIO_FOCUS_DEFAULT_VOLUME = 1.0f;
     //Reporting interval in seconds for media session
-    private static final int MEDIA_SESSION_REPORTING_INTERVAL = 10;
+    private static final int MEDIA_SESSION_REPORTING_INTERVAL = 5;
 
     private FrameLayout mVideoView;
     private SubtitleLayout mSubtitleLayout;
@@ -284,34 +287,19 @@ public class PlaybackActivity extends BasePlaybackActivity implements
         mVideoPositionTrackingRunnable = new Runnable() {
             @Override
             public void run() {
-//                /* Zype, Evgeny Cherkasov */
-//                boolean stopTracking = false;
-
                 try {
                     // If player exists and playing then set video position to ads implementation.
                     if (mPlayer != null && isPlaying()) {
                         if (mAdsImplementation != null) {
                             mAdsImplementation.setCurrentVideoPosition(
                                     mPlayer.getCurrentPosition());
-//                            /* Zype, Evgeny Cherkasov */
-//                            if (mSelectedContent.getAdCuePoints() != null && !mSelectedContent.getAdCuePoints().isEmpty()) {
-//                                int adNumber = mAdsImplementation.getExtra().getInt(IAds.AD_NUMBER);
-//                                if (adNumber >= 0 && mPlayer.getCurrentPosition() >= mSelectedContent.getAdCuePoints().get(adNumber)) {
-//                                    Log.d(TAG, "Start mid-roll ad");
-//                                    stopTracking = true;
-//                                    showMidRollAd();
-//                                }
-//                            }
                         }
                     }
                 }
                 catch (Exception e) {
                     Log.e(TAG, "Video position tracking failed.", e);
                 }
-//                /* Zype, Evgeny Cherkasov */
-//                if (!stopTracking) {
                 mVideoPositionTrackingHandler.postDelayed(this, VIDEO_POSITION_TRACKING_POLL_TIME_MS);
-//                }
             }
         };
 
@@ -443,6 +431,7 @@ public class PlaybackActivity extends BasePlaybackActivity implements
 
         if (mMediaSessionController != null) {
             mMediaSessionController.setMediaSessionActive(true);
+            stopPlaybackReportingService();
             //Start the reporting service which reports the playback state every few seconds
             startPlaybackReportingService();
         }
@@ -478,8 +467,10 @@ public class PlaybackActivity extends BasePlaybackActivity implements
             public void run() {
 
                 if (!Thread.currentThread().isInterrupted()) {
+                    long position = getCurrentPosition();
                     // Executor has probably asked us to stop
-                    mMediaSessionController.updatePlaybackState(getCurrentPosition());
+                    AnalyticsHelper.trackPlayback(mSelectedContent, position);
+                    mMediaSessionController.updatePlaybackState(position);
                 }
 
             }
@@ -1380,6 +1371,7 @@ public class PlaybackActivity extends BasePlaybackActivity implements
           case KeyEvent.KEYCODE_BACK:
           case KeyEvent.KEYCODE_MENU:{
             if (isAutoPlay) {
+                AnalyticsHelper.trackAutoplayFinished(mSelectedContent, getCurrentPosition());
               ContentBrowser.getInstance(PlaybackActivity.this).switchToHomeScreen();
               finish();
             }
@@ -2015,6 +2007,7 @@ public class PlaybackActivity extends BasePlaybackActivity implements
                     // from bright cove before PLAYING state. DEVTECH-4973
                     if (mPrevState == PlayerState.READY || mPrevState == PlayerState.SEEKING) {
                         modifyClosedCaptionState(mIsClosedCaptionEnabled);
+                        mPlayer.updateSurfaceView();
                         mPlaybackOverlayFragment.updatePlayback();
                     }
                     mPlaybackOverlayFragment.togglePlaybackUI(true);
@@ -2046,7 +2039,14 @@ public class PlaybackActivity extends BasePlaybackActivity implements
                     mMediaSessionController.updatePlaybackState(PlaybackState.STATE_PLAYING,
                             getCurrentPosition());
                 }
-                AnalyticsHelper.trackPlaybackStarted(mSelectedContent, getDuration(),
+//                AnalyticsHelper.trackPlaybackStarted(mSelectedContent, getDuration(),
+//                        mCurrentPlaybackPosition,
+//                        mTotalSegments, currentSegment);
+                mSelectedContent.setExtraValue(Content.EXTRA_ANALYTICS_CHANNEL,
+                        getString(R.string.app_name_short));
+                mSelectedContent.setExtraValue(Content.EXTRA_ANALYTICS_SESSION_ID,
+                        AnalyticsManager.getInstance(this).getSessionId());
+                AnalyticsHelper.trackPlaybackStarted(mSelectedContent, mSelectedContent.getDuration(),
                         mCurrentPlaybackPosition,
                         mTotalSegments, currentSegment);
                 /* Zype, Evgeny Cherkasov */
@@ -2150,7 +2150,13 @@ public class PlaybackActivity extends BasePlaybackActivity implements
                     .ERROR_CATEGORY.NETWORK_ERROR, this);
             mIsNetworkError = true;
         }
-        mErrorDialogFragment.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
+        try{
+            if (!isFinishing()) {
+                mErrorDialogFragment.show(getFragmentManager(), ErrorDialogFragment.FRAGMENT_TAG_NAME);
+            }
+        } catch (Exception ignored){
+
+        }
     }
 
     private boolean requestAudioFocus() {
@@ -2267,10 +2273,14 @@ public class PlaybackActivity extends BasePlaybackActivity implements
         // We need to pass id, duration and adCuePoints to player interface.
         // Usually required for ads support.
         // The player interface doesn't know about the video model so we are using Bundles.
-        mPlayer.getExtra().putBundle(IAds.VIDEO_EXTRAS, videoExtras);
+        if (mPlayer != null && mPlayer.getExtra() != null) {
+            mPlayer.getExtra().putBundle(IAds.VIDEO_EXTRAS, videoExtras);
+        }
 
         // Set Ads video extras.
-        mAdsImplementation.getExtra().putBundle(IAds.VIDEO_EXTRAS, videoExtras);
+        if (mAdsImplementation.getExtra() != null) {
+            mAdsImplementation.getExtra().putBundle(IAds.VIDEO_EXTRAS, videoExtras);
+        }
 
         mAdsImplementation.showAds();
     }

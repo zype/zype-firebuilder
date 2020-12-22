@@ -75,6 +75,7 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.List;
 
 import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
+import static com.zype.fire.api.ZypeSettings.SHOW_TITLE;
 
 /* Zype, Evgeny Cherkasov */
 
@@ -130,7 +131,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
         CustomListRowPresenter customListRowPresenter = new CustomListRowPresenter();
         customListRowPresenter.setHeaderPresenter(new RowHeaderPresenter());
         // Uncomment this code to remove shadow from the cards
-        //customListRowPresenter.setShadowEnabled(false);
+        customListRowPresenter.setShadowEnabled(!SHOW_TITLE);
 
         mRowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
 

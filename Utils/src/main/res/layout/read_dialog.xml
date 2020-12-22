@@ -19,7 +19,7 @@ permissions and limitations under the License.
         class="com.amazon.android.ui.widget.ReadView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/synopsis_modal_bg"
+        android:background="@color/dialog_background_color"
         >
 
     <RelativeLayout

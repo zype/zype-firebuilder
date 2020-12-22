@@ -131,7 +131,9 @@ public class ContentContainer implements Iterable<Content> {
      * @return The reference to this container.
      */
     public ContentContainer addContent(Content content) {
-        mContents.add(content);
+        if(content != null) {
+            mContents.add(content);
+        }
         return this;
     }
 

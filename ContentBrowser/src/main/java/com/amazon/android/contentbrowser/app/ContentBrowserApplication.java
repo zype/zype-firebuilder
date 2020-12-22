@@ -143,12 +143,12 @@ public class ContentBrowserApplication extends ModularApplication {
         ads.setExtra(new Bundle());
 
         // Setup Analytics.
-        /*IAnalytics analytics =
-                (IAnalytics) ModuleManager.getInstance()
-                                          .getModule(IAnalytics.class.getSimpleName())
-                                          .getImpl(true);
-
-        mAnalyticsManager.setAnalyticsInterface(analytics);*/
+//        IAnalytics analytics =
+//                (IAnalytics) ModuleManager.getInstance()
+//                                          .getModule(IAnalytics.class.getSimpleName())
+//                                          .getImpl(true);
+//
+//        mAnalyticsManager.setAnalyticsInterface(analytics);
 
         ModuleManager.getInstance().getModule(IAnalytics.class.getSimpleName())
                 .createImpls();
