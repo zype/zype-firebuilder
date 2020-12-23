@@ -245,6 +245,10 @@ public class PurchaseManager {
         }
     }
 
+    public String getMarketplace() {
+        return mPurchaseSystem.getMarketplace();
+    }
+
     /**
      * Reads the SKU list and registers each SKU into the system.
      * It also updates the user data and the purchases made by user.

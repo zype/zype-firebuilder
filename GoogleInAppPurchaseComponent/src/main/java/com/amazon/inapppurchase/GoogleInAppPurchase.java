@@ -326,6 +326,11 @@ public class GoogleInAppPurchase implements IPurchase {
 //        PurchasingService.notifyFulfillment(receipt.getReceiptId(), FulfillmentResult.FULFILLED);
     }
 
+    @Override
+    public String getMarketplace() {
+        return IPurchase.GOOGLE;
+    }
+
     // Google Billing Library
 
     private PurchasesUpdatedListener createPurchasesUpdatedListener() {

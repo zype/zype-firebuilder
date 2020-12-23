@@ -665,7 +665,12 @@ public class PurchaseHelper {
         String sku = null;
 
         if (video != null) {
-            sku = video.getExtraValueAsString(Content.EXTRA_MARKETPLACE_ID);
+            if (mPurchaseManager.getMarketplace().equals(IPurchase.GOOGLE)) {
+                sku = video.getExtraValueAsString(Content.EXTRA_MARKETPLACE_ID_GOOGLE);
+            }
+            else {
+                sku = video.getExtraValueAsString(Content.EXTRA_MARKETPLACE_ID);
+            }
         }
         if (TextUtils.isEmpty(sku)) {
             Recipe recipe = Recipe.newInstance(FileHelper.readFile(mContext, mContext.getString(R.string.skus_file)));

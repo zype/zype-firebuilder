@@ -111,6 +111,16 @@ public interface IPurchase {
     void notifyFulfillment(String sku, UserData userData, Receipt receipt, Receipt
             .FulfillmentStatus fulfillmentResult);
 
+    public final static String GOOGLE = "googleplay";
+    public final static String AMAZON = "amazon_fire_tv";
+
+    /**
+     * The name of the marketplace
+     *
+     * @return Must return one of the 'GOOGLE' or 'AMAZON'
+     */
+    String getMarketplace();
+
     /**
      * Interface for listening to purchase updates.
      */
