@@ -42,8 +42,8 @@ permissions and limitations under the License.
     <color name="lb_speech_orb_not_recording_icon">@color/search_orb_not_recording_color</color>
     <color name="lb_speech_orb_not_recording_pulsed">@color/search_orb</color>
 
-    <color name="search_edit_text_color">#99FFFFFF</color>
-    <color name="search_edit_text_hint_color">#99FFFFFF</color>
+    <color name="search_edit_text_color">@color/primary_text</color>
+    <color name="search_edit_text_hint_color">@color/primary_text</color>
     <color name="search_edit_text_bg_color">#4DFFFFFF</color>
     <color name="search_edit_text_bg_color_unfocused">#1AFFFFFF</color>
     <color name="search_orb_not_recording_color">#FFEEEEEE</color>
