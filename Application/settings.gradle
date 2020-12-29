@@ -42,7 +42,8 @@ include ':app',
         ':ExoPlayer2MediaPlayerComponent',
 //        ':PassThroughLoginComponent',
         ':AkamaiAnalyticsComponent',
-        ':SegmentAnalyticsComponent'
+        ':SegmentAnalyticsComponent',
+        ':CrashlyticsComponent'
 //        ':LoggerAnalyticsComponent'
 
 /* Frameworks */
@@ -73,6 +74,7 @@ project(':AmazonInAppPurchaseComponent').projectDir = new File(rootProject.proje
 //project(':PassThroughLoginComponent').projectDir = new File(rootProject.projectDir, '../PassThroughLoginComponent')
 project(':AkamaiAnalyticsComponent').projectDir = new File(rootProject.projectDir, '../AkamaiAnalyticsComponent')
 project(':SegmentAnalyticsComponent').projectDir = new File(rootProject.projectDir, '../SegmentAnalyticsComponent')
+project(':CrashlyticsComponent').projectDir = new File(rootProject.projectDir, '../CrashlyticsComponent')
 //project(':LoggerAnalyticsComponent').projectDir = new File(rootProject.projectDir, '../LoggerAnalyticsComponent')
 // Uncomment when using ComScore Analytics
 //project(':comscore').projectDir = new File(rootProject.projectDir, '../ComScoreAnalyticsComponent/libs/comscore')
