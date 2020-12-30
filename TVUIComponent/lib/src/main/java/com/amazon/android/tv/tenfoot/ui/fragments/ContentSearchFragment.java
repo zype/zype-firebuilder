@@ -204,11 +204,13 @@ public class ContentSearchFragment extends androidx.leanback.app.SearchFragment
                     if (extras != null) {
                         extras.putString("backLabel", getString(R.string.ime_action_label_previous));
                     }
+                    searchEditText.setShowSoftInputOnFocus(false);
 
                     // Handle keyboard being dismissed to prevent focus going to SearchOrb
                     // If user presses back from keyboard, you don't get KeyboardDismissListener
                     // so handle that here.
                     searchEditText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
+                        Log.d(TAG, "OnEditorActionListener: actionId=" + actionId);
 
                         // Track search if keyboard is closed with IME_ACTION_PREVIOUS or
                         // if IME_ACTION_SEARCH occurs.
@@ -464,5 +466,26 @@ public class ContentSearchFragment extends androidx.leanback.app.SearchFragment
                      .show();
             }
         }
+    }
+
+    public void showKeyboard() {
+        mAutoTextViewFocusHandler.postDelayed(() -> {
+
+            if (mSearchEditText != null) {
+
+                // Select search edit text, bring up keyboard.
+                // Always make SpeechOrb not focusable, leanback always tries to bring it back.
+                mSearchEditText.setFocusable(true);
+                mSearchEditText.requestFocus();
+                mSpeechOrbView.setFocusable(false);
+                InputMethodManager imm = (InputMethodManager) getActivity()
+                        .getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.showSoftInput(mSearchEditText, 0);
+                }
+            }
+            // There must be a delay to allow SearchOrb to initialize, otherwise no search
+            // results will come back from leanback.
+        }, 1000);
     }
 }

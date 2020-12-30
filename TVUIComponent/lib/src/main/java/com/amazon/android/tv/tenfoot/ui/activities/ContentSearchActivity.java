@@ -123,6 +123,11 @@ private static final String TAG = ContentSearchActivity.class.getSimpleName();
                     }
                 }
                 break;
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    mFragment.showKeyboard();
+                }
+                break;
         }
         return super.dispatchKeyEvent(event);
     }

@@ -39,7 +39,7 @@ public class ZypeSettings {
     public static final boolean SHOW_LEFT_MENU = false;
     public static final boolean SHOW_MENU_ICON = true;
     public static final boolean SHOW_SEARCH_ICON = true;
-    public static final boolean SHOW_TOP_MENU = false;
+    public static final boolean SHOW_TOP_MENU = true;
     public static final boolean TERMS_NAV_BUTTON_DISPLAY = false;
     public static final boolean UNLOCK_TRANSPARENT = false;
 

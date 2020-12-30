@@ -61,7 +61,7 @@ android {
 
     defaultConfig {
         applicationId "com.zype.aftv.demo"
-        minSdkVersion 20
+        minSdkVersion 21
         targetSdkVersion 29
         versionCode currentCodeVersion
         versionName "2.2.0"
