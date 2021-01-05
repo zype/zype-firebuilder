@@ -151,6 +151,7 @@ public class ContentSearchFragment extends androidx.leanback.app.SearchFragment
                     .transparent));
             view.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable
                     .search_background));
+            view.setPadding(0, Helpers.convertDpToPixel(getActivity(), 64), 0, 0);
 
             final SearchBar searchBar = (SearchBar) view.findViewById(R.id.lb_search_bar);
             if (searchBar != null) {
