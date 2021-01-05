@@ -25,6 +25,6 @@ permissions and limitations under the License.
             android:paddingRight="@dimen/action_widget_padding"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
-            android:textSize="10sp"
+            android:textSize="12sp"
             android:focusable="true"/>
 </LinearLayout>
