@@ -38,7 +38,7 @@ permissions and limitations under the License.
          Also used for button text, Splash screen text, and read more dialog text. -->
     <color name="primary_text">#E6000000</color>
     <!-- Used for the text on the card views and playback progress bar text. -->
-    <color name="secondary_text">#000000</color>
+    <color name="secondary_text">@color/primary_text</color>
     <!-- Used for the category titles and content subtitles -->
     <color name="tertiary_text">#99000000</color>
     <!-- End of App Colors -->
@@ -104,7 +104,7 @@ permissions and limitations under the License.
     <!-- Icon to display inside of search orb -->
     <drawable name="search_icon">@drawable/ic_search</drawable>
     <!-- Background color of Search screen -->
-    <drawable name="search_background">@drawable/bg_gradient_search</drawable>
+    <drawable name="search_background">@color/background</drawable>
 
     <color name="search_edit_text_bg_color">#4D000000</color>
     <color name="search_edit_text_bg_color_unfocused">#1A000000</color>
