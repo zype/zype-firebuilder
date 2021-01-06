@@ -58,6 +58,7 @@ public class ZypeSettings {
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = false;
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = false;
     public static final boolean UNIVERSAL_TVOD = false;
+    public static final boolean FIREBASE_ENABLED = true;
 
     // Analytics
     public static final boolean SEGMENT_ANALYTICS = false;

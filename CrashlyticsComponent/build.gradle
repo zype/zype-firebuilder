@@ -16,7 +16,8 @@ apply plugin: 'com.android.library'
 
 repositories {
     mavenCentral()
-    maven { url 'https://maven.fabric.io/public' }
+//    maven { url 'https://maven.fabric.io/public' }
+    google()
 }
 
 apply plugin: 'jacoco'
@@ -25,31 +26,35 @@ jacoco {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile project(':ModuleInterface')
-    compile project(':AnalyticsInterface')
-    compile project(':Utils')
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
-        transitive = true;
-    }
-    androidTestCompile 'junit:junit:4.12'
+    api fileTree(include: ['*.jar'], dir: 'libs')
+    api project(':ModuleInterface')
+    api project(':AnalyticsInterface')
+    api project(':Utils')
+    api project(':ZypeAPI')
+//    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
+//        transitive = true;
+//    }
+    implementation 'com.google.firebase:firebase-analytics:17.4.3'
+    implementation 'com.google.firebase:firebase-crashlytics:17.1.1'
 
-    androidTestCompile('com.android.support.test:runner:0.4') {
+    androidTestImplementation 'junit:junit:4.12'
+
+    androidTestImplementation('androidx.test:runner:1.1.1') {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    androidTestCompile('com.android.support.test:rules:0.4') {
+    androidTestImplementation('androidx.test:rules:1.1.1') {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "24.0.3"
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
 
     defaultConfig {
 
-        minSdkVersion 21
-        targetSdkVersion 23
+        minSdkVersion 20
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
