@@ -249,6 +249,7 @@ public class ZypeContentDetailsPlaylistFragment extends RowsFragment {
 
             if (playlist == null) {
                 isDataLoaded = true;
+                mCallback.onItemSelected(video, null, -1, 0);
                 Handler handler = new Handler();
                 handler.postDelayed(() -> {
                     LocalBroadcastManager.getInstance(getActivity())
