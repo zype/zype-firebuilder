@@ -201,6 +201,7 @@ public abstract class BaseActivity extends Activity implements TopMenuFragment.I
             showActions(false);
             isMenuOpened = true;
             fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.top_menu_background));
+            fragment.getView().setVisibility(View.VISIBLE);
             getFragmentManager().beginTransaction()
                     .setCustomAnimations(R.animator.slide_in_top, R.animator.slide_out_top)
                     .show(fragment)

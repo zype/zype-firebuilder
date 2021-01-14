@@ -172,7 +172,6 @@ public class ContentBrowseActivity extends BaseActivity implements
         /*Zype, Evgeny Cherkasov */
         hideMenu();
         if (ZypeSettings.SHOW_TOP_MENU) {
-            showActions(false);
             showTopMenu();
             handler.postDelayed(new Runnable() {
                 @Override
