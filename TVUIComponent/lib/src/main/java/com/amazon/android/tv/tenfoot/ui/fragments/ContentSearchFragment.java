@@ -97,6 +97,7 @@ public class ContentSearchFragment extends androidx.leanback.app.SearchFragment
     private ArrayObjectAdapter mRowsAdapter;
     private String mQuery;
     private boolean mHasResults = false;
+    private boolean started = false;
     private SpeechOrbView mSpeechOrbView = null;
     private SearchEditText mSearchEditText = null;
 
@@ -115,6 +116,7 @@ public class ContentSearchFragment extends androidx.leanback.app.SearchFragment
         super.onCreate(savedInstanceState);
 
         CustomListRowPresenter presenter = new CustomListRowPresenter();
+        presenter.setSelectEffectEnabled(false);
         presenter.setHeaderPresenter(new RowHeaderPresenter());
         mRowsAdapter = new ArrayObjectAdapter(presenter);
 
@@ -280,7 +282,7 @@ public class ContentSearchFragment extends androidx.leanback.app.SearchFragment
 
         super.onResume();
 
-        if (!mHasResults) {
+        if (!mHasResults && !started) {
             mAutoTextViewFocusHandler.postDelayed(() -> {
 
                 if (mSearchEditText != null) {
@@ -295,6 +297,7 @@ public class ContentSearchFragment extends androidx.leanback.app.SearchFragment
                     if (imm != null) {
                         imm.showSoftInput(mSearchEditText, 0);
                     }
+                    started = true;
                 }
                 // There must be a delay to allow SearchOrb to initialize, otherwise no search
                 // results will come back from leanback.

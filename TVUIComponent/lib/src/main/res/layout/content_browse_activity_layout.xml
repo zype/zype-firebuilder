@@ -59,7 +59,7 @@ permissions and limitations under the License.
         <LinearLayout
             android:id="@+id/hero_slider_ly"
             android:layout_width="match_parent"
-            android:layout_height="292dp"
+            android:layout_height="280dp"
             android:layout_alignParentTop="true"
             android:alpha="0" >
 

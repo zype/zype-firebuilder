@@ -75,6 +75,7 @@ import android.util.Log;
 
 import static androidx.leanback.widget.FocusHighlight.ZOOM_FACTOR_NONE;
 import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
+import static com.zype.fire.api.ZypeSettings.SHOW_TITLE;
 
 /**
  * This fragment displays content in horizontal rows for browsing. Each row has its title displayed
@@ -93,6 +94,7 @@ public class ContentBrowseFragment extends RowsFragment {
     ArrayObjectAdapter mRowsAdapter = null;
     private BroadcastReceiver receiver;
 
+    private boolean contentUpdationInProgress = false;
     private boolean userAuthenticated;
 
     // Container Activity must implement this interface.
@@ -119,7 +121,7 @@ public class ContentBrowseFragment extends RowsFragment {
         customListRowPresenter.setHeaderPresenter(new RowHeaderPresenter());
 
         // Uncomment this code to remove shadow from the cards
-        //customListRowPresenter.setShadowEnabled(false);
+        customListRowPresenter.setShadowEnabled(!SHOW_TITLE);
 
         /* Zype, Evgney Cherkasov */
 //        ArrayObjectAdapter rowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
@@ -158,6 +160,7 @@ public class ContentBrowseFragment extends RowsFragment {
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                contentUpdationInProgress = false;
                 updateContents(mRowsAdapter);
             }
         };
@@ -388,6 +391,16 @@ public class ContentBrowseFragment extends RowsFragment {
                 }
             }
             mCallback.onItemSelected(item, row, isLastContentRow);
+
+            if (item instanceof Content) {
+                Content content = (Content) item;
+                if (content.getExtras().containsKey(ContentBrowser.NEXT_PAGE) && content.getExtraValueAsBoolean(ContentBrowser.NEXT_PAGE) && !contentUpdationInProgress) {
+                    contentUpdationInProgress = true;
+                    Log.d(TAG, "Next page item was selected");
+                    String playlistId = content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID);
+                    ContentBrowser.getInstance(getActivity()).loadPlaylistVideos(playlistId);
+                }
+            }
         }
     }
 
@@ -408,27 +421,31 @@ public class ContentBrowseFragment extends RowsFragment {
             ListRow row = (ListRow) rowsAdapter.get(index);
             ArrayObjectAdapter listRowAdapter = (ArrayObjectAdapter) row.getAdapter();
 
-            // Remove 'Load more' action button
+            // Remove 'Load more' action button    (No need now)
             if (listRowAdapter.size() > 0 && listRowAdapter.get(listRowAdapter.size() - 1) instanceof PlaylistAction) {
                 listRowAdapter.remove(listRowAdapter.get(listRowAdapter.size() - 1));
             }
+
+            if (listRowAdapter.size() > 0 && listRowAdapter.get(listRowAdapter.size() - 1) instanceof Content && listRowAdapter.size() < contentContainer.getContentCount()) {
+                Content content = (Content) listRowAdapter.get(listRowAdapter.size() - 1);
+                content.setExtraValue(ContentBrowser.NEXT_PAGE, false);
+            }
             // Add new contents
             for (int i = listRowAdapter.size() - contentContainer.getContentContainerCount(); i < contentContainer.getContentCount(); i++) {
-                listRowAdapter.add(contentContainer.getContents().get(i));
-            }
-            // Add a button for loading next page of playlist videos
-            if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0) {
-                PlaylistAction action = new PlaylistAction();
-                action.setAction(ContentBrowser.NEXT_PAGE)
-                        .setIconResourceId(com.amazon.android.contentbrowser.R.drawable.ic_add_white_48dp)
-                        .setLabel1(getString(R.string.action_load_more));
-                action.setExtraValue(PlaylistAction.EXTRA_PLAYLIST_ID, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
-                listRowAdapter.add(action);
+                Content content = contentContainer.getContents().get(i);
+
+                if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0 &&
+                        contentContainer.getContents().indexOf(content) == contentContainer.getContentCount()-1){
+                    content.setExtraValue(ContentBrowser.NEXT_PAGE, true);
+                    content.setExtraValue(Content.EXTRA_PLAYLIST_ID, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
+                }
+                listRowAdapter.add(content);
             }
 
             index++;
         }
     }
+
 
     private void addStubRow(ArrayObjectAdapter rowsAdapter) {
         StubItemPresenter presenter = new StubItemPresenter();

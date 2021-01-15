@@ -58,6 +58,7 @@ dependencies {
     api 'androidx.multidex:multidex:2.0.1'
 
     api project(':Utils')
+    api project(':ZypeAPI')
     // Set this dependency to use JUnit 4 rules
     androidTestImplementation 'androidx.test:rules:1.1.1'
 

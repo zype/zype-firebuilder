@@ -34,6 +34,7 @@ import com.amazon.android.contentbrowser.helper.AnalyticsHelper;
 import com.amazon.android.model.content.Content;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.presenter.CardPresenter;
+import com.amazon.android.tv.tenfoot.presenter.CustomListRowPresenter;
 import com.amazon.android.tv.tenfoot.utils.ContentHelper;
 import com.amazon.android.uamp.mediaSession.MediaSessionController;
 import com.amazon.utils.StringManipulation;
@@ -438,7 +439,8 @@ public class PlaybackOverlayFragment extends TenFootPlaybackOverlayFragment
 
         ps.addClassPresenter(PlaybackControlsRow.class, playbackControlsRowPresenter);
 
-        ListRowPresenter listRowPresenter = new ListRowPresenter();
+        CustomListRowPresenter listRowPresenter = new CustomListRowPresenter();
+        listRowPresenter.setHeaderColor(ContextCompat.getColor(getActivity().getApplicationContext(), R.color.primary_text_inverse));
         listRowPresenter.setHeaderPresenter(new RowHeaderPresenter());
         ps.addClassPresenter(ListRow.class, listRowPresenter);
 

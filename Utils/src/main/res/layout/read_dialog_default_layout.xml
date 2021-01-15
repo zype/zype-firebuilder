@@ -19,6 +19,6 @@ permissions and limitations under the License.
             android:id="@+id/txt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/details_description_extended"
+            android:textColor="@color/primary_text"
             android:textSize="@dimen/details_description_extended_text"/>
 </merge>

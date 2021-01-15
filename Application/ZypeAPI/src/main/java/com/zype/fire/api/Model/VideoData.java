@@ -81,6 +81,10 @@ public class VideoData {
     @Expose
     public String season;
 
+    @SerializedName("series_id")
+    @Expose
+    public String seriesId;
+
     @SerializedName("short_description")
     @Expose
     public String shortDescription;

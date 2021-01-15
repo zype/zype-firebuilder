@@ -152,26 +152,26 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
 
         mContentImage.setImageURI(Uri.EMPTY);
 
-        // Get display/background size
-        Display display = getWindowManager().getDefaultDisplay();
-        Point windowSize = new Point();
-        display.getSize(windowSize);
-        int imageWidth = (int) getResources().getDimension(R.dimen.content_image_width);
-        int imageHeight = (int) getResources().getDimension(R.dimen.content_image_height);
-        int gradientSize = (int) getResources().getDimension(R.dimen.content_image_gradient_size_zype);
-        // Create the background
-        Bitmap background =
-                BackgroundImageUtils.createBackgroundWithPreviewWindow(
-                        windowSize.x,
-                        windowSize.y,
-                        imageWidth,
-                        imageHeight,
-                        gradientSize,
-                        ContextCompat.getColor(this, R.color.browse_background_color));
-        mBackgroundWithPreview = new BitmapDrawable(getResources(), background);
-        // Set the background
-        mMainFrame = findViewById(R.id.main_frame);
-        mMainFrame.setBackground(mBackgroundWithPreview);
+//        // Get display/background size
+//        Display display = getWindowManager().getDefaultDisplay();
+//        Point windowSize = new Point();
+//        display.getSize(windowSize);
+//        int imageWidth = (int) getResources().getDimension(R.dimen.content_image_width);
+//        int imageHeight = (int) getResources().getDimension(R.dimen.content_image_height);
+//        int gradientSize = (int) getResources().getDimension(R.dimen.content_image_gradient_size_zype);
+//        // Create the background
+//        Bitmap background =
+//                BackgroundImageUtils.createBackgroundWithPreviewWindow(
+//                        windowSize.x,
+//                        windowSize.y,
+//                        imageWidth,
+//                        imageHeight,
+//                        gradientSize,
+//                        ContextCompat.getColor(this, R.color.browse_background_color));
+//        mBackgroundWithPreview = new BitmapDrawable(getResources(), background);
+//        // Set the background
+//        mMainFrame = findViewById(R.id.main_frame);
+//        mMainFrame.setBackground(mBackgroundWithPreview);
 
         hideMenu();
         if (ZypeSettings.SHOW_TOP_MENU) {
@@ -277,13 +277,13 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
                             CONTENT_IMAGE_CROSS_FADE_DURATION,
                             R.color.browse_background_color);
 
-                    // If there is no image, remove the preview window
-                    if (bgImageUrl != null && !bgImageUrl.isEmpty()) {
-                        mMainFrame.setBackground(mBackgroundWithPreview);
-                    }
-                    else {
-                        mMainFrame.setBackgroundColor(Color.TRANSPARENT);
-                    }
+//                    // If there is no image, remove the preview window
+//                    if (bgImageUrl != null && !bgImageUrl.isEmpty()) {
+//                        mMainFrame.setBackground(mBackgroundWithPreview);
+//                    }
+//                    else {
+//                        mMainFrame.setBackgroundColor(Color.TRANSPARENT);
+//                    }
                 });
 
     }
@@ -381,9 +381,7 @@ public class ZypePlaylistContentBrowseActivity extends BaseActivity
         MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
         if (fragment != null) {
             isMenuOpened = true;
-            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.background_color_translucent));
-//            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.lb_error_background_color_translucent));
-//             fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.left_menu_background));
+            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.left_menu_background_color));
             int paddingTop = (int) getResources().getDimension(R.dimen.lb_browse_padding_top);
             fragment.getView().setPadding(0, paddingTop, 0, 0);
             getFragmentManager().beginTransaction()

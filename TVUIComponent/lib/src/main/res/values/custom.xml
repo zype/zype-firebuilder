@@ -23,16 +23,18 @@ permissions and limitations under the License.
     <!-- The background color of the screens. -->
     <color name="background">#22282E</color>
     <!-- Used for card background. -->
-    <color name="card_background">#2B2B2B</color>
+    <color name="card_background">@color/background</color>
     <!-- The color of button highlights and widgets. -->
     <color name="accent">#EE962D</color>
     <!-- Used for the text of a selected item's title and description.
          Also used for button text, Splash screen text, and read more dialog text. -->
     <color name="primary_text">#E6FFFFFF</color>
     <!-- Used for the text on the card views and playback progress bar text. -->
-    <color name="secondary_text">#FFFFFFFF</color>
+    <color name="secondary_text">#E6FFFFFF</color>
     <!-- Used for the category titles and content subtitles -->
     <color name="tertiary_text">#99FFFFFF</color>
+
+    <color name="primary_text_inverse">@color/tertiary_text</color>
 
     <color name="transparent">#00FFFFFF</color>
 
@@ -183,5 +185,17 @@ permissions and limitations under the License.
     <drawable name="subscription_background">@color/background</drawable>
 
     <drawable name="logo">@drawable/company_logo</drawable>
+
+    <!-- Only these colors alert exit alert theme changes  -->
+
+    <color name="app_exit_bg_color">#9022282E</color>
+    <color name="app_text_color">#FFFFFF</color>
+
+    <!-- Only these colors alert exit alert theme changes -->
+
+    <color name="app_bg_color">#22282E</color>
+    <string name="exit_alert_message">Are you sure you want to exit %s?</string>
+    <string name="positive">Yes, exit.</string>
+    <string name="negative">No, take me back.</string>
 
 </resources>

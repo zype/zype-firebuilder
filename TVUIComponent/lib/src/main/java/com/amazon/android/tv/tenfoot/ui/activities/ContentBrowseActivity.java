@@ -42,7 +42,6 @@ import com.amazon.android.tv.tenfoot.utils.BrowseHelper;
 import com.amazon.android.ui.constants.ConfigurationConstants;
 import com.amazon.android.ui.fragments.LogoutSettingsFragment;
 import com.amazon.android.utils.GlideHelper;
-import com.amazon.android.ui.utils.BackgroundImageUtils;
 import com.amazon.android.utils.Helpers;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
@@ -52,10 +51,8 @@ import com.zype.fire.api.ZypeSettings;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
+import android.app.AlertDialog;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -72,6 +69,9 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -149,25 +149,25 @@ public class ContentBrowseActivity extends BaseActivity implements
         imageLogo = findViewById(R.id.main_logo);
 
         // Get display/background size
-        Display display = getWindowManager().getDefaultDisplay();
-        Point windowSize = new Point();
-        display.getSize(windowSize);
-        int imageWidth = (int) getResources().getDimension(R.dimen.content_image_width);
-        int imageHeight = (int) getResources().getDimension(R.dimen.content_image_height);
-        int gradientSize = (int) getResources().getDimension(R.dimen.content_image_gradient_size_zype);
-        // Create the background
-        Bitmap background =
-                BackgroundImageUtils.createBackgroundWithPreviewWindow(
-                        windowSize.x,
-                        windowSize.y,
-                        imageWidth,
-                        imageHeight,
-                        gradientSize,
-                        ContextCompat.getColor(this, R.color.browse_background_color));
-        mBackgroundWithPreview = new BitmapDrawable(getResources(), background);
-        // Set the background
-        mMainFrame = findViewById(R.id.main_frame);
-        mMainFrame.setBackground(mBackgroundWithPreview);
+//        Display display = getWindowManager().getDefaultDisplay();
+//        Point windowSize = new Point();
+//        display.getSize(windowSize);
+//        int imageWidth = (int) getResources().getDimension(R.dimen.content_image_width);
+//        int imageHeight = (int) getResources().getDimension(R.dimen.content_image_height);
+//        int gradientSize = (int) getResources().getDimension(R.dimen.content_image_gradient_size_zype);
+//        // Create the background
+//        Bitmap background =
+//                BackgroundImageUtils.createBackgroundWithPreviewWindow(
+//                        windowSize.x,
+//                        windowSize.y,
+//                        imageWidth,
+//                        imageHeight,
+//                        gradientSize,
+//                        ContextCompat.getColor(this, R.color.browse_background_color));
+//        mBackgroundWithPreview = new BitmapDrawable(getResources(), background);
+//        // Set the background
+//        mMainFrame = findViewById(R.id.main_frame);
+//        mMainFrame.setBackground(mBackgroundWithPreview);
 
         /*Zype, Evgeny Cherkasov */
         hideMenu();
@@ -213,6 +213,7 @@ public class ContentBrowseActivity extends BaseActivity implements
         if(!sliderShown || !slidersPresent()) {
             return;
         }
+        Log.d(TAG, "hideHeroSlider()");
         mContentImage.setVisibility(View.VISIBLE);
         layoutContentDetails.setVisibility(View.VISIBLE);
         imageLogo.setVisibility(View.VISIBLE);
@@ -226,6 +227,7 @@ public class ContentBrowseActivity extends BaseActivity implements
         if (sliderShown || !slidersPresent()) {
             return;
         }
+        Log.d(TAG, "showHeroSlider()");
         mContentImage.setVisibility(View.GONE);
         layoutContentDetails.setVisibility(View.GONE);
         imageLogo.setVisibility(View.GONE);
@@ -236,6 +238,7 @@ public class ContentBrowseActivity extends BaseActivity implements
     }
 
     private void fadeInFadeOut(List<View> fadeInViews, List<View> fadeOutViews) {
+
         final AnimatorSet animatorSet = new AnimatorSet();
 
         List<Animator> animations = new ArrayList<>();
@@ -307,10 +310,12 @@ public class ContentBrowseActivity extends BaseActivity implements
 
         if(slidersPresent()) {
             handler.postDelayed(() -> {
-                if(sliderHasFocus()
-                      || (event.getKeyCode()== KeyEvent.KEYCODE_BACK && sliderShown)) {
-                  sliderShown=false;
-                  showHeroSlider();
+                if (sliderHasFocus()) {
+                    if (!sliderShown
+                            || (event.getKeyCode() == KeyEvent.KEYCODE_BACK && sliderShown && isMenuOpened)) {
+                        sliderShown = false;
+                        showHeroSlider();
+                    }
                 }
                 else {
                     if (!isMenuOpened){
@@ -428,13 +433,13 @@ public class ContentBrowseActivity extends BaseActivity implements
                                                                  CONTENT_IMAGE_CROSS_FADE_DURATION,
                                                                  R.color.browse_background_color);
 
-                    // If there is no image, remove the preview window
-                    if (bgImageUrl != null && !bgImageUrl.isEmpty()) {
-                        mMainFrame.setBackground(mBackgroundWithPreview);
-                    }
-                    else {
-                        mMainFrame.setBackgroundColor(Color.TRANSPARENT);
-                    }
+//                    // If there is no image, remove the preview window
+//                    if (bgImageUrl != null && !bgImageUrl.isEmpty()) {
+//                        mMainFrame.setBackground(mBackgroundWithPreview);
+//                    }
+//                    else {
+//                        mMainFrame.setBackgroundColor(Color.TRANSPARENT);
+//                    }
                 });
 
     }
@@ -471,9 +476,7 @@ public class ContentBrowseActivity extends BaseActivity implements
         MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
         if (fragment != null) {
             isMenuOpened = true;
-            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.background_color_translucent));
-//            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.lb_error_background_color_translucent));
-//             fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.left_menu_background));
+            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.left_menu_background_color));
             int paddingTop = (int) getResources().getDimension(R.dimen.lb_browse_padding_top);
             fragment.getView().setPadding(0, paddingTop, 0, 0);
             getFragmentManager().beginTransaction()
@@ -648,5 +651,37 @@ public class ContentBrowseActivity extends BaseActivity implements
         hideMenu();
         ContentBrowser.getInstance(this)
                 .settingsActionTriggered(this, item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        showExitAlert();
+    }
+
+    private void showExitAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.MyDialogTheme);
+        final View customLayout = getLayoutInflater().inflate(R.layout.view_custom_dialog, null);
+        TextView message= (TextView) customLayout.findViewById(R.id.exitMessage);
+        message.setText(String.format(getString(R.string.exit_alert_message), getString(R.string.app_name)));
+        builder.setView(customLayout);
+        builder.setCancelable(true);
+
+        AlertDialog alertDialog = builder.create();
+        Button yesBtn= (Button) customLayout.findViewById(R.id.yesBtn);
+        yesBtn.setPressed(true);
+        yesBtn.setOnClickListener(v -> {
+            alertDialog.dismiss();
+            finish();
+        });
+
+        customLayout.findViewById(R.id.noBtn).setOnClickListener(v -> {
+            alertDialog.dismiss();
+        });
+
+        alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.transparent)));
+        WindowManager.LayoutParams wmlp = alertDialog.getWindow().getAttributes();
+        wmlp.gravity = Gravity.CENTER;
+        alertDialog.show();
     }
 }

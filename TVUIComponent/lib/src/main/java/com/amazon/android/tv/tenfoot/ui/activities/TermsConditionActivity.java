@@ -7,7 +7,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
 import androidx.core.content.ContextCompat;
 
 import com.amazon.android.tv.tenfoot.R;
@@ -46,10 +45,9 @@ public class TermsConditionActivity extends BaseActivity {
                 + "<body>"
                 + Preferences.getString(PREFERENCE_TERMS)
                 + "</body></html>";
-        webView.loadData(finalHtml, "text/html", "UTF-8");
+        webView.loadDataWithBaseURL(null, finalHtml, "text/html", "UTF-8", null);
 
         webView.setWebViewClient(new WebViewClient() {
-
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 view.loadUrl(url);
