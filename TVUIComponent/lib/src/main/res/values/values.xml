@@ -25,5 +25,7 @@ permissions and limitations under the License.
     <!-- Global Search -->
     <!-- The action label for global search -->
     <string name="global_search">GLOBALSEARCH</string>
+
+    <integer name="top_navigation_item_spacing">110</integer>
 </resources>
 

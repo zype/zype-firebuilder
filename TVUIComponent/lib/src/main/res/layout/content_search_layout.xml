@@ -30,9 +30,21 @@ permissions and limitations under the License.
      limitations under the License.
 -->
 
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-          android:name="com.amazon.android.tv.tenfoot.ui.fragments.ContentSearchFragment"
-          android:id="@+id/content_search_fragment"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+    <fragment
+        android:name="com.amazon.android.tv.tenfoot.ui.fragments.ContentSearchFragment"
+        android:id="@+id/content_search_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         />
+    <fragment
+        android:id="@+id/fragmentTopMenu"
+        android:name="com.amazon.android.tv.tenfoot.ui.menu.TopMenuFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:layout="@layout/fragment_top_menu"
+        />
+</FrameLayout>

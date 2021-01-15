@@ -32,9 +32,14 @@ package com.amazon.android.tv.tenfoot.ui.activities;
 import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.amazon.android.tv.tenfoot.ui.fragments.ContentSearchFragment;
+import com.zype.fire.api.ZypeSettings;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
+
 import androidx.annotation.VisibleForTesting;
+import androidx.leanback.widget.SearchEditText;
 
 /**
  * An activity class for the {@link ContentSearchFragment} fragment.
@@ -59,10 +64,72 @@ private static final String TAG = ContentSearchActivity.class.getSimpleName();
         // Set the ContentSearchFragment.
         mFragment = (ContentSearchFragment) getFragmentManager()
                 .findFragmentById(R.id.content_search_fragment);
+
+        if (ZypeSettings.SHOW_TOP_MENU) {
+            hideTopMenu();
+        }
     }
 
     @Override
     public void setRestoreActivityValues() {
         // not saving this state.
     }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        Log.d(TAG, "event=" + event.toString());
+
+        switch (event.getKeyCode()) {
+            case KeyEvent.KEYCODE_MENU:
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    if (!isMenuOpened) {
+                        if (ZypeSettings.SHOW_TOP_MENU) {
+                            showTopMenu();
+                            return true;
+                        }
+                    }
+                }
+                break;
+            case KeyEvent.KEYCODE_BACK: {
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    Log.d(TAG, "Back button pressed");
+                    if (isMenuOpened) {
+                        if (ZypeSettings.SHOW_TOP_MENU) {
+                            hideTopMenu();
+                            return true;
+                        }
+                    }
+                }
+                break;
+            }
+            case KeyEvent.KEYCODE_DPAD_UP:
+                Log.d(TAG, "Up button pressed");
+                if (!isMenuOpened && ZypeSettings.SHOW_TOP_MENU) {
+                    if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                        final SearchEditText searchEditText = findViewById(R.id.lb_search_text_editor);
+                        if (searchEditText != null && searchEditText.hasFocus()) {
+                            showTopMenu();
+                            return true;
+                        }
+                    }
+                }
+                break;
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+                Log.d(TAG, "Down button pressed");
+                if (isMenuOpened) {
+                    if (ZypeSettings.SHOW_TOP_MENU) {
+                        hideTopMenu();
+                        return true;
+                    }
+                }
+                break;
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    mFragment.showKeyboard();
+                }
+                break;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
 }
