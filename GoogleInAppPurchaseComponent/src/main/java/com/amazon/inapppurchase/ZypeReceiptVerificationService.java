@@ -9,9 +9,11 @@ import com.amazon.purchase.model.Receipt;
 import com.amazon.purchase.model.Response;
 import com.amazon.purchase.model.UserData;
 import com.google.gson.Gson;
+import com.zype.fire.api.IZypeApiListener;
 import com.zype.fire.api.Model.MarketplaceConnectBody;
 import com.zype.fire.api.Model.MarketplaceConnectBodyData;
 import com.zype.fire.api.ZypeApi;
+import com.zype.fire.api.ZypeApiResponse;
 import com.zype.fire.api.ZypeConfiguration;
 
 import java.io.IOException;
@@ -29,8 +31,45 @@ public class ZypeReceiptVerificationService extends AReceiptVerifier {
      * {@inheritDoc}
      */
     @Override
-    public String validateReceipt(Context context, String requestId, String sku, UserData
-            userData, Receipt receipt, IPurchase.PurchaseListener listener) {
+    public String validateReceipt(Context context, final String requestId,
+          final String sku, final UserData userData, final Receipt receipt,
+          final IPurchase.PurchaseListener listener) {
+
+        // Verify Video TVOD purchase
+        if (receipt.getExtras().containsKey("VideoId")) {
+            ZypeApi.getInstance().verifyVideoPurchaseGoogle(
+                    ZypeConfiguration.getAppId(context),
+                    ZypeConfiguration.getSiteId(context),
+                    Preferences.getString("ZypeConsumerId"),
+                    receipt.getExtras().getString("VideoId"),
+                    receipt.getReceiptId(),
+                    String.valueOf(receipt.getExtras().getDouble("Price") / 1000000),
+                    receipt.getExtras().getString("OriginalReceipt"),
+                    receipt.getExtras().getString("Signature"),
+                    new IZypeApiListener() {
+                        @Override
+                        public void onCompleted(ZypeApiResponse response) {
+                            if (response.isSuccessful) {
+                                Log.i(TAG, "validateReceipt(): Receipt is valid");
+                                Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
+                                listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
+                            } else {
+                                if (response.errorBody.status == 400) {
+                                    Log.w(TAG, "validateReceipt(): Error verifying purchase. It is likely because it was processed earlier. Consuming this purchase.");
+                                }
+                                Log.i(TAG, "validateReceipt(): Receipt is not valid");
+                                Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
+                                listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
+                            }
+                        }
+                    });
+        }
+        else {
+            Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
+            listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
+        }
+        return requestId;
+
 
 //        if (ZypeConfiguration.marketplaceConnectSvodEnabled(context)) {
 //            Map<String, String> fieldParams = new HashMap<>();
@@ -73,86 +112,86 @@ public class ZypeReceiptVerificationService extends AReceiptVerifier {
 //                return requestId;
 //            }
 //        }
-        if (ZypeConfiguration.marketplaceConnectSvodEnabled(context)) {
-            Log.i(TAG, "validateReceipt(): Subscription");
-            MarketplaceConnectBody body = new MarketplaceConnectBody();
-            body.amount = "";
-            body.appId = ZypeConfiguration.getAppId(context);
-            body.consumerId = Preferences.getString("ZypeConsumerId");
-            body.planId = receipt.getExtras().getString("PlanId");
-            body.siteId = ZypeConfiguration.getSiteId(context);
-            body.transactionType = "subscription";
-            MarketplaceConnectBodyData bodyData = new MarketplaceConnectBodyData();
-            bodyData.receiptId = receipt.getReceiptId();
-            bodyData.userId = userData.getUserId();
-            body.data = bodyData;
-            Log.i(TAG, "validateReceipt(): body=" + (new Gson()).toJson(body));
-            try {
-                retrofit2.Response response = ZypeApi.getInstance().getApi().verifySubscriptionPurchaseAmazon(body).execute();
-                if (response.isSuccessful()) {
-                    Log.i(TAG, "validateReceipt(): Receipt is valid");
-                    Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
-                    listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
-                    return requestId;
-                }
-                else {
-                    Log.i(TAG, "validateReceipt(): Receipt is not valid");
-                    Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
-                    listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
-                    return requestId;
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.i(TAG, "validateReceipt(): Error marketplace connect call");
-                Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
-                listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
-                return requestId;
-            }
-        }
-        else if (ZypeConfiguration.isUniversalTVODEnabled(context)) {
-            MarketplaceConnectBody body = new MarketplaceConnectBody();
-            body.amount = "";
-            body.appId = ZypeConfiguration.getAppId(context);
-            body.consumerId = Preferences.getString("ZypeConsumerId");
-            body.playlistId = receipt.getExtras().getString("PlaylistId");
-            body.siteId = ZypeConfiguration.getSiteId(context);
-            body.transactionType = "purchase";
-            body.productId = receipt.getExtras().getString("VideoId");
-            body.videoId = receipt.getExtras().getString("VideoId");
-            MarketplaceConnectBodyData bodyData = new MarketplaceConnectBodyData();
-            bodyData.receiptId = receipt.getReceiptId();
-            bodyData.userId = userData.getUserId();
-            body.data = bodyData;
-            Log.i(TAG, "validateReceipt(): body=" + (new Gson()).toJson(body));
-            try {
-                retrofit2.Response response = ZypeApi.getInstance().getApi().verifyPurchaseAmazon(body).execute();
-                if (response.isSuccessful()) {
-                    Log.i(TAG, "validateReceipt(): Receipt is valid");
-                    Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
-                    listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
-                    return requestId;
-                }
-                else {
-                    Log.i(TAG, "validateReceipt(): Receipt is not valid");
+//        if (ZypeConfiguration.marketplaceConnectSvodEnabled(context)) {
+//            Log.i(TAG, "validateReceipt(): Subscription");
+//            MarketplaceConnectBody body = new MarketplaceConnectBody();
+//            body.amount = "";
+//            body.appId = ZypeConfiguration.getAppId(context);
+//            body.consumerId = Preferences.getString("ZypeConsumerId");
+//            body.planId = receipt.getExtras().getString("PlanId");
+//            body.siteId = ZypeConfiguration.getSiteId(context);
+//            body.transactionType = "subscription";
+//            MarketplaceConnectBodyData bodyData = new MarketplaceConnectBodyData();
+//            bodyData.receiptId = receipt.getReceiptId();
+//            bodyData.userId = userData.getUserId();
+//            body.data = bodyData;
+//            Log.i(TAG, "validateReceipt(): body=" + (new Gson()).toJson(body));
+//            try {
+//                retrofit2.Response response = ZypeApi.getInstance().getApi().verifySubscriptionPurchaseAmazon(body).execute();
+//                if (response.isSuccessful()) {
+//                    Log.i(TAG, "validateReceipt(): Receipt is valid");
 //                    Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
 //                    listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
-                    Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
-                    listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
-                    return requestId;
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.i(TAG, "validateReceipt(): Error marketplace connect call");
-                Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
-                listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
-                return requestId;
-            }
-        }
-        else {
-            Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
-            listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
-            return requestId;
-        }
+//                    return requestId;
+//                }
+//                else {
+//                    Log.i(TAG, "validateReceipt(): Receipt is not valid");
+//                    Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
+//                    listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
+//                    return requestId;
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                Log.i(TAG, "validateReceipt(): Error marketplace connect call");
+//                Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
+//                listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
+//                return requestId;
+//            }
+//        }
+//        else if (ZypeConfiguration.isUniversalTVODEnabled(context)) {
+//            MarketplaceConnectBody body = new MarketplaceConnectBody();
+//            body.amount = "";
+//            body.appId = ZypeConfiguration.getAppId(context);
+//            body.consumerId = Preferences.getString("ZypeConsumerId");
+//            body.playlistId = receipt.getExtras().getString("PlaylistId");
+//            body.siteId = ZypeConfiguration.getSiteId(context);
+//            body.transactionType = "purchase";
+//            body.productId = receipt.getExtras().getString("VideoId");
+//            body.videoId = receipt.getExtras().getString("VideoId");
+//            MarketplaceConnectBodyData bodyData = new MarketplaceConnectBodyData();
+//            bodyData.receiptId = receipt.getReceiptId();
+//            bodyData.userId = userData.getUserId();
+//            body.data = bodyData;
+//            Log.i(TAG, "validateReceipt(): body=" + (new Gson()).toJson(body));
+//            try {
+//                retrofit2.Response response = ZypeApi.getInstance().getApi().verifyPurchaseAmazon(body).execute();
+//                if (response.isSuccessful()) {
+//                    Log.i(TAG, "validateReceipt(): Receipt is valid");
+//                    Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
+//                    listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
+//                    return requestId;
+//                }
+//                else {
+//                    Log.i(TAG, "validateReceipt(): Receipt is not valid");
+////                    Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
+////                    listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
+//                    Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
+//                    listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
+//                    return requestId;
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                Log.i(TAG, "validateReceipt(): Error marketplace connect call");
+//                Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
+//                listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
+//                return requestId;
+//            }
+//        }
+//        else {
+//            Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
+//            listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
+//            return requestId;
+//        }
     }
 
     /**

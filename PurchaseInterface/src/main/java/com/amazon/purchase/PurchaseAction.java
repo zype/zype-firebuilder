@@ -115,7 +115,10 @@ class PurchaseAction extends AsyncTask<Void, Void, String> {
 //            Bundle receiptExtras = new Bundle();
 //            receiptExtras.putString("VideoId", mPurchaseManagerListener.getVideoId());
 //            receipt.setExtras(receiptExtras);
-            receipt.setExtras(mPurchaseManagerListener.getPurchaseExtras());
+            if (receipt.getExtras() == null) {
+                receipt.setExtras(new Bundle());
+            }
+            receipt.getExtras().putAll(mPurchaseManagerListener.getPurchaseExtras());
         }
         /* Zype
          * end */

@@ -32,6 +32,8 @@ import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
 import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.ConsumeParams;
+import com.android.billingclient.api.ConsumeResponseListener;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.SkuDetails;
@@ -42,6 +44,8 @@ import com.zype.fire.api.ZypeSettings;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -320,10 +324,20 @@ public class GoogleInAppPurchase implements IPurchase {
     @Override
     public void notifyFulfillment(String sku, UserData userData, Receipt receipt,
                                   Receipt.FulfillmentStatus fulfillmentResult) {
-        Log.d(TAG, "notifyFulfillment()");
+        Log.d(TAG, "notifyFulfillment(): " + receipt);
 
-//        Log.d(TAG, "calling PurchaseService notifyFulfillment " + receipt);
-//        PurchasingService.notifyFulfillment(receipt.getReceiptId(), FulfillmentResult.FULFILLED);
+        ConsumeParams consumeParams = ConsumeParams.newBuilder()
+            .setPurchaseToken(receipt.getReceiptId())
+            .build();
+        ConsumeResponseListener listener = new ConsumeResponseListener() {
+            @Override
+            public void onConsumeResponse(@NonNull BillingResult billingResult, @NonNull String purchaseToken) {
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                    Log.i(TAG, "notifyFulfillment(): Purchase consumed.");
+                }
+            }
+        };
+        billingClient.consumeAsync(consumeParams, listener);
     }
 
     @Override
@@ -468,7 +482,6 @@ public class GoogleInAppPurchase implements IPurchase {
      * @return The purchase receipt.
      */
     private Receipt createReceipt(Purchase purchase) {
-
         if (purchase == null) {
             return null;
         }
@@ -480,6 +493,12 @@ public class GoogleInAppPurchase implements IPurchase {
         receipt.setExpiryDate(null);
         receipt.setReceiptId(purchase.getPurchaseToken());
         receipt.setProductType(isSubscription(purchase) ? Product.ProductType.SUBSCRIBE : Product.ProductType.BUY);
+        Bundle extras = new Bundle();
+        extras.putString("OriginalReceipt", purchase.getOriginalJson());
+        extras.putDouble("Price", 0.0);
+        extras.putString("Signature", purchase.getSignature());
+        receipt.setExtras(extras);
+        Log.i(TAG, "createReceipt(): receipt=" + receipt.toString());
         return receipt;
     }
 

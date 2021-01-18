@@ -119,6 +119,9 @@ public interface IZypeApi {
     @POST("https://mkt.zype.com/v1/amazon/transactions")
     Call<ResponseBody> verifyPurchaseAmazon(@Body MarketplaceConnectBody body);
 
+    @POST("https://mkt.zype.com/v1/googleplay/transactions")
+    Call<ResponseBody> verifyTvodPurchaseGoogle(@Body MarketplaceConnectBody body);
+
     // Plans
 
     /**

@@ -358,13 +358,13 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
 //        contentBrowser.getPurchaseHelper().setBuyVideoSKU(sku);
         if (mode == MODE_VIDEO) {
             Bundle extras = new Bundle();
-            extras.putString("VideoId", contentBrowser.getLastSelectedContent().getId());
+            extras.putString(PurchaseHelper.EXTRA_VIDEO_ID, contentBrowser.getLastSelectedContent().getId());
             contentBrowser.getPurchaseHelper().setPurchaseExtras(extras);
 //            contentBrowser.getPurchaseHelper().setVideoId(contentBrowser.getLastSelectedContent().getId());
         }
         else if (mode == MODE_PLAYLIST) {
             Bundle extras = new Bundle();
-            extras.putString("PlaylistId", contentBrowser.getLastSelectedContent()
+            extras.putString(PurchaseHelper.EXTRA_PLAYLIST_ID, contentBrowser.getLastSelectedContent()
                     .getExtraValueAsString(Content.EXTRA_PLAYLIST_ID));
             contentBrowser.getPurchaseHelper().setPurchaseExtras(extras);
         }
@@ -453,9 +453,12 @@ public class BuyVideoActivity extends Activity implements ErrorDialogFragment.Er
      */
     @Subscribe
     public void onPurchaseEvent(PurchaseEvent event) {
+        Log.d(TAG, "onPurchaseEvent(): event=" + event.toString());
         contentBrowser.getPurchaseHelper().setPurchaseExtras(null);
 //        contentBrowser.getPurchaseHelper().setVideoId(null);
-        if (event.getExtras().getBoolean(PurchaseHelper.RESULT)) {
+        boolean result = event.getExtras().getBoolean(PurchaseHelper.RESULT);
+        Log.d(TAG, "onPurchaseEvent(): result=" + result);
+        if (result) {
             boolean validity = event.getExtras().getBoolean(PurchaseHelper.RESULT_VALIDITY);
             Log.i(TAG, "onPurchaseEvent(): " + validity);
             if (validity) {

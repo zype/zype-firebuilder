@@ -1,5 +1,7 @@
 package com.zype.fire.api;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.Gson;
 import com.zype.fire.api.Model.AccessTokenInfoResponse;
 import com.zype.fire.api.Model.AccessTokenResponse;
@@ -8,7 +10,11 @@ import com.zype.fire.api.Model.Channel;
 import com.zype.fire.api.Model.ConsumerResponse;
 import com.zype.fire.api.Model.DevicePinResponse;
 import com.zype.fire.api.Model.ChannelResponse;
+import com.zype.fire.api.Model.ErrorBody;
+import com.zype.fire.api.Model.MarketplaceConnectBody;
+import com.zype.fire.api.Model.MarketplaceConnectBodyData;
 import com.zype.fire.api.Model.PlanResponse;
+import com.zype.fire.api.Model.PlayerResponse;
 import com.zype.fire.api.Model.PlaylistData;
 import com.zype.fire.api.Model.PlaylistResponse;
 import com.zype.fire.api.Model.Program;
@@ -28,7 +34,10 @@ import java.util.List;
 import java.util.Map;
 
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -507,7 +516,7 @@ public class ZypeApi {
         }
     }
 
-  public ProgramResponse loadEpgEvents(Channel channel, String startDate, String endDate) {
+    public ProgramResponse loadEpgEvents(Channel channel, String startDate, String endDate) {
     try {
 
       HashMap<String, String> params = new HashMap<>();
@@ -532,4 +541,50 @@ public class ZypeApi {
       return null;
     }
   }
+
+    public void verifyVideoPurchaseGoogle(String appId, String siteId, String consumerId,
+                                          String videoId, String purchaseToken, String amount,
+                                          String receipt, String signature,
+                                          @NonNull final IZypeApiListener listener) {
+        MarketplaceConnectBody body = new MarketplaceConnectBody();
+        body.appId = appId;
+        body.consumerId = consumerId;
+        body.videoId = videoId;
+        body.purchaseToken = purchaseToken;
+        body.siteId = siteId;
+        body.amount = amount;
+        body.transactionType = "purchase";
+        MarketplaceConnectBodyData bodyData = new MarketplaceConnectBodyData();
+        bodyData.receipt = receipt;
+        bodyData.signature = signature;
+        body.data = bodyData;
+        getApi().verifyTvodPurchaseGoogle(body).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    listener.onCompleted(new ZypeApiResponse<>(response.body(), true));
+                }
+                else {
+                    try {
+                        String error = response.errorBody().string();
+                        Gson gson = new Gson();
+                        ErrorBody errorBody = gson.fromJson(error, ErrorBody.class);
+                        errorBody.status = response.code();
+                        listener.onCompleted(new ZypeApiResponse(errorBody));
+                    }
+                    catch (Exception e) {
+                        ErrorBody errorBody = new ErrorBody();
+                        errorBody.status = response.code();
+                        listener.onCompleted(new ZypeApiResponse(errorBody));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                listener.onCompleted(new ZypeApiResponse(null, false));
+            }
+        });
+    }
+
 }

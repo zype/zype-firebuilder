@@ -116,6 +116,10 @@ public class PurchaseHelper {
     private String mBuyVideoSKU;
     private String videoId;
     private Bundle purchaseExtras;
+
+    public static final String EXTRA_PLAYLIST_ID = "PlaylistId";
+    public static final String EXTRA_VIDEO_ID = "VideoId";
+
     /* Zype
      * end */
 
