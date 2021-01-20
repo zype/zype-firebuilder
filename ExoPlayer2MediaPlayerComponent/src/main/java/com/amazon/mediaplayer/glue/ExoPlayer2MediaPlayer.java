@@ -35,9 +35,9 @@ import com.amazon.android.uamp.UAMP;
 import com.amazon.mediaplayer.AMZNMediaPlayer;
 import com.amazon.mediaplayer.playback.SeekRange;
 import com.amazon.mediaplayer.playback.config.BaseContentPlaybackBufferConfig;
-import com.amazon.mediaplayer.tracks.MediaFormat;
 import com.amazon.mediaplayer.tracks.TrackType;
 //import com.google.android.exoplayer.smoothstreaming.SmoothStreamingChunkSource;
+import com.amazon.mediaplayer.tracks.MediaFormat;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -48,6 +48,8 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MergingMediaSource;
+import com.google.android.exoplayer2.source.SingleSampleMediaSource;
 import com.google.android.exoplayer2.source.TrackGroup;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
@@ -69,6 +71,7 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.upstream.TransferListener;
 import com.google.android.exoplayer2.util.EventLogger;
+import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoListener;
 
@@ -264,6 +267,7 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
         mTrackSelectionFactory = new AdaptiveTrackSelection.Factory(BANDWIDTH_METER);
         mTrackSelector = new DefaultTrackSelector(mTrackSelectionFactory);
         eventLogger = new EventLogger(mTrackSelector);
+        mTrackSelector.setParameters(new DefaultTrackSelector.ParametersBuilder().setPreferredAudioLanguage("eng").build());
 
         mPlayer = ExoPlayerFactory.newSimpleInstance(mContext, mTrackSelector);
         mPlayer.addListener(eventLogger);
@@ -641,7 +645,15 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
 
         setPlayerState(PlayerState.OPENING);
         if (mediaSource != null) {
-            mCurrentMediaSource = mediaSource;
+            Format textFormat = Format.createTextSampleFormat(null, MimeTypes.APPLICATION_SUBRIP,
+                null, Format.NO_VALUE, Format.NO_VALUE, "eng", null, Format.OFFSET_SAMPLE_RELATIVE);
+
+            Uri captionUri= Uri.parse("https://gvupload.zype.com/video/5e17a4a2ba6d660001aeff51/subtitles/5e1dd98cdcd81b0001dcf752.srt?1579014540");
+           // MediaSource srtSource = new SingleSampleMediaSource.Factory(mDataSourceFactory).createMediaSource(captionUri, textFormat, C.TIME_UNSET);
+            MediaSource subtitleSource = new SingleSampleMediaSource(captionUri, mDataSourceFactory,textFormat, C.TIME_UNSET);
+
+            mCurrentMediaSource = new MergingMediaSource(mediaSource, subtitleSource);
+            // mCurrentMediaSource = mediaSource;
             setPlayerState(PlayerState.OPENED);
         }
         else {
