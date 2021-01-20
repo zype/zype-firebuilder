@@ -35,8 +35,66 @@ public class ZypeReceiptVerificationService extends AReceiptVerifier {
           final String sku, final UserData userData, final Receipt receipt,
           final IPurchase.PurchaseListener listener) {
 
+        // Verify Subscription
+        if (receipt.getExtras().containsKey("PlanId")) {
+            ZypeApi.getInstance().verifySubscriptionGoogle(
+                    ZypeConfiguration.getAppId(context),
+                    ZypeConfiguration.getSiteId(context),
+                    Preferences.getString("ZypeConsumerId"),
+                    receipt.getExtras().getString("PlanId"),
+                    receipt.getReceiptId(),
+                    String.valueOf(receipt.getExtras().getDouble("Price") / 1000000),
+                    receipt.getExtras().getString("OriginalReceipt"),
+                    receipt.getExtras().getString("Signature"),
+                    new IZypeApiListener() {
+                        @Override
+                        public void onCompleted(ZypeApiResponse response) {
+                            if (response.isSuccessful) {
+                                Log.i(TAG, "validateReceipt(): Receipt is valid");
+                                Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
+                                listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
+                            } else {
+                                if (response.errorBody.status == 400) {
+                                    Log.w(TAG, "validateReceipt(): Error verifying purchase. It is likely because it was processed earlier. Consuming this purchase.");
+                                }
+                                Log.i(TAG, "validateReceipt(): Receipt is not valid");
+                                Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
+                                listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
+                            }
+                        }
+                    });
+        }
+        // Verify Playlist TVOD purchase
+        else if (receipt.getExtras().containsKey("PlaylistId")) {
+            ZypeApi.getInstance().verifyPlaylistPurchaseGoogle(
+                    ZypeConfiguration.getAppId(context),
+                    ZypeConfiguration.getSiteId(context),
+                    Preferences.getString("ZypeConsumerId"),
+                    receipt.getExtras().getString("PlaylistId"),
+                    receipt.getReceiptId(),
+                    String.valueOf(receipt.getExtras().getDouble("Price") / 1000000),
+                    receipt.getExtras().getString("OriginalReceipt"),
+                    receipt.getExtras().getString("Signature"),
+                    new IZypeApiListener() {
+                        @Override
+                        public void onCompleted(ZypeApiResponse response) {
+                            if (response.isSuccessful) {
+                                Log.i(TAG, "validateReceipt(): Receipt is valid");
+                                Response purchaseResponse = new Response(requestId, Response.Status.SUCCESSFUL, null);
+                                listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, true, userData);
+                            } else {
+                                if (response.errorBody.status == 400) {
+                                    Log.w(TAG, "validateReceipt(): Error verifying purchase. It is likely because it was processed earlier. Consuming this purchase.");
+                                }
+                                Log.i(TAG, "validateReceipt(): Receipt is not valid");
+                                Response purchaseResponse = new Response(requestId, Response.Status.FAILED, null);
+                                listener.isPurchaseValidResponse(purchaseResponse, sku, receipt, false, userData);
+                            }
+                        }
+                    });
+        }
         // Verify Video TVOD purchase
-        if (receipt.getExtras().containsKey("VideoId")) {
+        else if (receipt.getExtras().containsKey("VideoId")) {
             ZypeApi.getInstance().verifyVideoPurchaseGoogle(
                     ZypeConfiguration.getAppId(context),
                     ZypeConfiguration.getSiteId(context),

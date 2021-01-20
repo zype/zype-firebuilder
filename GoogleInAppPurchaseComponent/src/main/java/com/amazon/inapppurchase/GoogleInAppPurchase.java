@@ -326,18 +326,20 @@ public class GoogleInAppPurchase implements IPurchase {
                                   Receipt.FulfillmentStatus fulfillmentResult) {
         Log.d(TAG, "notifyFulfillment(): " + receipt);
 
-        ConsumeParams consumeParams = ConsumeParams.newBuilder()
-            .setPurchaseToken(receipt.getReceiptId())
-            .build();
-        ConsumeResponseListener listener = new ConsumeResponseListener() {
-            @Override
-            public void onConsumeResponse(@NonNull BillingResult billingResult, @NonNull String purchaseToken) {
-                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    Log.i(TAG, "notifyFulfillment(): Purchase consumed.");
+        if (receipt.getProductType() == Product.ProductType.BUY) {
+            ConsumeParams consumeParams = ConsumeParams.newBuilder()
+                    .setPurchaseToken(receipt.getReceiptId())
+                    .build();
+            ConsumeResponseListener listener = new ConsumeResponseListener() {
+                @Override
+                public void onConsumeResponse(@NonNull BillingResult billingResult, @NonNull String purchaseToken) {
+                    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                        Log.i(TAG, "notifyFulfillment(): Purchase consumed.");
+                    }
                 }
-            }
-        };
-        billingClient.consumeAsync(consumeParams, listener);
+            };
+            billingClient.consumeAsync(consumeParams, listener);
+        }
     }
 
     @Override
