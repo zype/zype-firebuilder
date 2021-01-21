@@ -60,12 +60,11 @@ android {
     buildToolsVersion "28.0.3"
 
     defaultConfig {
-//        applicationId "com.zype.aftv.demo"
-        applicationId "com.isn.androidtv"
+        applicationId "com.zype.aftv.demo"
         minSdkVersion 20
         targetSdkVersion 29
         versionCode currentCodeVersion
-        versionName "2.2.0"
+        versionName "2.3.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 //        multiDexKeepProguard file('multidex-config.pro')
@@ -164,8 +163,8 @@ dependencies {
     api project(':ExoPlayer2MediaPlayerComponent')
 //    implementation project(':PassThroughAdsComponent')
     api project(':VastAdsComponent')
-//    api project(':AmazonInAppPurchaseComponent')
-    api project(':GoogleInAppPurchaseComponent')
+    api project(':AmazonInAppPurchaseComponent')
+//    api project(':GoogleInAppPurchaseComponent')
     implementation project(':AkamaiAnalyticsComponent')
 //    implementation project(':LoggerAnalyticsComponent')
     // Uncomment when using CrashlyticsComponent

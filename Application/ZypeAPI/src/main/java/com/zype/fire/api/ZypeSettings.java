@@ -7,19 +7,12 @@ import android.content.Context;
  */
 
 public class ZypeSettings {
-//    // Zype app key
-//    public static final String APP_KEY = "C0zChR4FyNVixEOsyJCi1_HLdmklFlj-uUbOAamfEq0f7ML7aJkekOFIbPmbiS9j";
-//    // OAuth credentials
-//    public static final String CLIENT_ID = "6f861db9b340975edddd68d853069e095a37a1609ca328b96b35b17be68b0470";
-//    // Playlist
-//    public static final String ROOT_PLAYLIST_ID = "5c91b0d2be3b9e14f51c450e";
-
     // Zype app key
-    public static final String APP_KEY = "rad2NsIJajGEiY2WLbzwgxuRzWyUlgDlO9QB9NXmw5SL2Awu";
+    public static final String APP_KEY = "";
     // OAuth credentials
-    public static final String CLIENT_ID = "e4a6acf9b92cc0bbd5115f6bba75503bbee6a6cb7e81fea263de991f4f1fb1d5";
+    public static final String CLIENT_ID = "";
     // Playlist
-    public static final String ROOT_PLAYLIST_ID = "5988733935fdb3138d010dcb";
+    public static final String ROOT_PLAYLIST_ID = "";
 
     public static final String FAVORITES_PLAYLIST_ID = "Favorites";
     public static final String MY_LIBRARY_PLAYLIST_ID = "MyLibrary";
@@ -58,15 +51,15 @@ public class ZypeSettings {
     public static final boolean LIBRARY_ENABLED = false;
 
     // Monetization
-    public static final String MARKETPLACE = Marketplace.GOOGLE;
-    public static final boolean MARKETPLACE_CONNECT_SVOD = true;
+    public static final String MARKETPLACE = Marketplace.AMAZON;    // Supported values: 'Marketplace.AMAZON', 'Marketplace.GOOGLE'
+    public static final boolean MARKETPLACE_CONNECT_SVOD = false;
     public static final boolean NATIVE_SUBSCRIPTION_ENABLED = false;
-    public static final boolean NATIVE_TVOD = true;
-    public static final String[] PLAN_IDS = new String[] { "5b366329849e2d140c00002f", "5b366368849e2d141400002b" };
+    public static final boolean NATIVE_TVOD = false;
+    public static final String[] PLAN_IDS = new String[] { };
     public static final boolean PLAYLIST_PURCHASE_ENABLED = false;
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = false;
-    public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = true;
-    public static final boolean UNIVERSAL_TVOD = true;
+    public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = false;
+    public static final boolean UNIVERSAL_TVOD = false;
 
     /**
      * Amazon shared key is required for native subscription feature. It is used in request to Zype Bifrost
