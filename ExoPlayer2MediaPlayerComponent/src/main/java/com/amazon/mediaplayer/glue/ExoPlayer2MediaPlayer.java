@@ -1018,6 +1018,7 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
        mVideoWidth = width;
        mVideoHeight = height;
        mVideoAspect = pixelWidthHeightRatio;
+       updateSurfaceView();
     }
 
     @Override
@@ -1038,7 +1039,10 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
         int screenWidth = displayMetrics.widthPixels;
         int screenHeight = displayMetrics.heightPixels;
 
-        if (videoHeight != screenHeight || videoWidth != screenWidth) {
+        int currentSurfaceViewWidth = mSurfaceView.getLayoutParams().width;
+        int currentSurfaceViewHeight = mSurfaceView.getLayoutParams().height;
+
+        if (videoWidth != currentSurfaceViewWidth || videoHeight != currentSurfaceViewHeight) {
             float ratio = Math.min((float) screenHeight / videoHeight, (float) screenWidth / videoWidth);
             int newWidth = (int) (1.0 * videoWidth * ratio);
             int newHeight = (int) (1.0 * videoHeight * ratio);

@@ -99,7 +99,7 @@ public class CardPresenter extends Presenter {
             sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_trance);
 
             /* Zype, Evgeny Cherkasov */
-            infoFieldWithProgressBarBackground = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_progress_bar);
+//            infoFieldWithProgressBarBackground = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_progress_bar);
             imageLocked = ContextCompat.getDrawable(mContext, R.drawable.locked);
             imageUnlocked = ContextCompat.getDrawable(mContext, R.drawable.unlocked);
         }
@@ -183,7 +183,7 @@ public class CardPresenter extends Presenter {
                         }
                     }
                     cardView.setTitleText(title);
-                    cardView.setContentText(content.getTitle()+ "\n ");
+                    cardView.setContentText(content.getTitle());
                 }
                 else {
                     cardView.setTitleText("");
@@ -196,7 +196,7 @@ public class CardPresenter extends Presenter {
                     SimpleTarget<Bitmap> bitmapTarget = new SimpleTarget<Bitmap>(mCardWidthDp, mCardHeightDp) {
                         @Override
                         public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                            cardView.setInfoAreaBackground(infoFieldWithProgressBarBackground);
+                            //cardView.setInfoAreaBackground(infoFieldWithProgressBarBackground);
                             Bitmap bitmap = Helpers.addProgressToThumbnail((Activity) mContext, resource, playbackPercentage, 0);
                             cardView.getMainImageView().setImageBitmap(bitmap);
                         }
@@ -264,7 +264,7 @@ public class CardPresenter extends Presenter {
                     }
                 }
                 cardView.setTitleText(title);
-                cardView.setContentText(contentContainer.getName()+ "\n ");
+                cardView.setContentText(contentContainer.getName());
             }
             else {
                 cardView.setTitleText("");

@@ -33,13 +33,14 @@ public class ZypeSettings {
      * - Text color on Terms and Privacy Policy screen
     */
     public static final boolean LIGHT_THEME = false;
+    public static final boolean SETTINGS_PLAYLIST_ENABLED = false;
     public static final boolean SHOW_EPISODE_NUMBER = false;
-    public static final boolean SHOW_TITLE = false;
-    public static final boolean SHOW_LEFT_MENU = true;
-    public static final boolean SHOW_SEARCH_ICON = true;
-    public static final boolean SETTINGS_PLAYLIST_ENABLED = true;
-    public static final boolean SHOW_MENU_ICON = true;
-    public static final boolean TERMS_NAV_BUTTON_DISPLAY = true;
+    public static final boolean SHOW_TITLE = true;
+    public static final boolean SHOW_LEFT_MENU = false;
+    public static final boolean SHOW_MENU_ICON = false;
+    public static final boolean SHOW_SEARCH_ICON = false;
+    public static final boolean SHOW_TOP_MENU = true;
+    public static final boolean TERMS_NAV_BUTTON_DISPLAY = false;
     public static final boolean UNLOCK_TRANSPARENT = false;
 
     public static final String TERMS_CONDITION_URL  = "https://www.zype.com/";
@@ -60,10 +61,15 @@ public class ZypeSettings {
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = false;
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = false;
     public static final boolean UNIVERSAL_TVOD = false;
+    public static final boolean FIREBASE_ENABLED = true;
+
+    // Analytics
+    public static final boolean SEGMENT_ANALYTICS = false;
+    public static final String SEGMENT_ANALYTICS_WRITE_KEY = "";
 
     /**
      * Amazon shared key is required for native subscription feature. It is used in request to Zype Bifrost
      * service for verifying subscription.
      */
-    public static final String AMAZON_SHARED_KEY = "2:QwDSMRWE6-QskpjXS0LDjFOqu9jWadiFvygv15Onw2Xt917Bm-9vHXUfwWmTFyKo:Lntf8F3vQfgCgGjTIh7kVw==";
+    public static final String AMAZON_SHARED_KEY = "";
 }

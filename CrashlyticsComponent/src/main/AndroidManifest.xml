@@ -13,17 +13,27 @@ express or implied. See the License for the specific language governing
 permissions and limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.amazon.analytics.crash">
+  xmlns:tools="http://schemas.android.com/tools"
+  package="com.amazon.analytics.crash">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <application>
         <!-- Crashlytics currently is only able to evaluate the AndroidManifest.xml at build time
          so they don't look at any strings resources, hence they only support a hard coded string.-->
+<!--
         <meta-data
                 android:name="io.fabric.ApiKey"
                 android:value="your_fabric_api_account_key"/>
+-->
 
         <meta-data android:name="AMZNAP@CrashlyticsAnalytics"
                    android:value="IAnalytics@com.amazon.analytics.crash.CrashlyticsAnalyticsImplCreator"/>
+    
+        <provider
+          android:name="com.google.firebase.provider.FirebaseInitProvider"
+          android:authorities="${applicationId}.firebaseinitprovider"
+          tools:node="remove"
+          />
+       
     </application>
 </manifest>

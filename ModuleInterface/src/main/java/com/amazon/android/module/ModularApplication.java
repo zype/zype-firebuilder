@@ -70,7 +70,7 @@ public abstract class ModularApplication extends Application {
 
         super.onCreate();
         Log.d(TAG, "onCreate called.");
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+        /*Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 
             @Override
             public void uncaughtException(Thread thread, Throwable exception) {
@@ -103,7 +103,7 @@ public abstract class ModularApplication extends Application {
                 }
                 android.os.Process.killProcess(android.os.Process.myPid());
             }
-        });
+        });*/
     }
 
     /**
