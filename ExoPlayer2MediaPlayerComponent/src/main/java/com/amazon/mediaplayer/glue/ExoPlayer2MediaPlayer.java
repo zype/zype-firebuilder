@@ -258,7 +258,10 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
         mExtras = extras;
         mUserAgent = "CustomExoPlayer";
 
-        mDataSourceFactory = buildDataSourceFactory(true);
+        //   mDataSourceFactory = buildDataSourceFactory(true);
+        mDataSourceFactory=    new DefaultDataSourceFactory(context,
+            Util.getUserAgent(context, "exo-demo"));
+
 
         /*
          * AdaptiveTrackSelection must be driven by the same instance of
@@ -322,7 +325,7 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
     private DataSource.Factory buildDataSourceFactory(boolean useBandwidthMeter) {
         TransferListener<? super DataSource> listener = useBandwidthMeter ? BANDWIDTH_METER : null;
         return new DefaultDataSourceFactory(mContext, listener,
-                buildHttpDataSourceFactory(useBandwidthMeter));
+            buildHttpDataSourceFactory(useBandwidthMeter));
     }
 
     /**
@@ -368,7 +371,7 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
                     Log.v(TAG, "STATE_ENDED");
                     setPlayerState(PlayerState.ENDED);
                     break;
-           }
+            }
         }
 
         @Override
@@ -451,7 +454,7 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
         // Try to retrieve the video quality setting from global settings.
         try {
             defaultVideoQualityType = getInt(mContext.getContentResolver(),
-                                             VIDEO_QUALITY);
+                VIDEO_QUALITY);
         }
         catch (Settings.SettingNotFoundException e) {
             Log.i(TAG, "Settings do not contain any video quality preferences");
@@ -549,7 +552,7 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
      */
     @Override
     public void setContentBufferConfig(BaseContentPlaybackBufferConfig
-                                               baseContentPlaybackBufferConfig) {
+                                           baseContentPlaybackBufferConfig) {
         Log.w(TAG, "setContentBufferConfig not implemented");
     }
 
@@ -614,46 +617,65 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
         // Build the appropriate MediaSource
         MediaSource mediaSource;
         DataSource.Factory manifestDataSourceFactory =
-                new DefaultHttpDataSourceFactory(mUserAgent);
-        mDataSourceFactory = buildDataSourceFactory(true);
+            new DefaultHttpDataSourceFactory(mUserAgent);
+        mDataSourceFactory = new DefaultDataSourceFactory(mContext,
+            Util.getUserAgent(mContext, "exo-demo"));
 
         switch (mediaSourceType) {
             case C.TYPE_DASH:
                 mediaSource = new DashMediaSource.Factory(
-                        new DefaultDashChunkSource.Factory(mDataSourceFactory),
-                        buildDataSourceFactory(true))
-                        .createMediaSource(url, mMediaSourceHandler, eventLogger);
+                    new DefaultDashChunkSource.Factory(mDataSourceFactory),
+                    buildDataSourceFactory(true))
+                    .createMediaSource(url, new Handler(), null);
                 break;
 
             case C.TYPE_SS:
                 mediaSource = new SsMediaSource.Factory(
-                        new DefaultSsChunkSource.Factory(mDataSourceFactory),
-                        buildDataSourceFactory(true))
-                        .createMediaSource(url, mMediaSourceHandler, eventLogger);
+                    new DefaultSsChunkSource.Factory(mDataSourceFactory),
+                    buildDataSourceFactory(true))
+                    .createMediaSource(url, new Handler(), null);
                 break;
 
             case C.TYPE_HLS:
                 mediaSource = new HlsMediaSource.Factory(mDataSourceFactory)
-                        .createMediaSource(url, mMediaSourceHandler, eventLogger);
+                    .createMediaSource(url, new Handler(), null);
                 break;
 
             case C.TYPE_OTHER:
             default:
                 mediaSource = new ExtractorMediaSource.Factory(mDataSourceFactory)
-                        .createMediaSource(url, mMediaSourceHandler, eventLogger);
+                    .createMediaSource(url, new Handler(), null);
         }
 
         setPlayerState(PlayerState.OPENING);
         if (mediaSource != null) {
-            Format textFormat = Format.createTextSampleFormat(null, MimeTypes.APPLICATION_SUBRIP,
-                null, Format.NO_VALUE, Format.NO_VALUE, "eng", null, Format.OFFSET_SAMPLE_RELATIVE);
 
-            Uri captionUri= Uri.parse("https://gvupload.zype.com/video/5e17a4a2ba6d660001aeff51/subtitles/5e1dd98cdcd81b0001dcf752.srt?1579014540");
-           // MediaSource srtSource = new SingleSampleMediaSource.Factory(mDataSourceFactory).createMediaSource(captionUri, textFormat, C.TIME_UNSET);
-            MediaSource subtitleSource = new SingleSampleMediaSource(captionUri, mDataSourceFactory,textFormat, C.TIME_UNSET);
+            MediaSource[] mediaSources = new MediaSource[2]; //The Size must change depending on the Uris
+            mediaSources[0] = mediaSource; // uri
 
-            mCurrentMediaSource = new MergingMediaSource(mediaSource, subtitleSource);
-            // mCurrentMediaSource = mediaSource;
+            Uri subtitleUri= Uri.parse("https://gvupload.zype.com/video/5e17a4a2ba6d660001aeff51/subtitles/5e1dd98cdcd81b0001dcf752.srt?1579014540");
+            //Add subtitles
+            SingleSampleMediaSource subtitleSource = new SingleSampleMediaSource(subtitleUri, mDataSourceFactory,
+                Format.createTextSampleFormat(null, MimeTypes.APPLICATION_SUBRIP, Format.NO_VALUE, "en", null),
+                C.TIME_UNSET);
+
+            mediaSources[1] = subtitleSource;
+
+            MediaSource mSource = new MergingMediaSource(mediaSources);
+            mPlayer.prepare(mSource);
+            mPlayer.setPlayWhenReady(true);
+
+
+
+//            Format textFormat = Format.createTextSampleFormat(null, MimeTypes.APPLICATION_SUBRIP,
+//                null, Format.NO_VALUE, Format.NO_VALUE, "eng", null, Format.OFFSET_SAMPLE_RELATIVE);
+//
+//            Uri captionUri= Uri.parse("https://gvupload.zype.com/video/5e17a4a2ba6d660001aeff51/subtitles/5e1dd98cdcd81b0001dcf752.srt?1579014540");
+//           // MediaSource srtSource = new SingleSampleMediaSource.Factory(mDataSourceFactory).createMediaSource(captionUri, textFormat, C.TIME_UNSET);
+//            MediaSource subtitleSource = new SingleSampleMediaSource(captionUri, mDataSourceFactory,textFormat, C.TIME_UNSET);
+//
+//            mCurrentMediaSource = new MergingMediaSource(mediaSource, subtitleSource);
+//            // mCurrentMediaSource = mediaSource;
             setPlayerState(PlayerState.OPENED);
         }
         else {
@@ -1027,10 +1049,10 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
 
     @Override
     public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-       mVideoWidth = width;
-       mVideoHeight = height;
-       mVideoAspect = pixelWidthHeightRatio;
-       updateSurfaceView();
+        mVideoWidth = width;
+        mVideoHeight = height;
+        mVideoAspect = pixelWidthHeightRatio;
+        updateSurfaceView();
     }
 
     @Override
