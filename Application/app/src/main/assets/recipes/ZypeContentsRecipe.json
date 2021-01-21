@@ -13,6 +13,7 @@
     "duration@mDuration",
     "images@Images",
     "marketplace_ids/amazon_fire_tv@marketplaceId",
+    "marketplace_ids/googleplay@marketplaceIdGooglePlay",
     "on_air@live",
     "playerUrl@mUrl",
     "pass_required@PassRequired",

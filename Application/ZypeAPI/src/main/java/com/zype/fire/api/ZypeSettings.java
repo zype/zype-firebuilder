@@ -52,9 +52,11 @@ public class ZypeSettings {
     public static final boolean LIBRARY_ENABLED = false;
 
     // Monetization
+    public static final String MARKETPLACE = Marketplace.AMAZON;    // Supported values: 'Marketplace.AMAZON', 'Marketplace.GOOGLE'
     public static final boolean MARKETPLACE_CONNECT_SVOD = false;
     public static final boolean NATIVE_SUBSCRIPTION_ENABLED = false;
     public static final boolean NATIVE_TVOD = false;
+    public static final String[] PLAN_IDS = new String[] { };
     public static final boolean PLAYLIST_PURCHASE_ENABLED = false;
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = false;
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = false;

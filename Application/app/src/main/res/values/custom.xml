@@ -74,7 +74,7 @@ permissions and limitations under the License.
     <!-- App icon -->
     <drawable name="app_logo">@mipmap/ic_launcher</drawable>
     <!-- App banner. Note: Used for Google Play Store -->
-    <drawable name="app_banner">@drawable/placeholder_banner</drawable>
+    <drawable name="app_banner">@drawable/banner</drawable>
     <!-- Content preview window customization -->
     <dimen name="content_image_height">310dp</dimen>
     <dimen name="content_image_width">520dp</dimen>

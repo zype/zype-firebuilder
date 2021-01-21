@@ -67,7 +67,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 29
         versionCode currentCodeVersion
-        versionName "2.2.0"
+        versionName "2.3.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 //        multiDexKeepProguard file('multidex-config.pro')
@@ -168,6 +168,7 @@ dependencies {
 //    implementation project(':PassThroughAdsComponent')
     api project(':VastAdsComponent')
     api project(':AmazonInAppPurchaseComponent')
+//    api project(':GoogleInAppPurchaseComponent')
     implementation project(':AkamaiAnalyticsComponent')
     
     api project(':CrashlyticsComponent')

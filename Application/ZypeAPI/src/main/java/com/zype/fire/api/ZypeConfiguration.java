@@ -156,6 +156,10 @@ public class ZypeConfiguration {
         return getBooleanPreference(PREFERENCE_UNIVERSAL_TVOD, ZypeSettings.UNIVERSAL_TVOD, context);
     }
 
+    public static String getMarketplace() {
+        return ZypeSettings.MARKETPLACE;
+    }
+
     // UI
     public static boolean displayWatchedBarOnVideoThumbnails() {
         return true;

@@ -99,7 +99,7 @@ public class MarketplaceGateway {
     private static PlanData loadPlan(String planId) {
         PlanResponse response = ZypeApi.getInstance().getPlan(planId);
         if (response != null) {
-            Log.d(TAG, "loadPlan(): success, sku=" + response.response.marketplaceIds.amazon);
+            Log.d(TAG, "loadPlan(): success, id=" + response.response.id);
             return response.response;
         }
         else {
@@ -110,8 +110,7 @@ public class MarketplaceGateway {
 
     public PlanData findPlanBySku(String sku) {
         for (PlanData plan : plans) {
-//            if (plan.marketplaceIds.amazon.substring(0, plan.marketplaceIds.amazon.lastIndexOf(".")).equals(sku)) {
-              if (plan.marketplaceIds.amazon.equals(sku)) {
+              if (getSubscriptionSku(plan).equals(sku)) {
                 return plan;
             }
         }
@@ -125,19 +124,38 @@ public class MarketplaceGateway {
         for (PlanData plan : plans) {
             Map<String, String> skuData = new HashMap<>();
             skuData.put("productType", "SUBSCRIBE");
-            skuData.put("sku", plan.marketplaceIds.amazon.substring(0, plan.marketplaceIds.amazon.lastIndexOf(".")));
-            skuData.put("purchaseSku", plan.marketplaceIds.amazon);
-            skuData.put("id", plan.marketplaceIds.amazon);
+            skuData.put("sku", getSubscriptionPartialSku(plan));
+            skuData.put("purchaseSku", getSubscriptionSku(plan));
+            skuData.put("id", getSubscriptionSku(plan));
             result.add(skuData);
         }
         return result;
     }
 
+    private String getSubscriptionSku(PlanData plan) {
+        if (ZypeConfiguration.getMarketplace().equals(Marketplace.GOOGLE)) {
+            return plan.marketplaceIds.google;
+        }
+        else if (ZypeConfiguration.getMarketplace().equals(Marketplace.AMAZON)) {
+            return plan.marketplaceIds.amazon;
+        }
+        throw new IllegalStateException("Invalid 'Marketplace' value: " + ZypeConfiguration.getMarketplace());
+    }
+
+    private String getSubscriptionPartialSku(PlanData plan) {
+        if (ZypeConfiguration.getMarketplace().equals(Marketplace.GOOGLE)) {
+            return plan.marketplaceIds.google;
+        }
+        else if (ZypeConfiguration.getMarketplace().equals(Marketplace.AMAZON)) {
+            return plan.marketplaceIds.amazon.substring(0, plan.marketplaceIds.amazon.lastIndexOf("."));
+        }
+        throw new IllegalStateException("Invalid 'Marketplace' value: " + ZypeConfiguration.getMarketplace());
+    }
+
     public Set<String> getSubscriptionSkus() {
         Set<String> result = new HashSet<>();
         for (PlanData plan : plans) {
-//            result.add(plan.marketplaceIds.amazon.substring(0, plan.marketplaceIds.amazon.lastIndexOf(".")));
-            result.add(plan.marketplaceIds.amazon);
+            result.add(getSubscriptionSku(plan));
         }
         return result;
     }

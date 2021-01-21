@@ -94,7 +94,7 @@ permissions and limitations under the License.
     <!-- Card info content text size -->
     <dimen name="card_info_content_text">12sp</dimen>
     <!-- Card info selected title text size -->
-    <dimen name="card_info_selected_title_text">10sp</dimen>
+    <dimen name="card_info_selected_title_text">12sp</dimen>
     <!-- Card info selected content text size -->
     <dimen name="card_info_selected_content_text">15sp</dimen>
 
@@ -123,7 +123,7 @@ permissions and limitations under the License.
     <!-- Details description title text size -->
     <dimen name="details_description_title_text">24sp</dimen>
     <!-- Details description subtitle text size -->
-    <dimen name="details_description_subtitle_text">10sp</dimen>
+    <dimen name="details_description_subtitle_text">12sp</dimen>
     <!-- Details description body text size -->
     <dimen name="details_description_body_text">16sp</dimen>
     <!-- Details description extended body text size -->

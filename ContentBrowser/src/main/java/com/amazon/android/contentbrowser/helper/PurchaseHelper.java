@@ -116,6 +116,10 @@ public class PurchaseHelper {
     private String mBuyVideoSKU;
     private String videoId;
     private Bundle purchaseExtras;
+
+    public static final String EXTRA_PLAYLIST_ID = "PlaylistId";
+    public static final String EXTRA_VIDEO_ID = "VideoId";
+
     /* Zype
      * end */
 
@@ -191,7 +195,7 @@ public class PurchaseHelper {
         // listener.
         this.mPurchaseManager = PurchaseManager.getInstance(mContext.getApplicationContext());
         try {
-            mPurchaseManager.init(purchaseSystem, new PurchaseManagerListener() {
+            mPurchaseManager.init(purchaseSystem, mContentBrowser.getNavigator(), new PurchaseManagerListener() {
                 @Override
                 public void onRegisterSkusResponse(Response response) {
 
@@ -665,7 +669,12 @@ public class PurchaseHelper {
         String sku = null;
 
         if (video != null) {
-            sku = video.getExtraValueAsString(Content.EXTRA_MARKETPLACE_ID);
+            if (mPurchaseManager.getMarketplace().equals(IPurchase.GOOGLE)) {
+                sku = video.getExtraValueAsString(Content.EXTRA_MARKETPLACE_ID_GOOGLE);
+            }
+            else {
+                sku = video.getExtraValueAsString(Content.EXTRA_MARKETPLACE_ID);
+            }
         }
         if (TextUtils.isEmpty(sku)) {
             Recipe recipe = Recipe.newInstance(FileHelper.readFile(mContext, mContext.getString(R.string.skus_file)));

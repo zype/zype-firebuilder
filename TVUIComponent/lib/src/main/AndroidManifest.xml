@@ -71,6 +71,7 @@ permissions and limitations under the License.
             android:screenOrientation="landscape"/>
         <activity
                 android:name="com.amazon.android.tv.tenfoot.ui.activities.ContentDetailsActivity"
+                android:screenOrientation="landscape"
                 android:exported="true">
 
             <!-- Receives the PendingIntent requests to view a specific content. -->
@@ -80,23 +81,40 @@ permissions and limitations under the License.
             </intent-filter>
 
         </activity>
-        <activity android:name="com.amazon.android.tv.tenfoot.ui.activities.ContentSearchActivity"/>
-        <activity android:name="com.amazon.android.tv.tenfoot.ui.activities.SplashActivity"/>
-        <activity android:name="com.amazon.android.uamp.ui.PlaybackActivity"/>
-        <activity android:name="com.amazon.android.uamp.ui.PlaybackTrailerActivity" />
-        <activity android:name="com.amazon.android.tv.tenfoot.ui.epg.EpgActivity" />
+        <activity android:name="com.amazon.android.tv.tenfoot.ui.activities.ContentSearchActivity"
+            android:screenOrientation="landscape"
+            />
+        <activity android:name="com.amazon.android.tv.tenfoot.ui.activities.SplashActivity"
+            android:screenOrientation="landscape"
+            />
+        <activity android:name="com.amazon.android.uamp.ui.PlaybackActivity"
+            android:screenOrientation="landscape"
+            />
+        <activity android:name="com.amazon.android.uamp.ui.PlaybackTrailerActivity"
+            android:screenOrientation="landscape"
+            />
+        <activity android:name="com.amazon.android.tv.tenfoot.ui.epg.EpgActivity"
+            android:screenOrientation="landscape"
+            />
         <!-- Zype, Evgeny Cherkasov -->
         <activity
             android:name="com.amazon.android.tv.tenfoot.ui.purchase.BuyVideoActivity"
+            android:screenOrientation="landscape"
             android:label="@string/buy_video_confirm" />
         <activity
             android:name="com.amazon.android.tv.tenfoot.ui.purchase.CreateLoginActivity"
+            android:screenOrientation="landscape"
             android:label="@string/create_login_title" />
         <activity
             android:name="com.amazon.android.tv.tenfoot.ui.purchase.SubscriptionActivity"
+            android:screenOrientation="landscape"
             android:label="@string/subscription_title_choose_plan" />
-        <activity android:name="com.amazon.android.tv.tenfoot.ui.Subscription.SubscriptionSplashActivity" />
-        <activity android:name="com.amazon.android.tv.tenfoot.ui.activities.ZypeContentDetailsActivity" />
+        <activity android:name="com.amazon.android.tv.tenfoot.ui.Subscription.SubscriptionSplashActivity"
+            android:screenOrientation="landscape"
+            />
+        <activity android:name="com.amazon.android.tv.tenfoot.ui.activities.ZypeContentDetailsActivity"
+            android:screenOrientation="landscape"
+            />
 
     </application>
 

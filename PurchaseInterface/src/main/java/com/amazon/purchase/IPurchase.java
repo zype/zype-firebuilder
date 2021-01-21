@@ -14,6 +14,7 @@
  */
 package com.amazon.purchase;
 
+import com.amazon.android.navigator.Navigator;
 import com.amazon.purchase.model.Product;
 import com.amazon.purchase.model.Receipt;
 import com.amazon.purchase.model.Response;
@@ -37,7 +38,7 @@ public interface IPurchase {
      * @param context The application context.
      * @param extras  Any extra params.
      */
-    void init(Context context, Bundle extras);
+    void init(Context context, Navigator navigator, Bundle extras);
 
     /**
      * Registers the {@link PurchaseListener} for all purchase calls.
@@ -109,6 +110,16 @@ public interface IPurchase {
      */
     void notifyFulfillment(String sku, UserData userData, Receipt receipt, Receipt
             .FulfillmentStatus fulfillmentResult);
+
+    public final static String GOOGLE = "googleplay";
+    public final static String AMAZON = "amazon_fire_tv";
+
+    /**
+     * The name of the marketplace
+     *
+     * @return Must return one of the 'GOOGLE' or 'AMAZON'
+     */
+    String getMarketplace();
 
     /**
      * Interface for listening to purchase updates.
