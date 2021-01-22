@@ -258,10 +258,7 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
         mExtras = extras;
         mUserAgent = "CustomExoPlayer";
 
-        //   mDataSourceFactory = buildDataSourceFactory(true);
-        mDataSourceFactory=    new DefaultDataSourceFactory(context,
-            Util.getUserAgent(context, "exo-demo"));
-
+          mDataSourceFactory = buildDataSourceFactory(true);
 
         /*
          * AdaptiveTrackSelection must be driven by the same instance of
@@ -618,33 +615,33 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
         MediaSource mediaSource;
         DataSource.Factory manifestDataSourceFactory =
             new DefaultHttpDataSourceFactory(mUserAgent);
-        mDataSourceFactory = new DefaultDataSourceFactory(mContext,
-            Util.getUserAgent(mContext, "exo-demo"));
+
+        mDataSourceFactory = buildDataSourceFactory(true);
 
         switch (mediaSourceType) {
             case C.TYPE_DASH:
                 mediaSource = new DashMediaSource.Factory(
                     new DefaultDashChunkSource.Factory(mDataSourceFactory),
                     buildDataSourceFactory(true))
-                    .createMediaSource(url, new Handler(), null);
+                    .createMediaSource(url, mMediaSourceHandler, eventLogger);
                 break;
 
             case C.TYPE_SS:
                 mediaSource = new SsMediaSource.Factory(
                     new DefaultSsChunkSource.Factory(mDataSourceFactory),
                     buildDataSourceFactory(true))
-                    .createMediaSource(url, new Handler(), null);
+                    .createMediaSource(url, mMediaSourceHandler, eventLogger);
                 break;
 
             case C.TYPE_HLS:
                 mediaSource = new HlsMediaSource.Factory(mDataSourceFactory)
-                    .createMediaSource(url, new Handler(), null);
+                    .createMediaSource(url, mMediaSourceHandler, eventLogger);
                 break;
 
             case C.TYPE_OTHER:
             default:
                 mediaSource = new ExtractorMediaSource.Factory(mDataSourceFactory)
-                    .createMediaSource(url, new Handler(), null);
+                    .createMediaSource(url, mMediaSourceHandler, eventLogger);
         }
 
         setPlayerState(PlayerState.OPENING);
@@ -660,22 +657,7 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
                 C.TIME_UNSET);
 
             mediaSources[1] = subtitleSource;
-
-            MediaSource mSource = new MergingMediaSource(mediaSources);
-            mPlayer.prepare(mSource);
-            mPlayer.setPlayWhenReady(true);
-
-
-
-//            Format textFormat = Format.createTextSampleFormat(null, MimeTypes.APPLICATION_SUBRIP,
-//                null, Format.NO_VALUE, Format.NO_VALUE, "eng", null, Format.OFFSET_SAMPLE_RELATIVE);
-//
-//            Uri captionUri= Uri.parse("https://gvupload.zype.com/video/5e17a4a2ba6d660001aeff51/subtitles/5e1dd98cdcd81b0001dcf752.srt?1579014540");
-//           // MediaSource srtSource = new SingleSampleMediaSource.Factory(mDataSourceFactory).createMediaSource(captionUri, textFormat, C.TIME_UNSET);
-//            MediaSource subtitleSource = new SingleSampleMediaSource(captionUri, mDataSourceFactory,textFormat, C.TIME_UNSET);
-//
-//            mCurrentMediaSource = new MergingMediaSource(mediaSource, subtitleSource);
-//            // mCurrentMediaSource = mediaSource;
+            mCurrentMediaSource = new MergingMediaSource(mediaSources);
             setPlayerState(PlayerState.OPENED);
         }
         else {
@@ -897,8 +879,8 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
             /* Calling prepare() causes a BUFFERING state change, but for PlaybackActivity
              * to operate correctly it MUST transition from PREPARING to READY directly.
              */
-            setPlayerState(PlayerState.PREPARING);
-            setPlayerState(PlayerState.READY);
+//            setPlayerState(PlayerState.PREPARING);
+//            setPlayerState(PlayerState.READY);
         }
     }
 
