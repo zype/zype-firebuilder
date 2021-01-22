@@ -879,8 +879,8 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
             /* Calling prepare() causes a BUFFERING state change, but for PlaybackActivity
              * to operate correctly it MUST transition from PREPARING to READY directly.
              */
-//            setPlayerState(PlayerState.PREPARING);
-//            setPlayerState(PlayerState.READY);
+            setPlayerState(PlayerState.PREPARING);
+            setPlayerState(PlayerState.READY);
         }
     }
 
