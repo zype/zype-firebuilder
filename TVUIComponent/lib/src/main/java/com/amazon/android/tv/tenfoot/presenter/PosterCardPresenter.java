@@ -93,11 +93,11 @@ public class PosterCardPresenter extends Presenter {
         appConf = ZypeConfiguration.readAppConfiguration(mContext);
         try {
             mDefaultCardImage = ContextCompat.getDrawable(mContext, R.drawable.movie);
-            if (SHOW_TITLE) {
-                sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused);
-            }else{
+//            if (SHOW_TITLE) {
+//                sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused);
+//            }else{
                 sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_trance);
-            }
+//            }
 
             infoFieldWithProgressBarBackground = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_progress_bar);
             imageLocked = ContextCompat.getDrawable(mContext, R.drawable.locked);
@@ -161,11 +161,12 @@ public class PosterCardPresenter extends Presenter {
                 // the 'TitleText' is actually smaller text compared to 'ContentText',
                 // so we are using TitleText to show subtitle and ContentText to show the
                 // actual Title.
-                cardView.setTitleText(ContentHelper.getCardViewSubtitle(mContext, content));
+//                cardView.setTitleText(ContentHelper.getCardViewSubtitle(mContext, content));
 
 
                 if (SHOW_TITLE) {
                     cardView.setContentText(content.getTitle());
+                    cardView.setTitleText(ContentHelper.getCardViewSubtitle(mContext, content));
                 }
                 else {
                     cardView.setContentText("");
@@ -272,7 +273,7 @@ public class PosterCardPresenter extends Presenter {
         ImageCardView cardView = (ImageCardView) viewHolder.view;
         // Remove references to images so that the garbage collector can free up memory.
         cardView.setBadgeImage(null);
-        cardView.setMainImage(null);
+        cardView.getMainImageView().setImageDrawable(null);
     }
 }
 
