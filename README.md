@@ -137,7 +137,7 @@ To enable light theme:
 |`background`                          |#FFFFFF           |#22282E           |
 |`spinner_color`                       |#FF000000         |#FFFFFFFF         |
 |`primary_text`                        |#E6000000         |#E6FFFFFF         |
-|`secondary_text`                      |#00000000         |#E6FFFFFF         |
+|`secondary_text`                      |#99000000         |#E6FFFFFF         |
 |`tertiary_text`                       |#99000000         |#99FFFFFF         |
 |`search_edit_text_bg_color`           |#4D000000         |#4DFFFFFF         |
 |`search_edit_text_bg_color_unfocused` |#1A000000         |#1AFFFFFF         |
