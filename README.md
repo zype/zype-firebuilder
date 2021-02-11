@@ -79,10 +79,12 @@ Non-Amazon Android devices and Amazon Fire phones and tablets are not supported 
 
 3. Replace following placeholders with actual values:
 
-  **Application/ZypeAPI/src/template/java/com/zype/fire/api/ZypeSettings.java**
-  - ```<APP_KEY>```
-  - ```<CLIENT_ID>```
-  - ```<ROOT_PLAYLIST_ID>```
+  **Application/ZypeAPI/src/main/java/com/zype/fire/api/ZypeSettings.java**
+```
+    public static final String APP_KEY = "";
+    public static final String CLIENT_ID = "";
+    public static final String ROOT_PLAYLIST_ID = "";
+```
 
 Also replace features and monetization options placeholders with `true` or `false` values.
 
@@ -127,7 +129,7 @@ The default appearance is dark, where the screen background is black/dark grey, 
 The Light theme will display all screens with white background and black/grey text elements.
 
 To enable light theme:  
-  - Set `LIGHT_THEME` feature flag to `true` in the *Application/ZypeAPI/src/template/java/com/zype/fire/api/ZypeSettings.java* file
+  - Set `LIGHT_THEME` feature flag to `true` in the *Application/ZypeAPI/src/main/java/com/zype/fire/api/ZypeSettings.java* file
   - Update the following values in the *Application/app/src/template/res/values/custom.xml* file:
 
 | ***Attribute name***                 | ***Light theme***      | ***Dark theme***      |
