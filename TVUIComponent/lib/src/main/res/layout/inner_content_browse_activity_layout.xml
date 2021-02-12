@@ -71,19 +71,18 @@ permissions and limitations under the License.
             android:id="@+id/main_logo"
             android:layout_width="116dp"
             android:layout_height="46dp"
-            android:layout_marginBottom="24dp"
             android:layout_marginLeft="@dimen/lb_browse_padding_start"
             android:layout_marginTop="@dimen/lb_browse_padding_top"
+            android:layout_marginBottom="24dp"
             android:scaleType="centerInside"
             android:src="@drawable/company_logo"/>
         <LinearLayout
             android:id="@+id/content_details"
             android:layout_width="352dp"
-            android:layout_height="wrap_content"
-            android:minHeight="120dp"
-            android:layout_below="@id/main_logo"
-            android:layout_marginBottom="71dp"
+            android:layout_height="192dp"
+            android:layout_marginBottom="0dp"
             android:layout_marginLeft="@dimen/lb_browse_padding_start"
+            android:layout_below="@id/main_logo"
             android:orientation="vertical"
             >
 
@@ -114,7 +113,7 @@ permissions and limitations under the License.
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:ellipsize="end"
-                android:maxLines="5"
+                android:maxLines="3"
                 android:textSize="@dimen/lb_details_description_body_text_size"/>
 
         </LinearLayout>
