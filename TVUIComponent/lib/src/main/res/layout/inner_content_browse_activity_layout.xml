@@ -29,21 +29,20 @@ permissions and limitations under the License.
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     >
-
     <LinearLayout
         android:layout_width="@dimen/content_image_width"
         android:layout_height="@dimen/content_image_height"
         android:layout_alignParentTop="true"
         android:gravity="top"
         android:layout_alignParentRight="true"
-        android:layout_marginBottom="8dp"
         android:id="@+id/layout_image"
         >
-
         <ImageView
             android:id="@+id/content_image"
             android:layout_width="match_parent"
@@ -71,27 +70,29 @@ permissions and limitations under the License.
         <ImageView
             android:id="@+id/main_logo"
             android:layout_width="116dp"
-            android:layout_height="50dp"
-            android:layout_marginBottom="20dp"
-            android:layout_marginLeft="24dp"
+            android:layout_height="46dp"
+            android:layout_marginBottom="24dp"
+            android:layout_marginLeft="@dimen/lb_browse_padding_start"
             android:layout_marginTop="@dimen/lb_browse_padding_top"
             android:scaleType="centerInside"
             android:src="@drawable/company_logo"/>
         <LinearLayout
             android:id="@+id/content_details"
             android:layout_width="352dp"
-            android:layout_height="195dp"
+            android:layout_height="wrap_content"
+            android:minHeight="120dp"
             android:layout_below="@id/main_logo"
-            android:layout_marginBottom="0dp"
+            android:layout_marginBottom="71dp"
             android:layout_marginLeft="@dimen/lb_browse_padding_start"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            >
 
             <TextView
                 android:id="@+id/content_detail_title"
                 style="@style/Widget.Leanback.DetailsDescriptionTitleStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="10dp"
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:textSize="@dimen/lb_details_description_title_text_size"/>
@@ -117,39 +118,38 @@ permissions and limitations under the License.
                 android:textSize="@dimen/lb_details_description_body_text_size"/>
 
         </LinearLayout>
+        <fragment
+            android:id="@+id/full_content_browse_fragment"
+            android:name="com.amazon.android.tv.tenfoot.ui.fragments.ZypePlaylistContentBrowseFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/content_details"
+            android:layout_marginTop="0dp"
+            tools:layout="@layout/action_widget_container"/>
+        <fragment
+            android:id="@+id/fragmentMenu"
+            android:name="com.amazon.android.tv.tenfoot.ui.fragments.MenuFragment"
+            android:layout_width="380dp"
+            android:layout_height="match_parent"
+            tools:layout="@layout/action_widget_container" />
+
+        <ProgressBar
+            android:id="@+id/feed_progress"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerInParent="true"
+            android:indeterminateDrawable="@drawable/custom_progress"/>
+
+        <fragment
+            android:id="@+id/fragmentTopMenu"
+            android:name="com.amazon.android.tv.tenfoot.ui.menu.TopMenuFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:layout="@layout/fragment_top_menu"
+            />
 
     </RelativeLayout>
-
-    <fragment
-        android:id="@+id/full_content_browse_fragment"
-        android:name="com.amazon.android.tv.tenfoot.ui.fragments.ZypePlaylistContentBrowseFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/layout_image"
-        android:layout_marginTop="0dp"
-        tools:layout="@layout/action_widget_container"/>
-    <fragment
-        android:id="@+id/fragmentMenu"
-        android:name="com.amazon.android.tv.tenfoot.ui.fragments.MenuFragment"
-        android:layout_width="380dp"
-        android:layout_height="match_parent"
-        tools:layout="@layout/action_widget_container" />
-
-    <ProgressBar
-        android:id="@+id/feed_progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_centerInParent="true"
-        android:indeterminateDrawable="@drawable/custom_progress"/>
-
-    <fragment
-        android:id="@+id/fragmentTopMenu"
-        android:name="com.amazon.android.tv.tenfoot.ui.menu.TopMenuFragment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:layout="@layout/fragment_top_menu"
-        />
 
     <include layout="@layout/action_widget_container"/>
 </RelativeLayout>

@@ -27,20 +27,20 @@ permissions and limitations under the License.
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/browse_background_color">
-
-
+    android:background="@color/browse_background_color"
+    >
     <LinearLayout
         android:layout_width="@dimen/content_image_width"
         android:layout_height="@dimen/content_image_height"
         android:layout_alignParentTop="true"
         android:gravity="top"
-        android:layout_alignParentRight="true">
-
+        android:layout_alignParentRight="true"
+        >
         <ImageView
             android:id="@+id/content_image"
             android:layout_width="match_parent"
@@ -99,7 +99,7 @@ permissions and limitations under the License.
                 style="@style/Widget.Leanback.DetailsDescriptionTitleStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="10dp"
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:textSize="@dimen/lb_details_description_title_text_size" />
