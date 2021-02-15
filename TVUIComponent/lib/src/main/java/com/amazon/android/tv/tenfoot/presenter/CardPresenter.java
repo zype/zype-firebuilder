@@ -116,9 +116,9 @@ public class CardPresenter extends Presenter {
 
                 // comment this code to remove shadow from the cards
                 if (SHOW_TITLE) {
-                CardView cardView1 = this.findViewById(R.id.main_image_lt);
-                cardView1.setCardElevation(selected ? 6f : 0f);
-                cardView1.setContentPadding(selected ? 5 : 0, 0, 0, 0);
+                    CardView cardView1 = this.findViewById(R.id.main_image_lt);
+                    cardView1.setCardElevation(selected ? 6f : 0f);
+                    cardView1.setContentPadding(selected ? 5 : 0, 0, 0, 0);
                 }
                 //
 
@@ -148,6 +148,7 @@ public class CardPresenter extends Presenter {
         titleText = (TextView) cardView.findViewById(R.id.title_text);
 
         if (subtitle != null) {
+            subtitle.setLines(2);
             subtitle.setMaxLines(2);
             //subtitle.setEllipsize(TextUtils.TruncateAt.END);
         }

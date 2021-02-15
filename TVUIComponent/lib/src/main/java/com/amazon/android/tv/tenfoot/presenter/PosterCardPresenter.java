@@ -134,6 +134,7 @@ public class PosterCardPresenter extends Presenter {
 
         TextView subtitle = (TextView) cardView.findViewById(R.id.content_text);
         if (subtitle != null) {
+            subtitle.setLines(2);
             subtitle.setMaxLines(2);
             subtitle.setEllipsize(TextUtils.TruncateAt.END);
         }
