@@ -87,11 +87,10 @@ permissions and limitations under the License.
         <LinearLayout
             android:id="@+id/content_details"
             android:layout_width="352dp"
-            android:layout_height="wrap_content"
-            android:minHeight="120dp"
-            android:layout_below="@id/main_logo"
+            android:layout_height="192dp"
+            android:layout_marginBottom="0dp"
             android:layout_marginLeft="@dimen/lb_browse_padding_start"
-            android:layout_marginBottom="71dp"
+            android:layout_below="@id/main_logo"
             android:orientation="vertical">
 
             <TextView
