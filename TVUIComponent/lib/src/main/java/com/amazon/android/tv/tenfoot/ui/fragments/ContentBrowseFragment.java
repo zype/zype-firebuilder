@@ -188,9 +188,9 @@ public class ContentBrowseFragment extends RowsFragment {
             LocalBroadcastManager.getInstance(getActivity())
                     .registerReceiver(receiver, new IntentFilter(BROADCAST_DATA_LOADED));
         }
-        if (mRowsAdapter != null) {
+        /*if (mRowsAdapter != null) {
             mRowsAdapter.notifyArrayItemRangeChanged(0, mRowsAdapter.size());
-        }
+        }*/
 
         ArrayObjectAdapter rowsAdapter = (ArrayObjectAdapter) getAdapter();
 
@@ -394,7 +394,7 @@ public class ContentBrowseFragment extends RowsFragment {
 
             if (item instanceof Content) {
                 Content content = (Content) item;
-                if (content.getExtras().containsKey(ContentBrowser.NEXT_PAGE) && content.getExtraValueAsBoolean(ContentBrowser.NEXT_PAGE) && !contentUpdationInProgress) {
+                if (content.getExtras().containsKey(ContentBrowser.NEXT_PAGE) /*&& content.getExtraValueAsBoolean(ContentBrowser.NEXT_PAGE)*/ && !contentUpdationInProgress) {
                     contentUpdationInProgress = true;
                     Log.d(TAG, "Next page item was selected");
                     String playlistId = content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID);

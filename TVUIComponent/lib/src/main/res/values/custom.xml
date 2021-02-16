@@ -103,9 +103,9 @@ permissions and limitations under the License.
     <!-- Details Customization -->
 
     <!-- Text color for unfocused action button -->
-    <color name="action_button_text_color">@color/primary_text</color>
+    <color name="action_button_text_color">#ffffff</color>
     <!-- Text color for focused action button -->
-    <color name="action_button_text_color_focused">@color/primary_text</color>
+    <color name="action_button_text_color_focused">#ffffff</color>
     <!-- Background color for focused action button -->
     <drawable name="action_button_focused">@drawable/btn_generic_focused</drawable>
     <!-- Background color for normal state of action button -->
