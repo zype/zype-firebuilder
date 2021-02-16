@@ -162,8 +162,6 @@ permissions and limitations under the License.
     <color name="error_message_text_color">@color/primary_text</color>
     <integer name="error_button_height">64</integer>
 
-    <color name="lock_color">#FF0000</color>
-    <color name="unlock_color">#0000FF</color>
     <!-- End of Error Activity Customization -->
 
 
@@ -176,7 +174,17 @@ permissions and limitations under the License.
     <!-- Drm encryption schema, Allowed options are ENCRYPTION_DEFAULT, ENCRYPTION_PLAYREADY,
     ENCRYPTION_WIDEVINE -->
     <string name="drm_encryption_schema">ENCRYPTION_DEFAULT</string>
+
+    <color name="lock_color">#FF0000</color>
+    <color name="unlock_color">#0000FF</color>
+
     <color name="background_color_translucent">#CC000000</color>
+    <color name="menu_item_text_color">#FFFFFF</color>
+    <color name="top_menu_background">@android:color/transparent</color>
+
+    <drawable name="subscription_background">@color/background</drawable>
+
+    <drawable name="logo">@drawable/company_logo</drawable>
 
     <!-- Only these colors alert exit alert theme changes  -->
 
