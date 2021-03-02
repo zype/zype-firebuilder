@@ -68,7 +68,7 @@ public class VideoData {
     public String publishedAt;
 
     @Expose
-    public int rating;
+    public double rating;
 
     @SerializedName("related_playlist_ids")
     @Expose
