@@ -93,11 +93,11 @@ public class PosterCardPresenter extends Presenter {
         appConf = ZypeConfiguration.readAppConfiguration(mContext);
         try {
             mDefaultCardImage = ContextCompat.getDrawable(mContext, R.drawable.movie);
-//            if (SHOW_TITLE) {
-//                sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused);
-//            }else{
+            if (SHOW_TITLE) {
+                sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused);
+            }else{
                 sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_trance);
-//            }
+            }
 
             infoFieldWithProgressBarBackground = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_progress_bar);
             imageLocked = ContextCompat.getDrawable(mContext, R.drawable.locked);
