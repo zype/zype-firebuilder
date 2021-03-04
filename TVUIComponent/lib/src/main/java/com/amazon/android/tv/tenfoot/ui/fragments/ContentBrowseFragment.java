@@ -274,7 +274,8 @@ public class ContentBrowseFragment extends RowsFragment {
             // If selected playlist contains videos then open video details screen of the first video
             // in the playlist
             if (item instanceof ContentContainer) {
-                ContentContainer contentContainer = (ContentContainer) item;
+                ContentContainer contentContainer = ContentBrowser.getInstance(getActivity())
+                        .getPlayList(((ContentContainer) item).getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
                 if (!contentContainer.getContents().isEmpty()) {
                     item = contentContainer.getContents().get(0);
                 }
