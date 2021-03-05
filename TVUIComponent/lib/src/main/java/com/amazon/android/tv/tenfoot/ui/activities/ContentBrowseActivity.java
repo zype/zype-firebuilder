@@ -350,6 +350,16 @@ public class ContentBrowseActivity extends BaseActivity implements
 //                }
 //            }, 50);
         }
+        else if(!processed) {
+            if(event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
+                if (ZypeSettings.SHOW_TOP_MENU && isTopRowSelected()) {
+                    if (!isMenuOpened) {
+                        showTopMenu();
+                        return true;
+                    }
+                }
+            }
+        }
 
         return processed;
     }
@@ -644,6 +654,11 @@ public class ContentBrowseActivity extends BaseActivity implements
                 break;
         }
         return super.dispatchKeyEvent(event);
+    }
+
+    private boolean isTopRowSelected() {
+        ContentBrowseFragment fragment = (ContentBrowseFragment) getFragmentManager().findFragmentById(R.id.full_content_browse_fragment);
+        return fragment.getRowSelectedIndex() == 0;
     }
 
     @Override
