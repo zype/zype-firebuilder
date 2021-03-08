@@ -96,6 +96,7 @@ public class ContentBrowseFragment extends RowsFragment {
 
     private boolean contentUpdationInProgress = false;
     private boolean userAuthenticated;
+    private Row lastRowSelected = null;
 
     // Container Activity must implement this interface.
     public interface OnBrowseRowListener {
@@ -383,6 +384,7 @@ public class ContentBrowseFragment extends RowsFragment {
         public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
                                    RowPresenter.ViewHolder rowViewHolder, Row row) {
             boolean isLastContentRow = false;
+            lastRowSelected = row;
             if (!ZypeSettings.SETTINGS_PLAYLIST_ENABLED) {
                 if (mRowsAdapter.indexOf(row) == mRowsAdapter.size() - 2) {
                     isLastContentRow = true;
@@ -447,6 +449,12 @@ public class ContentBrowseFragment extends RowsFragment {
         }
     }
 
+    public int getRowSelectedIndex() {
+        if(lastRowSelected != null) {
+            return mRowsAdapter.indexOf(lastRowSelected);
+        }
+        return -1;
+    }
 
     private void addStubRow(ArrayObjectAdapter rowsAdapter) {
         StubItemPresenter presenter = new StubItemPresenter();
