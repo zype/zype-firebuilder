@@ -1213,6 +1213,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             }
             setupSearchAction();
             setupFavoritesAction();
+            setupMyLibraryAction();
             if (ZypeConfiguration.displayTermsNavigationButton()) {
                 addSettingsAction(createTermsOfUseSettingsAction());
             }
