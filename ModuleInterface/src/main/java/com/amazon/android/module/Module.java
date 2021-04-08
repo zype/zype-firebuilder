@@ -118,7 +118,7 @@ public class Module<I> {
 
     public void createImpls() {
         for (Map.Entry<String, IImplCreator> creator : mImplCreators.entrySet()) {
-            if (creator.getKey().equals("CrashlyticsAnalytics") && !ZypeSettings.FIREBASE_ENABLED) {
+            if (creator.getKey().equals("CrashlyticsAnalytics")) {
                 continue;
             }
             if (creator.getKey().equals("SegmentAnalytics") && !ZypeSettings.SEGMENT_ANALYTICS) {

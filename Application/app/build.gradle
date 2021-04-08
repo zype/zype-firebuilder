@@ -14,6 +14,9 @@ import java.text.SimpleDateFormat
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
+
+def FIREBASE_ENABLED = true
+
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 // Uncomment when using CrashlyticsComponent
@@ -21,6 +24,10 @@ apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'com.google.firebase.firebase-perf'
 apply from: "../artifacts.gradle"
+
+if (FIREBASE_ENABLED) {
+    apply plugin: 'com.google.gms.google-services'
+}
 
 repositories {
     // Uncomment when using CrashlyticsComponent
@@ -76,6 +83,7 @@ android {
 //        multiDexKeepProguard file('multidex-config.pro')
         multiDexKeepFile file('multidex-config.txt')
     }
+
     buildTypes {
         release {
             setVersionNameSuffix(".${currentCodeVersion}")
@@ -104,8 +112,8 @@ android {
         template {
             applicationId "<APPLICATION_ID>"
             manifestPlaceholders = [
-                    crashlyticsCollectionEnabled: "true",
-                    performanceMonitoringEnabled : "true"
+                    crashlyticsCollectionEnabled: "false",
+                    performanceMonitoringEnabled : "false"
             ]
         }
     }
