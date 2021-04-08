@@ -99,8 +99,13 @@ public class AnalyticsHelper {
     private static Map<String, Object> getDetailedContentAttributes(Content content) {
 
         Map<String, Object> attributes = new HashMap<>();
-        attributes.put(AnalyticsTags.ATTRIBUTE_PUBLISHER_NAME, content.getStudio());
+//        attributes.put(AnalyticsTags.ATTRIBUTE_PUBLISHER_NAME, content.getStudio());
         attributes.put(AnalyticsTags.ATTRIBUTE_AIRDATE, content.getAvailableDate());
+        attributes.put(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_DESCRIPTION,
+                content.getDescription());
+        attributes.put(AnalyticsTags.ATTRIBUTE_EPISODE_NUMBER, content.getEpisode());
+        attributes.put(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_THUMBNAIL,
+                content.getCardImageUrl());
         return attributes;
     }
 
@@ -148,14 +153,13 @@ public class AnalyticsHelper {
         // try to test individual components that rely on ContentBrowser.
         if (AnalyticsManager.getInstance(ContentBrowserApplication.getInstance()) != null) {
 
-           /* IAnalytics analyticsInterface =
-                    AnalyticsManager.getInstance(ContentBrowserApplication.getInstance())
-                                    .getIAnalytics();
-
-            if (analyticsInterface != null) {
-                analyticsInterface.trackAction(data);
-            }*/
-
+//            IAnalytics analyticsInterface =
+//                    AnalyticsManager.getInstance(ContentBrowserApplication.getInstance())
+//                                    .getIAnalytics();
+//
+//            if (analyticsInterface != null) {
+//                analyticsInterface.trackAction(data);
+//            }
             Set<IAnalytics> analyticsSet = AnalyticsManager
                     .getInstance(ContentBrowserApplication.getInstance())
                     .getIAnalyticsSet();
@@ -250,6 +254,25 @@ public class AnalyticsHelper {
     }
 
     /**
+     * Report the current playback state.
+     *
+     * @param content         Content that started/resumed playback.
+     * @param currentPosition The current playback position.
+     */
+    public static void trackPlayback(Content content, long currentPosition) {
+
+        Map<String, Object> attributes = getBasicAnalyticsAttributesForContent(content);
+        attributes.putAll(getDetailedContentAttributes(content));
+        attributes.putAll(getClassificationTypeAttributes(content));
+
+        // Get Content extras
+        attributes.putAll(ExtraContentAttributes.getExtraAttributes(content.getExtras()));
+        attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_DURATION, content.getDuration());
+        attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_CURRENT_POSITION, currentPosition);
+        sendAnalytics(AnalyticsTags.ACTION_PLAYBACK, attributes);
+    }
+
+    /**
      * Tracks that a content's playback finished. This could be that the content was played to
      * completion or that the player was exited.
      *
@@ -262,11 +285,28 @@ public class AnalyticsHelper {
 
         // Get the attributes for the selected movie.
         Map<String, Object> attributes = getBasicAnalyticsAttributesForContent(content);
+        attributes.putAll(getDetailedContentAttributes(content));
+        attributes.putAll(getClassificationTypeAttributes(content));
+        attributes.putAll(ExtraContentAttributes.getExtraAttributes(content.getExtras()));
         attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_SECONDS_WATCHED,
                        currentPosition - startingPosition);
+        attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_DURATION, content.getDuration());
         attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_CURRENT_POSITION, currentPosition);
 
         sendAnalytics(AnalyticsTags.ACTION_PLAYBACK_FINISHED, attributes);
+    }
+
+    public static void trackAutoplayFinished(Content content, long currentPosition) {
+
+        // Get the attributes for the selected movie.
+        Map<String, Object> attributes = getBasicAnalyticsAttributesForContent(content);
+        attributes.putAll(getDetailedContentAttributes(content));
+        attributes.putAll(getClassificationTypeAttributes(content));
+        attributes.putAll(ExtraContentAttributes.getExtraAttributes(content.getExtras()));
+        attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_DURATION, content.getDuration());
+        attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_CURRENT_POSITION, currentPosition);
+
+        sendAnalytics(AnalyticsTags.ACTION_AUTOPLAY_FINISHED, attributes);
     }
 
     /**
@@ -412,7 +452,15 @@ public class AnalyticsHelper {
                                                   long currentPosition) {
 
         // Get the attributes for the selected content.
+//        Map<String, Object> attributes = getBasicAnalyticsAttributesForContent(content);
+//        attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_CURRENT_POSITION, currentPosition);
         Map<String, Object> attributes = getBasicAnalyticsAttributesForContent(content);
+        attributes.putAll(getDetailedContentAttributes(content));
+        attributes.putAll(getClassificationTypeAttributes(content));
+
+        // Get Content extras
+        attributes.putAll(ExtraContentAttributes.getExtraAttributes(content.getExtras()));
+        attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_DURATION, content.getDuration());
         attributes.put(AnalyticsTags.ATTRIBUTE_VIDEO_CURRENT_POSITION, currentPosition);
 
         sendAnalytics(action, attributes);

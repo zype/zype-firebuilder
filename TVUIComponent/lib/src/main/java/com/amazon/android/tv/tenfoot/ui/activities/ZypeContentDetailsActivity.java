@@ -100,6 +100,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
+import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_VIDEO_DETAIL_DATA_LOADED;
 
 /* Zype, Evgeny Cherkasov */
 
@@ -130,7 +131,7 @@ public class ZypeContentDetailsActivity extends BaseActivity
     private View mMainFrame;
     private Drawable mBackgroundWithPreview;
 
-    private boolean isMenuOpened = false;
+//    private boolean isMenuOpened = false;
 
     private boolean lastRowSelected = false;
 
@@ -190,28 +191,32 @@ public class ZypeContentDetailsActivity extends BaseActivity
         updateActions(mSelectedContent);
         mActionsRow.requestFocus();
 
-        // Get display/background size
-        Display display = getWindowManager().getDefaultDisplay();
-        Point windowSize = new Point();
-        display.getSize(windowSize);
-        int imageWidth = (int) getResources().getDimension(R.dimen.content_image_width);
-        int imageHeight = (int) getResources().getDimension(R.dimen.content_image_height);
-        int gradientSize = (int) getResources().getDimension(R.dimen.content_image_gradient_size_zype);
-        // Create the background
-        Bitmap background =
-                BackgroundImageUtils.createBackgroundWithPreviewWindow(
-                        windowSize.x,
-                        windowSize.y,
-                        imageWidth,
-                        imageHeight,
-                        gradientSize,
-                        ContextCompat.getColor(this, R.color.browse_background_color));
-        mBackgroundWithPreview = new BitmapDrawable(getResources(), background);
-        // Set the background
-        mMainFrame = findViewById(R.id.main_frame);
-        mMainFrame.setBackground(mBackgroundWithPreview);
+//        // Get display/background size
+//        Display display = getWindowManager().getDefaultDisplay();
+//        Point windowSize = new Point();
+//        display.getSize(windowSize);
+//        int imageWidth = (int) getResources().getDimension(R.dimen.content_image_width);
+//        int imageHeight = (int) getResources().getDimension(R.dimen.content_image_height);
+//        int gradientSize = (int) getResources().getDimension(R.dimen.content_image_gradient_size_zype);
+//        // Create the background
+//        Bitmap background =
+//                BackgroundImageUtils.createBackgroundWithPreviewWindow(
+//                        windowSize.x,
+//                        windowSize.y,
+//                        imageWidth,
+//                        imageHeight,
+//                        gradientSize,
+//                        ContextCompat.getColor(this, R.color.browse_background_color));
+//        mBackgroundWithPreview = new BitmapDrawable(getResources(), background);
+//        // Set the background
+//        mMainFrame = findViewById(R.id.main_frame);
+//        mMainFrame.setBackground(mBackgroundWithPreview);
 
         hideMenu();
+        if (ZypeSettings.SHOW_TOP_MENU) {
+            showActions(false);
+            hideTopMenu();
+        }
 
         progressBar = (ProgressBar) findViewById(R.id.feed_progress);
         progressBar.setVisibility(View.VISIBLE);
@@ -329,13 +334,13 @@ public class ZypeContentDetailsActivity extends BaseActivity
                             CONTENT_IMAGE_CROSS_FADE_DURATION,
                             R.color.browse_background_color);
 
-                    // If there is no image, remove the preview window
-                    if (bgImageUrl != null && !bgImageUrl.isEmpty()) {
-                        mMainFrame.setBackground(mBackgroundWithPreview);
-                    }
-                    else {
-                        mMainFrame.setBackgroundColor(Color.TRANSPARENT);
-                    }
+//                    // If there is no image, remove the preview window
+//                    if (bgImageUrl != null && !bgImageUrl.isEmpty()) {
+//                        mMainFrame.setBackground(mBackgroundWithPreview);
+//                    }
+//                    else {
+//                        mMainFrame.setBackgroundColor(Color.TRANSPARENT);
+//                    }
                 });
 
     }
@@ -344,6 +349,8 @@ public class ZypeContentDetailsActivity extends BaseActivity
     protected void onResume() {
         super.onResume();
         if (receiver != null) {
+            LocalBroadcastManager.getInstance(this)
+                    .registerReceiver(receiver, new IntentFilter(BROADCAST_VIDEO_DETAIL_DATA_LOADED));
             LocalBroadcastManager.getInstance(this)
                     .registerReceiver(receiver, new IntentFilter(BROADCAST_DATA_LOADED));
         }
@@ -484,8 +491,7 @@ public class ZypeContentDetailsActivity extends BaseActivity
         MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
         if (fragment != null) {
             isMenuOpened = true;
-            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.lb_error_background_color_translucent));
-//             fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.left_menu_background));
+            fragment.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.left_menu_background_color));
             int paddingTop = (int) getResources().getDimension(R.dimen.lb_browse_padding_top);
             fragment.getView().setPadding(0, paddingTop, 0, 0);
             getFragmentManager().beginTransaction()
@@ -520,6 +526,13 @@ public class ZypeContentDetailsActivity extends BaseActivity
 
             case KeyEvent.KEYCODE_MENU:
                 if (event.getAction() == KeyEvent.ACTION_UP) {
+                    if (ZypeSettings.SHOW_TOP_MENU) {
+                        Log.d(TAG, "Menu button pressed");
+                        if (!isMenuOpened) {
+                            showTopMenu();
+                        }
+                        return true;
+                    }
                     if (ZypeSettings.SHOW_LEFT_MENU) {
                         Log.d(TAG, "Menu button pressed");
                         if (!isMenuOpened) {
@@ -533,7 +546,12 @@ public class ZypeContentDetailsActivity extends BaseActivity
                 if (event.getAction() == KeyEvent.ACTION_UP) {
                     Log.d(TAG, "Back button pressed");
                     if (isMenuOpened) {
-                        hideMenu();
+                        if (ZypeSettings.SHOW_LEFT_MENU) {
+                            hideMenu();
+                        }
+                        else if (ZypeSettings.SHOW_TOP_MENU) {
+                            hideTopMenu();
+                        }
                         if (restoreActionsFocus) {
                             mActionsRow.requestFocus();
                         }
@@ -547,7 +565,7 @@ public class ZypeContentDetailsActivity extends BaseActivity
             }
             case KeyEvent.KEYCODE_DPAD_UP:
                 Log.d(TAG, "Up button pressed");
-                if (isMenuOpened) {
+                if (isMenuOpened && ZypeSettings.SHOW_LEFT_MENU) {
                     MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
                     if (fragment != null) {
                         ArrayObjectAdapter menuAdapter = (ArrayObjectAdapter) fragment.getAdapter();
@@ -558,38 +576,53 @@ public class ZypeContentDetailsActivity extends BaseActivity
                         }
                     }
                 }
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    if (!isMenuOpened && ZypeSettings.SHOW_TOP_MENU) {
+                        if (mActionsRow.hasFocus()) {
+                            showTopMenu();
+                            return true;
+                        }
+                    }
+                }
                 break;
             case KeyEvent.KEYCODE_DPAD_DOWN:
                 Log.d(TAG, "Down button pressed");
                 if (isMenuOpened) {
-                    MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
-                    if (fragment != null) {
-                        ArrayObjectAdapter menuAdapter = (ArrayObjectAdapter) fragment.getAdapter();
-                        if (fragment.getSelectedMenuItemIndex() + 1 >= menuAdapter.size()) {
-                            if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                                return true;
+                    if (ZypeSettings.SHOW_LEFT_MENU) {
+                        MenuFragment fragment = (MenuFragment) getFragmentManager().findFragmentById(R.id.fragmentMenu);
+                        if (fragment != null) {
+                            ArrayObjectAdapter menuAdapter = (ArrayObjectAdapter) fragment.getAdapter();
+                            if (fragment.getSelectedMenuItemIndex() + 1 >= menuAdapter.size()) {
+                                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                                    return true;
+                                }
                             }
                         }
+                    }
+                    else if (ZypeSettings.SHOW_TOP_MENU) {
+                        hideTopMenu();
+                        return true;
                     }
                 }
                 break;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
                 Log.d(TAG, "Right button pressed");
                 if (isMenuOpened) {
-                    hideMenu();
-                    if (restoreActionsFocus) {
-                        mActionsRow.requestFocus();
+                    if (ZypeSettings.SHOW_LEFT_MENU) {
+                        hideMenu();
+                        if (restoreActionsFocus) {
+                            mActionsRow.requestFocus();
+                        } else {
+                            findViewById(R.id.full_content_browse_fragment).requestFocus();
+                        }
+                        return true;
                     }
-                    else {
-                        findViewById(R.id.full_content_browse_fragment).requestFocus();
-                    }
-                    return true;
                 }
                 break;
             case KeyEvent.KEYCODE_DPAD_LEFT:
                 Log.d(TAG, "Left button pressed");
                 if (event.getAction() == KeyEvent.ACTION_UP) {
-                    if (!isMenuOpened) {
+                    if (!isMenuOpened && ZypeSettings.SHOW_LEFT_MENU) {
                         if (mActionsRow.hasFocus()) {
                             if (lastSelectedActionIndex == 0) {
                                 lastSelectedActionIndex = -1;

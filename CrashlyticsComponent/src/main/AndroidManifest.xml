@@ -13,7 +13,8 @@ express or implied. See the License for the specific language governing
 permissions and limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.amazon.analytics.crash">
+  xmlns:tools="http://schemas.android.com/tools"
+  package="com.amazon.analytics.crash">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <application>
@@ -27,7 +28,6 @@ permissions and limitations under the License.
 
         <meta-data android:name="AMZNAP@CrashlyticsAnalytics"
                    android:value="IAnalytics@com.amazon.analytics.crash.CrashlyticsAnalyticsImplCreator"/>
-
         <meta-data
           android:name="firebase_crashlytics_collection_enabled"
           android:value="${crashlyticsCollectionEnabled}"/>
@@ -35,6 +35,12 @@ permissions and limitations under the License.
         <meta-data
             android:name="firebase_performance_logcat_enabled"
             android:value="${performanceMonitoringEnabled}" />
-
+    
+        <provider
+          android:name="com.google.firebase.provider.FirebaseInitProvider"
+          android:authorities="${applicationId}.firebaseinitprovider"
+          tools:node="remove"
+          />
+       
     </application>
 </manifest>

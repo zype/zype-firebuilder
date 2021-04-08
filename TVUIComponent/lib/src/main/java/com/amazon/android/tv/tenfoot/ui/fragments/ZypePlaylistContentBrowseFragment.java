@@ -75,6 +75,7 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.List;
 
 import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
+import static com.zype.fire.api.ZypeSettings.SHOW_TITLE;
 
 /* Zype, Evgeny Cherkasov */
 
@@ -98,7 +99,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
 
     // Container Activity must implement this interface.
     public interface OnBrowseRowListener {
-        void onItemSelected(Object item, Row row, boolean isLastContentRow);
+        void onItemSelected(Object item, Row row, boolean isLastContentRow, int rowIndex);
     }
 
     @Override
@@ -130,7 +131,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
         CustomListRowPresenter customListRowPresenter = new CustomListRowPresenter();
         customListRowPresenter.setHeaderPresenter(new RowHeaderPresenter());
         // Uncomment this code to remove shadow from the cards
-        //customListRowPresenter.setShadowEnabled(false);
+        customListRowPresenter.setShadowEnabled(!SHOW_TITLE);
 
         mRowsAdapter = new ArrayObjectAdapter(customListRowPresenter);
 
@@ -520,7 +521,7 @@ public class ZypePlaylistContentBrowseFragment extends RowsFragment {
             else {
                 isLastContentRow = false;
             }
-            mCallback.onItemSelected(item, row, isLastContentRow);
+            mCallback.onItemSelected(item, row, isLastContentRow, mRowsAdapter.indexOf(row));
         }
     }
 

@@ -25,7 +25,7 @@ permissions and limitations under the License.
     <!-- The background color of the screens. -->
     <color name="background">#22282E</color>
     <!-- Used for card background -->
-    <color name="card_background">#2B2B2B</color>
+    <color name="card_background">@color/background</color>
     <!-- Background color of the progress bar -->
     <color name="playback_background_progress_bar">#FF373737</color>
     <!-- Color of buffered progress bar -->
@@ -43,7 +43,7 @@ permissions and limitations under the License.
          Also used for button text, Splash screen text, and read more dialog text. -->
     <color name="primary_text">#E6FFFFFF</color>
     <!-- Used for the text on the card views and playback progress bar text. -->
-    <color name="secondary_text">#FFFFFFFF</color>
+    <color name="secondary_text">#E6FFFFFF</color>
     <!-- Used for the category titles and content subtitles -->
     <color name="tertiary_text">#99FFFFFF</color>
     <!-- End of App Colors -->
@@ -76,8 +76,8 @@ permissions and limitations under the License.
     <!-- App banner. Note: Used for Google Play Store -->
     <drawable name="app_banner">@drawable/placeholder_banner</drawable>
     <!-- Content preview window customization -->
-    <dimen name="content_image_height">350dp</dimen>
-    <dimen name="content_image_width">540dp</dimen>
+    <dimen name="content_image_height">310dp</dimen>
+    <dimen name="content_image_width">520dp</dimen>
     <!-- Size of gradient fade for content preview window -->
     <dimen name="content_image_gradient_size">100dp</dimen>
     <!-- A grace period used when selecting recent records that have been started but not

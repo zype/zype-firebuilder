@@ -221,6 +221,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
     /* Zype, Evgeny Cherkasov */
     public static final String FAVORITES = "Favorites";
+    public static final String HOME = "Home";
     public static final String MY_LIBRARY = "MyLibrary";
     public static final String NEXT_PAGE = "NextPage";
     public static final String EPG = "EPG";
@@ -721,20 +722,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         }
         //addWidgetsAction(createSlideShowAction());
 
-        //addSettingsAction(createSlideShowSettingAction());
-        setupSearchAction();
-        if (ZypeConfiguration.displayAccountNavigationButton()) {
-            setupLoginAction();
-        }
-        if(ZypeSettings.EPG_ENABLED) {
-            setupEpgAction();
-        }
-        setupMyLibraryAction();
-        setupFavoritesAction();
-        //if (!TextUtils.isEmpty(Preferences.getString("ZypeTerms")))
-        if (ZypeConfiguration.displayTermsNavigationButton()) {
-            addSettingsAction(createTermsOfUseSettingsAction());
-        }
+        setupSettingsActions();
 
         mSearchManager.addSearchAlgo(DEFAULT_SEARCH_ALGO_NAME, new ISearchAlgo<Content>() {
             @Override
@@ -1216,6 +1204,35 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         mPoweredByLogoUrlMap.put(name, url);
     }
 
+    private void setupSettingsActions() {
+        if (ZypeSettings.SHOW_TOP_MENU) {
+            addSettingsAction(new Action().setAction(HOME)
+                .setLabel1(mAppContext.getString(R.string.menu_home)));
+            if (ZypeConfiguration.displayAccountNavigationButton()) {
+                setupLogoutAction();
+            }
+            setupSearchAction();
+            setupFavoritesAction();
+            setupMyLibraryAction();
+            if (ZypeConfiguration.displayTermsNavigationButton()) {
+                addSettingsAction(createTermsOfUseSettingsAction());
+            }
+        }
+        else {
+            //addSettingsAction(createSlideShowSettingAction());
+            setupSearchAction();
+            setupLogoutAction();
+            if(ZypeSettings.EPG_ENABLED) {
+                setupEpgAction();
+            }
+            setupFavoritesAction();
+            //if (!TextUtils.isEmpty(Preferences.getString("ZypeTerms")))
+            addSettingsAction(createTermsOfUseSettingsAction());
+            //  setupMyLibraryAction();
+            // setupLogoutAction();
+        }
+    }
+
     /**
      * Get settings actions.
      *
@@ -1568,7 +1585,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             case SEARCH:
                 searchActionTriggered(activity);
                 break;
-
+            case HOME:
+                homeActionTriggered(activity);
+                break;
             default:
                 Log.e(TAG, "Unsupported action " + settingsAction);
                 break;
@@ -1660,12 +1679,14 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         switchToScreen(ContentBrowser.EPG_SCREEN);
     }
 
+    private void homeActionTriggered(Activity activity) {
+        switchToScreen(ContentBrowser.CONTENT_HOME_SCREEN);
+    }
+
     private void searchActionTriggered(Activity activity) {
         ContentBrowser.getInstance(activity)
                 .switchToScreen(ContentBrowser.CONTENT_SEARCH_SCREEN);
     }
-
-
 
     private void openTermsTriggered(Activity activity) {
         ContentBrowser.getInstance(activity)

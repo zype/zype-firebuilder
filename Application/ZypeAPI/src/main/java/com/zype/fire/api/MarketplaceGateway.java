@@ -123,11 +123,15 @@ public class MarketplaceGateway {
     public List<Map<String, String>> getSkuData() {
         List<Map<String, String>> result = new ArrayList<>();
         for (PlanData plan : plans) {
+            String marketplaceId = plan.marketplaceIds.amazon;
+            if (TextUtils.isEmpty(marketplaceId)) {
+                continue;
+            }
             Map<String, String> skuData = new HashMap<>();
             skuData.put("productType", "SUBSCRIBE");
-            skuData.put("sku", plan.marketplaceIds.amazon.substring(0, plan.marketplaceIds.amazon.lastIndexOf(".")));
-            skuData.put("purchaseSku", plan.marketplaceIds.amazon);
-            skuData.put("id", plan.marketplaceIds.amazon);
+            skuData.put("sku", marketplaceId.substring(0, marketplaceId.lastIndexOf(".")));
+            skuData.put("purchaseSku", marketplaceId);
+            skuData.put("id", marketplaceId);
             result.add(skuData);
         }
         return result;

@@ -49,6 +49,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+
+import androidx.cardview.widget.CardView;
 import androidx.leanback.widget.BaseCardView;
 import androidx.leanback.widget.ImageCardView;
 import androidx.leanback.widget.Presenter;
@@ -97,7 +99,7 @@ public class CardPresenter extends Presenter {
             sFocusedFadeMask = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_trance);
 
             /* Zype, Evgeny Cherkasov */
-            infoFieldWithProgressBarBackground = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_progress_bar);
+//            infoFieldWithProgressBarBackground = ContextCompat.getDrawable(mContext, R.drawable.content_fade_focused_progress_bar);
             imageLocked = ContextCompat.getDrawable(mContext, R.drawable.locked);
             imageUnlocked = ContextCompat.getDrawable(mContext, R.drawable.unlocked);
         }
@@ -111,6 +113,15 @@ public class CardPresenter extends Presenter {
             public void setSelected(boolean selected) {
 
                 super.setSelected(selected);
+
+                // comment this code to remove shadow from the cards
+                if (SHOW_TITLE) {
+                    CardView cardView1 = this.findViewById(R.id.main_image_lt);
+                    cardView1.setCardElevation(selected ? 6f : 0f);
+                    cardView1.setContentPadding(selected ? 5 : 0, 0, 0, 0);
+                }
+                //
+
 //                if (mInfoField != null) {
 //                    mInfoField.setBackground(sFocusedFadeMask);
 //                }
@@ -137,6 +148,7 @@ public class CardPresenter extends Presenter {
         titleText = (TextView) cardView.findViewById(R.id.title_text);
 
         if (subtitle != null) {
+            subtitle.setLines(2);
             subtitle.setMaxLines(2);
             //subtitle.setEllipsize(TextUtils.TruncateAt.END);
         }
@@ -172,7 +184,7 @@ public class CardPresenter extends Presenter {
                         }
                     }
                     cardView.setTitleText(title);
-                    cardView.setContentText(content.getTitle()+ "\n ");
+                    cardView.setContentText(content.getTitle());
                 }
                 else {
                     cardView.setTitleText("");
@@ -185,7 +197,7 @@ public class CardPresenter extends Presenter {
                     SimpleTarget<Bitmap> bitmapTarget = new SimpleTarget<Bitmap>(mCardWidthDp, mCardHeightDp) {
                         @Override
                         public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                            cardView.setInfoAreaBackground(infoFieldWithProgressBarBackground);
+                            //cardView.setInfoAreaBackground(infoFieldWithProgressBarBackground);
                             Bitmap bitmap = Helpers.addProgressToThumbnail((Activity) mContext, resource, playbackPercentage, 0);
                             cardView.getMainImageView().setImageBitmap(bitmap);
                         }
@@ -253,7 +265,7 @@ public class CardPresenter extends Presenter {
                     }
                 }
                 cardView.setTitleText(title);
-                cardView.setContentText(contentContainer.getName()+ "\n ");
+                cardView.setContentText(contentContainer.getName());
             }
             else {
                 cardView.setTitleText("");
@@ -307,7 +319,7 @@ public class CardPresenter extends Presenter {
         ImageCardView cardView = (ImageCardView) viewHolder.view;
         // Remove references to images so that the garbage collector can free up memory.
         cardView.setBadgeImage(null);
-        cardView.setMainImage(null);
+        cardView.getMainImageView().setImageDrawable(null);
     }
 }
 

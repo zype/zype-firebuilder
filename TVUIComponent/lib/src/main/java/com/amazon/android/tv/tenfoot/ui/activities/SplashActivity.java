@@ -29,10 +29,10 @@
 package com.amazon.android.tv.tenfoot.ui.activities;
 
 
+import com.amazon.analytics.AnalyticsManager;
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.contentbrowser.helper.ErrorHelper;
 import com.amazon.android.interfaces.ICancellableLoad;
-import com.amazon.android.tv.tenfoot.BuildConfig;
 import com.amazon.android.tv.tenfoot.ui.epg.EPGDataManager;
 import com.amazon.android.tv.tenfoot.ui.sliders.HeroSlider;
 import com.amazon.android.utils.ErrorUtils;
@@ -41,6 +41,7 @@ import com.amazon.android.tv.tenfoot.R;
 import com.amazon.android.tv.tenfoot.base.BaseActivity;
 import com.zype.fire.api.Model.ZobjectTopPlaylist;
 import com.zype.fire.api.Model.ZobjectTopPlaylistResponse;
+import com.zype.fire.api.Util.AdMacrosHelper;
 import com.zype.fire.api.ZypeApi;
 import com.zype.fire.api.ZypeSettings;
 
@@ -56,6 +57,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -82,13 +84,13 @@ public class SplashActivity extends BaseActivity implements ICancellableLoad {
         setContentView(R.layout.splash_activity_layout);
         mAppLogo = (ImageView) findViewById(R.id.main_logo);
         mProgress = (ProgressBar) findViewById(R.id.feed_progress);
-        TextView mProgressText = (TextView) findViewById(R.id.feed_loader);
-        TextView copyrightTextView = (TextView) findViewById(R.id.copyright);
+//        TextView mProgressText = (TextView) findViewById(R.id.feed_loader);
+//        TextView copyrightTextView = (TextView) findViewById(R.id.copyright);
 
         try {
             // Update copyright text with app version.
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            copyrightTextView.append("\nVersion " + pInfo.versionName);
+//            copyrightTextView.append("\nVersion " + pInfo.versionName);
         }
         catch (Resources.NotFoundException exception) {
             Log.e(TAG, "Resource not found: ", exception);
@@ -98,12 +100,17 @@ public class SplashActivity extends BaseActivity implements ICancellableLoad {
         }
         // Check to see if this activity is not called from the TenFootApp.
         if (!getIntent().hasExtra(ContentBrowser.CONTENT_WILL_UPDATE)) {
-            mProgressText.setText(R.string.feed_loading);
+//            mProgressText.setText(R.string.feed_loading);
         }
         // If this activity was called from the TenFootApp call activity method.
         else {
-            mProgressText.setText(R.string.feed_reloading);
+//            mProgressText.setText(R.string.feed_reloading);
         }
+        String sessionId = AdMacrosHelper.getAdvertisingId(this) + "-" +
+                Calendar.getInstance().getTimeInMillis();
+        Log.d(TAG, "onCreate(): sessionId=" + sessionId);
+        AnalyticsManager.getInstance(this).setSessionId(sessionId);
+
     }
 
     @Override

@@ -23,16 +23,18 @@ permissions and limitations under the License.
     <!-- The background color of the screens. -->
     <color name="background">#22282E</color>
     <!-- Used for card background. -->
-    <color name="card_background">#2B2B2B</color>
+    <color name="card_background">@color/background</color>
     <!-- The color of button highlights and widgets. -->
     <color name="accent">#EE962D</color>
     <!-- Used for the text of a selected item's title and description.
          Also used for button text, Splash screen text, and read more dialog text. -->
     <color name="primary_text">#E6FFFFFF</color>
     <!-- Used for the text on the card views and playback progress bar text. -->
-    <color name="secondary_text">#FFFFFFFF</color>
+    <color name="secondary_text">#E6FFFFFF</color>
     <!-- Used for the category titles and content subtitles -->
     <color name="tertiary_text">#99FFFFFF</color>
+
+    <color name="primary_text_inverse">@color/tertiary_text</color>
 
     <color name="transparent">#00FFFFFF</color>
 
@@ -101,9 +103,9 @@ permissions and limitations under the License.
     <!-- Details Customization -->
 
     <!-- Text color for unfocused action button -->
-    <color name="action_button_text_color">@color/primary_text</color>
+    <color name="action_button_text_color">#ffffff</color>
     <!-- Text color for focused action button -->
-    <color name="action_button_text_color_focused">@color/primary_text</color>
+    <color name="action_button_text_color_focused">#ffffff</color>
     <!-- Background color for focused action button -->
     <drawable name="action_button_focused">@drawable/btn_generic_focused</drawable>
     <!-- Background color for normal state of action button -->
@@ -160,8 +162,6 @@ permissions and limitations under the License.
     <color name="error_message_text_color">@color/primary_text</color>
     <integer name="error_button_height">64</integer>
 
-    <color name="lock_color">#FF0000</color>
-    <color name="unlock_color">#0000FF</color>
     <!-- End of Error Activity Customization -->
 
 
@@ -174,6 +174,28 @@ permissions and limitations under the License.
     <!-- Drm encryption schema, Allowed options are ENCRYPTION_DEFAULT, ENCRYPTION_PLAYREADY,
     ENCRYPTION_WIDEVINE -->
     <string name="drm_encryption_schema">ENCRYPTION_DEFAULT</string>
+
+    <color name="lock_color">#FF0000</color>
+    <color name="unlock_color">#0000FF</color>
+
     <color name="background_color_translucent">#CC000000</color>
+    <color name="menu_item_text_color">#FFFFFF</color>
+    <color name="top_menu_background">@android:color/transparent</color>
+
+    <drawable name="subscription_background">@color/background</drawable>
+
+    <drawable name="logo">@drawable/company_logo</drawable>
+
+    <!-- Only these colors alert exit alert theme changes  -->
+
+    <color name="app_exit_bg_color">#9022282E</color>
+    <color name="app_text_color">#FFFFFF</color>
+
+    <!-- Only these colors alert exit alert theme changes -->
+
+    <color name="app_bg_color">#22282E</color>
+    <string name="exit_alert_message">Are you sure you want to exit %s?</string>
+    <string name="positive">Yes, exit.</string>
+    <string name="negative">No, take me back.</string>
 
 </resources>

@@ -14,6 +14,8 @@
  */
 package com.amazon.android.module;
 
+import com.zype.fire.api.ZypeSettings;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,6 +71,7 @@ public class Module<I> {
             mImplCreator = implCreator;
         }
         mImplCreators.put(name, implCreator);
+
     }
 
     /**
@@ -113,9 +116,14 @@ public class Module<I> {
         return (I) mImplCreators.get(name).createImpl();
     }
 
-
     public void createImpls() {
         for (Map.Entry<String, IImplCreator> creator : mImplCreators.entrySet()) {
+            if (creator.getKey().equals("CrashlyticsAnalytics") && !ZypeSettings.FIREBASE_ENABLED) {
+                continue;
+            }
+            if (creator.getKey().equals("SegmentAnalytics") && !ZypeSettings.SEGMENT_ANALYTICS) {
+                continue;
+            }
             mImpls.put(creator.getKey(), (I) creator.getValue().createImpl());
         }
     }

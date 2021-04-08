@@ -18,5 +18,7 @@ permissions and limitations under the License.
             android:allowBackup="true"
             android:supportsRtl="true">
 
+        <meta-data android:name="com.amazon.android.utils.glide.GlideConfiguration" android:value="GlideModule" />
+
     </application>
 </manifest>

@@ -79,10 +79,12 @@ Non-Amazon Android devices and Amazon Fire phones and tablets are not supported 
 
 3. Replace following placeholders with actual values:
 
-  **Application/ZypeAPI/src/template/java/com/zype/fire/api/ZypeSettings.java**
-  - ```<APP_KEY>```
-  - ```<CLIENT_ID>```
-  - ```<ROOT_PLAYLIST_ID>```
+  **Application/ZypeAPI/src/main/java/com/zype/fire/api/ZypeSettings.java**
+```
+    public static final String APP_KEY = "";
+    public static final String CLIENT_ID = "";
+    public static final String ROOT_PLAYLIST_ID = "";
+```
 
 Also replace features and monetization options placeholders with `true` or `false` values.
 
@@ -120,21 +122,25 @@ You can use icon generator in Android Studio to produce icons with required dime
 
 5. Setup UI options
 
-**Light theme**
+**App theme**
 
-Light theme will display all background for all screens in white color and text elements in black/grey color.
-To enable light appearance update following values in the *Application/app/src/template/res/values/custom.xml* file:
+The app supports both dark and light themes.  
+The default appearance is dark, where the screen background is black/dark grey, and text elements are white/light grey.
+The Light theme will display all screens with white background and black/grey text elements.
 
+To enable light theme:  
+  - Set `LIGHT_THEME` feature flag to `true` in the *Application/ZypeAPI/src/main/java/com/zype/fire/api/ZypeSettings.java* file
+  - Update the following values in the *Application/app/src/template/res/values/custom.xml* file:
 
-| ***Attribute name***                 | ***Value***      |
-|:-------------------------------------|:-----------------|
-|`background`                          |#FFFFFF           |
-|`card_background`                     |#FFFFFF           |
-|`spinner_color`                       |#FF000000         |
-|`primary_text`                        |#E6000000         |
-|`tertiary_text`                       |#99000000         |
-|`search_edit_text_bg_color`           |#4D000000         |
-|`search_edit_text_bg_color_unfocused` |#1A000000         |
+| ***Attribute name***                 | ***Light theme***      | ***Dark theme***      |
+|:-------------------------------------|:-----------------|:-----------------|
+|`background`                          |#FFFFFF           |#22282E           |
+|`spinner_color`                       |#FF000000         |#FFFFFFFF         |
+|`primary_text`                        |#E6000000         |#E6FFFFFF         |
+|`secondary_text`                      |#99000000         |#E6FFFFFF         |
+|`tertiary_text`                       |#99000000         |#99FFFFFF         |
+|`search_edit_text_bg_color`           |#4D000000         |#4DFFFFFF         |
+|`search_edit_text_bg_color_unfocused` |#1A000000         |#1AFFFFFF         |
 
 
 
@@ -148,7 +154,27 @@ This option is turned off by default. To turn it on make the method `displayLeft
 The watched bar is displayed on the video thumbnail and shows the time that user watched this video.
 This option is turned on by default. To turn it off make the method `displayWatchedBarOnVideoThumbnails()` in the `ZypeConfiguration.java` return `false` value.
 
-6. Rebuild the project
+6. Analytics
+
+**Segment analytics**
+
+To enable Segment Analytics:
+- In the ***settings.gradle*** file uncomment lines referencing to `SegmentAnalyticsComponent`.
+- In the ***app/build.gradle*** file uncomment the following row:   
+```    
+    compile project(':SegmentAnalyticsComponent')
+```
+- Rebuild the project
+
+***Note:** You can find detail instructions on adding and removing Fire App Builder components [here](https://developer.amazon.com/docs/fire-app-builder/load-a-component.html#loadcomponent)* 
+
+Setting up Segment Analytics:
+- In the `SegmentAnalyticsComponent` module open the ***res/values/values.xml*** file and set your Segment write key in this line:
+```
+    <string name="segment_analytics_write_key">Your WRITE_KEY here</string>
+```
+
+7. Rebuild the project
 
 ## Built With
 
