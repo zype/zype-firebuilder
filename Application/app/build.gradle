@@ -15,7 +15,7 @@ import java.text.SimpleDateFormat
  * permissions and limitations under the License.
  */
 
-def FIREBASE_ENABLED = true
+def FIREBASE_ENABLED = false
 
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
