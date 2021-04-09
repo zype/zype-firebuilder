@@ -33,6 +33,8 @@ public class ZypeSettings {
      * - Text color on Terms and Privacy Policy screen
     */
     public static final boolean LIGHT_THEME = false;
+    public static final boolean LIVE_NAV_BUTTON_DISPLAY = true;
+    public static final String LIVE_VIDEO_ID = "5fc54fc630bbaa000150135f";
     public static final boolean SETTINGS_PLAYLIST_ENABLED = false;
     public static final boolean SHOW_EPISODE_NUMBER = false;
     public static final boolean SHOW_TITLE = true;
@@ -49,7 +51,7 @@ public class ZypeSettings {
     public static final boolean ACCOUNT_CREATION_TOS = false;
     public static final boolean DEVICE_LINKING = false;
     public static final boolean FAVORITES_VIA_API = false;
-    public static final boolean LIBRARY_ENABLED = false;
+    public static final boolean LIBRARY_ENABLED = true;
 
     // Monetization
     public static final boolean MARKETPLACE_CONNECT_SVOD = false;
@@ -58,7 +60,7 @@ public class ZypeSettings {
     public static final boolean PLAYLIST_PURCHASE_ENABLED = false;
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = false;
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = false;
-    public static final boolean UNIVERSAL_TVOD = false;
+    public static final boolean UNIVERSAL_TVOD = true;
     public static final boolean FIREBASE_ENABLED = true;
 
     // Analytics
