@@ -33,6 +33,8 @@ public class ZypeSettings {
      * - Text color on Terms and Privacy Policy screen
     */
     public static final boolean LIGHT_THEME = false;
+    public static final boolean LIVE_NAV_BUTTON_DISPLAY = false;
+    public static final String LIVE_VIDEO_ID = "";
     public static final boolean SETTINGS_PLAYLIST_ENABLED = false;
     public static final boolean SHOW_EPISODE_NUMBER = false;
     public static final boolean SHOW_TITLE = true;
