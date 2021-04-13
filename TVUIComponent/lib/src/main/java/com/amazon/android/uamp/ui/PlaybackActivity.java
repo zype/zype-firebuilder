@@ -1077,7 +1077,7 @@ public class PlaybackActivity extends BasePlaybackActivity implements
                     mPlayer.enableTextTrack(TrackType.CLOSED_CAPTION, state);
                 }
                 else {
-                    mPlayer.enableTextTrack(TrackType.SUBTITLE, state);
+                    //mPlayer.enableTextTrack(TrackType.SUBTITLE, state);
                 }
 //                /* Zype, Evgeny Cherkasov */
 //                int ccTrackIndex = -1;

@@ -35,9 +35,9 @@ import com.amazon.android.uamp.UAMP;
 import com.amazon.mediaplayer.AMZNMediaPlayer;
 import com.amazon.mediaplayer.playback.SeekRange;
 import com.amazon.mediaplayer.playback.config.BaseContentPlaybackBufferConfig;
-import com.amazon.mediaplayer.tracks.MediaFormat;
 import com.amazon.mediaplayer.tracks.TrackType;
 //import com.google.android.exoplayer.smoothstreaming.SmoothStreamingChunkSource;
+import com.amazon.mediaplayer.tracks.MediaFormat;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -48,6 +48,8 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MergingMediaSource;
+import com.google.android.exoplayer2.source.SingleSampleMediaSource;
 import com.google.android.exoplayer2.source.TrackGroup;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
@@ -69,6 +71,7 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.upstream.TransferListener;
 import com.google.android.exoplayer2.util.EventLogger;
+import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoListener;
 
@@ -255,7 +258,7 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
         mExtras = extras;
         mUserAgent = "CustomExoPlayer";
 
-        mDataSourceFactory = buildDataSourceFactory(true);
+          mDataSourceFactory = buildDataSourceFactory(true);
 
         /*
          * AdaptiveTrackSelection must be driven by the same instance of
@@ -264,6 +267,7 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
         mTrackSelectionFactory = new AdaptiveTrackSelection.Factory(BANDWIDTH_METER);
         mTrackSelector = new DefaultTrackSelector(mTrackSelectionFactory);
         eventLogger = new EventLogger(mTrackSelector);
+        mTrackSelector.setParameters(new DefaultTrackSelector.ParametersBuilder().setPreferredAudioLanguage("eng").build());
 
         mPlayer = ExoPlayerFactory.newSimpleInstance(mContext, mTrackSelector);
         mPlayer.addListener(eventLogger);
@@ -318,7 +322,7 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
     private DataSource.Factory buildDataSourceFactory(boolean useBandwidthMeter) {
         TransferListener<? super DataSource> listener = useBandwidthMeter ? BANDWIDTH_METER : null;
         return new DefaultDataSourceFactory(mContext, listener,
-                buildHttpDataSourceFactory(useBandwidthMeter));
+            buildHttpDataSourceFactory(useBandwidthMeter));
     }
 
     /**
@@ -364,7 +368,7 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
                     Log.v(TAG, "STATE_ENDED");
                     setPlayerState(PlayerState.ENDED);
                     break;
-           }
+            }
         }
 
         @Override
@@ -447,7 +451,7 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
         // Try to retrieve the video quality setting from global settings.
         try {
             defaultVideoQualityType = getInt(mContext.getContentResolver(),
-                                             VIDEO_QUALITY);
+                VIDEO_QUALITY);
         }
         catch (Settings.SettingNotFoundException e) {
             Log.i(TAG, "Settings do not contain any video quality preferences");
@@ -545,7 +549,7 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
      */
     @Override
     public void setContentBufferConfig(BaseContentPlaybackBufferConfig
-                                               baseContentPlaybackBufferConfig) {
+                                           baseContentPlaybackBufferConfig) {
         Log.w(TAG, "setContentBufferConfig not implemented");
     }
 
@@ -610,38 +614,50 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
         // Build the appropriate MediaSource
         MediaSource mediaSource;
         DataSource.Factory manifestDataSourceFactory =
-                new DefaultHttpDataSourceFactory(mUserAgent);
+            new DefaultHttpDataSourceFactory(mUserAgent);
+
         mDataSourceFactory = buildDataSourceFactory(true);
 
         switch (mediaSourceType) {
             case C.TYPE_DASH:
                 mediaSource = new DashMediaSource.Factory(
-                        new DefaultDashChunkSource.Factory(mDataSourceFactory),
-                        buildDataSourceFactory(true))
-                        .createMediaSource(url, mMediaSourceHandler, eventLogger);
+                    new DefaultDashChunkSource.Factory(mDataSourceFactory),
+                    buildDataSourceFactory(true))
+                    .createMediaSource(url, mMediaSourceHandler, eventLogger);
                 break;
 
             case C.TYPE_SS:
                 mediaSource = new SsMediaSource.Factory(
-                        new DefaultSsChunkSource.Factory(mDataSourceFactory),
-                        buildDataSourceFactory(true))
-                        .createMediaSource(url, mMediaSourceHandler, eventLogger);
+                    new DefaultSsChunkSource.Factory(mDataSourceFactory),
+                    buildDataSourceFactory(true))
+                    .createMediaSource(url, mMediaSourceHandler, eventLogger);
                 break;
 
             case C.TYPE_HLS:
                 mediaSource = new HlsMediaSource.Factory(mDataSourceFactory)
-                        .createMediaSource(url, mMediaSourceHandler, eventLogger);
+                    .createMediaSource(url, mMediaSourceHandler, eventLogger);
                 break;
 
             case C.TYPE_OTHER:
             default:
                 mediaSource = new ExtractorMediaSource.Factory(mDataSourceFactory)
-                        .createMediaSource(url, mMediaSourceHandler, eventLogger);
+                    .createMediaSource(url, mMediaSourceHandler, eventLogger);
         }
 
         setPlayerState(PlayerState.OPENING);
         if (mediaSource != null) {
-            mCurrentMediaSource = mediaSource;
+
+            MediaSource[] mediaSources = new MediaSource[2]; //The Size must change depending on the Uris
+            mediaSources[0] = mediaSource; // uri
+
+            Uri subtitleUri= Uri.parse("https://gvupload.zype.com/video/5e17a4a2ba6d660001aeff51/subtitles/5e1dd98cdcd81b0001dcf752.srt?1579014540");
+            //Add subtitles
+            SingleSampleMediaSource subtitleSource = new SingleSampleMediaSource(subtitleUri, mDataSourceFactory,
+                Format.createTextSampleFormat(null, MimeTypes.APPLICATION_SUBRIP, Format.NO_VALUE, "en", null),
+                C.TIME_UNSET);
+
+            mediaSources[1] = subtitleSource;
+            mCurrentMediaSource = new MergingMediaSource(mediaSources);
             setPlayerState(PlayerState.OPENED);
         }
         else {
@@ -1015,10 +1031,10 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
 
     @Override
     public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-       mVideoWidth = width;
-       mVideoHeight = height;
-       mVideoAspect = pixelWidthHeightRatio;
-       updateSurfaceView();
+        mVideoWidth = width;
+        mVideoHeight = height;
+        mVideoAspect = pixelWidthHeightRatio;
+        updateSurfaceView();
     }
 
     @Override

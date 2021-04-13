@@ -481,7 +481,7 @@ public class Content implements Serializable {
      */
     public String getUrl() {
 
-        return mUrl;
+        return "https://player.zype.com/manifest/5e17a4a2ba6d660001aeff51.m3u8?ad_enabled=true&app_key=_8lturwVNItBuL0t7mN_2gc3jsJF-a72V-zyDOLZekuHR2uRl1SRxtAw2XkcVNsJ&https=true&player_request_id=60066b58a28ea200012ac290&preview=false";
     }
 
     /**
