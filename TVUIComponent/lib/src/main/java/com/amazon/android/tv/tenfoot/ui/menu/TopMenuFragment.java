@@ -29,6 +29,8 @@ public class TopMenuFragment extends Fragment {
     private ITopMenuListener listener;
 
     private HorizontalGridView menuContainer;
+    private int itemWidthTotal = 0;
+    private boolean menuWidthEvaluated = false;
 
     public interface ITopMenuListener {
         void onTopMenuItemSelected(Action item);
@@ -62,6 +64,26 @@ public class TopMenuFragment extends Fragment {
         }
         adapter = new TopMenuAdapter(getTopMenuActions(), listener);
         menuContainer.setAdapter(adapter);
+        itemWidthTotal = 0;
+        int topMenuMaxWidth = getResources().getDimensionPixelSize(R.dimen.top_navigation_max_width);
+        menuContainer.setOnChildLaidOutListener((parent, view, position, id) -> {
+            Log.d(TAG, "ChildLaidOutListener(): id=" + id + ", width=" + view.getWidth() + ", position=" + position);
+            if (!menuWidthEvaluated) {
+                itemWidthTotal += view.getWidth();
+                if (position + 1 != adapter.getItemCount()) {
+                    itemWidthTotal += getResources().getInteger(R.integer.top_navigation_item_spacing);
+                }
+                if (position + 1 == adapter.getItemCount() || itemWidthTotal > topMenuMaxWidth) {
+                    menuWidthEvaluated = true;
+                    ViewGroup.LayoutParams layoutParams = menuContainer.getLayoutParams();
+                    Log.d(TAG, "ChildLaidOutListener(): current menu width: " + layoutParams.width);
+                    layoutParams.width = Math.min(itemWidthTotal, topMenuMaxWidth);
+                    menuContainer.setLayoutParams(layoutParams);
+                    menuContainer.invalidate();
+                    Log.d(TAG, "ChildLaidOutListener(): menu width updated: " + layoutParams.width);
+                }
+            }
+        });
     }
 
     private List<Action> getTopMenuActions() {

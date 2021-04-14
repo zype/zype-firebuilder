@@ -13,7 +13,7 @@ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
 express or implied. See the License for the specific language governing
 permissions and limitations under the License.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="60dp"
     android:orientation="horizontal"
@@ -24,21 +24,15 @@ permissions and limitations under the License.
     android:paddingTop="25dp"
     android:paddingLeft="30dp"
     android:paddingRight="30dp"
-    android:visibility="gone"
+    android:visibility="visible"
     android:focusableInTouchMode="false"
     >
-    <View
-        android:layout_width="wrap_content"
-        android:layout_height="1dp"
-        android:layout_weight="1"
-        />
     <androidx.leanback.widget.HorizontalGridView
         android:transitionGroup="true"
         android:layout_gravity="center_horizontal"
         android:id="@+id/gridTopMenu"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/top_navigation_max_width"
         android:layout_height="35dp"
-        android:layout_weight="0.367"
         android:padding="0dp"
         android:clipToPadding="false"
         android:focusable="true"
@@ -48,9 +42,4 @@ permissions and limitations under the License.
         android:backgroundTint="#BF999999"
         lb:numberOfRows="1"
         />
-    <View
-        android:layout_width="wrap_content"
-        android:layout_height="1dp"
-        android:layout_weight="1"
-        />
-</LinearLayout>
+</FrameLayout>

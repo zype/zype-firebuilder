@@ -138,4 +138,6 @@ permissions and limitations under the License.
     <dimen name="epg_reset_button_margin">10dp</dimen>
     <dimen name="epg_channel_bar_text">11sp</dimen>
 
+    <!-- Top menu -->
+    <dimen name="top_navigation_max_width">700dp</dimen>
 </resources>
