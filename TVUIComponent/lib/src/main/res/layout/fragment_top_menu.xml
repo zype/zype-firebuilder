@@ -24,7 +24,7 @@ permissions and limitations under the License.
     android:paddingTop="25dp"
     android:paddingLeft="30dp"
     android:paddingRight="30dp"
-    android:visibility="visible"
+    android:visibility="gone"
     android:focusableInTouchMode="false"
     >
     <androidx.leanback.widget.HorizontalGridView
