@@ -2,6 +2,7 @@ package com.amazon.android.tv.tenfoot.ui.menu;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,9 +79,12 @@ public class TopMenuFragment extends Fragment {
                     ViewGroup.LayoutParams layoutParams = menuContainer.getLayoutParams();
                     Log.d(TAG, "ChildLaidOutListener(): current menu width: " + layoutParams.width);
                     layoutParams.width = Math.min(itemWidthTotal, topMenuMaxWidth);
-                    menuContainer.setLayoutParams(layoutParams);
-                    menuContainer.invalidate();
-                    Log.d(TAG, "ChildLaidOutListener(): menu width updated: " + layoutParams.width);
+                    Handler handler = new Handler();
+                    handler.post(() -> {
+                        menuContainer.setLayoutParams(layoutParams);
+                        menuContainer.invalidate();
+                        Log.d(TAG, "ChildLaidOutListener(): menu width updated: " + layoutParams.width);
+                    });
                 }
             }
         });
