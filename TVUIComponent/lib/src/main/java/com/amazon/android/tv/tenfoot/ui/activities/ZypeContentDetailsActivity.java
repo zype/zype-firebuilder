@@ -219,7 +219,7 @@ public class ZypeContentDetailsActivity extends BaseActivity
         }
 
         progressBar = (ProgressBar) findViewById(R.id.feed_progress);
-        progressBar.setVisibility(View.VISIBLE);
+//        progressBar.setVisibility(View.VISIBLE);
 
         receiver = new BroadcastReceiver() {
             @Override

@@ -143,10 +143,9 @@ permissions and limitations under the License.
         <fragment
             android:id="@+id/fragmentTopMenu"
             android:name="com.amazon.android.tv.tenfoot.ui.menu.TopMenuFragment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:layout="@layout/fragment_top_menu"
-            />
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            tools:layout="@layout/action_widget_container" />
 
     </RelativeLayout>
 
