@@ -15,19 +15,21 @@ import java.text.SimpleDateFormat
  * permissions and limitations under the License.
  */
 
-def FIREBASE_ENABLED = false
+def FIREBASE_ENABLED = true
 
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 // Uncomment when using CrashlyticsComponent
 //apply plugin: 'io.fabric'
+if (FIREBASE_ENABLED) {
+    apply plugin: 'com.google.gms.google-services'
+}
+
 apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'com.google.firebase.firebase-perf'
 apply from: "../artifacts.gradle"
 
-if (FIREBASE_ENABLED) {
-    apply plugin: 'com.google.gms.google-services'
-}
+
 
 repositories {
     // Uncomment when using CrashlyticsComponent
@@ -46,10 +48,6 @@ buildscript {
         classpath 'me.tatarka:gradle-retrolambda:3.7.1'
         // Uncomment when using CrashlyticsComponent
         //classpath 'io.fabric.tools:gradle:1.+'
-        classpath 'com.google.gms:google-services:4.3.3'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.2.0'
-        classpath 'com.google.firebase:perf-plugin:1.3.2'
-
     }
 }
 
@@ -105,15 +103,17 @@ android {
     productFlavors {
         zype {
             manifestPlaceholders = [
-                    crashlyticsCollectionEnabled: "true",
-                    performanceMonitoringEnabled : "true"
+                    performanceCollectionEnabled: true,
+                    performanceMonitoringEnabled : true,
+                    crashlyticsCollectionEnabled : true
             ]
         }
         template {
             applicationId "<APPLICATION_ID>"
             manifestPlaceholders = [
-                    crashlyticsCollectionEnabled: "false",
-                    performanceMonitoringEnabled : "false"
+                    performanceCollectionEnabled: false,
+                    performanceMonitoringEnabled : false,
+                    crashlyticsCollectionEnabled : true
             ]
         }
     }
