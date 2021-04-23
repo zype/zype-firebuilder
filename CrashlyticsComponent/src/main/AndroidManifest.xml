@@ -30,11 +30,11 @@ permissions and limitations under the License.
                    android:value="IAnalytics@com.amazon.analytics.crash.CrashlyticsAnalyticsImplCreator"/>
 
     
-        <provider
-          android:name="com.google.firebase.provider.FirebaseInitProvider"
-          android:authorities="${applicationId}.firebaseinitprovider"
-          tools:node="remove"
-          />
+<!--        <provider-->
+<!--          android:name="com.google.firebase.provider.FirebaseInitProvider"-->
+<!--          android:authorities="${applicationId}.firebaseinitprovider"-->
+<!--          tools:node="remove"-->
+<!--          />-->
        
     </application>
 </manifest>
