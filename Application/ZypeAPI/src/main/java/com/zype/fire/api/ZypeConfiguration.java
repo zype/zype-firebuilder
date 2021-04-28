@@ -116,6 +116,10 @@ public class ZypeConfiguration {
         return getStringPreference(PREFERENCE_APP_ID, "", context);
     }
 
+    public static String getLiveVideoId() {
+        return ZypeSettings.LIVE_VIDEO_ID;
+    }
+
     public static String getRootPlaylistId(Context context) {
         return getStringPreference(PREFERENCE_ROOT_PLAYLIST_ID, ZypeSettings.ROOT_PLAYLIST_ID, context);
     }
@@ -169,6 +173,10 @@ public class ZypeConfiguration {
 
     public static boolean displayAccountNavigationButton() {
         return ZypeSettings.ACCOUNT_NAV_BUTTON_DISPLAY;
+    }
+
+    public static boolean displayLiveNavigationButton() {
+        return ZypeSettings.LIVE_NAV_BUTTON_DISPLAY;
     }
 
     public static boolean displayTermsNavigationButton() {

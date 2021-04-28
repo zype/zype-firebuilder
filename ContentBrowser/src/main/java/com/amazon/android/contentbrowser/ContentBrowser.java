@@ -222,6 +222,7 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
     /* Zype, Evgeny Cherkasov */
     public static final String FAVORITES = "Favorites";
     public static final String HOME = "Home";
+    public static final String LIVE = "Live";
     public static final String MY_LIBRARY = "MyLibrary";
     public static final String NEXT_PAGE = "NextPage";
     public static final String EPG = "EPG";
@@ -1212,6 +1213,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                 setupLogoutAction();
             }
             setupSearchAction();
+            if (ZypeConfiguration.displayLiveNavigationButton()) {
+                addSettingsAction(new Action().setAction(LIVE)
+                    .setLabel1(mAppContext.getString(R.string.menu_live)));
+            }
             setupFavoritesAction();
             setupMyLibraryAction();
             if (ZypeConfiguration.displayTermsNavigationButton()) {
@@ -1224,6 +1229,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             setupLogoutAction();
             if(ZypeSettings.EPG_ENABLED) {
                 setupEpgAction();
+            }
+            if (ZypeConfiguration.displayLiveNavigationButton()) {
+                addSettingsAction(new Action().setAction(LIVE)
+                        .setLabel1(mAppContext.getString(R.string.menu_live)));
             }
             setupFavoritesAction();
             //if (!TextUtils.isEmpty(Preferences.getString("ZypeTerms")))
@@ -1579,6 +1588,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
             case FAVORITES:
                 favoritesActionTriggered(activity);
                 break;
+            case LIVE:
+                liveActionTriggered(activity);
+                break;
             case MY_LIBRARY:
                 myLibraryActionTriggered(activity);
                 break;
@@ -1681,6 +1693,20 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
 
     private void homeActionTriggered(Activity activity) {
         switchToScreen(ContentBrowser.CONTENT_HOME_SCREEN);
+    }
+
+    private void liveActionTriggered(Activity activity) {
+        mCompositeSubscription.add(getContentById(ZypeConfiguration.getLiveVideoId())
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(content -> {
+                handleRendererScreenSwitch(getNavigator().getActiveActivity(), content,
+                    CONTENT_ACTION_WATCH_NOW, true);
+                },
+                throwable -> {
+                }
+            )
+        );
     }
 
     private void searchActionTriggered(Activity activity) {

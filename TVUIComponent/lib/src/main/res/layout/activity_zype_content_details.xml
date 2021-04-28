@@ -5,6 +5,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
+    <LinearLayout
+        android:layout_width="520dp"
+        android:layout_height="310dp"
+        android:layout_alignParentTop="true"
+        android:gravity="top"
+        android:layout_alignParentRight="true">
+
+        <ImageView
+            android:id="@+id/content_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:layout_gravity="top"
+            android:background="@color/accent"
+            android:scaleType="fitCenter" />
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/main_frame"
@@ -81,6 +97,12 @@
             android:layout_width="380dp"
             android:layout_height="match_parent"
             tools:layout="@layout/action_widget_container" />
+        <fragment
+            android:id="@+id/fragmentTopMenu"
+            android:name="com.amazon.android.tv.tenfoot.ui.menu.TopMenuFragment"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            tools:layout="@layout/action_widget_container" />
 
     </RelativeLayout>
 
@@ -90,30 +112,9 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_centerInParent="true"
-        android:indeterminateDrawable="@drawable/custom_progress"/>
-
-    <LinearLayout
-        android:layout_width="520dp"
-        android:layout_height="310dp"
-        android:layout_alignParentTop="true"
-        android:gravity="top"
-        android:layout_alignParentRight="true">
-
-        <ImageView
-            android:id="@+id/content_image"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:layout_gravity="top"
-            android:background="@color/accent"
-            android:scaleType="fitCenter" />
-    </LinearLayout>
-    <fragment
-        android:id="@+id/fragmentTopMenu"
-        android:name="com.amazon.android.tv.tenfoot.ui.menu.TopMenuFragment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:layout="@layout/fragment_top_menu"
+        android:indeterminateDrawable="@drawable/custom_progress"
+        android:visibility="invisible"
         />
+
     <include layout="@layout/action_widget_container"/>
 </RelativeLayout>

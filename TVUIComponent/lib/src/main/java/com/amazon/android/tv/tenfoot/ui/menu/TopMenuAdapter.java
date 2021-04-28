@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TopMenuAdapter extends RecyclerView.Adapter {
+    private final static String TAG = TopMenuAdapter.class.getSimpleName();
 
     private List<Action> items;
 
