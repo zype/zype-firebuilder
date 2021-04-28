@@ -59,6 +59,23 @@ permissions and limitations under the License.
             -->
             <!-- Launcher integration intents complete -->
         </activity>
+
+        <meta-data
+          android:name="firebase_crashlytics_collection_enabled"
+          android:value="${crashlyticsCollectionEnabled}" />
+
+        <meta-data
+            android:name="firebase_performance_collection_enabled"
+            android:value="${performanceCollectionEnabled}"/>
+
+        <meta-data
+            android:name="firebase_performance_logcat_enabled"
+            android:value="${performanceMonitoringEnabled}" />
+
+        <meta-data
+          android:name="firebase_performance_collection_deactivated"
+          android:value="false" />
+
     </application>
 
 </manifest>

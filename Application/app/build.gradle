@@ -14,12 +14,22 @@ import java.text.SimpleDateFormat
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
+
+def FIREBASE_ENABLED = false
+
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 // Uncomment when using CrashlyticsComponent
 //apply plugin: 'io.fabric'
+if (FIREBASE_ENABLED) {
+    apply plugin: 'com.google.gms.google-services'
+}
+
 apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.google.firebase.firebase-perf'
 apply from: "../artifacts.gradle"
+
+
 
 repositories {
     // Uncomment when using CrashlyticsComponent
@@ -38,8 +48,6 @@ buildscript {
         classpath 'me.tatarka:gradle-retrolambda:3.7.1'
         // Uncomment when using CrashlyticsComponent
         //classpath 'io.fabric.tools:gradle:1.+'
-        classpath 'com.google.gms:google-services:4.3.3'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.2.0'
     }
 }
 
@@ -73,6 +81,7 @@ android {
 //        multiDexKeepProguard file('multidex-config.pro')
         multiDexKeepFile file('multidex-config.txt')
     }
+
     buildTypes {
         release {
             setVersionNameSuffix(".${currentCodeVersion}")
@@ -93,10 +102,19 @@ android {
     flavorDimensions "main"
     productFlavors {
         zype {
-
+            manifestPlaceholders = [
+                    performanceCollectionEnabled: true,
+                    performanceMonitoringEnabled : true,
+                    crashlyticsCollectionEnabled : true
+            ]
         }
         template {
             applicationId "<APPLICATION_ID>"
+            manifestPlaceholders = [
+                    performanceCollectionEnabled: false,
+                    performanceMonitoringEnabled : false,
+                    crashlyticsCollectionEnabled : true
+            ]
         }
     }
 

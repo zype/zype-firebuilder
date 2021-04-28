@@ -57,22 +57,9 @@ public class CrashlyticsAnalytics implements IAnalytics {
      */
     @Override
     public void configure(Context context) {
-        initializeFirebaseApp(context);
         mCustomTags.init(context, R.string.crashlytics_analytics_custom_tags);
     }
 
-    private void initializeFirebaseApp(Context context) {
-        if(!ZypeSettings.FIREBASE_ENABLED) {
-            return;
-        }
-
-        FirebaseApp firebaseApp = FirebaseApp.initializeApp(context);
-        if(firebaseApp != null) {
-            Log.i("ZypeApp", "FirebaseApp initialization successful");
-        } else {
-            Log.i("ZypeApp", "FirebaseApp initialization unsuccessful");
-        }
-    }
     /**
      * {@inheritDoc}
      */

@@ -7,7 +7,7 @@ import android.content.Context;
  */
 
 public class ZypeSettings {
-    // Zype app key
+ // Zype app key
     public static final String APP_KEY = "V6fnOdsr8zckXyJJeSvfP77mUPPOb9IUo6h1gSI0bb29Hw2c";
     // OAuth credentials
     public static final String CLIENT_ID = "3913d2a25478e001a60a91edc194f674625f0d11bf3d710d71abad4a88fa97f7";
@@ -61,7 +61,6 @@ public class ZypeSettings {
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = false;
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = false;
     public static final boolean UNIVERSAL_TVOD = false;
-    public static final boolean FIREBASE_ENABLED = true;
 
     // Analytics
     public static final boolean SEGMENT_ANALYTICS = false;
