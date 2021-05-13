@@ -174,8 +174,9 @@ public class HeroSliderFragment extends RowsFragment {
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    int index = listRowAdapter.realSize() % 2 == 0 ? 1 : 0;
-                    selectedIndex = (listRowAdapter.size() / 2 + index) - 1;
+                    int initialIndex = listRowAdapter.size() / 2;
+                    int offset = initialIndex % listRowAdapter.realSize();
+                    selectedIndex = initialIndex - offset - 1;
                     scrollToNextItem(false);
                 }
             }, WAIT_BEFORE_FOCUS_REQUEST_MS);
