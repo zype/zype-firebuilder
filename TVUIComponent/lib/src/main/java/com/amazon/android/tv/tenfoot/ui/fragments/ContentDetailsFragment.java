@@ -291,6 +291,10 @@ public class ContentDetailsFragment extends androidx.leanback.app.DetailsFragmen
         // light theme.
         mBackgroundManager.setDimLayer(ContextCompat.getDrawable(getActivity(), R.color.transparent));
         mDefaultBackground = ContextCompat.getDrawable(getActivity(), android.R.color.transparent);
+        updateDisplayMetrics();
+    }
+
+    private void updateDisplayMetrics(){
         mMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(mMetrics);
     }
@@ -300,6 +304,10 @@ public class ContentDetailsFragment extends androidx.leanback.app.DetailsFragmen
         Log.v(TAG, "updateBackground called");
         if (Helpers.DEBUG) {
             Log.v(TAG, "updateBackground called: " + uri);
+        }
+
+        if (mMetrics == null){
+            updateDisplayMetrics();
         }
 
         SimpleTarget<Bitmap> bitmapTarget = new SimpleTarget<Bitmap>(mMetrics.widthPixels,
