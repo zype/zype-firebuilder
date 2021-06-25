@@ -25,7 +25,7 @@ public class ZypeSettings {
 
     public static final boolean ACCOUNT_NAV_BUTTON_DISPLAY = false;
     public static final boolean EPG_ENABLED = false;
-    public static final boolean DETAIL_BACKGROUND_IMAGE = false;
+    public static final boolean DETAIL_BACKGROUND_IMAGE = true;
     /* Define the app theme
      *
      * The default theme is dark. To make the app theme light, set this flag to 'true'.
@@ -38,10 +38,10 @@ public class ZypeSettings {
     public static final boolean SETTINGS_PLAYLIST_ENABLED = false;
     public static final boolean SHOW_EPISODE_NUMBER = false;
     public static final boolean SHOW_TITLE = true;
-    public static final boolean SHOW_LEFT_MENU = false;
-    public static final boolean SHOW_MENU_ICON = false;
+    public static final boolean SHOW_LEFT_MENU = true;
+    public static final boolean SHOW_MENU_ICON = true;
     public static final boolean SHOW_SEARCH_ICON = false;
-    public static final boolean SHOW_TOP_MENU = true;
+    public static final boolean SHOW_TOP_MENU = false;
     public static final boolean TERMS_NAV_BUTTON_DISPLAY = false;
     public static final boolean UNLOCK_TRANSPARENT = false;
 
