@@ -1226,7 +1226,9 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         else {
             //addSettingsAction(createSlideShowSettingAction());
             setupSearchAction();
-            setupLogoutAction();
+            if (ZypeConfiguration.displayAccountNavigationButton()) {
+                setupLogoutAction();
+            }
             if(ZypeSettings.EPG_ENABLED) {
                 setupEpgAction();
             }
@@ -1235,10 +1237,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
                         .setLabel1(mAppContext.getString(R.string.menu_live)));
             }
             setupFavoritesAction();
-            //if (!TextUtils.isEmpty(Preferences.getString("ZypeTerms")))
-            addSettingsAction(createTermsOfUseSettingsAction());
-            //  setupMyLibraryAction();
-            // setupLogoutAction();
+            if (ZypeConfiguration.displayTermsNavigationButton()) {
+                addSettingsAction(createTermsOfUseSettingsAction());
+            }
+            setupMyLibraryAction();
         }
     }
 

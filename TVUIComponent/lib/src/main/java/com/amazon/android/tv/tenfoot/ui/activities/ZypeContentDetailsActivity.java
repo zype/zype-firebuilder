@@ -41,6 +41,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.leanback.app.BackgroundManager;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.HorizontalGridView;
 import androidx.leanback.widget.ListRow;
@@ -48,6 +50,7 @@ import androidx.leanback.widget.Row;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -85,6 +88,8 @@ import com.amazon.android.utils.ErrorUtils;
 import com.amazon.android.utils.GlideHelper;
 import com.amazon.android.utils.Helpers;
 import com.amazon.android.utils.LeanbackHelpers;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.zype.fire.api.ZypeSettings;
 
 import org.greenrobot.eventbus.EventBus;
@@ -101,6 +106,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
 import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_VIDEO_DETAIL_DATA_LOADED;
+import static com.zype.fire.api.ZypeSettings.DETAIL_BACKGROUND_IMAGE;
 
 /* Zype, Evgeny Cherkasov */
 
@@ -126,6 +132,9 @@ public class ZypeContentDetailsActivity extends BaseActivity
     private HorizontalGridView mActionsRow;
     private ProgressBar progressBar;
     private Subscription mContentImageLoadSubscription;
+    private BackgroundManager mBackgroundManager;
+    private Drawable mDefaultBackground;
+    private DisplayMetrics mMetrics;
 
     // View that contains the background
     private View mMainFrame;
@@ -190,6 +199,9 @@ public class ZypeContentDetailsActivity extends BaseActivity
         mSelectedContent = ContentBrowser.getInstance(this).getLastSelectedContent();
         updateActions(mSelectedContent);
         mActionsRow.requestFocus();
+
+        prepareBackgroundManager();
+
 
 //        // Get display/background size
 //        Display display = getWindowManager().getDefaultDisplay();
@@ -267,6 +279,9 @@ public class ZypeContentDetailsActivity extends BaseActivity
                 mContentEpisode.setVisibility(View.GONE);
             }
             updateActions(content);
+            if (DETAIL_BACKGROUND_IMAGE){
+                updateBackground(content.getBackgroundImageUrl());
+            }
         }
         else if (item instanceof ContentContainer) {
             ContentContainer contentContainer = (ContentContainer) item;
@@ -382,8 +397,8 @@ public class ZypeContentDetailsActivity extends BaseActivity
 
     @Override
     protected void onStart() {
-
         super.onStart();
+
         EventBus.getDefault().register(this);
     }
 
@@ -665,6 +680,45 @@ public class ZypeContentDetailsActivity extends BaseActivity
     @Subscribe
     public void onFavoritesLoadEvent(FavoritesLoadEvent event) {
         updateActions(mSelectedContent);
+    }
+
+    private void prepareBackgroundManager() {
+
+        mBackgroundManager = BackgroundManager.getInstance(this);
+        if (!mBackgroundManager.isAttached()) {
+            mBackgroundManager.attach(getWindow());
+            mDefaultBackground = ContextCompat.getDrawable(this, android.R.color.transparent);
+            mMetrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(mMetrics);
+        }
+    }
+
+    private void updateBackground(String uri) {
+
+        Log.v(TAG, "updateBackground called");
+        if (Helpers.DEBUG) {
+            Log.v(TAG, "updateBackground called: " + uri);
+        }
+
+        SimpleTarget<Bitmap> bitmapTarget = new SimpleTarget<Bitmap>(mMetrics.widthPixels,
+            mMetrics.heightPixels) {
+            @Override
+            public void onResourceReady(Bitmap resource,
+                                        GlideAnimation<? super Bitmap> glideAnimation) {
+
+//                Bitmap bitmap = Helpers.adjustOpacity(resource, getResources().getInteger(
+//                        R.integer.content_details_fragment_bg_opacity));
+//
+                Bitmap bitmap = Helpers.adjustOpacityAndBackground(resource,
+                    getResources().getInteger(R.integer.content_details_fragment_bg_opacity),
+                    ContextCompat.getColor(ZypeContentDetailsActivity.this, R.color.background));
+                mBackgroundManager.setBitmap(bitmap);
+            }
+        };
+
+        GlideHelper.loadImageIntoSimpleTargetBitmap(this, uri,
+            new GlideHelper.LoggingListener(),
+            android.R.color.transparent, bitmapTarget);
     }
 
 }
