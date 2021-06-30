@@ -190,16 +190,21 @@ public class HeroSliderFragment extends RowsFragment {
 
     private void openVideo(Content content, Slider slider) {
         ContentBrowser contentBrowser = ContentBrowser.getInstance(getActivity());
-        // Open playback screen when 'autoplay' is set to true
-        if (slider.autoplay != null && slider.autoplay) {
+        boolean registrationRequired = content.getExtraValueAsBoolean(Content.EXTRA_REGISTRATION_REQUIRED);
+
+        if (registrationRequired){
+            contentBrowser
+                .setLastSelectedContent(content)
+                .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
+        } else if (slider.autoplay != null && slider.autoplay) {
+            // Open playback screen when 'autoplay' is set to true
             contentBrowser.handleRendererScreenSwitch(getActivity(), content,
-                    contentBrowser.CONTENT_ACTION_WATCH_NOW, true);
-        }
-        else {
+                contentBrowser.CONTENT_ACTION_WATCH_NOW, true);
+        } else {
             //move the user to the detail screen
             contentBrowser
-                    .setLastSelectedContent(content)
-                    .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
+                .setLastSelectedContent(content)
+                .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
         }
     }
 
