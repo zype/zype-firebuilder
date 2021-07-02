@@ -64,22 +64,6 @@ public class HeroSliderFragment extends RowsFragment {
     }
 
     private void scrollToNextItem(boolean smooth) {
-//        if (getView() != null) {
-//            VerticalGridView verticalGridView = findGridViewFromRoot(getView());
-//
-//            View view = verticalGridView.getLayoutManager().getChildAt(0);
-//            ItemBridgeAdapter.ViewHolder ibvh = (ItemBridgeAdapter.ViewHolder)
-//                    verticalGridView.getChildViewHolder(view);
-//            CustomListRowPresenter rowPresenter = (CustomListRowPresenter) ibvh.getPresenter();
-//            CustomListRowPresenter.ViewHolder vh = (CustomListRowPresenter.ViewHolder)
-//                    rowPresenter.getRowViewHolder(ibvh.getViewHolder());
-//
-//            if (smooth) {
-//                vh.getGridView().setSelectedPositionSmooth(selectedIndex + 1);
-//            } else {
-//                vh.getGridView().setSelectedPosition(selectedIndex + 1);
-//            }
-//        }
         ListRowPresenter.SelectItemViewHolderTask selectItemTask = new ListRowPresenter.SelectItemViewHolderTask(selectedIndex + 1);
         selectItemTask.setSmoothScroll(smooth);
         setSelectedPosition(0, smooth, selectItemTask);
@@ -112,18 +96,15 @@ public class HeroSliderFragment extends RowsFragment {
         rowsAdapter.add(listRow);
         setAdapter(rowsAdapter);
 
-        setOnItemViewSelectedListener(new BaseOnItemViewSelectedListener() {
-            @Override
-            public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Object row) {
-                if (item != null) {
-                    int newSelectedIndex = ((HeroCardPresenter.ViewHolder) itemViewHolder).getIndex();
-                    if (selectedIndex != newSelectedIndex) {
-                        selectedIndex = newSelectedIndex;
-                        registerNextScroll();
-                        listRowAdapter.reset();
-                        ((HeroCardPresenter.ViewHolder) itemViewHolder).getSlider().setSelected(true);
-                        listRowAdapter.notifyChanges(selectedIndex);
-                    }
+        setOnItemViewSelectedListener((itemViewHolder, item, rowViewHolder, row) -> {
+            if (item != null) {
+                int newSelectedIndex = ((HeroCardPresenter.ViewHolder) itemViewHolder).getIndex();
+                if (selectedIndex != newSelectedIndex) {
+                    selectedIndex = newSelectedIndex;
+                    registerNextScroll();
+                    listRowAdapter.reset();
+                    ((HeroCardPresenter.ViewHolder) itemViewHolder).getSlider().setSelected(true);
+                    listRowAdapter.notifyChanges(selectedIndex);
                 }
             }
         });
@@ -171,29 +152,12 @@ public class HeroSliderFragment extends RowsFragment {
         if (sliderList.size() > 0) {
             //run the timer to toggle the positions
             Handler handler = new Handler(Looper.getMainLooper());
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    int index = listRowAdapter.realSize() % 2 == 0 ? 1 : 0;
-                    selectedIndex = (listRowAdapter.size() / 2 + index) - 1;
-                    scrollToNextItem(false);
-                }
+            handler.postDelayed(() -> {
+                int initialIndex = listRowAdapter.size() / 2;
+                int offset = initialIndex % listRowAdapter.realSize();
+                selectedIndex = initialIndex - offset - 1;
+                scrollToNextItem(false);
             }, WAIT_BEFORE_FOCUS_REQUEST_MS);
-//            setOnItemViewSelectedListener(new BaseOnItemViewSelectedListener() {
-//                @Override
-//                public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Object row) {
-//                    if (item != null) {
-//                        int newSelectedIndex = ((HeroCardPresenter.ViewHolder) itemViewHolder).getIndex();
-//                        if (selectedIndex != newSelectedIndex) {
-//                            selectedIndex = newSelectedIndex;
-//                            registerNextScroll();
-//                            listRowAdapter.reset();
-//                            ((HeroCardPresenter.ViewHolder) itemViewHolder).getSlider().setSelected(true);
-//                            listRowAdapter.notifyChanges(selectedIndex);
-//                        }
-//                    }
-//                }
-//            });
         }
     }
 
@@ -226,27 +190,27 @@ public class HeroSliderFragment extends RowsFragment {
 
     private void openVideo(Content content, Slider slider) {
         ContentBrowser contentBrowser = ContentBrowser.getInstance(getActivity());
-        // Open playback screen when 'autoplay' is set to true
-        if (slider.autoplay != null && slider.autoplay) {
+        boolean registrationRequired = content.getExtraValueAsBoolean(Content.EXTRA_REGISTRATION_REQUIRED);
+
+        if (registrationRequired){
+            contentBrowser
+                .setLastSelectedContent(content)
+                .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
+        } else if (slider.autoplay != null && slider.autoplay) {
+            // Open playback screen when 'autoplay' is set to true
             contentBrowser.handleRendererScreenSwitch(getActivity(), content,
-                    contentBrowser.CONTENT_ACTION_WATCH_NOW, true);
-//            switchToRendererScreen(content, 0);
-        }
-        else {
+                contentBrowser.CONTENT_ACTION_WATCH_NOW, true);
+        } else {
             //move the user to the detail screen
             contentBrowser
-                    .setLastSelectedContent(content)
-                    .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
+                .setLastSelectedContent(content)
+                .switchToScreen(ContentBrowser.CONTENT_DETAILS_SCREEN, content);
         }
     }
 
     public boolean hasFocus() {
         if (getView() != null) {
             return getView().hasFocus();
-//            VerticalGridView verticalGridView = findGridViewFromRoot(getView());
-//            if (verticalGridView != null) {
-//                return verticalGridView.hasFocus();
-//            }
         }
         return false;
     }
@@ -254,10 +218,6 @@ public class HeroSliderFragment extends RowsFragment {
     public void requestFocus() {
         if (getView() != null) {
             getView().requestFocus();
-//            VerticalGridView verticalGridView = findGridViewFromRoot(getView());
-//            if (verticalGridView != null) {
-//                verticalGridView.requestFocus();
-//            }
         }
     }
 }
