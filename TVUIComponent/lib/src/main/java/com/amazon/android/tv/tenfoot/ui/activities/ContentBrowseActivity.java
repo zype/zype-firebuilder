@@ -371,7 +371,9 @@ public class ContentBrowseActivity extends BaseActivity implements
      */
     @Override
     public void onItemSelected(Object item, Row row, boolean isLastContentRow) {
-        lastRowSelected = isLastContentRow;
+        if (item != null) {
+            lastRowSelected = isLastContentRow;
+        }
         if (row != lastSelectedRow && item != null) {
             lastSelectedRow = row;
             lastSelectedRowChanged = true;
@@ -611,9 +613,12 @@ public class ContentBrowseActivity extends BaseActivity implements
                         hideTopMenu();
                         return true;
                     }
-                }
-                if (!ZypeSettings.SETTINGS_PLAYLIST_ENABLED) {
-                    if (lastRowSelected && !isMenuOpened) return true;
+                } else {
+                    if (!ZypeSettings.SETTINGS_PLAYLIST_ENABLED) {
+                        if (lastRowSelected && findViewById(R.id.full_content_browse_fragment).hasFocus()) {
+                            return true;
+                        }
+                    }
                 }
                 break;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
@@ -682,8 +687,9 @@ public class ContentBrowseActivity extends BaseActivity implements
         builder.setCancelable(true);
 
         AlertDialog alertDialog = builder.create();
+        Button noBtn= (Button) customLayout.findViewById(R.id.noBtn);
+        noBtn.requestFocus();
         Button yesBtn= (Button) customLayout.findViewById(R.id.yesBtn);
-        yesBtn.setPressed(true);
         yesBtn.setOnClickListener(v -> {
             alertDialog.dismiss();
             finish();
