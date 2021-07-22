@@ -67,7 +67,7 @@ public class ZypeApi {
     private static final String USERNAME = "username";
     public static final String UUID = "uuid";
 
-    public static final int PER_PAGE_DEFAULT = 20;
+    public static final int PER_PAGE_DEFAULT = 10;
 
     private static ZypeApi instance;
     private static Retrofit retrofit;

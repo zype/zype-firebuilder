@@ -3,7 +3,7 @@ package com.amazon.dataloader.datadownloader;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
-
+import android.util.Pair;
 import com.amazon.android.recipe.Recipe;
 import com.amazon.android.utils.Preferences;
 import com.amazon.dataloader.R;
@@ -29,6 +29,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import rx.Observable;
+import rx.Scheduler;
+import rx.Single;
+import rx.Single.OnSubscribe;
+import rx.SingleSubscriber;
+import rx.functions.FuncN;
+import rx.schedulers.Schedulers;
+
 /**
  * Created by Evgeny Cherkasov on 04.03.2017.
  */
@@ -42,6 +50,8 @@ public class ZypeDataDownloader extends ADataDownloader {
     protected static final String URL_GENERATOR_RECIPE = "url_generator";
 
     private static final String PREFERENCE_TERMS = "ZypeTerms";
+
+    private final Object syncObject = new Object();
 
     /**
      * {@link AUrlGenerator} instance.
@@ -108,12 +118,13 @@ public class ZypeDataDownloader extends ADataDownloader {
         Log.d(TAG, "fetchData(): Started");
 
         AppData appData = loadAppConfiguration();
-        Log.d(TAG, "fetchData(): App configuration loaded");
         ZypeConfiguration.update(appData, mContext);
+        Log.d(TAG, "fetchData(): App configuration loaded");
 
         loadZobjectContents();
+        Log.d(TAG, "fetchData(): ZObjects loaded");
 
-        List<PlaylistData> playlists = loadPlaylists();
+        List<PlaylistData> playlists = ZypeDataDownloaderHelper.loadPlaylists();
         Log.d(TAG, "fetchData(): Playlists loaded");
         addFavoritesPlaylist(playlists);
         if (ZypeSettings.LIBRARY_ENABLED) {
@@ -127,29 +138,7 @@ public class ZypeDataDownloader extends ADataDownloader {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
 
-        for (PlaylistData playlistData : playlists) {
-            if (TextUtils.isEmpty(playlistData.description)) {
-                playlistData.description = " ";
-            }
-            // Skip playlist that are not direct child of the root playlist
-            if (TextUtils.isEmpty(playlistData.parentId)
-                    || !playlistData.parentId.equals(ZypeConfiguration.getRootPlaylistId(mContext))) {
-                continue;
-            }
-
-            if (playlistData.playlistItemCount > 0) {
-                Log.d(TAG, "fetchData(): Loading videos for " + playlistData.title);
-
-                VideosResponse videosResponse = ZypeDataDownloaderHelper.loadPlaylistVideos(playlistData.id, 1);
-                if (videosResponse != null) {
-                    for (VideoData videoData : videosResponse.videoData) {
-                        jsonContents.put(new JSONObject(gson.toJson(videoData)));
-                    }
-                }
-            }
-        }
-        Log.d(TAG, "fetchData(): Videos loaded");
-
+        //sort the play lists based on priority first
         Collections.sort(playlists, (a, b) -> {
             Integer valA;
             Integer valB;
@@ -163,14 +152,57 @@ public class ZypeDataDownloader extends ADataDownloader {
             return valA.compareTo(valB);
         });
 
+        Log.d(TAG, "testData(): Videos loaded Started");
+        List<Single<Pair<PlaylistData, VideosResponse>>> playListVideosLoader = new ArrayList<>();
+
         for (PlaylistData playlistData : playlists) {
-            String playlistId = playlistData.id;
-            if (playlistId.equals(ZypeConfiguration.getRootPlaylistId(mContext))
-                    || TextUtils.isEmpty(playlistData.parentId)) {
+            if (TextUtils.isEmpty(playlistData.description)) {
+                playlistData.description = " ";
+            }
+            // Skip playlist that are not direct child of the root playlist
+            if (TextUtils.isEmpty(playlistData.parentId)
+                || !playlistData.parentId.equals(ZypeConfiguration.getRootPlaylistId(mContext))) {
                 continue;
             }
-            jsonCategories.put(new JSONObject(gson.toJson(playlistData)));
+            if (playlistData.playlistItemCount > 0) {
+                jsonCategories.put(new JSONObject(gson.toJson(playlistData)));
+                playListVideosLoader.add(ZypeDataDownloaderHelper.loadPlayListVideos(playlistData));
+            }
+
+            if(playListVideosLoader.size() > 20) {
+                break;
+            }
         }
+        Single.zip(playListVideosLoader, (FuncN<List<VideosResponse>>) args -> {
+            ArrayList<VideosResponse> videosResponses = new ArrayList<>();
+            if(args != null) {
+                for (Object arg : args) {
+                    if (arg instanceof Pair) {
+                        VideosResponse videosResponse = (VideosResponse) ((Pair)arg).second;
+                        for (VideoData videoData : videosResponse.videoData) {
+                            try {
+                                jsonContents.put(new JSONObject(gson.toJson(videoData)));
+                            } catch (Exception ignored) {
+                            }
+                        }
+                        videosResponses.add(videosResponse);
+                    }
+                }
+            }
+            return videosResponses;
+        }).subscribeOn(Schedulers.io()).subscribe(videosResponses -> {
+            synchronized (syncObject) {
+                syncObject.notify();
+            }
+        }, throwable -> {
+            synchronized (syncObject) {
+                syncObject.notify();
+            }
+        });
+        synchronized (syncObject) {
+            syncObject.wait();
+        }
+        Log.d(TAG, "testData(): Videos loaded");
 
         JSONObject jsonResult = new JSONObject();
         jsonResult.put("categories", jsonCategories);
@@ -210,25 +242,6 @@ public class ZypeDataDownloader extends ADataDownloader {
             Log.e(TAG, "loadZobjectContents(): failed");
             Preferences.setString(PREFERENCE_TERMS, null);
         }
-    }
-
-    private List<PlaylistData> loadPlaylists() {
-        List<PlaylistData> result = new ArrayList<>();
-
-        int page = 1;
-        PlaylistsResponse playlistsResponse = ZypeApi.getInstance().getPlaylists(page);
-        if (playlistsResponse != null && playlistsResponse.response != null) {
-            result.addAll(playlistsResponse.response);
-            if (playlistsResponse.pagination != null && playlistsResponse.pagination.pages > 1) {
-                for (page = playlistsResponse.pagination.next; page <= playlistsResponse.pagination.pages; page++) {
-                    playlistsResponse = ZypeApi.getInstance().getPlaylists(page);
-                    if (playlistsResponse != null && playlistsResponse.response != null) {
-                        result.addAll(playlistsResponse.response);
-                    }
-                }
-            }
-        }
-        return result;
     }
 
     private void addFavoritesPlaylist(List<PlaylistData> playlists) {

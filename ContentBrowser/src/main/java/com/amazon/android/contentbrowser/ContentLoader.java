@@ -56,17 +56,24 @@ import android.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
 import okhttp3.ResponseBody;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import rx.Observable;
+import rx.Single;
+import rx.Single.OnSubscribe;
+import rx.SingleSubscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.FuncN;
 import rx.schedulers.Schedulers;
 
 import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
@@ -789,6 +796,82 @@ public class ContentLoader {
             Log.e(TAG, "getVideosFeedObservable(): no videos found");
             return Observable.just(Pair.create(contentContainerAsObject, ""));
         }
+    }
+
+    public Single<List<ContentContainer>> loadNextPlaylists(String lastPlayListId, String parentContainerId) {
+        return Single.create((OnSubscribe<List<ContentContainer>>) emitter -> {
+            List<PlaylistData> playlists = ZypeDataDownloaderHelper.loadPlaylists();
+            //sort the play lists based on priority first
+            Collections.sort(playlists, (a, b) -> {
+                Integer valA;
+                Integer valB;
+                try {
+                    valA = a.priority;
+                    valB = b.priority;
+                }
+                catch (Exception e) {
+                    return 0;
+                }
+                return valA.compareTo(valB);
+            });
+            List<Single<ContentContainer>> playListVideosLoader = new ArrayList<>();
+            boolean found = false;
+
+            for (PlaylistData playlistData : playlists) {
+                if (TextUtils.isEmpty(playlistData.description)) {
+                    playlistData.description = " ";
+                }
+                // Skip playlist that are not direct child of the root playlist
+                if (TextUtils.isEmpty(playlistData.parentId)
+                    || !playlistData.parentId.equals(ZypeConfiguration.getRootPlaylistId(mContext))) {
+                    continue;
+                }
+                if (playlistData.playlistItemCount > 0 && found) {
+                    playListVideosLoader.add(loadContainer(playlistData));
+                }
+                if(!found) {
+                    found = playlistData.id.equalsIgnoreCase(lastPlayListId);
+                }
+            }
+
+            if(playListVideosLoader.isEmpty()) {
+                emitter.onSuccess(Collections.emptyList());
+                return;
+            }
+
+            Single.zip(playListVideosLoader, (FuncN<List<ContentContainer>>) args -> {
+                ArrayList<ContentContainer> containers = new ArrayList<>();
+                if(args != null) {
+                    for (Object arg : args) {
+                        if (arg instanceof ContentContainer) {
+                            containers.add((ContentContainer)arg);
+                        }
+                    }
+                }
+                return containers;
+            }).subscribeOn(Schedulers.io()).subscribe(emitter::onSuccess, emitter::onError);
+        }).subscribeOn(Schedulers.io());
+    }
+
+    private Single<ContentContainer> loadContainer(PlaylistData playlistData) {
+        return Single.create((OnSubscribe<ContentContainer>) emitter -> {
+            Recipe recipeDynamicParserContainer = Recipe.newInstance(mContext, "recipes/ZypeCategoriesRecipe.json");
+            HashMap map = new HashMap();
+            map.put("categories", Arrays.asList(playlistData));
+            GsonBuilder builder = new GsonBuilder();
+            Gson gson = builder.create();
+            String feed = gson.toJson(map);
+            String[] params = new String[] { playlistData.parentId };
+
+            mDynamicParser.cookRecipeObservable(recipeDynamicParserContainer, feed,null, params).flatMap(o -> {
+                ContentContainer contentContainer = (ContentContainer)o;
+                return Observable.just(contentContainer);
+            }).observeOn(Schedulers.io()).subscribe(container-> {
+                loadContentForContentContainer(container, mContext, () -> {
+                    emitter.onSuccess(container);
+                });
+            });
+        }).subscribeOn(Schedulers.io());
     }
 
     public Observable<ContentContainer> loadPlayList(ContentContainer root, String playListId) {

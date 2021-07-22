@@ -73,6 +73,8 @@ import androidx.leanback.widget.VerticalGridView;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 
+import java.util.List;
+
 import static androidx.leanback.widget.FocusHighlight.ZOOM_FACTOR_NONE;
 import static com.amazon.android.contentbrowser.ContentBrowser.BROADCAST_DATA_LOADED;
 import static com.zype.fire.api.ZypeSettings.SHOW_TITLE;
@@ -134,7 +136,7 @@ public class ContentBrowseFragment extends RowsFragment {
             mLoginButtonIndex = BrowseHelper.getLoginButtonIndex(mSettingsAdapter);
         }
         else {
-            addStubRow(mRowsAdapter);
+            //addStubRow(mRowsAdapter);
         }
 
         setAdapter(mRowsAdapter);
@@ -265,6 +267,12 @@ public class ContentBrowseFragment extends RowsFragment {
         }
     }
 
+    public void addContentContainers(List<ContentContainer> contentContainers) {
+        int size = mRowsAdapter.size();
+        BrowseHelper.addContentContainers(mRowsAdapter, contentContainers);
+        mRowsAdapter.notifyArrayItemRangeChanged(size, mRowsAdapter.size() - size);
+    }
+
     private final class ItemViewClickedListener implements OnItemViewClickedListener {
 
         @Override
@@ -386,7 +394,7 @@ public class ContentBrowseFragment extends RowsFragment {
             boolean isLastContentRow = false;
             lastRowSelected = row;
             if (!ZypeSettings.SETTINGS_PLAYLIST_ENABLED) {
-                if (mRowsAdapter.indexOf(row) == mRowsAdapter.size() - 2) {
+                if (mRowsAdapter.indexOf(row) == mRowsAdapter.size() - 1) {
                     isLastContentRow = true;
                 }
                 else {
