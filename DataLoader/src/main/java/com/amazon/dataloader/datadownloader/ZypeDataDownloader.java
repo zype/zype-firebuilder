@@ -165,7 +165,7 @@ public class ZypeDataDownloader extends ADataDownloader {
                 continue;
             }
             if (playlistData.playlistItemCount > 0) {
-                jsonCategories.put(new JSONObject(gson.toJson(playlistData)));
+                //jsonCategories.put(new JSONObject(gson.toJson(playlistData)));
                 playListVideosLoader.add(ZypeDataDownloaderHelper.loadPlayListVideos(playlistData));
             }
 
@@ -202,6 +202,16 @@ public class ZypeDataDownloader extends ADataDownloader {
         synchronized (syncObject) {
             syncObject.wait();
         }
+
+        for (PlaylistData playlistData : playlists) {
+            String playlistId = playlistData.id;
+            if (playlistId.equals(ZypeConfiguration.getRootPlaylistId(mContext))
+                || TextUtils.isEmpty(playlistData.parentId)) {
+                continue;
+            }
+            jsonCategories.put(new JSONObject(gson.toJson(playlistData)));
+        }
+
         Log.d(TAG, "testData(): Videos loaded");
 
         JSONObject jsonResult = new JSONObject();
