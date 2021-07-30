@@ -1077,7 +1077,7 @@ public class PlaybackActivity extends BasePlaybackActivity implements
                     mPlayer.enableTextTrack(TrackType.CLOSED_CAPTION, state);
                 }
                 else {
-                    mPlayer.enableTextTrack(TrackType.SUBTITLE, state);
+                   // mPlayer.enableTextTrack(TrackType.SUBTITLE, state);
                 }
 //                /* Zype, Evgeny Cherkasov */
 //                int ccTrackIndex = -1;
@@ -2308,6 +2308,10 @@ public class PlaybackActivity extends BasePlaybackActivity implements
             // Url
             String url = playerData.body.files.get(0).url;
             content.setUrl(url);
+            if (playerData.body.subtitles != null && playerData.body.subtitles.size() > 0) {
+                String subTitle = playerData.body.subtitles.get(0).file;
+                mPlayer.updateSubTitleUrl(subTitle);
+            }
             content.setExtraValue(Content.EXTRA_VIDEO_URL, content.getUrl());
             checkIsAudio(url);
             // Ads

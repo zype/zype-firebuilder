@@ -67,4 +67,7 @@ public interface UAMP extends AMZNMediaPlayer {
 
     /* Zype, Evgeny Cherkasov */
     void updateSurfaceView();
+
+
+    void updateSubTitleUrl(String ccUrl);
 }
