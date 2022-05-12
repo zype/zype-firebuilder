@@ -18,7 +18,6 @@ import java.text.SimpleDateFormat
 def FIREBASE_ENABLED = false
 
 apply plugin: 'com.android.application'
-apply plugin: 'me.tatarka.retrolambda'
 // Uncomment when using CrashlyticsComponent
 //apply plugin: 'io.fabric'
 if (FIREBASE_ENABLED) {
@@ -45,7 +44,6 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'me.tatarka:gradle-retrolambda:3.7.1'
         // Uncomment when using CrashlyticsComponent
         //classpath 'io.fabric.tools:gradle:1.+'
     }
@@ -66,14 +64,14 @@ android {
     }
 
     def currentCodeVersion = versionProperties[versionCodeKey].toString().toInteger()
+    compileSdk 30
 
-    compileSdkVersion 29
-    buildToolsVersion "28.0.3"
+    buildToolsVersion '30.0.2'
 
     defaultConfig {
         applicationId "com.zype.aftv.demo"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdk 30
         versionCode currentCodeVersion
         versionName "2.2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -187,7 +185,7 @@ dependencies {
     api project(':VastAdsComponent')
     api project(':AmazonInAppPurchaseComponent')
     implementation project(':AkamaiAnalyticsComponent')
-    
+    implementation "androidx.multidex:multidex:2.0.1"
     api project(':CrashlyticsComponent')
 
 //    implementation project(':LoggerAnalyticsComponent')

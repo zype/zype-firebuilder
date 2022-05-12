@@ -37,7 +37,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics:17.4.3'
     implementation 'com.google.firebase:firebase-crashlytics:17.1.1'
     implementation 'com.google.firebase:firebase-perf:19.1.1'
-
+    implementation "androidx.multidex:multidex:2.0.1"
     androidTestImplementation 'junit:junit:4.12'
 
     androidTestImplementation('androidx.test:runner:1.1.1') {
@@ -49,16 +49,17 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion "28.0.3"
+    compileSdk 30
+    buildToolsVersion '30.0.2'
 
     defaultConfig {
 
         minSdkVersion 20
-        targetSdkVersion 28
+        targetSdk 30
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -75,5 +76,9 @@ android {
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/services/com.fasterxml.jackson.core.JsonFactory'
         exclude 'META-INF/services/com.fasterxml.jackson.core.ObjectCodec'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
