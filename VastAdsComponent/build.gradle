@@ -15,15 +15,16 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion "25.0.3"
+    compileSdk 30
+    buildToolsVersion '30.0.2'
 
     defaultConfig {
         minSdkVersion 20
-        targetSdkVersion 28
+        targetSdk 30
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
 
     }
     buildTypes {
@@ -35,13 +36,17 @@ android {
     packagingOptions {
         pickFirst  'META-INF/LICENSE'
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
     api files('libs/mfXerces.jar')
     api 'androidx.appcompat:appcompat:1.0.0'
-
+    implementation "androidx.multidex:multidex:2.0.1"
     androidTestImplementation('androidx.test.ext:junit:1.1.1') {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
