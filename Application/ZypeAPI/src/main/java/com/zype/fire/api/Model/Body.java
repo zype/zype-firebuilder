@@ -18,4 +18,7 @@ public class Body {
 
     @Expose
     public List<File> files = new ArrayList<>();
+
+    @Expose
+    public List<SubTitle> subtitles = new ArrayList<>();
 }

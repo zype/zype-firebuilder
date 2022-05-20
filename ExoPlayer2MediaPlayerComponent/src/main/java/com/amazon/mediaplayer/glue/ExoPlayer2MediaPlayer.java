@@ -22,6 +22,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import androidx.annotation.Nullable;
+
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -48,6 +50,8 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MergingMediaSource;
+import com.google.android.exoplayer2.source.SingleSampleMediaSource;
 import com.google.android.exoplayer2.source.TrackGroup;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
@@ -69,6 +73,7 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.upstream.TransferListener;
 import com.google.android.exoplayer2.util.EventLogger;
+import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoListener;
 
@@ -135,7 +140,7 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
     private Set<OnStateChangeListener> mStateListeners;
     private Set<OnCuesListener> mCuesListeners;
     private Set<OnInfoListener> mInfoListeners;
-
+    private String ccUrl="";
     /**
      * Static bandwidth meter so that we get a universal view from all transfers.
      */
@@ -188,6 +193,14 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
     public boolean canRenderAds() {
 
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateSubTitleUrl(String url) {
+        ccUrl = url;
     }
 
     /**
@@ -264,7 +277,8 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
         mTrackSelectionFactory = new AdaptiveTrackSelection.Factory(BANDWIDTH_METER);
         mTrackSelector = new DefaultTrackSelector(mTrackSelectionFactory);
         eventLogger = new EventLogger(mTrackSelector);
-
+        mTrackSelector.setParameters(new
+            DefaultTrackSelector.ParametersBuilder().setPreferredAudioLanguage("eng").build());
         mPlayer = ExoPlayerFactory.newSimpleInstance(mContext, mTrackSelector);
         mPlayer.addListener(eventLogger);
         mPlayer.addListener(new PlayerEventListener());
@@ -641,7 +655,31 @@ public class ExoPlayer2MediaPlayer implements UAMP, SurfaceHolder.Callback, Even
 
         setPlayerState(PlayerState.OPENING);
         if (mediaSource != null) {
-            mCurrentMediaSource = mediaSource;
+            if (!TextUtils.isEmpty(ccUrl) && (ccUrl.contains(".srt") || ccUrl.contains(".vtt"))) {
+                MediaSource[] mediaSources = new MediaSource[2]; //The Size must change depending on the Uris
+                mediaSources[0] = mediaSource; // uri
+
+                Uri subtitleUri = Uri.parse(ccUrl);
+                Format textFormat;
+                if (ccUrl.contains(".srt")){
+                    textFormat=   Format.createTextSampleFormat(null, MimeTypes.APPLICATION_SUBRIP, Format.NO_VALUE, "en", null);
+                }else{
+                    textFormat = Format.createTextSampleFormat(
+                        null,
+                        MimeTypes.TEXT_VTT,
+                        C.SELECTION_FLAG_DEFAULT,
+                        null
+                    );
+                }
+                //Add subtitles
+                SingleSampleMediaSource subtitleSource = new SingleSampleMediaSource(subtitleUri, mDataSourceFactory,
+                    textFormat,
+                    C.TIME_UNSET);
+                mediaSources[1] = subtitleSource;
+                mCurrentMediaSource = new MergingMediaSource(mediaSources);
+            } else {
+                mCurrentMediaSource = mediaSource;
+            }
             setPlayerState(PlayerState.OPENED);
         }
         else {
