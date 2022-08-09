@@ -77,6 +77,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import rx.Observable;
+import rx.Single;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -2712,6 +2713,10 @@ public class ContentBrowser implements IContentBrowser, ICancellableLoad {
         if (actionCompletedListener != null) {
             actionCompletedListener.onContentActionCompleted(activity, content, actionId);
         }
+    }
+
+    public Single<List<ContentContainer>> loadNextPlaylists(String lastPlayListId) {
+        return getContentLoader().loadNextPlaylists(lastPlayListId, ZypeConfiguration.getRootPlaylistId(mAppContext));
     }
 
     /**

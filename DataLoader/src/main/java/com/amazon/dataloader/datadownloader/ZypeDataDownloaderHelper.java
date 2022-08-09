@@ -2,7 +2,7 @@ package com.amazon.dataloader.datadownloader;
 
 import android.text.TextUtils;
 import android.util.Log;
-
+import android.util.Pair;
 import com.amazon.android.recipe.Recipe;
 import com.zype.fire.api.Model.PlaylistData;
 import com.zype.fire.api.Model.PlaylistsResponse;
@@ -18,6 +18,9 @@ import com.zype.fire.api.ZypeApi;
 
 import java.util.ArrayList;
 import java.util.List;
+import rx.Single;
+import rx.Single.OnSubscribe;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Evgeny Cherkasov on 20.11.2017.
@@ -97,7 +100,7 @@ public class ZypeDataDownloaderHelper {
 
         while (loadNext) {
             VideoFavoritesResponse response = ZypeApi.getInstance()
-                    .getVideoFavorites(consumerId, accessToken, result.nextPage);
+                .getVideoFavorites(consumerId, accessToken, result.nextPage);
             if (response != null) {
                 Log.d(TAG, "loadFavoriteVideos(): size=" + response.videoFavorites.size());
 
@@ -140,4 +143,34 @@ public class ZypeDataDownloaderHelper {
         return result;
     }
 
+    public static List<PlaylistData> loadPlaylists() {
+        List<PlaylistData> result = new ArrayList<>();
+
+        int page = 1;
+        PlaylistsResponse playlistsResponse = ZypeApi.getInstance().getPlaylists(page);
+        if (playlistsResponse != null && playlistsResponse.response != null) {
+            result.addAll(playlistsResponse.response);
+            if (playlistsResponse.pagination != null && playlistsResponse.pagination.pages > 1) {
+                for (page = playlistsResponse.pagination.next; page <= playlistsResponse.pagination.pages; page++) {
+                    playlistsResponse = ZypeApi.getInstance().getPlaylists(page);
+                    if (playlistsResponse != null && playlistsResponse.response != null) {
+                        result.addAll(playlistsResponse.response);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public static Single<Pair<PlaylistData, VideosResponse>> loadPlayListVideos(PlaylistData playlistData) {
+        return Single.create((OnSubscribe<Pair<PlaylistData, VideosResponse>>) emitter -> {
+            Log.d(TAG, "fetchData(): Loading videos for " + playlistData.title);
+
+            VideosResponse videosResponse = loadPlaylistVideos(playlistData.id, 1);
+            if(videosResponse == null) {
+                videosResponse = new VideosResponse();
+            }
+            emitter.onSuccess(Pair.create(playlistData, videosResponse));
+        }).subscribeOn(Schedulers.io());
+    }
 }

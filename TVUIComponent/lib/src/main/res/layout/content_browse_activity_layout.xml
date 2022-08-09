@@ -1,26 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?><!--
 This file was modified by Amazon:
 Copyright 2015-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 A copy of the License is located at
-
     http://aws.amazon.com/apache2.0/
-
 or in the "license" file accompanying this file. This file is distributed
 on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
 express or implied. See the License for the specific language governing
 permissions and limitations under the License.
 --><!--
      Copyright (C) 2014 The Android Open Source Project
-
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
      You may obtain a copy of the License at
-
           http://www.apache.org/licenses/LICENSE-2.0
-
      Unless required by applicable law or agreed to in writing, software
      distributed under the License is distributed on an "AS IS" BASIS,
      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,117 +22,114 @@ permissions and limitations under the License.
      limitations under the License.
 -->
 <RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/browse_background_color"
-    >
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="@color/browse_background_color"
+  >
     <LinearLayout
-        android:layout_width="@dimen/content_image_width"
-        android:layout_height="@dimen/content_image_height"
-        android:layout_alignParentTop="true"
-        android:gravity="top"
-        android:layout_alignParentRight="true"
-        >
+      android:layout_width="@dimen/content_image_width"
+      android:layout_height="@dimen/content_image_height"
+      android:layout_alignParentTop="true"
+      android:gravity="top"
+      android:layout_alignParentRight="true"
+      >
         <ImageView
-            android:id="@+id/content_image"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:layout_gravity="top"
-            android:background="@color/accent"
-            android:scaleType="fitCenter" />
+          android:id="@+id/content_image"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:adjustViewBounds="true"
+          android:layout_gravity="top"
+          android:background="@color/accent"
+          android:scaleType="fitCenter" />
     </LinearLayout>
-
     <RelativeLayout
-        android:id="@+id/main_frame"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
+      android:id="@+id/main_frame"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent">
         <LinearLayout
-            android:id="@+id/hero_slider_ly"
-            android:layout_width="match_parent"
-            android:layout_height="280dp"
-            android:layout_alignParentTop="true"
-            android:alpha="0" >
-
+          android:id="@+id/hero_slider_ly"
+          android:layout_width="match_parent"
+          android:layout_height="280dp"
+          android:layout_alignParentTop="true"
+          android:alpha="0" >
             <fragment
-                android:id="@+id/hero_slider_fragment"
-                android:name="com.amazon.android.tv.tenfoot.ui.sliders.HeroSliderFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
+              android:id="@+id/hero_slider_fragment"
+              android:name="com.amazon.android.tv.tenfoot.ui.sliders.HeroSliderFragment"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent" />
         </LinearLayout>
-
-
         <ImageView
-            android:id="@+id/main_logo"
-            android:layout_width="116dp"
-            android:layout_height="46dp"
-            android:layout_marginLeft="@dimen/lb_browse_padding_start"
-            android:layout_marginTop="@dimen/lb_browse_padding_top"
-            android:layout_marginBottom="24dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/company_logo" />
-
+          android:id="@+id/main_logo"
+          android:layout_width="116dp"
+          android:layout_height="46dp"
+          android:layout_marginLeft="@dimen/lb_browse_padding_start"
+          android:layout_marginTop="@dimen/lb_browse_padding_top"
+          android:layout_marginBottom="24dp"
+          android:scaleType="centerInside"
+          android:src="@drawable/company_logo" />
         <include layout="@layout/powered_by_image_view" />
-
         <LinearLayout
-            android:id="@+id/content_details"
-            android:layout_width="352dp"
-            android:layout_height="192dp"
-            android:layout_marginBottom="0dp"
-            android:layout_marginLeft="@dimen/lb_browse_padding_start"
-            android:layout_below="@id/main_logo"
-            android:orientation="vertical">
-
+          android:id="@+id/content_details"
+          android:layout_width="352dp"
+          android:layout_height="192dp"
+          android:layout_marginBottom="0dp"
+          android:layout_marginLeft="@dimen/lb_browse_padding_start"
+          android:layout_below="@id/main_logo"
+          android:orientation="vertical">
             <TextView
-                android:id="@+id/content_detail_title"
-                style="@style/Widget.Leanback.DetailsDescriptionTitleStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:textSize="@dimen/lb_details_description_title_text_size" />
-
-
+              android:id="@+id/content_detail_title"
+              style="@style/Widget.Leanback.DetailsDescriptionTitleStyle"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginBottom="10dp"
+              android:ellipsize="end"
+              android:maxLines="2"
+              android:textSize="@dimen/lb_details_description_title_text_size" />
             <TextView
-                android:id="@+id/content_detail_description"
-                style="@style/Widget.Leanback.DetailsDescriptionBodyStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:ellipsize="end"
-                android:maxLines="5"
-                android:textSize="@dimen/lb_details_description_body_text_size" />
-
+              android:id="@+id/content_detail_description"
+              style="@style/Widget.Leanback.DetailsDescriptionBodyStyle"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginBottom="5dp"
+              android:ellipsize="end"
+              android:maxLines="5"
+              android:textSize="@dimen/lb_details_description_body_text_size" />
         </LinearLayout>
-
-
+        <ProgressBar
+          style="?android:attr/progressBarStyleLarge"
+          android:layout_width="48dp"
+          android:layout_height="48dp"
+          android:layout_marginBottom="16dp"
+          android:orientation="vertical"
+          android:id="@+id/progressBarLoadMore"
+          android:layout_centerHorizontal="true"
+          android:layout_alignParentBottom="true"
+          android:indeterminateDrawable="@drawable/custom_progress"
+          android:visibility="gone"
+          android:indeterminate="true" />
         <fragment
-            android:id="@+id/full_content_browse_fragment"
-            android:name="com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="0dp"
-            android:layout_below="@id/hero_slider_ly"
-            tools:layout="@layout/action_widget_container" />
-
+          android:id="@+id/full_content_browse_fragment"
+          android:name="com.amazon.android.tv.tenfoot.ui.fragments.ContentBrowseFragment"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:layout_marginTop="0dp"
+          android:layout_above="@id/progressBarLoadMore"
+          android:layout_below="@id/hero_slider_ly"
+          tools:layout="@layout/action_widget_container" />
         <fragment
-            android:id="@+id/fragmentMenu"
-            android:name="com.amazon.android.tv.tenfoot.ui.fragments.MenuFragment"
-            android:layout_width="380dp"
-            android:layout_height="match_parent"
-            tools:layout="@layout/action_widget_container" />
+          android:id="@+id/fragmentMenu"
+          android:name="com.amazon.android.tv.tenfoot.ui.fragments.MenuFragment"
+          android:layout_width="380dp"
+          android:layout_height="match_parent"
+          tools:layout="@layout/action_widget_container" />
         <fragment
-            android:id="@+id/fragmentTopMenu"
-            android:name="com.amazon.android.tv.tenfoot.ui.menu.TopMenuFragment"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            tools:layout="@layout/action_widget_container" />
+          android:id="@+id/fragmentTopMenu"
+          android:name="com.amazon.android.tv.tenfoot.ui.menu.TopMenuFragment"
+          android:layout_width="match_parent"
+          android:layout_height="100dp"
+          tools:layout="@layout/action_widget_container" />
     </RelativeLayout>
-
     <include layout="@layout/action_widget_container" />
 </RelativeLayout>

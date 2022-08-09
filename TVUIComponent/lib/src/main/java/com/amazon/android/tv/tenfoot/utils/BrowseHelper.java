@@ -57,12 +57,12 @@ public class BrowseHelper {
         // Update the last activity preference value if an activity restore is not currently in
         // progress.
         if (activity.getIntent() == null ||
-                !activity.getIntent().getBooleanExtra(ContentBrowser.RESTORE_ACTIVITY, false)) {
+            !activity.getIntent().getBooleanExtra(ContentBrowser.RESTORE_ACTIVITY, false)) {
 
             Preferences.setString(PreferencesConstants.LAST_ACTIVITY,
-                                  ContentBrowser.CONTENT_HOME_SCREEN);
+                ContentBrowser.CONTENT_HOME_SCREEN);
             Preferences.setLong(PreferencesConstants.TIME_LAST_SAVED,
-                                DateAndTimeHelper.getCurrentDate().getTime());
+                DateAndTimeHelper.getCurrentDate().getTime());
         }
     }
 
@@ -90,7 +90,7 @@ public class BrowseHelper {
         }
         // Create settings header and row.
         HeaderItem header = new HeaderItem(0, activity.getResources()
-                                                      .getString(R.string.settings_title));
+            .getString(R.string.settings_title));
         rowAdapter.add(new ListRow(header, settingsAdapter));
 
         return settingsAdapter;
@@ -114,28 +114,41 @@ public class BrowseHelper {
         return -1;
     }
 
+    public static void loadRootContentContainer(Activity activity, ArrayObjectAdapter rowsAdapter) {
+        ContentContainer rootContentContainer = ContentBrowser.getInstance(activity)
+            .getRootContentContainer();
+        addContentContainers(rowsAdapter, rootContentContainer.getContentContainers());
+    }
+
+    public static void addToRootContainers(Activity activity, List<ContentContainer> contentContainers) {
+        ContentContainer rootContentContainer = ContentBrowser.getInstance(activity)
+            .getRootContentContainer();
+
+        for (ContentContainer contentContainer : contentContainers) {
+            rootContentContainer.addContentContainer(contentContainer);
+        }
+    }
+
     /**
      * Loads the content from the root content container into the rows adapter.
      *
      * @param activity    The activity.
      * @param rowsAdapter The rows adapter.
      */
-    public static void loadRootContentContainer(Activity activity, ArrayObjectAdapter rowsAdapter) {
-
-        ContentContainer rootContentContainer = ContentBrowser.getInstance(activity)
-                .getRootContentContainer();
+    public static void addContentContainers(ArrayObjectAdapter rowsAdapter,
+                                            List<ContentContainer> contentContainers) {
 
         CardPresenter cardPresenter = new CardPresenter();
         /* Zype, Evgeny Cherkasov */
         PosterCardPresenter posterCardPresenter = new PosterCardPresenter();
 
-        for (ContentContainer contentContainer : rootContentContainer.getContentContainers()) {
+        for (ContentContainer contentContainer : contentContainers) {
 
             /* Zype, Evgeny Cherkasob */
             // Don't show My Library and Favorites content container
             if (contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_MY_LIBRARY_PLAYLIST_ID)
-                    || contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID)
-                    || contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID)) {
+                || contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_FAVORITES_PLAYLIST_ID)
+                || contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG).equals(ZypeSettings.ROOT_SLIDERS_PLAYLIST_ID)) {
                 continue;
             }
 
@@ -165,7 +178,7 @@ public class BrowseHelper {
 
             for (Content content : contentContainer.getContents()) {
                 if (contentContainer.getExtraValueAsInt(ExtraKeys.NEXT_PAGE) > 0 &&
-                        contentContainer.getContents().indexOf(content) == contentContainer.getContentCount() - 1){
+                    contentContainer.getContents().indexOf(content) == contentContainer.getContentCount() - 1){
                     content.setExtraValue(ContentBrowser.NEXT_PAGE, true);
                     content.setExtraValue(Content.EXTRA_PLAYLIST_ID, contentContainer.getExtraStringValue(Recipe.KEY_DATA_TYPE_TAG));
                 }
@@ -199,13 +212,13 @@ public class BrowseHelper {
         if (ContentBrowser.getInstance(activity).getContentLoader().isContentLoaded()) {
 
             List<Content> recentContent = ContentBrowser.getInstance(activity)
-                    .getRecentContent();
+                .getRecentContent();
 
             int maxItems = ContentBrowser.getInstance(activity).getMaxNumberOfRecentItems();
 
             return updateListRow(activity.getApplicationContext(), rowsAdapter, recentListRow,
-                    recentContent, rowsAdapter.size() - 1, R.string.recent_row,
-                    maxItems);
+                recentContent, rowsAdapter.size() - 1, R.string.recent_row,
+                maxItems);
 
         }
         return null;
@@ -223,19 +236,19 @@ public class BrowseHelper {
      */
     public static ListRow updateWatchlistRow(Activity activity, ListRow watchlistListRow,
                                              ListRow recentListRow, ArrayObjectAdapter
-                                                     rowsAdapter) {
+                                                 rowsAdapter) {
 
         if (ContentBrowser.getInstance(activity).getContentLoader().isContentLoaded()) {
 
             List<Content> watchlistItems = ContentBrowser.getInstance(activity)
-                    .getWatchlistContent();
+                .getWatchlistContent();
 
             // This row should be inserted before the settings row and the recent row if present.
             int rowIndex = recentListRow == null ? rowsAdapter.size() - 1 : rowsAdapter.size() - 2;
             Log.d(TAG, "Inserting watchlist row at index " + rowIndex);
             return updateListRow(activity.getApplicationContext(), rowsAdapter, watchlistListRow,
-                    watchlistItems, rowIndex, R.string.watchlist_row,
-                    watchlistItems.size());
+                watchlistItems, rowIndex, R.string.watchlist_row,
+                watchlistItems.size());
         }
         return null;
     }

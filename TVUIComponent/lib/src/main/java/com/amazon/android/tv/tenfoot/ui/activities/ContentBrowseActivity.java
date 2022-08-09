@@ -29,6 +29,8 @@
 
 package com.amazon.android.tv.tenfoot.ui.activities;
 
+import static com.amazon.android.recipe.Recipe.KEY_DATA_TYPE_TAG;
+
 import com.amazon.android.configuration.ConfigurationManager;
 import com.amazon.android.contentbrowser.ContentBrowser;
 import com.amazon.android.model.Action;
@@ -74,6 +76,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -84,14 +87,16 @@ import java.util.concurrent.TimeUnit;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.subscriptions.CompositeSubscription;
+import rx.subscriptions.Subscriptions;
 import uk.co.chrisjenx.calligraphy.CalligraphyUtils;
 
 /**
  * ContentBrowseActivity class that loads the ContentBrowseFragment.
  */
 public class ContentBrowseActivity extends BaseActivity implements
-        ContentBrowseFragment.OnBrowseRowListener,
-        MenuFragment.IMenuFragmentListener
+    ContentBrowseFragment.OnBrowseRowListener,
+    MenuFragment.IMenuFragmentListener
 //        TopMenuFragment.ITopMenuListener
 {
 
@@ -105,6 +110,7 @@ public class ContentBrowseActivity extends BaseActivity implements
     private TextView mContentDescription;
     private ImageView mContentImage;
     private Subscription mContentImageLoadSubscription;
+    private ProgressBar progressBar;
 
     // View that contains the background
     private View mMainFrame;
@@ -121,6 +127,9 @@ public class ContentBrowseActivity extends BaseActivity implements
     private Row lastSelectedRow = null;
     private boolean lastSelectedRowChanged = false;
     private int lastSelectedItemIndex = -1;
+    private boolean allContentLoaded = false;
+    private String lastPlaylistId = "";
+    private final CompositeSubscription compositeSubscription = new CompositeSubscription();
 
     private final Handler handler = new Handler();
 
@@ -134,13 +143,14 @@ public class ContentBrowseActivity extends BaseActivity implements
         Helpers.handleActivityEnterFadeTransition(this, ACTIVITY_ENTER_TRANSITION_FADE_DURATION);
 
         mContentTitle = (TextView) findViewById(R.id.content_detail_title);
+        progressBar = (ProgressBar) findViewById(R.id.progressBarLoadMore);
 
         CalligraphyUtils.applyFontToTextView(this, mContentTitle, ConfigurationManager
-                .getInstance(this).getTypefacePath(ConfigurationConstants.BOLD_FONT));
+            .getInstance(this).getTypefacePath(ConfigurationConstants.BOLD_FONT));
 
         mContentDescription = (TextView) findViewById(R.id.content_detail_description);
         CalligraphyUtils.applyFontToTextView(this, mContentDescription, ConfigurationManager
-                .getInstance(this).getTypefacePath(ConfigurationConstants.LIGHT_FONT));
+            .getInstance(this).getTypefacePath(ConfigurationConstants.LIGHT_FONT));
 
         mContentImage = (ImageView) findViewById(R.id.content_image);
         mContentImage.setImageURI(Uri.EMPTY);
@@ -199,7 +209,7 @@ public class ContentBrowseActivity extends BaseActivity implements
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-               findViewById(R.id.hero_slider_ly).setAlpha(1);
+                findViewById(R.id.hero_slider_ly).setAlpha(1);
             }
         },700);
 
@@ -312,7 +322,7 @@ public class ContentBrowseActivity extends BaseActivity implements
             handler.postDelayed(() -> {
                 if (sliderHasFocus()) {
                     if (!sliderShown
-                            || (event.getKeyCode() == KeyEvent.KEYCODE_BACK && sliderShown && isMenuOpened)) {
+                        || (event.getKeyCode() == KeyEvent.KEYCODE_BACK && sliderShown && isMenuOpened)) {
                         sliderShown = false;
                         showHeroSlider();
                     }
@@ -350,16 +360,6 @@ public class ContentBrowseActivity extends BaseActivity implements
 //                }
 //            }, 50);
         }
-        else if(!processed) {
-            if(event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
-                if (ZypeSettings.SHOW_TOP_MENU && isTopRowSelected()) {
-                    if (!isMenuOpened) {
-                        showTopMenu();
-                        return true;
-                    }
-                }
-            }
-        }
 
         return processed;
     }
@@ -371,9 +371,7 @@ public class ContentBrowseActivity extends BaseActivity implements
      */
     @Override
     public void onItemSelected(Object item, Row row, boolean isLastContentRow) {
-        if (item != null) {
-            lastRowSelected = isLastContentRow;
-        }
+        lastRowSelected = isLastContentRow;
         if (row != lastSelectedRow && item != null) {
             lastSelectedRow = row;
             lastSelectedRowChanged = true;
@@ -385,38 +383,41 @@ public class ContentBrowseActivity extends BaseActivity implements
         if (item instanceof Content) {
             Content content = (Content) item;
             callImageLoadSubscription(content.getTitle(),
-                                      content.getDescription(),
-                                      content.getBackgroundImageUrl());
+                content.getDescription(),
+                content.getBackgroundImageUrl());
+            lastPlaylistId = content.getExtraValueAsString(Content.EXTRA_PLAYLIST_ID);
 
         }
         /* Zype, Evgeny Cherkasov */
         // Update screen background with selected playlist (category) image
+
         else if (item instanceof ContentContainer) {
             ContentContainer contentContainer = (ContentContainer) item;
             callImageLoadSubscription(contentContainer.getName(),
-                    contentContainer.getExtraStringValue("description"),
-                    contentContainer.getExtraStringValue(Content.BACKGROUND_IMAGE_URL_FIELD_NAME));
+                contentContainer.getExtraStringValue("description"),
+                contentContainer.getExtraStringValue(Content.BACKGROUND_IMAGE_URL_FIELD_NAME));
+            lastPlaylistId = contentContainer.getExtraStringValue(KEY_DATA_TYPE_TAG);
         }
         else if (item instanceof Action) {
             Action settingsAction = (Action) item;
             // Terms of use action.
             if (ContentBrowser.TERMS.equals(settingsAction.getAction())) {
                 callImageLoadSubscription(getString(R.string.terms_title),
-                                          getString(R.string.terms_description),
-                                          null);
+                    getString(R.string.terms_description),
+                    null);
             }
             // Login and logout action.
             else if (ContentBrowser.LOGIN_LOGOUT.equals(settingsAction.getAction())) {
 
                 if (settingsAction.getState() == LogoutSettingsFragment.TYPE_LOGOUT) {
                     callImageLoadSubscription(getString(R.string.logout_label),
-                                              getString(R.string.logout_description),
-                                              null);
+                        getString(R.string.logout_description),
+                        null);
                 }
                 else {
                     callImageLoadSubscription(getString(R.string.login_label),
-                                              getString(R.string.login_description),
-                                              null);
+                        getString(R.string.login_description),
+                        null);
                 }
             }
         }
@@ -434,16 +435,16 @@ public class ContentBrowseActivity extends BaseActivity implements
     public void callImageLoadSubscription(String title, String description, String bgImageUrl) {
 
         mContentImageLoadSubscription = Observable
-                .timer(UI_UPDATE_DELAY_IN_MS, TimeUnit.MILLISECONDS)
-                .observeOn(AndroidSchedulers.mainThread()) // This is a must for timer.
-                .subscribe(c -> {
-                    mContentTitle.setText(title);
-                    mContentDescription.setText(description);
-                    GlideHelper.loadImageWithCrossFadeTransition(this,
-                                                                 mContentImage,
-                                                                 bgImageUrl,
-                                                                 CONTENT_IMAGE_CROSS_FADE_DURATION,
-                                                                 R.color.browse_background_color);
+            .timer(UI_UPDATE_DELAY_IN_MS, TimeUnit.MILLISECONDS)
+            .observeOn(AndroidSchedulers.mainThread()) // This is a must for timer.
+            .subscribe(c -> {
+                mContentTitle.setText(title);
+                mContentDescription.setText(description);
+                GlideHelper.loadImageWithCrossFadeTransition(this,
+                    mContentImage,
+                    bgImageUrl,
+                    CONTENT_IMAGE_CROSS_FADE_DURATION,
+                    R.color.browse_background_color);
 
 //                    // If there is no image, remove the preview window
 //                    if (bgImageUrl != null && !bgImageUrl.isEmpty()) {
@@ -452,7 +453,7 @@ public class ContentBrowseActivity extends BaseActivity implements
 //                    else {
 //                        mMainFrame.setBackgroundColor(Color.TRANSPARENT);
 //                    }
-                });
+            });
 
     }
 
@@ -471,7 +472,7 @@ public class ContentBrowseActivity extends BaseActivity implements
         super.onResume();
         if (ContentBrowser.getInstance(this).getAuthHelper() != null) {
             ContentBrowser.getInstance(this).getAuthHelper()
-                          .loadPoweredByLogo(this, (ImageView) findViewById(R.id.mvpd_logo));
+                .loadPoweredByLogo(this, (ImageView) findViewById(R.id.mvpd_logo));
         }
 
         reportFullyDrawn();
@@ -492,8 +493,8 @@ public class ContentBrowseActivity extends BaseActivity implements
             int paddingTop = (int) getResources().getDimension(R.dimen.lb_browse_padding_top);
             fragment.getView().setPadding(0, paddingTop, 0, 0);
             getFragmentManager().beginTransaction()
-                    .show(fragment)
-                    .commit();
+                .show(fragment)
+                .commit();
             fragment.getView().requestFocus();
         }
     }
@@ -503,8 +504,8 @@ public class ContentBrowseActivity extends BaseActivity implements
         if (fragment != null) {
             isMenuOpened = false;
             getFragmentManager().beginTransaction()
-                    .hide(fragment)
-                    .commit();
+                .hide(fragment)
+                .commit();
         }
     }
 
@@ -565,7 +566,7 @@ public class ContentBrowseActivity extends BaseActivity implements
                             hideMenu();
                             findViewById(R.id.full_content_browse_fragment).requestFocus();
                             Object item = ((ListRow) lastSelectedRow).getAdapter()
-                                    .get(lastSelectedItemIndex == -1 ? 0 : lastSelectedItemIndex);
+                                .get(lastSelectedItemIndex == -1 ? 0 : lastSelectedItemIndex);
                             onItemSelected(item, lastSelectedRow, lastRowSelected);
                             return true;
                         }
@@ -573,7 +574,7 @@ public class ContentBrowseActivity extends BaseActivity implements
                             hideTopMenu();
                             findViewById(R.id.full_content_browse_fragment).requestFocus();
                             Object item = ((ListRow) lastSelectedRow).getAdapter()
-                                    .get(lastSelectedItemIndex == -1 ? 0 : lastSelectedItemIndex);
+                                .get(lastSelectedItemIndex == -1 ? 0 : lastSelectedItemIndex);
                             onItemSelected(item, lastSelectedRow, lastRowSelected);
                             return true;
                         }
@@ -613,13 +614,42 @@ public class ContentBrowseActivity extends BaseActivity implements
                         hideTopMenu();
                         return true;
                     }
-                } else {
-                    if (!ZypeSettings.SETTINGS_PLAYLIST_ENABLED) {
-                        if (lastRowSelected && findViewById(R.id.full_content_browse_fragment).hasFocus()) {
-                            return true;
-                        }
-                    }
                 }
+
+                if(!allContentLoaded && !compositeSubscription.hasSubscriptions() && lastRowSelected) {
+                    progressBar.setVisibility(View.VISIBLE);
+                    compositeSubscription.add(ContentBrowser.getInstance(this).loadNextPlaylists(lastPlaylistId)
+                        .observeOn(AndroidSchedulers.mainThread()).subscribe(containers -> {
+                            //add all the containers to the root containers
+
+                            List<ContentContainer> contentContainers = new ArrayList<>();
+
+                            for(ContentContainer contentContainer : containers) {
+                                if(contentContainer.getContentContainerCount()> 0 || contentContainer.getContentCount() > 0) {
+                                    contentContainers.add(contentContainer);
+                                }
+                            }
+
+                            BrowseHelper.addToRootContainers(this, contentContainers);
+                            ContentBrowseFragment contentBrowseFragment =
+                                (ContentBrowseFragment) getFragmentManager().findFragmentById(R.id.full_content_browse_fragment);
+                            if(contentBrowseFragment != null) {
+                                contentBrowseFragment.addContentContainers(contentContainers);
+                            }
+                            allContentLoaded = true;
+                            lastRowSelected = contentContainers.isEmpty();
+                            progressBar.setVisibility(View.GONE);
+                            compositeSubscription.clear();
+                        }, throwable -> {
+                            progressBar.setVisibility(View.GONE);
+                            compositeSubscription.clear();
+                        }));
+                }
+
+                if (!ZypeSettings.SETTINGS_PLAYLIST_ENABLED) {
+                    if (lastRowSelected && !isMenuOpened) return true;
+                }
+                //
                 break;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
                 Log.d(TAG, "Right button pressed");
@@ -661,16 +691,11 @@ public class ContentBrowseActivity extends BaseActivity implements
         return super.dispatchKeyEvent(event);
     }
 
-    private boolean isTopRowSelected() {
-        ContentBrowseFragment fragment = (ContentBrowseFragment) getFragmentManager().findFragmentById(R.id.full_content_browse_fragment);
-        return fragment.getRowSelectedIndex() == 0;
-    }
-
     @Override
     public void onItemSelected(Action item) {
         hideMenu();
         ContentBrowser.getInstance(this)
-                .settingsActionTriggered(this, item);
+            .settingsActionTriggered(this, item);
     }
 
     @Override
@@ -687,9 +712,8 @@ public class ContentBrowseActivity extends BaseActivity implements
         builder.setCancelable(true);
 
         AlertDialog alertDialog = builder.create();
-        Button noBtn= (Button) customLayout.findViewById(R.id.noBtn);
-        noBtn.requestFocus();
         Button yesBtn= (Button) customLayout.findViewById(R.id.yesBtn);
+        yesBtn.setPressed(true);
         yesBtn.setOnClickListener(v -> {
             alertDialog.dismiss();
             finish();
