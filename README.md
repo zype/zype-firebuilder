@@ -22,15 +22,7 @@ Full Documentation for Fire App Builder is located [here](https://developer.amaz
 
 2. Open Application folder as existing project in Android Studio
 
-3. This SDK has two app variants - Zype demo app and template app. To build Zype demo app:
-
-   - Select `zypeDebug` build variant for `app`, `PurchaseInterface` and `ZypeAPI` modules
-
-     <a href="https://drive.google.com/uc?export=view&id=1wz_eFKHcljpUFYuwfIKSCSCVhcKFGDPG"><img src="https://drive.google.com/uc?export=view&id=1wz_eFKHcljpUFYuwfIKSCSCVhcKFGDPG" style="width: auto; height: auto" title="Click for the larger version." /></a>
-
-   - Set `zypeDebug` value to `defaultPublishConfig` parameters in `PurchaseInterface/build.gradle` and `Application/ZypeAPI/build.gradle` files.
-
-***Note:*** To build custom app based on the template see [this section](#template).
+3. To build custom app based on the template see: [this section](#template).
 
 4. Wait for Gradle to finish building. It may take up to 30 minutes.
 
@@ -69,7 +61,7 @@ Please only select the following devices when submitting your app to Amazon.
 - Fire TV Stick with Alexa Voice Remote
 - Amazon Fire TV Edition
 
-Non-Amazon Android devices and Amazon Fire phones and tablets are not supported and should be deselected. 
+Non-Amazon Android devices and Amazon Fire phones and tablets are not supported and should be deselected.
 
 ## Creating Custom App Based on the Template<a name="template"></a>
 
@@ -101,7 +93,7 @@ Also replace features and monetization options placeholders with `true` or `fals
 - ```<APP_NAME>```
 
 **Application/app/src/template/res/values/custom.xml**
-- ```<BRAND_COLOR>``` - used for highlighting buttons and widgets
+- ```<BRAND_COLOR>``` - hex color used for highlighting buttons and widgets
 
 4. Update following resources:
 
@@ -113,10 +105,10 @@ Image dimensions should be approximately 356 x 108 px and have a transparent bac
 
 **App icon**
 
-*Application/app/src/template/res/mipmap-mdpi/ic_launcher.png*
-*Application/app/src/template/res/mipmap-hdpi/ic_launcher.png*
-*Application/app/src/template/res/mipmap-xhdpi/ic_launcher.png*
-*Application/app/src/template/res/mipmap-xxhdpi/ic_launcher.png*
+- *Application/app/src/template/res/mipmap-mdpi/ic_launcher.png*
+- *Application/app/src/template/res/mipmap-hdpi/ic_launcher.png*
+- *Application/app/src/template/res/mipmap-xhdpi/ic_launcher.png*
+- *Application/app/src/template/res/mipmap-xxhdpi/ic_launcher.png*
 
 You can use icon generator in Android Studio to produce icons with required dimensions from 512x512 source icon image.
 
@@ -186,7 +178,7 @@ Please submit pull requests to us.
 
 ## Versioning
 
-For the versions available, see the [tags on this repository](https://github.com/zype/zype-firebuilder/tags). 
+For the versions available, see the [tags on this repository](https://github.com/zype/zype-firebuilder/tags).
 
 ## Authors
 
